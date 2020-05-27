@@ -1,0 +1,7 @@
+How-To:
+
+Ihr könnte die angehängten Dateien auf zwei Arten verwenden:
+
+1. Vergleicht euren Code mit dem Lösungscode (hauptsächlich die JavaScript Dateien)
+
+2. Führt den Lösungscode aus: öffnet nach dem Extrahieren das Command Promt/Terminal, navigiert in den Lösungsordner (mit cd command) und führt die Befehle "npm install" sowie anschließend "npm start" aus.
