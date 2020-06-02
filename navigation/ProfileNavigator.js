@@ -6,8 +6,7 @@ const ProfileStack = createStackNavigator();
 
 export default ProfileNavigator = () => {
     return (
-<<<<<<< HEAD
->>>>>>> a43f41048d95d9e92f3effc95e0f4f8c67132882
+        <ProfileStack.Navigator initialRouteName="Profil" screenOptions={{
             headerStyle: {height: 130},
             headerTitleStyle: {
                 fontSize: 32,
