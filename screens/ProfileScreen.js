@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useContext } from 'react';
 import { 
     View, 
@@ -283,3 +284,16 @@ const styles = StyleSheet.create({
         marginBottom: 30,
       }
 })
+=======
+import React from 'react';
+import {View, Text, BackHandler } from 'react-native';
+import {Button} from 'react-native-elements';
+
+export default ProfileScreen =  ({navigation})  => {
+    return(
+        <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
+            <Text>ProfileScreen!</Text>
+        </View>
+    );
+}
+>>>>>>> a43f41048d95d9e92f3effc95e0f4f8c67132882

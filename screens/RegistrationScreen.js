@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useContext, useState } from 'react';
 import { View, TextInput, Text, Modal } from 'react-native';
 import { Button } from 'react-native-elements';
@@ -70,6 +71,36 @@ export default RegistrationScreen = ({navigation}) => {
                         setAuthentication(true)
                         console.log("setAuthentication(true)")
                     }}
+=======
+import React from 'react';
+import {View, TextInput, Text} from 'react-native';
+import {Button} from 'react-native-elements';
+
+export default RegistrationScreen = ({navigation}) => {
+    return(
+        <View style={{flex:1, justifyContent: 'flex-start', alignItems: 'center'}}>
+            <Text style={{
+                    padding: 40,
+                    fontSize: 32,
+                    fontWeight: 'bold',
+                    color: 'tomato'
+            }}>Registration</Text>
+            
+            <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
+                <Text>Benutzername</Text>
+                <TextInput placeholder="deincoolerbenutzername"/>
+                <Text>E-Mail</Text>
+                <TextInput placeholder="student@example.com"/>
+                <Text>Passwort</Text>
+                <TextInput placeholder="supersicherespasswort"/>
+                <Button 
+                    title= "Confirm"
+                    onPress={() =>navigation.navigate("Main")}
+                />
+                <Button 
+                    title= "Back"
+                    onPress={() =>navigation.navigate("Login")}
+>>>>>>> a43f41048d95d9e92f3effc95e0f4f8c67132882
                 />
             </View>
         </View>
