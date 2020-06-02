@@ -1,7 +1,6 @@
 import React from 'react';
-<<<<<<< HEAD
-import {NavigationContainer} from '@react-navigation/native';
-import  {createStackNavigator} from '@react-navigation/stack';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from '../screens/LoginScreen';
 import RegistrationScreen from '../screens/RegistrationScreen';
 
@@ -23,4 +22,4 @@ export default AuthenticationNavigator = () => {
             </AuthenticationStack.Navigator>
         </NavigationContainer>
     );
->>>>>>> a43f41048d95d9e92f3effc95e0f4f8c67132882
+};
