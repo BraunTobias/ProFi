@@ -14,7 +14,7 @@ export default ProfileNavigator = () => {
                 color: 'tomato'
             }
         }}>
-            <ProfileStack.Screen name = "Profile" component = {ProfileScreen}/>
+            <ProfileStack.Screen name = "Profil" component = {ProfileScreen}/>
         </ProfileStack.Navigator>
     );
 };
