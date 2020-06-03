@@ -15,6 +15,8 @@ export default App => {
     }
   }
 
+  const bla = 0;
+
   return (
     <LogInContext.Provider value={[authentication, setAuthentication, user, setUser]}>
         {authHandler(authentication)}
