@@ -14,12 +14,9 @@
     "@react-navigation/native": "^5.4.0",
     "@react-navigation/stack": "^5.3.7",
     "expo": "~36.0.0",
-<<<<<<< HEAD
     "expo-camera": "^8.2.0",
     "expo-image-picker": "^8.1.0",
     "expo-permissions": "^8.1.0",
-=======
->>>>>>> a43f41048d95d9e92f3effc95e0f4f8c67132882
     "react": "~16.9.0",
     "react-dom": "~16.9.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-36.0.0.tar.gz",
