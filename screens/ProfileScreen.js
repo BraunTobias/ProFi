@@ -9,16 +9,14 @@ import {
     Keyboard, 
     Alert, 
     Image, 
-    StyleSheet ,
-    BackHandler } from 'react-native';
+    StyleSheet } from 'react-native';
 import { Button } from 'react-native-elements';
 import { Ionicons } from "@expo/vector-icons";
 import { Camera } from "expo-camera";
 import * as Permissions from "expo-permissions";
 import * as ImagePicker from "expo-image-picker"
-
 import { LogInContext } from '../data/LogInContext';
-import { USER } from'../data/dummy-data';
+import { FunctionsScreen } from '../screens/FunctionsScreen';
 
 export default ProfileScreen =  ({navigation})  => {
     const [authentication, setAuthentication, user, setUser] = useContext(LogInContext);
@@ -26,25 +24,37 @@ export default ProfileScreen =  ({navigation})  => {
     const [currentMail, setCurrentMail] = useState(user.mail);
     const [currentPW, setCurrentPW] = useState(user.pw);
     const [acknowledgementVisibility, setAcknowledgementVisibility] = useState(false);
+    const [currentFunctions, setCurrentFunctions] = useState(user.functions);
+    const [currentInterests, setCurrentInterests] = useState(user.interests);
+    const [functionsVisibility, setFunctionsVisibility] = useState(false);
+    const [interestsVisibility, setInterestsVisibility] = useState(false);
 
     // Benutzereingaben
     const changeNameHandler = (enteredText) => {
         setCurrentName(enteredText);
-      };
+    };
     const changeMailHandler = (enteredText) => {
         setCurrentMail(enteredText);
     };
     const changePWHandler = (enteredText) => {
         setCurrentPW(enteredText);
     };
-    
+    const changeFunctionsHandler = (updatedFunctions) => {
+        setCurrentFunctions(updatedFunctions);
+    }
+    const changeInterestsHandler = (updatedInterests) => {
+        setCurrentInterests(updatedInterests);
+    }
+
     // Benutzerprofil aktualisieren
     const updateUserHandler = () => {
         setUser(user => ({
             id: user.id,
             username: currentName,
             mail: currentMail,
-            image: selectedImage
+            image: selectedImage,
+            functions: currentFunctions,
+            interests: currentInterests
         }))
         setAcknowledgementVisibility(true);
         console.log("Updated User: " + currentName + " " + currentMail + " " + currentPW);
@@ -141,6 +151,10 @@ export default ProfileScreen =  ({navigation})  => {
                                 <Button title='OK'onPress={() => setImagePickerVisibility(false)}/>
                             </View>
                         </Modal>
+                            
+                        {/* <Modal visible={functionsVisibility} animationType='slide'>
+                            < FunctionsScreen user={user} />
+                        </Modal> */}
 
                         <TouchableWithoutFeedback>
                             <View>
