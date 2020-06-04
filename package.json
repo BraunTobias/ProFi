@@ -8,6 +8,8 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@material-ui/core": "^4.10.1",
+    "@material-ui/lab": "^4.0.0-alpha.55",
     "@react-native-community/masked-view": "^0.1.10",
     "@react-native-firebase/app": "^7.1.0",
     "@react-navigation/bottom-tabs": "^5.4.5",
