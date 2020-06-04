@@ -18,6 +18,7 @@ import * as ImagePicker from "expo-image-picker"
 import { LogInContext } from '../data/LogInContext';
 import { FunctionsScreen } from '../screens/FunctionsScreen';
 
+
 export default ProfileScreen =  ({navigation})  => {
     const [authentication, setAuthentication, user, setUser] = useContext(LogInContext);
     const [currentName, setCurrentName] = useState(user.username);
@@ -219,6 +220,13 @@ export default ProfileScreen =  ({navigation})  => {
                                 />
                             </View>
                         </TouchableWithoutFeedback>
+
+                        <Button
+                            title="Fähigkeiten"
+                            onPress={() =>
+                                navigation.navigate('Functions')
+                            }
+                        />
 
                         <Button
                             title= " Übernehmen"

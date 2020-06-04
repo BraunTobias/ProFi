@@ -15,7 +15,7 @@ import { LogInContext } from '../data/LogInContext';
 export default FunctionsScreen = (props)  => {
     const [authentication, setAuthentication, user, setUser] = useContext(LogInContext);
     //const functions = FUNCTIONS;
-    const user = props.user;
+    const userProp = props.user;
 
     return (
         <View>
@@ -27,8 +27,8 @@ export default FunctionsScreen = (props)  => {
             <View>
                 <TextInput></TextInput>
 
-                <FlatList
-                    data={user.functions.design}
+                {/* <FlatList
+                    data={userProp.functions.design}
                     renderItem={(itemData) => { 
                         return (
                             <TouchableOpacity>
@@ -36,7 +36,7 @@ export default FunctionsScreen = (props)  => {
                             </TouchableOpacity>
                         );
                     }}
-                />
+                /> */}
             </View>
         </View>
     )
