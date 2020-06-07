@@ -224,7 +224,14 @@ export default ProfileScreen =  ({navigation})  => {
                         <Button
                             title="Fähigkeiten"
                             onPress={() =>
-                                navigation.navigate('Functions')
+                                navigation.navigate('Fähigkeiten')
+                            }
+                        />
+
+                        <Button
+                            title="Interessen"
+                            onPress={() =>
+                                navigation.navigate('Interessen')
                             }
                         />
 

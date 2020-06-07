@@ -7,6 +7,7 @@ import {Ionicons} from '@expo/vector-icons';
 
 export default HomeScreen = ({navigation}) => {
 
+    //Button fürs Hinzufügen der Fähigkeiten
     useLayoutEffect(() => {
         navigation.setOptions({
             headerRight : () => (
@@ -28,6 +29,7 @@ export default HomeScreen = ({navigation}) => {
         data={courses}
         renderItem={(itemData) => { 
             return (
+                //CourseTile = Style
                 <CoursesTile
                     text={itemData.item.title + "\n "+ itemData.item.member + "\n "+ itemData.item.date}
                     onClick={clickHandler} 

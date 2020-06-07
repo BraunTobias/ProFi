@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useLayoutEffect } from 'react';
 import { 
     View, 
     TouchableOpacity, 
@@ -9,62 +9,44 @@ import {
     Alert, 
     StyleSheet } from 'react-native';
 import { Button } from 'react-native-elements';
-import { LogInContext } from '../data/LogInContext';
+import { FlatList } from 'react-native-gesture-handler';
+import {Ionicons} from '@expo/vector-icons';
 //import FUNCTIONS from '../data/dummy-data';
-import Chip from '@material-ui/core/Chip';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import { makeStyles } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
 
-//Styles für das TextField mit Tags
-const useStyles = makeStyles((theme) => ({
-    root: {
-      width: 500,
-      '& > * + *': {
-        marginTop: theme.spacing(3),
-      },
-    },
-}));
+export default FunctionsScreen = ({navigation})  => {
+    // const [authentication, setAuthentication, user, setUser] = useContext(LogInContext);
+    // const functions = FUNCTIONS;
+    // const userProp = props.user;
+    const [skills, setSkills] = useState ([
+        { name: 'Programmieren', id: '1' },
+        { name: 'Design', id: '2' },
+        { name: 'Sozial', id: '3' },
+        { name: 'Sonstiges', id: '4' },
+    ]);
 
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerRight : () => (
+                <Button 
+                    type ='clear'
+                    icon={<Ionicons name='ios-add' size={32} color="rgb(0,122,255)"/>}
+                    // onPress={() => Modal}
+                />)
+        });
+    }, [navigation]);
 
-export default FunctionsScreen = (props)  => {
-    const [authentication, setAuthentication, user, setUser] = useContext(LogInContext);
-    //const functions = FUNCTIONS;
-    const userProp = props.user;
-
-    //Tags
-    const classes = useStyles();
 
     return (
         <View>
-            {/* Fähigkeiten-Header */}
-            <View style={{ backgroundColor: 'tomato' }}>
-                <Text style={{ fontSize: 30, fontWeight: 'bold', color: 'white' }}>Fähigkeiten</Text>
-            </View>
             {/* Fähigkeiten-Body */}
-            {/* Tags */}
-            <View className={classes.root}>
-                <Text>               
-                    <Autocomplete
-                        multiple
-                        id="tags-standard"
-                        options={skills}
-                        getOptionLabel={(option) => option.title}
-                        defaultValue={[skills[1]]}
-                        renderInput={(params) => (
-                            <TextField
-                                    {...params}
-                                    variant="standard"
-                                    label="Fähigkeiten"
-                                    placeholder="füge deine Fähigkeiten hinzu"
-                            /> 
-                        )}
-                    />
-                </Text>
-                {/* TextField mit Text zu umranden bringt auch nichts beim Fehler */}
-            </View>
- 
-            {/* <View>
+            <View>
+                <FlatList 
+                    keyExtractor={(item) => (item.id)}
+                    data={skills}
+                    renderItem={({ item }) => (
+                        <Text style={styles.item}>{item.name}</Text>
+                    )}
+                />
                 {/* <FlatList
                     data={userProp.functions.design}
                     renderItem={(itemData) => { 
@@ -75,12 +57,18 @@ export default FunctionsScreen = (props)  => {
                         );
                     }}
                 /> */}
+            </View>
         </View>
     )
 }
 
-const skills = [
-    { name: 'Java'},
-    { name: 'blender'},
-    { name: 'C#'}
-];
+const styles = StyleSheet.create({
+    item: {
+        marginTop: 24,
+        padding: 30,
+        backgroundColor: 'tomato',
+        color: 'white',
+        fontSize: 24,
+        marginHorizontal: 10
+    }
+})
