@@ -17,8 +17,8 @@ export default ProfileNavigator = () => {
             }
         }}>
             <ProfileStack.Screen name = "Profil" component = {ProfileScreen}/>
-            <ProfileStack.Screen name = "Fähigkeiten" component = {FunctionsScreen}/>
-            {/* <ProfileStack.Screen name = "Fähigkeiten" component = {SkillScreen}/> */}
+            {/* <ProfileStack.Screen name = "Fähigkeiten" component = {FunctionsScreen}/> */}
+            <ProfileStack.Screen name = "Fähigkeiten" component = {SkillScreen}/>
             {/* <ProfileStack.Screen name = "Interessen" component = {InterestsScreen}/> */}
         </ProfileStack.Navigator>
     );
