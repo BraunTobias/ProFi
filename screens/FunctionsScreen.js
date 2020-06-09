@@ -7,7 +7,9 @@ import {
     TextInput, 
     Keyboard, 
     Alert, 
-    StyleSheet
+    StyleSheet,
+    CheckBox,
+    ScrollView
     } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 import { FlatList, TouchableHighlight } from 'react-native-gesture-handler';

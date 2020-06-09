@@ -4,7 +4,7 @@ class ProjectIdea {
     this.categoryId = categoryId;
     this.title = title;
     this.describtion = describtion;
-    this. searched = searched;
+    this.searched = searched;
   }
 }
 

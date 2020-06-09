@@ -1,7 +1,7 @@
 import Course from '../models/course';
 import ProjectIdea from '../models/projectidea';
 import User from '../models/user';
-import Functions from '../models/functions';
+import Skill from '../models/skills';
 import { useReducer } from 'react';
 
 export const COURSES = [
@@ -23,16 +23,61 @@ export const PROJECTIDEAS = [
 ];
 
 export const USERS = [
-  new User('0', 'a', 'a', 'a', 'https://reactnative.dev/img/tiny_logo.png', new Functions(['c#'],['logo']), ['scifi']),
-  new User('1', 'b', 'b', 'b', 'https://reactnative.dev/img/tiny_logo.png', new Functions(['c#'],['logo']), ['scifi']),
-  new User('2', 'c', 'c', 'c', 'https://reactnative.dev/img/tiny_logo.png', new Functions(['c#'],['logo']), ['scifi'])
+  new User('0', 'a', 'a', 'a', 'https://reactnative.dev/img/tiny_logo.png'),
+  new User('1', 'b', 'b', 'b', 'https://reactnative.dev/img/tiny_logo.png'),
+  new User('2', 'c', 'c', 'c', 'https://reactnative.dev/img/tiny_logo.png')
 ];
 
-export const FUNCTIONS = [
-  new Functions(['c#', 'java'], ['logo', 'blender'])
-];
+export const SKILLS_PROG = [
+  new Skill('s1', 'Programmierung', 
+    ['C#', 
+    'Java', 
+    'JavaScript', 
+    'Python',
+    'Unity',
+    'Android Programmierung',
+    'CSS',
+    'HTML'])
+]
 
-export const INTERESTS = [
-  'scifi',
-  'thriller'
+export const SKILLS_DESIGN = [
+  new Skill('s2', 'Design', '', [
+  'Storyboard', 
+  'Storybuilding', 
+  'Konzeptart', 
+  'Charakterdesign',
+  'Mapdesign',
+  'Gamedesign',
+  'Writing'
+  ])
+]
+
+export const SKILLS_SOCIAL = [
+  new Skill('s3', 'Sozial', '', '', [
+  'Teamführung', 
+  'Organisator', 
+  'Kommunikation', 
+  'Beschaffung Materialien',
+  'Antragsstellung'
+  ])
+]
+
+export const SKILLS_ETC = [
+  new Skill('s4', 'Sonstiges', '', '', '', [
+  'Audio',
+  'Video',
+  'Konzept'
+  ])
+]
+
+export const PREFERENCES = [
+  'Sci Fi',
+  'Thriller',
+  'Game',
+  'App',
+  'Webseite',
+  'Film',
+  'Drehbuch',
+  'Unterhaltung',
+  'Aufführung'
 ];
