@@ -7,7 +7,7 @@ import {Ionicons} from '@expo/vector-icons';
 import { Icon } from 'react-native-elements';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 
-export default Skill2Screen = ({navigation}) => {
+export default SkillScreen = ({navigation}) => {
     const [currentCategory, setCurrentCategory] = useState('Programmieren');
     const displayedSkill = SKILLS.filter(item => item.category === currentCategory);
     
