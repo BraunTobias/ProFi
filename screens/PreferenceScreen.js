@@ -1,20 +1,20 @@
 import React, {useLayoutEffect, useState} from 'react';
 import {FlatList, View} from "react-native";
-import {SKILLS} from'../data/dummy-data';
-import SkillsTile from '../components/SkillsTile';
+import {PREFERENCES} from'../data/dummy-data';
+import PreferencesTile from '../components/PreferencesTile';
 import {Button} from 'react-native-elements';
 import {Ionicons} from '@expo/vector-icons';
 import { Icon } from 'react-native-elements';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 
-export default Skill2Screen = ({navigation}) => {
-    const [currentCategory, setCurrentCategory] = useState('Programmieren');
-    const displayedSkill = SKILLS.filter(item => item.category === currentCategory);
+export default PreferenceScreen = ({navigation}) => {
+    const [currentCategory, setCurrentCategory] = useState('Zeitaufwand');
+    const displayedPreference = PREFERENCES.filter(item => item.category === currentCategory);
     
     //Header
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerTitle: "Fähigkeiten",
+            headerTitle: "Präferenzen",
             headerRight : () => (
                 <Button 
                     type ='clear' 
@@ -27,40 +27,54 @@ export default Skill2Screen = ({navigation}) => {
     
     return(
         <View>
-            {/* Fähigkeiten-Header */}
+            {/* Präferenzen-Header */}
             <View style={{justifyContent: 'center', flexDirection: 'row', backgroundColor: 'tomato'}}>
-                {/*Programmierung */}
+                {/*Zeitaufwand */}
                 <TouchableHighlight 
-                    onPress={()=>{setCurrentCategory('Programmieren')}}
+                    onPress={()=>{setCurrentCategory('Zeitaufwand')}}
                     underlayColor="tomato"
                     >
                     <Icon 
                         class="toggle"
                         raised
-                        name={"ios-desktop"} 
+                        name={"ios-alarm"} 
                         size={35} 
                         type="ionicon"
                         color={"tomato"} 
                     />
                 </TouchableHighlight>
 
-                {/* Design */}
+                {/* Kategorie */}
                 <TouchableHighlight 
-                    onPress={()=>{setCurrentCategory('Design')}}
+                    onPress={()=>{setCurrentCategory('Kategorie')}}
                     underlayColor="tomato"
                 >
                 <Icon 
                     raised 
-                    name={"ios-color-palette"} 
+                    name={"ios-list"} 
                     size={35} 
                     type="ionicon"
                     color={"tomato"} 
                 />
                 </TouchableHighlight>
 
-                {/* Sozial */}
+                {/* Genre */}
                 <TouchableHighlight 
-                    onPress={()=>{setCurrentCategory('Sozial')}}
+                    onPress={()=>{setCurrentCategory('Genre')}}
+                    underlayColor="tomato"
+                >
+                <Icon 
+                    raised 
+                    name={"ios-image"} 
+                    size={35} 
+                    type="ionicon"
+                    color={"tomato"} 
+                />
+                </TouchableHighlight>
+                
+                {/* Gruppengröße */}
+                <TouchableHighlight 
+                    onPress={()=>{setCurrentCategory('Gruppengröße')}}
                     underlayColor="tomato"
                 >
                 <Icon 
@@ -71,28 +85,14 @@ export default Skill2Screen = ({navigation}) => {
                     color={"tomato"} 
                 />
                 </TouchableHighlight>
-                
-                {/* Audio */}
-                <TouchableHighlight 
-                    onPress={()=>{setCurrentCategory('Audio')}}
-                    underlayColor="tomato"
-                >
-                <Icon 
-                    raised 
-                    name={"ios-volume-high"} 
-                    size={35} 
-                    type="ionicon"
-                    color={"tomato"} 
-                />
-                </TouchableHighlight>
             </View>
             <View>   
             <FlatList
-                data={displayedSkill}
+                data={displayedPreference}
                 renderItem={(itemData) => { 
                     return (
                         // FlatList
-                        <SkillsTile
+                        <PreferencesTile
                             text={itemData.item.name}  
                             id={itemData.item.id}
                         />

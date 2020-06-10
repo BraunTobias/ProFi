@@ -1,9 +1,8 @@
 import React from 'react';
 import  {createStackNavigator} from '@react-navigation/stack';
 import ProfileScreen from '../screens/ProfileScreen';
-import FunctionsScreen from '../screens/FunctionsScreen';
-import SkillScreen from '../screens/SkillScreen';
 import Skill2Screen from '../screens/Skill2Screen';
+import PreferenceScreen from '../screens/PreferenceScreen';
 
 const ProfileStack = createStackNavigator();
 
@@ -18,10 +17,8 @@ export default ProfileNavigator = () => {
             }
         }}>
             <ProfileStack.Screen name = "Profil" component = {ProfileScreen}/>
-            {/* <ProfileStack.Screen name = "Fähigkeiten" component = {FunctionsScreen}/> */}
             <ProfileStack.Screen name = "Fähigkeiten" component = {Skill2Screen}/>
-            {/* <ProfileStack.Screen name = "Fähigkeiten" component = {SkillScreen}/> */}
-            {/* <ProfileStack.Screen name = "Interessen" component = {InterestsScreen}/> */}
+            <ProfileStack.Screen name = "Präferenzen" component = {PreferenceScreen}/>
         </ProfileStack.Navigator>
     );
 };

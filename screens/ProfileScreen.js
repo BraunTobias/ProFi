@@ -16,7 +16,7 @@ import { Camera } from "expo-camera";
 import * as Permissions from "expo-permissions";
 import * as ImagePicker from "expo-image-picker"
 import { LogInContext } from '../data/LogInContext';
-import { FunctionsScreen } from '../screens/FunctionsScreen';
+import { FunctionsScreen } from './#FunctionsScreen';
 
 
 export default ProfileScreen =  ({navigation})  => {
@@ -229,9 +229,9 @@ export default ProfileScreen =  ({navigation})  => {
                         />
 
                         <Button
-                            title="Interessen"
+                            title="Präferenzen"
                             onPress={() =>
-                                navigation.navigate('Interessen')
+                                navigation.navigate('Präferenzen')
                             }
                         />
 
