@@ -1,6 +1,6 @@
-import React, {useLayoutEffect} from 'react';
+import React, {useLayoutEffect, useState} from 'react';
 import {FlatList, View} from "react-native";
-import {SKILLS_PROG, SKILLS_DESIGN, SKILLS_SOCIAL, PREFERENCES} from'../data/dummy-data';
+import {SKILLS} from'../data/dummy-data';
 import SkillsTile from '../components/SkillsTile';
 import {Button} from 'react-native-elements';
 import {Ionicons} from '@expo/vector-icons';
@@ -8,10 +8,9 @@ import { Icon } from 'react-native-elements';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 
 export default Skill2Screen = ({navigation}) => {
-    // const itemId;
-    // const selectedSkillProg = SKILLS_PROG.find(skill => skill.id === itemId);
-    // const displayedSkillsProg = SKILLS_PROG.filter(item => item.categoryId === itemId);
-
+    const [currentCategory, setCurrentCategory] = useState('Programmieren');
+    const displayedSkill = SKILLS.filter(item => item.category === currentCategory);
+    
     //Header
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -25,14 +24,14 @@ export default Skill2Screen = ({navigation}) => {
                 
         });
     }, [navigation]);
-
+    
     return(
         <View>
             {/* Fähigkeiten-Header */}
             <View style={{justifyContent: 'center', flexDirection: 'row', backgroundColor: 'tomato'}}>
                 {/*Programmierung */}
                 <TouchableHighlight 
-                    onPress={()=>{}}
+                    onPress={()=>{setCurrentCategory('Programmieren')}}
                     underlayColor="tomato"
                     >
                     <Icon 
@@ -47,7 +46,7 @@ export default Skill2Screen = ({navigation}) => {
 
                 {/* Design */}
                 <TouchableHighlight 
-                    onPress={()=>{}}
+                    onPress={()=>{setCurrentCategory('Design')}}
                     underlayColor="tomato"
                 >
                 <Icon 
@@ -61,7 +60,7 @@ export default Skill2Screen = ({navigation}) => {
 
                 {/* Sozial */}
                 <TouchableHighlight 
-                    onPress={()=>{}}
+                    onPress={()=>{setCurrentCategory('Sozial')}}
                     underlayColor="tomato"
                 >
                 <Icon 
@@ -75,7 +74,7 @@ export default Skill2Screen = ({navigation}) => {
                 
                 {/* Audio */}
                 <TouchableHighlight 
-                    onPress={()=>{}}
+                    onPress={()=>{setCurrentCategory('Audio')}}
                     underlayColor="tomato"
                 >
                 <Icon 
@@ -89,14 +88,7 @@ export default Skill2Screen = ({navigation}) => {
             </View>
             <View>   
             <FlatList
-                data={['C#', 
-                'Java', 
-                'JavaScript', 
-                'Python',
-                'Unity',
-                'Android Programmierung',
-                'CSS',
-                'HTML']}
+                data={displayedSkill}
                 renderItem={(itemData) => { 
                     return (
                         // FlatList

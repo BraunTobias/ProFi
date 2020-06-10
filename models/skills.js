@@ -1,11 +1,8 @@
 class Skill {
-    constructor(id, name, prog, design, social, etc) {
+    constructor(id, category, name) {
       this.id = id;
+      this.category = category;
       this.name = name;
-      this.prog = prog;
-      this.design = design;
-      this.social = social;
-      this.etc = etc;
     }
   }
   

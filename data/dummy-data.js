@@ -28,17 +28,10 @@ export const USERS = [
   new User('2', 'c', 'c', 'c', 'https://reactnative.dev/img/tiny_logo.png')
 ];
 
-export const SKILLS_PROG = [
-  new Skill('s1', 'Programmierung', 
-    ['C#', 
-    'Java', 
-    'JavaScript', 
-    'Python',
-    'Unity',
-    'Android Programmierung',
-    'CSS',
-    'HTML'])
-]
+export const SKILLS = [
+  new Skill('s1', 'Programmieren', 'JavaScript'),
+  new Skill('s2', 'Design', 'blender')
+];
 
 export const SKILLS_DESIGN = [
   new Skill('s2', 'Design', '', [

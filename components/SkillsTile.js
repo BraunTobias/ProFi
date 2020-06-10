@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, CheckBox } from "react-native";
 
 export default SkillsTile = props => {
   return (
@@ -16,11 +16,12 @@ export default SkillsTile = props => {
 const styles = StyleSheet.create({
   itemContainer: {
     flex: 1,
+    flexDirection: 'row',
     marginVertical: 2,
     padding: 20,
     height: 100,
     alignItems: "flex-start",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     backgroundColor: "white",
   },
   tileText:{
