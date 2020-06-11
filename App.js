@@ -1,4 +1,3 @@
-//Test
 import React, { useState } from "react";
 import AuthenticationNavigator from './navigation/AuthenticationNavigator';
 import MainNavigator from './navigation/MainNavigator';
