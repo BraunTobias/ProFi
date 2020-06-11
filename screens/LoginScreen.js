@@ -4,6 +4,7 @@ import { Button } from 'react-native-elements';
 import { BackHandler } from 'react-native';
 import { LogInContext } from '../data/LogInContext';
 import { USERS } from '../data/dummy-data'
+import DB from '../api/DB_API';
 
 export default LoginScreen = ({navigation}) => {
     const [authentication, setAuthentication, user, setUser] = useContext(LogInContext);
@@ -21,23 +22,15 @@ export default LoginScreen = ({navigation}) => {
     
     // Authentifizierung
     const checkAuth = () => {
-        const user = USERS.find(user => user.mail === currentMail && user.pw === currentPW);
-        if (user) {
-            setUser(user);
-            console.log("User: " + user.username);
-            setAuthentication(true);
-            console.log("authenticated true");
-        }
-        else {
-            setErrorVisibility(true);
-        }
+        DB.logIn(currentMail, currentPW, (error) => {setErrorVisibility(true)});
     }
 
     return(
         <View style={{flex:1, justifyContent: 'flex-start', alignItems: 'center'}}>
             <View style={{flex:1, justifyContent: 'center', alignItems: 'center'}}>
-                <Modal visible={errorVisibility} animationType='slide'>
-                    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white'}}>
+
+                <Modal visible={errorVisibility} transparent = {true}>
+                    <View style={{flex: 1, margin: 100, marginBottom: 300, marginTop: 300, padding: 10, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white'}}>
                         <Text>Falsche Mail oder PW.</Text>
                         <Button title='OK'onPress={() => setErrorVisibility(false)}/>
                     </View>

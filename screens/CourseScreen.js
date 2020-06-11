@@ -1,18 +1,25 @@
-import React, {useLayoutEffect} from 'react';
+import React, {useState, useLayoutEffect} from 'react';
 import {FlatList } from "react-native";
 import {COURSES , PROJECTIDEAS} from'../data/dummy-data';
 import CoursesTile from '../components/CoursesTile';
 import {Button} from 'react-native-elements';
 import {Ionicons} from '@expo/vector-icons';
+import DB from '../api/DB_API';
 
 export default CourseScreen = ({route, navigation}) => {
     const {itemId} = route.params;
-    const selectedCourse = COURSES.find(course => course.id === itemId);
-    const displayedProjects = PROJECTIDEAS.filter(item => item.categoryId === itemId);
+    // const selectedCourse = COURSES.find(course => course.id === itemId);
+    // const displayedProjects = PROJECTIDEAS.filter(item => item.categoryId === itemId);
+    state = {
+        Title: ""
+    };
+ 
+    const [currentIdeas, setCurrentIdeas] = useState([]);
+    const [currentTitle, setCurrentTitle] = useState([]);
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerTitle: selectedCourse.title,
+            headerTitle: this.state.Title,
             headerRight : () => (
                 <Button 
                     type ='clear' 
@@ -26,9 +33,17 @@ export default CourseScreen = ({route, navigation}) => {
         navigation.navigate("Project", {itemId: id});
       };
 
+    // DB.getIdeasList({itemId}, (ideasList) => {
+    //     setCurrentIdeas(ideasList);
+    // });
+
+    DB.getTitle((title) => {
+        this.setState({ Title: title });
+    });
+
     return(
         <FlatList
-        data={displayedProjects}
+        data={currentIdeas}
         renderItem={(itemData) => { 
             return (
                 <CoursesTile
