@@ -54,8 +54,6 @@ export default ProfileScreen =  ({navigation})  => {
             username: currentName,
             mail: currentMail,
             image: selectedImage,
-            functions: currentFunctions,
-            interests: currentInterests
         }))
         setAcknowledgementVisibility(true);
         console.log("Updated User: " + currentName + " " + currentMail + " " + currentPW);

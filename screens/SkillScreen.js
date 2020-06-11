@@ -27,9 +27,9 @@ export default SkillScreen = ({navigation}) => {
     
     return(
         <View>
-            {/* Fähigkeiten-Header */}
+            {/* Fähigkeiten-Header: Icons */}
             <View style={{justifyContent: 'center', flexDirection: 'row', backgroundColor: 'tomato'}}>
-                {/*Programmierung */}
+                {/* Programmierung */}
                 <TouchableHighlight 
                     onPress={()=>{setCurrentCategory('Programmieren')}}
                     underlayColor="tomato"
