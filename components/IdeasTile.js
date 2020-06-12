@@ -1,13 +1,14 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
 export default IdeasTile = props => {
   return (
-    <View
+    <TouchableOpacity
       style={styles.itemContainer}
+      onPress={() => props.onClick(props.id, props.title)}
     >
-      <Text> {props.text} </Text>
-    </View>
+      <Text style = {styles.tileText}> {props.text} </Text>
+    </TouchableOpacity>
   );
 };
 
@@ -21,4 +22,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "white",
   },
+  tileText:{
+    fontSize:18,
+    fontWeight: 'bold',
+    textAlign: 'right',
+    color: 'grey'
+  }
 });

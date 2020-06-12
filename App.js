@@ -4,7 +4,6 @@ import MainNavigator from './navigation/MainNavigator';
 import { LogInContext } from './data/LogInContext';
 import * as firebase from 'firebase';
 import 'firebase/firestore';
-import DB from './api/DB_API';
 import {decode, encode} from 'base-64';
 
 if (!global.btoa) { global.btoa = encode }

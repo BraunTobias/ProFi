@@ -21,7 +21,7 @@ export default MainNavigator = () => {
                         iconName = 'ios-home';
                     } else if (route.name === 'Profile') {
                         iconName = 'ios-contact';
-                    } 
+                    }
                     /*
                     else if (route.name === 'Logout') {
                         iconName = 'ios-log-out';

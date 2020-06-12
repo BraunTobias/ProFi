@@ -10,6 +10,8 @@ const DB = {
         .then((userInfo) => {
             firebase.firestore().collection("users").doc(userInfo.user.uid).set({
                 username: name,
+                email: email,
+                password: password
             })        
             .then(() => {
                 this.fillAttributesList();
@@ -17,11 +19,11 @@ const DB = {
                 onSuccess();
             })
             .catch(error => {
-                onError(error); // Funktioniert scheinbar noch nicht
+                onError(error);
             });
         })
         .catch(error => {
-            onError(error); // Funktioniert scheinbar noch nicht
+            onError(error);
         });
     },
     // Listen fürs Profil ausfüllen 
@@ -94,6 +96,55 @@ const DB = {
             onSignedOut();
         });
     },
+    getUserInfo: async function(onSuccess) {
+        var userInfo = {};
+        const currentUserID = firebase.auth().currentUser.uid;
+        const snapshotDoc = await firebase.firestore().collection("users").doc(currentUserID).get();
+        if (snapshotDoc.data()) {
+            userInfo = snapshotDoc.data();
+        }
+        onSuccess(userInfo);
+    },
+    changeUsername: function(newName) {
+        const currentUserID = firebase.auth().currentUser.uid;
+        firebase.firestore().collection("users").doc(currentUserID).set({
+            username: newName
+        }, {merge: true}); 
+    },
+    changeEmail: function(newEmail, onError) {
+        var oldEmail = "";
+        const currentUser = firebase.auth().currentUser;
+        currentUser.updateEmail(newEmail)
+        .then(() => {
+            firebase.firestore().collection("users").doc(currentUser.uid).set({
+                email: newEmail
+            }, {merge: true}); 
+        })
+        .catch(async (error) => {
+            const snapshotDoc = await firebase.firestore().collection("users").doc(currentUser.uid).get();
+            if (snapshotDoc.data()) {
+                oldEmail = snapshotDoc.data().email;
+            }
+            onError(error, oldEmail);
+        });
+    },
+    changePassword: function(newPassword, onError) {
+        var oldPassword = "";
+        const currentUser = firebase.auth().currentUser;
+        currentUser.updatePassword(newPassword)
+        .then(() => {
+            firebase.firestore().collection("users").doc(currentUser.uid).set({
+                password: newPassword
+            }, {merge: true}); 
+        })
+        .catch(async (error) => {
+            const snapshotDoc = await firebase.firestore().collection("users").doc(currentUser.uid).get();
+            if (snapshotDoc.data()) {
+                oldPassword = snapshotDoc.data().password;
+            }
+            onError(error, oldPassword);
+        });
+    },
 
     // Neuen Kurs erstellen (Objekt der Klasse course übergeben)
     addCourse: function(course) {
@@ -120,7 +171,7 @@ const DB = {
     
     // Gibt Liste mit allen Kursen des aktuellen Users für Home-Seite zurück
     getCourseList: async function(courseListRetrieved) {
-        const courseList = [];
+        const courseList = [];//{"title": "Kurs", "date": "11.01.2221", "id": "XJYOaVAUvxhAm8lK96lR", "maxMembers": 4, "members": Array}];
         const currentUserID = firebase.auth().currentUser.uid;
         
         // Liste aller Kurse nach User-ID filtern und abspeichern
@@ -131,17 +182,24 @@ const DB = {
             courseList.push(course);
             // console.log(doc.id);
         });
-
-        // ID zurückgeben!!!!
         courseListRetrieved(courseList);
     },
-    // Funktion, die grundlegende Kurseigenschaften zurückgibt
+
+    // Gibt Eigenschaften eines Kurses zurück (NICHT BENÖTIGT?)
+    // getCourseInfo: async function(courseId, onSuccess) {
+    //     const courseData = {};
+    //     const snapshotDoc = await firebase.firestore().collection("courses").doc(courseId).get();
+    //     if (snapshotDoc.data()) {
+    //         courseList = snapshotDoc.data();
+    //     }
+    //     courseListRetrieved(courseList);
+    // },
 
     // Gibt Liste mit allen Ideen für Kurs-Seite zurück
     getIdeasList: async function(courseId, ideasListRetrieved) {
         const ideasList = [];
 
-        const snapshot = await firebase.firestore().collection("courses").doc(courseId).collection("ideas").orderBy("added").get();
+        const snapshot = await firebase.firestore().collection("courses").doc(courseId).collection("ideas").get();
         snapshot.forEach((doc) => {
             const idea = doc.data();
             idea["id"] = doc.id;

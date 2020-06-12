@@ -20,8 +20,8 @@ export default HomeNavigator = () => {
             <HomeStack.Screen name = "Home" component= {HomeScreen} options={{headerTitle: 'Meine Kurse'}}/>
             <HomeStack.Screen name = "AddCourse" component = {InputScreen} options={{headerTitle: 'Kurs hinzufügen'}}/>
             <HomeStack.Screen name = "AddProject" component = {InputScreen} options={{headerTitle: 'Projekt hinzufügen'}}/>
-            <HomeStack.Screen name = "Course" component = {CourseScreen}/>
-            <HomeStack.Screen name = "Project" component= {ProjectScreen}/>
+            <HomeStack.Screen name = "Course" component = {CourseScreen} options={{headerTitle: 'Kurs', headerBackTitle: ' '}}/>
+            <HomeStack.Screen name = "Project" component= {ProjectScreen} options={{headerTitle: 'Idee', headerBackTitle: ' '}}/>
         </HomeStack.Navigator>
     );
 };

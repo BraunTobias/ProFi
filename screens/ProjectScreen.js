@@ -1,24 +1,25 @@
-import React, {useLayoutEffect} from 'react';
+import React, {useState, useLayoutEffect} from 'react';
 import {FlatList , View, Text} from 'react-native';
-import {COURSES , PROJECTIDEAS} from'../data/dummy-data';
 import CoursesTile from '../components/CoursesTile';
 import IdeasTile from '../components/IdeasTile';
 
-
 export default ProjectScreen = ({route, navigation}) => {
     const {itemId} = route.params;
-    const displayedProjects = PROJECTIDEAS.filter(item => item.id === itemId);
+    const {itemTitle} = route.params;
 
+    const [currentComments, setCurrentComments] = useState([]);
+
+    
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerTitle: displayedProjects.title
+            headerTitle: itemTitle
         });
     }, [navigation]);
 
 
     return(
         <FlatList
-        data={displayedProjects}
+        data={currentComments}
         renderItem={(itemData) => { 
             return (
                 <IdeasTile

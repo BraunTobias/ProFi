@@ -1,25 +1,33 @@
-import React, {useState, useLayoutEffect} from 'react';
-import {FlatList } from "react-native";
-import {COURSES , PROJECTIDEAS} from'../data/dummy-data';
-import CoursesTile from '../components/CoursesTile';
+import React, {useState, useEffect, useLayoutEffect} from 'react';
+import {View, Text, FlatList } from "react-native";
+import IdeasTile from '../components/CoursesTile';
 import {Button} from 'react-native-elements';
 import {Ionicons} from '@expo/vector-icons';
 import DB from '../api/DB_API';
 
 export default CourseScreen = ({route, navigation}) => {
     const {itemId} = route.params;
-    // const selectedCourse = COURSES.find(course => course.id === itemId);
-    // const displayedProjects = PROJECTIDEAS.filter(item => item.categoryId === itemId);
-    state = {
-        Title: ""
-    };
- 
+    const {itemTitle} = route.params;
+    const {itemDate} = route.params;
+    const {members} = route.params;
+    const {minMembers} = route.params;
+    const {maxMembers} = route.params;
+
     const [currentIdeas, setCurrentIdeas] = useState([]);
-    const [currentTitle, setCurrentTitle] = useState([]);
+
+
+    // Wird nur beim Laden der Seite einmalig ausgeführt
+    useEffect(() => {
+        DB.getIdeasList(itemId, (ideasList) => {
+            setCurrentIdeas(ideasList);
+            console.log(ideasList);
+        });
+    }, []);
+
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerTitle: this.state.Title,
+            headerTitle: itemTitle,
             headerRight : () => (
                 <Button 
                     type ='clear' 
@@ -29,31 +37,29 @@ export default CourseScreen = ({route, navigation}) => {
         });
     }, [navigation]);
 
-    const clickHandler = id => {
-        navigation.navigate("Project", {itemId: id});
-      };
 
-    // DB.getIdeasList({itemId}, (ideasList) => {
-    //     setCurrentIdeas(ideasList);
-    // });
+    const clickHandler = (id, title) => {
+        navigation.navigate("Project", {itemId: id, itemTitle: title});
+    };
 
-    DB.getTitle((title) => {
-        this.setState({ Title: title });
-    });
-
+    
     return(
-        <FlatList
-        data={currentIdeas}
-        renderItem={(itemData) => { 
-            return (
-                <CoursesTile
-                    text={itemData.item.title} 
-                    onClick={clickHandler} 
-                    id={itemData.item.id}
-                />
-            );
-        }}
-      />
+        <View>
+            <Text>Datum: {itemDate + "\n"}Mitglieder: {members + "\n"}Gruppengröße: {minMembers}–{maxMembers} Personen</Text>
+            <FlatList
+            data={currentIdeas}
+            renderItem={(itemData) => { 
+                return (
+                    <IdeasTile
+                        text={itemData.item.title} 
+                        onClick={clickHandler} 
+                        id={itemData.item.id}
+                        title={itemData.item.title}
+                    />
+                );
+            }}
+            />
+        </View>
   );
 
 }

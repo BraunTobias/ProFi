@@ -5,7 +5,7 @@ export default CoursesTile = props => {
   return (
     <TouchableOpacity
       style={styles.itemContainer}
-      onPress={() => props.onClick(props.id)}
+      onPress={() => props.onClick(props.id, props.title, props.date, props.members, props.minMembers, props.maxMembers)}
     >
       <Text style = {styles.tileText}> {props.text} </Text>
     </TouchableOpacity>
