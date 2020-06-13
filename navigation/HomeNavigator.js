@@ -10,11 +10,14 @@ const HomeStack = createStackNavigator();
 export default HomeNavigator = () => {
     return (
         <HomeStack.Navigator initialRouteName="Home" screenOptions={{
-            headerStyle: {height: 130},
+            headerStyle: {
+                backgroundColor: "#222f56",
+                height: 100,
+            },
             headerTitleStyle: {
                 fontSize: 32,
                 fontWeight: 'bold',
-                color: 'tomato'
+                color: 'white',
             }
         }}>
             <HomeStack.Screen name = "Home" component= {HomeScreen} options={{headerTitle: 'Meine Kurse'}}/>
@@ -22,6 +25,7 @@ export default HomeNavigator = () => {
             <HomeStack.Screen name = "AddProject" component = {InputScreen} options={{headerTitle: 'Projekt hinzufügen'}}/>
             <HomeStack.Screen name = "Course" component = {CourseScreen} options={{headerTitle: 'Kurs', headerBackTitle: ' '}}/>
             <HomeStack.Screen name = "Project" component= {ProjectScreen} options={{headerTitle: 'Idee', headerBackTitle: ' '}}/>
+
         </HomeStack.Navigator>
     );
 };

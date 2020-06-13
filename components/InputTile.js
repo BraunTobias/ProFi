@@ -10,18 +10,18 @@ export default InputTile = props => {
     setCurrentInput(enteredText);
   }
 
-
   return (
-    <View style={styles.itemContainer} >
+    // <View style={styles.itemContainer} >
     <TextInput 
       placeholder={props.placeholderText} 
+      keyboardType={props.keyboardType}
       onChangeText={onChangeTextHandler} 
       value={currentInput}/>
-    <Button 
+    /* <Button 
       title= "Confirm"
       onPress={() => {props.onAdd(currentInput)}}            
-    />
-    </View>
+    /> */
+    // </View>
   );
 };
 

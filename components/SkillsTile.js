@@ -25,7 +25,10 @@ export default SkillsTile = props => {
     // FlatList
     <TouchableOpacity
         style={styles.itemContainer}
-        onPress={()=>{changeIconHandler(currentIconState)}}
+        onPress={()=>{
+          props.onClick(props.text);
+          changeIconHandler(currentIconState)
+        }}
         >
         <Ionicons
             raised

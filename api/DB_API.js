@@ -1,8 +1,16 @@
 import * as firebase from 'firebase';
 import 'firebase/firestore';
+import "firebase/storage";
 import {skillsList, prefsList} from './AttributesList';
 
 const DB = {
+    // Kopiert von https://stackoverflow.com/questions/48006903/react-unique-id-generation
+    guidGenerator: function() {
+        var S4 = function() {
+           return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+        };
+        return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+    },
 
     // Neu anmelden
     signUp: function(name, email, password, onSuccess, onError) {
@@ -105,6 +113,17 @@ const DB = {
         }
         onSuccess(userInfo);
     },
+    getUserInfoById: async function(userId, onSuccess) {
+        var userName = "";
+        var userImage = "";
+        const snapshotDoc = await firebase.firestore().collection("users").doc(userId).get();
+        if (snapshotDoc.data()) {
+            const userInfo = snapshotDoc.data();
+                userName = userInfo.username;
+                userImage = userInfo.image;
+        }
+        onSuccess(userName, userImage);
+    },
     changeUsername: function(newName) {
         const currentUserID = firebase.auth().currentUser.uid;
         firebase.firestore().collection("users").doc(currentUserID).set({
@@ -145,27 +164,93 @@ const DB = {
             onError(error, oldPassword);
         });
     },
+    changeProfileImage: async function(newImageUri) {
+        var oldImageName = "";
+        const currentUserId = firebase.auth().currentUser.uid;
+        const userDoc = await firebase.firestore().collection("users").doc(currentUserId).get();
+        if (userDoc.data()) {
+            oldImageName = userDoc.data().imageName;
+        }
+        const response = await fetch(newImageUri);
+        const blob = await response.blob();
+        const imageName = this.guidGenerator();
+        const uploadTask = firebase.storage().ref().child("images/" + imageName).put(blob);
+        uploadTask.on("state_changed", (snapshot) => {
+            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log("snapshot: " + snapshot.state + " " + progress + "% done");
+        }, (error) => {
+            // Fehler beim Hochladen
+        }, () => {
+            uploadTask.snapshot.ref.getDownloadURL()
+            .then((downloadURL) => {
+                console.log('File available at', downloadURL);
+                firebase.firestore().collection("users").doc(currentUserId).set({
+                    image: downloadURL,
+                    imageName: imageName
+                }, {merge: true}); 
+            })
+            .then(() => {
+                firebase.storage().ref().child("images/" + oldImageName).delete()
+                .then(() => {
+                    console.log("Deleted old image");
+                })
+                .catch((error) => {
+                    console.log(error);
+                })
+            })
+        });
+
+        // ALTES PROFILBILD VON STORAGE LÖSCHEN!!
+    },
 
     // Neuen Kurs erstellen (Objekt der Klasse course übergeben)
-    addCourse: function(course) {
+    addCourse: function(title, date, minMembers, maxMembers, onSuccess) {
         const currentUserID = firebase.auth().currentUser.uid;
 
         firebase.firestore().collection("courses").add({
-            title: course.title,
-            date: course.date,
-            minMembers: course.minMembers,
-            maxMembers: course.maxMembers,
-            members: [currentUserID],
+            title: title,
+            date: date,
+            minMembers: minMembers,
+            maxMembers: maxMembers,
             prospects: [currentUserID],
+        })
+        .then(() => {
+            onSuccess();
         });
     },
 
     // Neue Idee erstellen (Objekt der Klasse idea übergeben)
-    addIdea: function(courseId, idea) {
+    addIdea: function(courseId, title, description, skills, interests, onSuccess) {
         firebase.firestore().collection("courses").doc(courseId).collection("ideas").add({
-            title: idea.title,
-            interests: idea.interests,
-            skills: idea.skills,
+            title: title,
+            description: description,
+            interests: interests,
+            skills: skills,
+        })
+        .then(() => {
+            onSuccess();
+        });
+    },
+    // Neuen Kommentar erstellen
+    addComment: async function(courseId, ideaId, commentText, onSuccess) {
+        var currentUserName = "Anonym";
+        var currentUserImage  = "";
+        const currentUserID = firebase.auth().currentUser.uid;
+        const currentUserDoc = await firebase.firestore().collection("users").doc(currentUserID).get();
+        if (currentUserDoc.data()) {
+            currentUserName = currentUserDoc.data().username;
+            currentUserImage = currentUserDoc.data().image;
+        }
+
+        firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaId).collection("comments").add({
+            name: currentUserName,
+            image: currentUserImage,
+            user: currentUserID,
+            text: commentText,
+            time: firebase.firestore.Timestamp.fromDate(new Date()),
+        })
+        .then(() => {
+            onSuccess();
         });
     },
     
@@ -184,17 +269,6 @@ const DB = {
         });
         courseListRetrieved(courseList);
     },
-
-    // Gibt Eigenschaften eines Kurses zurück (NICHT BENÖTIGT?)
-    // getCourseInfo: async function(courseId, onSuccess) {
-    //     const courseData = {};
-    //     const snapshotDoc = await firebase.firestore().collection("courses").doc(courseId).get();
-    //     if (snapshotDoc.data()) {
-    //         courseList = snapshotDoc.data();
-    //     }
-    //     courseListRetrieved(courseList);
-    // },
-
     // Gibt Liste mit allen Ideen für Kurs-Seite zurück
     getIdeasList: async function(courseId, ideasListRetrieved) {
         const ideasList = [];
@@ -208,10 +282,37 @@ const DB = {
         
         ideasListRetrieved(ideasList);
     },
+    // Gibt Liste mit allen Kommentaren für Idee-Seite zurück
+    getCommentsList: async function(courseId, ideaId, commentsListRetrieved) {
+        const commentsList = [];
 
-    getTitle: async function(onSuccess) {
-        const snapshot = await firebase.firestore().collection("courses").doc("courseId").collection("ideas").orderBy("added").get();
-        onSuccess("Test");
+        const snapshot = await firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaId).collection("comments").orderBy("time", "desc").get();
+        snapshot.forEach((doc) => {
+            const comment = doc.data();
+            comment["id"] = doc.id;
+            commentsList.push(comment);
+            console.log("He")
+        });            
+        commentsListRetrieved(commentsList);
+    },
+    
+    // Gibt Eigenschaften eines Kurses zurück
+    getCourseData: async function(courseId, onSuccess) {
+        var courseData = {};
+        const snapshotDoc = await firebase.firestore().collection("courses").doc(courseId).get();
+        if (snapshotDoc.data()) {
+            courseData = snapshotDoc.data();
+        }
+        onSuccess(courseData);
+    },
+    // Gibt Eigenschaften einer Idee zurück
+    getIdeaData: async function(courseId, ideaId, onSuccess) {
+        var ideaData = {};
+        const snapshotDoc = await firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaId).get();
+        if (snapshotDoc.data()) {
+            ideaData = snapshotDoc.data();
+        }
+        onSuccess(ideaData);
     },
 
     // Der User wird zur Interessenten-Liste eines Kurses hinzugefügt bzw. entfernt

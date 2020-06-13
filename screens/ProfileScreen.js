@@ -13,6 +13,7 @@ import {
 import { Button } from 'react-native-elements';
 import { Ionicons } from "@expo/vector-icons";
 import { Camera } from "expo-camera";
+import * as ImageManipulator from "expo-image-manipulator";
 import * as Permissions from "expo-permissions";
 import * as ImagePicker from "expo-image-picker"
 import { LogInContext } from '../data/LogInContext';
@@ -40,6 +41,7 @@ export default ProfileScreen =  ({navigation})  => {
             setCurrentName(data.username);
             setCurrentMail(data.email);
             setCurrentPW(data.password);
+            setSelectedImage({localUri: data.image});
         });
     }, []);
 
@@ -62,22 +64,21 @@ export default ProfileScreen =  ({navigation})  => {
     // }
     const commitChangesHandler = () => {
         DB.changeUsername(currentName);
-        DB.changeEmail(currentMail, (error, oldMail) => {
-            console.log(error + ", alte Adresse wird beibehalten: " + oldMail)
-            setCurrentMail(oldMail);
-        });
-        DB.changePassword(currentPW, (error, oldPW) => {
-            console.log(error + ", altes Passwort wird beibehalten: " + oldPW)
-            setCurrentPW(oldPW);
-        });
+        // DB.changeEmail(currentMail, (error, oldMail) => {
+        //     console.log(error + ", alte Adresse wird beibehalten: " + oldMail)
+        //     setCurrentMail(oldMail);
+        // });
+        // DB.changePassword(currentPW, (error, oldPW) => {
+        //     console.log(error + ", altes Passwort wird beibehalten: " + oldPW)
+        //     setCurrentPW(oldPW);
+        // });
         // DB.logIn(currentMail, currentPW, () => {});
     }
-
     // Profilbild
-    const [imagePickerVisibility, setImagePickerVisibility] = useState(false);
-    const [isCameraOn, setIsCameraOn] = useState(false);
-    const [type, setType] = useState(Camera.Constants.Type.back);
-    // const [selectedImage, setSelectedImage] = useState({ localUri: user.image });
+    // const [imagePickerVisibility, setImagePickerVisibility] = useState(false);
+    const [selectedImage, setSelectedImage] = useState({});
+    // const [isCameraOn, setIsCameraOn] = useState(false);
+    // const [type, setType] = useState(Camera.Constants.Type.back);
     const verifyPermissions = async (permission) => {
         const result = await Permissions.askAsync(permission);
         if (result.status !== "granted") {
@@ -97,23 +98,29 @@ export default ProfileScreen =  ({navigation})  => {
     
         let pickerResult = await ImagePicker.launchImageLibraryAsync();
         if (pickerResult.cancelled === true) return;
-        // setSelectedImage({ localUri: pickerResult.uri });
+        setSelectedImage({ localUri: pickerResult.uri });
+        const smallImage = await ImageManipulator.manipulateAsync(
+            pickerResult.uri,
+            [{ resize: { height: 400 } }],
+            { compress: 0.2 }
+        );
+        DB.changeProfileImage(smallImage.uri);
     };
-    const toggleCameraHandler = async () => {
-        const hasPermission = await verifyPermissions(Permissions.CAMERA);
-        if (!hasPermission) return;
+    // const toggleCameraHandler = async () => {
+    //     const hasPermission = await verifyPermissions(Permissions.CAMERA);
+    //     if (!hasPermission) return;
     
-        setIsCameraOn(!isCameraOn);
-    };
-    const flipCameraHandler = () => {
-        if (isCameraOn) {
-            setType(
-                type === Camera.Constants.Type.back
-                    ? Camera.Constants.Type.front
-                    : Camera.Constants.Type.back
-            );
-        }
-    };
+    //     setIsCameraOn(!isCameraOn);
+    // };
+    // const flipCameraHandler = () => {
+    //     if (isCameraOn) {
+    //         setType(
+    //             type === Camera.Constants.Type.back
+    //                 ? Camera.Constants.Type.front
+    //                 : Camera.Constants.Type.back
+    //         );
+    //     }
+    // };
 
     const authHandler = (auth) => {
         if (auth) {
@@ -124,157 +131,148 @@ export default ProfileScreen =  ({navigation})  => {
     }
 
     return ( 
-        <View style={{flex:1, justifyContent: 'flex-start', alignItems: 'center'}}>
-            <View style={{flex:1, justifyContent: 'center', alignItems: 'center'}}>
-                <Modal visible={false} animationType='slide'>
-                    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white'}}>
-                        <Text>Gespeichert.</Text>
-                        <Button title='OK'onPress={() => setAcknowledgementVisibility(false)}/>
-                    </View>
-                </Modal>
-                
-                {/* <Modal visible={imagePickerVisibility} animationType='slide'>
-                    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white'}}>
-                        <Text>Foto aufnehmen</Text>
-                        
-                        <View style={styles.imageContainer}>
-                            <View style={styles.verticalContainer}>
-                                <Text>mit Kamera aufnehmen</Text>
-                                <TouchableWithoutFeedback 
-                                    style={[styles.imageTile, styles.cameraPreview]}
-                                    onPress={toggleCameraHandler} >
-                                    {!isCameraOn ? (
-                                        <Button
-                                        type="clear"
-                                        onPress={toggleCameraHandler}
-                                        icon={
-                                            <Ionicons
-                                                name="ios-camera"
-                                                size={50}
-                                                color="rgb(0, 0, 0)"
-                                            />
-                                        }
-                                    />
-                                    ) : (
-                                    <TouchableOpacity onPress={flipCameraHandler}>
-                                        <View style={{ borderRadius: 10, overflow: "hidden" }}>
-                                        <Camera style={styles.cameraPreview} type={type} />
-                                        </View>
-                                    </TouchableOpacity>
-                                    )}
-                                </TouchableWithoutFeedback>
-                            </View>
+        <View>
+            {/* // "Header" mit Profildaten */}
+            <View style={{padding: 20, flexDirection: "row", justifyContent: 'flexStart', alignItems: 'center', backgroundColor: "#aeb8c3"}}>
+                    <Modal visible={false} animationType='slide'>
+                        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white'}}>
+                            <Text>Gespeichert.</Text>
+                            <Button title='OK'onPress={() => setAcknowledgementVisibility(false)}/>
                         </View>
-
-                        <Button title='OK'onPress={() => setImagePickerVisibility(false)}/>
-                    </View>
-                </Modal> */}
+                    </Modal>
                     
-                {/* <Modal visible={functionsVisibility} animationType='slide'>
-                    < FunctionsScreen user={user} />
-                </Modal> */}
+                    {/* <Modal visible={imagePickerVisibility} animationType='slide'>
+                        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white'}}>
+                            <Text>Foto aufnehmen</Text>
+                            
+                            <View style={styles.imageContainer}>
+                                <View style={styles.verticalContainer}>
+                                    <Text>mit Kamera aufnehmen</Text>
+                                    <TouchableWithoutFeedback 
+                                        style={[styles.imageTile, styles.cameraPreview]}
+                                        onPress={toggleCameraHandler} >
+                                        {!isCameraOn ? (
+                                                    <Button
+                                            type="clear"
+                                            onPress={toggleCameraHandler}
+                                            icon={
+                                                <Ionicons
+                                                    name="ios-camera"
+                                                    size={50}
+                                                    color="rgb(0, 0, 0)"
+                                                />
+                                            }
+                                        />
+                                        ) : (
+                                        <TouchableOpacity onPress={flipCameraHandler}>
+                                            <View style={{ borderRadius: 10, overflow: "hidden" }}>
+                                            <Camera style={styles.cameraPreview} type={type} />
+                                            </View>
+                                        </TouchableOpacity>
+                                        )}
+                                    </TouchableWithoutFeedback>
+                                </View>
+                            </View>
 
-                {/* <TouchableWithoutFeedback>
-                    <View>
-                        <Text>Profilbild:</Text>
-                        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-evenly" }}>
-                            <Image
-                                // source={{ uri: selectedImage.localUri}}
-                                style={[styles.imageTile, styles.cameraPreview]} />
-                            <Button
-                                type="clear"
-                                onPress={selectImageHandler}
-                                icon={
-                                    <Ionicons
-                                        name="ios-folder-open"
-                                        size={50}
-                                        color="rgb(0, 0, 0)"
-                                    />
-                                }
+                            <Button title='OK'onPress={() => setImagePickerVisibility(false)}/>
+                        </View>
+                    </Modal> */}
+                        
+                    {/* <Modal visible={functionsVisibility} animationType='slide'>
+                        < FunctionsScreen user={user} />
+                    </Modal> */}
+                <View style={{flex:1, flexDirection: "column", justifyContent: 'center', alignItems: 'center'}}>
+                    <TouchableOpacity onPress={selectImageHandler}>
+                        <Image 
+                            style={[styles.imageTile, styles.cameraPreview]} 
+                            source={{ uri: selectedImage.localUri}} 
+                        />
+                    </TouchableOpacity>
+                    <Button 
+                            title= " Logout"
+                            onPress={() => {
+                                DB.signOut(() => {console.log("Signed Out")});
+                                    }}
+                            icon={
+                                <Ionicons
+                                    name="md-log-out"
+                                    size={30}
+                                    color="white"
+                                />
+                            }
+                    />
+                    {/* <Button
+                        type="clear"
+                        onPress={() => setImagePickerVisibility(true)}
+                        icon={
+                            <Ionicons
+                                name="ios-camera"
+                                size={50}
+                                color="rgb(0, 0, 0)"
                             />
-                            <Button
-                                type="clear"
-                                onPress={() => setImagePickerVisibility(true)}
-                                icon={
-                                    <Ionicons
-                                        name="ios-camera"
-                                        size={50}
-                                        color="rgb(0, 0, 0)"
-                                    />
-                                }
+                        }
+                    />
+                        */}
+                </View>
+                {/* // Rechte Spalte */}
+                <View style={{flex:2, flexDirection: "column", justifyContent: 'center', alignItems: 'center'}}>
+                    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+                        <View style={{width: "90%"}} >
+                            <Text>Benutzername:</Text>
+                            <TextInput 
+                                style={styles.textInputField}
+                                onChangeText={changeNameHandler}
+                                value={currentName}
                             />
                         </View>
-                    </View>
-                </TouchableWithoutFeedback> */}
-                
-                <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-                    <View>
-                        <Text>Benutzername:</Text>
-                        <TextInput
-                            onChangeText={changeNameHandler}
-                            value={currentName}
-                        />
-                    </View>
-                </TouchableWithoutFeedback>
-                
-                <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-                    <View>
-                        <Text>E-Mail:</Text>
-                        <TextInput
-                            onChangeText={changeMailHandler}
-                            value={currentMail}
-                        />
-                    </View>
-                </TouchableWithoutFeedback>
-                
-                <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-                    <View>
-                        <Text>Passwort:</Text>
-                        <TextInput
-                            onChangeText={changePWHandler}
-                            value={currentPW}
-                            secureTextEntry={true} 
-                        />
-                    </View>
-                </TouchableWithoutFeedback>
-                <Button                     
-                    title= " Übernehmen"
-                    onPress={commitChangesHandler}
-                    icon={
-                        <Ionicons
-                            name="md-checkmark"
-                            size={30}
-                            color="rgb(255, 255, 255)"
-                        />
-                    }
+                    </TouchableWithoutFeedback>
+                    
+                    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+                        <View style={{width: "90%"}}>
+                            <Text>E-Mail:</Text>
+                            <TextInput
+                                style={styles.textInputField}
+                                onChangeText={changeMailHandler}
+                                value={currentMail}
+                            />
+                        </View>
+                    </TouchableWithoutFeedback>
+                    
+                    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+                        <View style={{width: "90%"}}>
+                            <Text>Passwort:</Text>
+                            <TextInput
+                                style={styles.textInputField}
+                                onChangeText={changePWHandler}
+                                value={currentPW}
+                                secureTextEntry={true} 
+                            />
+                        </View>
+                    </TouchableWithoutFeedback>
+                    <Button                     
+                        title= " Übernehmen"
+                        onPress={commitChangesHandler}
+                        icon={
+                            <Ionicons
+                                name="md-checkmark"
+                                size={30}
+                                color="white"
+                            />
+                        }
+                    />
+                </View>
+            </View>
+            <View>
+                <ListTile
+                        title={"Meine Fähigkeiten"}
+                        subtitle={"Skills"}
+                        onClick={() => navigation.navigate('Fähigkeiten')} 
                 />
-                {/* <Button
-                    title="Fähigkeiten"
-                    onPress={() =>
-                        navigation.navigate('Fähigkeiten')
-                    }
+                <ListTile
+                        title={"Meine Fähigkeiten"}
+                        subtitle={"Prefs"}
+                        onClick={() => navigation.navigate('Fähigkeiten')} 
                 />
-
-                <Button
-                    title="Präferenzen"
-                    onPress={() =>
-                        navigation.navigate('Präferenzen')
-                    }
-                />
-                */
-                <Button 
-                    title= " Logout"
-                    onPress={() => {
-                        DB.signOut(() => {console.log("Signed Out")});
-                            }}
-                    icon={
-                        <Ionicons
-                            name="md-log-out"
-                            size={30}
-                            color="rgb(255, 255, 255)"
-                        />
-                    }
-                />}
             </View>
         </View>
      );
@@ -301,7 +299,7 @@ const styles = StyleSheet.create({
     cameraPreview: {
         width: 100,
         height: 100,
-        borderRadius: 10,
+        borderRadius: 100,
     },
     imageTile: {
         shadowColor: "black",
@@ -314,5 +312,11 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         marginBottom: 30,
-      }
+      },
+    textInputField: {
+        left: 0,
+        width: "100%",
+        backgroundColor: "white",
+        marginBottom: 10
+    }
 })
