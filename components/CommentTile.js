@@ -7,9 +7,12 @@ export default CommentTile = props => {
 
   const userId = props.userId;
   const date = props.timestamp.toDate().toLocaleDateString('de-DE');
-  console.log(date)
   const [currentUserName, setCurrentUserName] = useState("");
   const [currentUserImageUrl, setCurrentUserImageUrl] = useState("https://firebasestorage.googleapis.com/v0/b/teamfinder-be2e3.appspot.com/o/images%2Fempty.png?alt=media&token=454a1213-54e0-4402-a5e9-9cfa98901980");
+
+  const colorStyle = {
+    backgroundColor: props.backgroundColor
+  }
 
   useEffect(() => {
     DB.getUserInfoById(userId, (name, imageUrl) => {
@@ -20,7 +23,7 @@ export default CommentTile = props => {
   }, []);
 
   return (
-    <View style={styles.itemContainer}>
+    <View style={[styles.itemContainer, colorStyle]}>
       <TouchableOpacity onPress={() => props.onClick(userId)} >
         <Image style={styles.profileImage}
           source={{ uri: currentUserImageUrl}} 
@@ -40,7 +43,6 @@ export default CommentTile = props => {
 const styles = StyleSheet.create({
   itemContainer: {
     flexDirection: "row",
-    marginVertical: 2,
     paddingLeft: 15,
     padding: 10,
     backgroundColor: "white",

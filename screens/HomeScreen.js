@@ -2,9 +2,12 @@ import React, {useState, useLayoutEffect, useEffect}from "react";
 import {FlatList, Modal, View, TextInput, Text, TouchableWithoutFeedback, Keyboard} from "react-native";
 import ListTile from "../components/ListTile";
 import {Button} from 'react-native-elements';
+import { SwipeListView } from 'react-native-swipe-list-view';
 import {Ionicons} from '@expo/vector-icons';
 import DB from '../api/DB_API';
 import InputTile from "../components/InputTile";
+import NogoButton from "../components/NogoButton";
+
 
 export default HomeScreen = ({navigation}) => {
 
@@ -133,7 +136,7 @@ export default HomeScreen = ({navigation}) => {
             </View>
             </Modal>
 
-            <FlatList
+            {/* <FlatList
                 data = {currentCourses}
                 renderItem={(itemData) => { 
                     return (
@@ -145,7 +148,31 @@ export default HomeScreen = ({navigation}) => {
                         />
                     )
                 }}
+            /> */}
+            <SwipeListView
+                data={currentCourses}
+                renderItem={(itemData) => { 
+                    return (
+                        <ListTile
+                            onClick={clickHandler} 
+                            id={itemData.item.id}
+                            title={itemData.item.title}
+                            subtitle={"Gruppengröße: " + itemData.item.minMembers + " – " + itemData.item.maxMembers + " Personen\n "+ itemData.item.date}
+                        />
+                    )
+                }}
+                renderHiddenItem={ (itemData) => {
+                    return (
+                        <View style={{height: "100%", width: 150, flexDirection: "row", alignItems: "center", justifyContent: "center",}}>
+                            <FavButton/>
+                            <NogoButton/>
+                        </View>
+                    )
+                }}
+                leftOpenValue={150}
+                rightOpenValue={-75}
             />
+
         </View>
   );
 };

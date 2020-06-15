@@ -16,6 +16,8 @@ const DB = {
     signUp: function(name, email, password, onSuccess, onError) {
         firebase.auth().createUserWithEmailAndPassword(email, password)
         .then((userInfo) => {
+            console.log("User angelegt");
+
             firebase.firestore().collection("users").doc(userInfo.user.uid).set({
                 username: name,
                 email: email,
@@ -221,14 +223,18 @@ const DB = {
 
     // Neue Idee erstellen (Objekt der Klasse idea übergeben)
     addIdea: function(courseId, title, description, skills, interests, onSuccess) {
+        const currentUserID = firebase.auth().currentUser.uid;
         firebase.firestore().collection("courses").doc(courseId).collection("ideas").add({
             title: title,
             description: description,
             interests: interests,
             skills: skills,
         })
-        .then(() => {
-            onSuccess();
+        .then((docRef) => {
+            // Man favorisiert seine neu erstellte Idee automatisch
+            this.addPref("favourites", courseId, docRef.id, () => {
+                onSuccess();
+            })
         });
     },
     // Neuen Kommentar erstellen

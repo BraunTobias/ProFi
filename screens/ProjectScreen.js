@@ -130,6 +130,7 @@ export default ProjectScreen = ({route, navigation}) => {
                         subtitle={itemData.item.text}
                         timestamp={itemData.item.time}
                         onClick={commentClickHandler}
+                        backgroundColor = {itemData.index % 2 === 0 ? "#ffffff" : "#f5f7f7"}
                     />
                 );
             }}

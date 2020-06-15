@@ -2,17 +2,19 @@ import React, {useState, useEffect, useLayoutEffect} from 'react';
 import {View, Text, FlatList, Modal, TouchableWithoutFeedback, TextInput, Keyboard } from "react-native";
 import ListTile from '../components/ListTile';
 import {Button} from 'react-native-elements';
+import { SwipeListView } from 'react-native-swipe-list-view';
 import {Ionicons} from '@expo/vector-icons';
 import SkillSelect from '../components/SkillSelect';
 import DB from '../api/DB_API';
+import ProfileImageTile from '../components/ProfileImageTile';
 
 export default CourseScreen = ({route, navigation}) => {
     const {itemId} = route.params;
     const {itemTitle} = route.params;
-    // const {itemDate} = route.params;
-    // const {members} = route.params;
-    // const {minMembers} = route.params;
-    // const {maxMembers} = route.params;
+
+    // States für Profil-Ansicht
+    const [viewedUserId, setViewedUserId] = useState(false);
+    const [profileVisibility, setProfileVisibility] = useState(false);
 
     // States für Idea-Eingabe
     const [addIdeaVisibility, setAddIdeaVisibility] = useState(false);
@@ -26,7 +28,7 @@ export default CourseScreen = ({route, navigation}) => {
 
     // States für Kursinfo
     const [currentIdeas, setCurrentIdeas] = useState([]);
-    const [members, setMembers] = useState(["Keine"]);
+    const [members, setMembers] = useState([]);
     const [minMembers, setMinMembers] = useState(0);
     const [maxMembers, setMaxMembers] = useState(0);
     const [date, setDate] = useState("11.11.1111");
@@ -38,13 +40,26 @@ export default CourseScreen = ({route, navigation}) => {
             console.log(ideasList);
         });
         DB.getCourseData(itemId, (data) => {
-            console.log(data);
-            if (data.members && data.members.length > 0) {
-                setMembers(data.members);
-            }
+
             setDate(data.date);
             setMinMembers(data.minMembers);
             setMaxMembers(data.maxMembers);
+
+            if (data.members && data.members.length > 0) {
+                const memberUidList = data.members;
+                var newMembersList = [];
+                for (const member in memberUidList) {
+                    const uid = memberUidList[member];
+                    DB.getUserInfoById(uid, (name, url) => {
+                        newMembersList.push({
+                            "userId": uid,
+                            "username": name,
+                            "imageUrl": url
+                        });
+                        setMembers(newMembersList);
+                    });
+                }
+            }
         });
     }, []);
 
@@ -61,14 +76,19 @@ export default CourseScreen = ({route, navigation}) => {
     }, [navigation]);
 
 
-    const clickHandler = (id, title, subtitle, skills) => {
+    const clickIdeaHandler = (id, title, subtitle, skills) => {
         navigation.navigate("Project", {itemId: id, itemTitle: title, itemSubtitle: subtitle, skillsList: skills, courseId: itemId});
+    };
+
+    const clickProfileHandler = (userId) => {
+        setProfileVisibility(true);
+        setViewedUserId(userId);
+        console.log("User ID: " + viewedUserId);
     };
 
     const addIdeaHandler = (isAdd) => {
         if (isAdd) {
             if (currentIdeaName != "" && currentIdeaDescription != "" && selectedSkillsList.length > 1) {
-                    console.log("add");
                     DB.addIdea(itemId, currentIdeaName, currentIdeaDescription, selectedSkillsList, [], () => {
                         setAddIdeaVisibility(false);
                         setCurrentIdeaName("");
@@ -76,7 +96,6 @@ export default CourseScreen = ({route, navigation}) => {
                         setSelectedSkillsList([]);
                         DB.getIdeasList(itemId, (ideasList) => {
                             setCurrentIdeas(ideasList);
-                            console.log(ideasList);
                         });
                     });
             } else {
@@ -97,7 +116,6 @@ export default CourseScreen = ({route, navigation}) => {
     }
 
     const addSelectedSkillHandler = (skill) => {
-        console.log(skill);
         var oldList = selectedSkillsList;
         if (oldList.indexOf(skill) < 0) {
             oldList.push(skill);
@@ -155,8 +173,36 @@ export default CourseScreen = ({route, navigation}) => {
 
             </Modal>
 
-            <Text>Datum: {date + "\n"}Mitglieder: {members + "\n"}Gruppengröße: {minMembers}–{maxMembers} Personen</Text>
+            {/* // User-Profil ansehen */}
+            <Modal visible={profileVisibility} animationType='slide'>
+                    <View style={{height: "85%"}}>
+                        <View style={{backgroundColor: "#222f56", height: 110, justifyContent: "center", alignItems: "center"}}>
+                            <Text style={{fontSize: 30, top: 20, fontWeight: "bold", color: "white"}}>Profil ansehen</Text>
+                        </View>
+                        <ProfileView userId={viewedUserId}></ProfileView>
+                    </View>
+                    <Button title='OK' onPress={() => {setProfileVisibility(false)}}/>
+            </Modal>
+
+            <Text>Datum: {date + "\n"}Gruppengröße: {minMembers}–{maxMembers} Personen</Text>
             <FlatList
+                data={members}
+                horizontal={true}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={(itemData) => { 
+                    return (
+                        <ProfileImageTile
+                            onClick={() => {clickProfileHandler(itemData.item.userId)}} 
+                            imageUrl={itemData.item.imageUrl}
+                        />
+                    );
+                }}
+            >
+
+            </FlatList>
+
+            
+            {/* <FlatList
             data={currentIdeas}
             renderItem={(itemData) => { 
                 return (
@@ -169,7 +215,34 @@ export default CourseScreen = ({route, navigation}) => {
                     />
                 );
             }}
+            /> */}
+
+            <SwipeListView
+                data={currentIdeas}
+                renderItem={(itemData) => { 
+                    return (
+                        <ListTile
+                            onClick={clickIdeaHandler} 
+                            id={itemData.item.id}
+                            title={itemData.item.title}
+                            subtitle={itemData.item.description}
+                            skills={itemData.item.skills}
+                            backgroundColor = {itemData.index % 2 === 0 ? "#ffffff" : "#f5f7f7"}
+                        />
+                    );
+                }}
+                renderHiddenItem={ (itemData) => {
+                    return (
+                        <View style={{height: "100%", width: 150, flexDirection: "row", alignItems: "center", justifyContent: "center",}}>
+                            <FavButton ideaId={itemData.item.id} courseId={itemId}/>
+                            <NogoButton ideaId={itemData.item.id} courseId={itemId}/>
+                        </View>
+                    )
+                }}
+                leftOpenValue={150}
+                rightOpenValue={-75}
             />
+
         </View>
   );
 
