@@ -133,7 +133,7 @@ export default ProfileScreen =  ({navigation})  => {
     return ( 
         <View>
             {/* // "Header" mit Profildaten */}
-            <View style={{padding: 20, flexDirection: "row", justifyContent: 'flexStart', alignItems: 'center', backgroundColor: "#aeb8c3"}}>
+            <View style={{padding: 20, flexDirection: "row", justifyContent: 'flex-start', alignItems: 'center', backgroundColor: "#aeb8c3"}}>
                     <Modal visible={false} animationType='slide'>
                         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white'}}>
                             <Text>Gespeichert.</Text>
