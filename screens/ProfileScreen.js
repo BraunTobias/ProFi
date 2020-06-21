@@ -64,15 +64,15 @@ export default ProfileScreen =  ({navigation})  => {
     // }
     const commitChangesHandler = () => {
         DB.changeUsername(currentName);
-        // DB.changeEmail(currentMail, (error, oldMail) => {
-        //     console.log(error + ", alte Adresse wird beibehalten: " + oldMail)
-        //     setCurrentMail(oldMail);
-        // });
-        // DB.changePassword(currentPW, (error, oldPW) => {
-        //     console.log(error + ", altes Passwort wird beibehalten: " + oldPW)
-        //     setCurrentPW(oldPW);
-        // });
-        // DB.logIn(currentMail, currentPW, () => {});
+        DB.changeEmail(currentMail, (error, oldMail) => {
+            console.log(error + ", alte Adresse wird beibehalten: " + oldMail)
+            setCurrentMail(oldMail);
+        });
+        DB.changePassword(currentPW, (error, oldPW) => {
+            console.log(error + ", altes Passwort wird beibehalten: " + oldPW)
+            setCurrentPW(oldPW);
+        });
+        DB.logIn(currentMail, currentPW, () => {});
     }
     // Profilbild
     // const [imagePickerVisibility, setImagePickerVisibility] = useState(false);
