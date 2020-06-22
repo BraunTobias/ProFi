@@ -3,6 +3,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Ionicons} from '@expo/vector-icons';
 import DB from '../api/DB_API';
+import { darkBlue, lightBlue, lightGrey, darkGrey } from '../Styles';
 
 import HomeNavigator from './HomeNavigator';
 import ProfileNavigator from './ProfileNavigator';
@@ -22,18 +23,15 @@ export default MainNavigator = () => {
                     } else if (route.name === 'Profile') {
                         iconName = 'ios-contact';
                     }
-                    /*
-                    else if (route.name === 'Logout') {
-                        iconName = 'ios-log-out';
-                    } 
-                    */
-
+                    
                     return <Ionicons name={iconName} size={size} color={color} />;
                     },
                 })}
                 tabBarOptions={{
-                    activeTintColor: 'tomato',
-                    inactiveTintColor: 'gray',
+                    activeTintColor: darkBlue,
+                    inactiveTintColor: lightGrey,
+                    activeBackgroundColor: darkGrey,
+                    inactiveBackgroundColor: darkGrey
                 }}
             >
                 <Tab.Screen name = "Home" component ={HomeNavigator}/>

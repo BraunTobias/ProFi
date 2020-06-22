@@ -7,7 +7,7 @@ import {Ionicons} from '@expo/vector-icons';
 import DB from '../api/DB_API';
 import InputTile from "../components/InputTile";
 import NogoButton from "../components/NogoButton";
-
+import { styles, buttons, texts, white, lightGrey, iconsizeAdd } from "../Styles"
 
 export default HomeScreen = ({navigation}) => {
 
@@ -16,8 +16,13 @@ export default HomeScreen = ({navigation}) => {
     const [currentCourseName, setCurrentCourseName] = useState("");
     const [currentMinMembers, setCurrentMinMembers] = useState("");
     const [currentMaxMembers, setCurrentMaxMembers] = useState("");
+    const [currentDate, setCurrentDate] = useState("");
     // Später noch getrennte Warnungsfelder anlegen
     const [currentWarning, setCurrentWarning] = useState("");
+    const [nameError, setNameError] = useState("");
+    const [minMembersError, setMinMemebersError] = useState("");
+    const [maxMembersError, setMaxMembersError] = useState("");
+    const [dateError, setDateError] = useState("");
   
     // Wird nur beim Laden der Seite einmalig ausgeführt
     useEffect(() => {
@@ -27,17 +32,18 @@ export default HomeScreen = ({navigation}) => {
         });
     }, []);
     
-    //Button fürs Hinzufügen der Fähigkeiten
+    // Button fürs Hinzufügen neuer Kurse
     useLayoutEffect(() => {
         navigation.setOptions({
             headerRight : () => (
                 <Button 
                     type ='clear'
-                    icon={<Ionicons name='ios-add' size={32} color="rgb(0,122,255)"/>}
+                    icon={<Ionicons name='ios-add' size={iconsizeAdd} color={white}/>}
                     onPress={() => {setAddCourseVisibility(true)}}
                 />)
         });
     }, [navigation]);
+    
     const clickHandler = (id, title, date, members, minMembers, maxMembers) => {
         // DB.signOut(() => {console.log("SIGNED OUT");});
         navigation.navigate("Course", {itemId: id, itemTitle: title, itemDate: date, members: members, minMembers: minMembers, maxMembers: maxMembers});
@@ -47,19 +53,34 @@ export default HomeScreen = ({navigation}) => {
         if (isAdd) {
             if (currentCourseName != "" && currentMinMembers != "" && currentMaxMembers != "") {
                 if (parseInt(currentMinMembers) <= parseInt(currentMaxMembers)) {
-                    console.log("add");
-                    DB.addCourse(currentCourseName, "00.00.0000", currentMinMembers, currentMaxMembers, () => {
-                        setAddCourseVisibility(false);
-                        setCurrentCourseName("");
-                        setCurrentMinMembers("");
-                        setCurrentMaxMembers("");
-                        DB.getCourseList((courseList) => {
-                            console.log(courseList);
-                            setCurrentCourses(courseList);
+                    if (currentDate !== "") {
+                        console.log("add");
+                        DB.addCourse(currentCourseName, currentDate, currentMinMembers, currentMaxMembers, () => {
+                            setAddCourseVisibility(false);
+                            setCurrentCourseName("");
+                            setCurrentMinMembers("");
+                            setCurrentMaxMembers("");
+                            setCurrentDate("");
+                            DB.getCourseList((courseList) => {
+                                console.log(courseList);
+                                setCurrentCourses(courseList);
+                            });
                         });
-                    });
+                    } else {
+                        console.log("add");
+                        DB.addCourse(currentCourseName, "00.00.0000", currentMinMembers, currentMaxMembers, () => {
+                            setAddCourseVisibility(false);
+                            setCurrentCourseName("");
+                            setCurrentMinMembers("");
+                            setCurrentDate("");
+                            DB.getCourseList((courseList) => {
+                                console.log(courseList);
+                                setCurrentCourses(courseList);
+                            });
+                        });
+                    }
                 } else {
-                    setCurrentWarning("Minimum muss kleiner sein als Maximum");
+                    setMaxMembersError("Maximum muss größer sein als das Minimum");
                 }
             } else {
                 setCurrentWarning("Eingabe nicht vollständig");
@@ -67,17 +88,27 @@ export default HomeScreen = ({navigation}) => {
         } else {
             setAddCourseVisibility(false);
         }
-    }
+    };
 
     const setCourseNameHandler = (enteredText) => {
-        setCurrentCourseName(enteredText);
-    }
+        if (enteredText) {
+            if (true) {
+                // CHECK name-scheme
+                setCurrentCourseName(enteredText);
+            } else {
+                setNameError("Bitte ans Namens-Schema halten")
+            }
+        } else {
+            setCurrentCourseName("")
+            setNameError("Bitte einen Kursnamen eingeben")
+        }
+    };
 
     const setMinMaxMembersHandler = (enteredNumber, isMin) => {
         if (enteredNumber) {
             if (parseInt(enteredNumber)) {
                 enteredNumber = parseInt(enteredNumber);
-                console.log(parseInt(enteredNumber));
+                //console.log(parseInt(enteredNumber));
                 setCurrentWarning("");
                 if (enteredNumber < 1) {
                     if (isMin) setCurrentMinMembers("1");
@@ -95,45 +126,117 @@ export default HomeScreen = ({navigation}) => {
                 else setCurrentMaxMembers("");
             }
         } else {
-            if (isMin) setCurrentMinMembers("");
-            else setCurrentMaxMembers("");
-            setCurrentWarning("Bitte Zahl eingeben");
+            if (isMin) {
+                setCurrentMinMembers("");
+                setMinMemebersError("Bitte Zahl eingeben");
+            } else {
+                setCurrentMaxMembers("");
+                setMaxMembersError("Bitte Zahl eingeben");
+            }
         }
     }
-    
-
+  
+    const setDateHandler = (enteredDate) => {
+        if (enteredDate) {
+            setCurrentDate(enteredDate)
+            // parse enteredDate
+        } else {
+            setDateError("Bitte Datum eingeben");
+        }
+    }
 
     return (
         <View>
-            <Modal visible={addCourseVisibility} animationType='slide'>
-            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white'}}>
-                <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-                    <View style={{flex:1, padding: 100}}>
-                        {/* <InputTile id="test" placeholderText="Kursname"/>
-                        <InputTile placeholderText="minimale Mitglieder" keyboardType="numeric"/>
-                        <InputTile placeholderText="maximale Mitglieder" keyboardType="numeric"/> */}
-                        <TextInput 
-                            placeholder={"Kursname"} 
-                            onChangeText={setCourseNameHandler}
-                            value={currentCourseName}/>
-                        <TextInput 
-                            placeholder={"Minimale Mitgliederzahl"} 
-                            onChangeText={(text) => {setMinMaxMembersHandler(text, true)}} 
-                            keyboardType='numeric'
-                            value={currentMinMembers}/>
-                        <TextInput 
-                            placeholder={"Maximale Mitgliederzahl"} 
-                            onChangeText={(text) => {setMinMaxMembersHandler(text, false)}} 
-                            keyboardType='numeric'
-                            value={currentMaxMembers}/>
-                        <Text>
-                            {currentWarning}
-                        </Text>
-                        <Button title='OK' onPress={() => {addCourseHandler(true)}}/>
-                        <Button title='Abbrechen'onPress={() => {addCourseHandler(false)}}/>
-                    </View>
-                </TouchableWithoutFeedback>
-            </View>
+            <Modal visible= { addCourseVisibility } animationType= 'slide'>
+                <View style= { styles.modal } >
+                    <TouchableWithoutFeedback onPress= { () => Keyboard.dismiss() } >
+                        <View>
+                            <View style= { styles.headerFake } >
+                                <Text style= { texts.headerText } >Kurs erstellen</Text>
+                            </View>
+                            <View style= { styles.contentFake } >
+                                <View>
+                                    <View style= { styles.loginInput } >
+                                        <Text style= { texts.headline } >Kursname</Text>
+                                        <TextInput 
+                                            textAlign= {'left'}
+                                            style= { texts.inputText }
+                                            placeholder= { "KürzelSemesterJahr" } 
+                                            onChangeText= { setCourseNameHandler }
+                                            value= { currentCourseName }
+                                        />
+                                        <Text>
+                                            { nameError }
+                                        </Text>
+                                    </View>
+                                    
+                                    <View style= { styles.loginInput } >
+                                        <Text style= { texts.headline } >Minimale Mitgliederzahl</Text>
+                                        <TextInput 
+                                            textAlign= { 'left' }
+                                            style= { texts.inputText }
+                                            placeholder= '2'
+                                            onChangeText= { (text) => { setMinMaxMembersHandler(text, true) } } 
+                                            keyboardType= 'numeric'
+                                            value= { currentMinMembers }
+                                        />
+                                        <Text>
+                                            { minMembersError }
+                                        </Text>
+                                    </View>
+
+                                    <View style= { styles.loginInput } >
+                                        <Text style= { texts.headline } >Maximale Mitgliederzahl</Text>
+                                        <TextInput 
+                                            textAlign= { 'left' }
+                                            style= { texts.inputText }
+                                            placeholder= 'n'
+                                            onChangeText= { (text) => { setMinMaxMembersHandler(text, false) } } 
+                                            keyboardType= 'numeric'
+                                            value= { currentMaxMembers }
+                                        />
+                                        <Text>
+                                            { maxMembersError }
+                                        </Text>
+                                    </View>
+
+                                    <View style= { styles.loginInput } >
+                                        <Text style= { texts.headline } >Enddatum (optional)</Text>
+                                        <TextInput 
+                                            textAlign= { 'left' }
+                                            style= { texts.inputText }
+                                            placeholder= 'TT.MM.JJJJ'
+                                            onChangeText= { (text) => { setDateHandler(text) } } 
+                                            keyboardType= 'numeric'
+                                            value= { currentDate }
+                                        />
+                                        <Text>
+                                            { dateError }
+                                        </Text>
+                                    </View>
+
+                                    <Text>
+                                    { currentWarning }
+                                </Text>
+                                </View>
+                                <View style= { styles.row } >
+                                    <Button 
+                                        buttonStyle= { buttons.buttonRow }
+                                        titleStyle= { texts.buttonBlue }
+                                        title= 'OK' 
+                                        onPress= { () => { addCourseHandler(true) } }
+                                    />
+                                    <Button 
+                                        buttonStyle= { buttons.buttonRow }
+                                        titleStyle= { texts.buttonBlue }
+                                        title= 'Abbrechen'
+                                        onPress= { () => { addCourseHandler(false) } }
+                                    />
+                                </View>
+                            </View>
+                        </View>
+                    </TouchableWithoutFeedback>
+                </View>
             </Modal>
 
             {/* <FlatList
@@ -158,6 +261,7 @@ export default HomeScreen = ({navigation}) => {
                             id={itemData.item.id}
                             title={itemData.item.title}
                             subtitle={"Gruppengröße: " + itemData.item.minMembers + " – " + itemData.item.maxMembers + " Personen\n "+ itemData.item.date}
+                            backgroundColor = {itemData.index % 2 === 0 ? white : lightGrey}
                         />
                     )
                 }}

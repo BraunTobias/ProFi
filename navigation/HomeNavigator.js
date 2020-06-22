@@ -1,24 +1,21 @@
 import React from 'react';
-import  {createStackNavigator} from '@react-navigation/stack';
+import  {createStackNavigator, HeaderBackButton} from '@react-navigation/stack';
 import HomeScreen from '../screens/HomeScreen';
 import InputScreen from '../screens/InputScreen';
 import CourseScreen from '../screens/CourseScreen';
 import ProjectScreen from '../screens/ProjectScreen';
+import {Ionicons} from '@expo/vector-icons';
+import { styles, texts, white, iconsize } from '../Styles'
 
 const HomeStack = createStackNavigator();
 
 export default HomeNavigator = () => {
     return (
         <HomeStack.Navigator initialRouteName="Home" screenOptions={{
-            headerStyle: {
-                backgroundColor: "#222f56",
-                height: 100,
-            },
-            headerTitleStyle: {
-                fontSize: 32,
-                fontWeight: 'bold',
-                color: 'white',
-            }
+            headerStyle: styles.header,
+            headerTitleStyle: texts.headerText,
+            headerTintColor: 'white',
+            headerBackImage: (()=>{return(<Ionicons name={'ios-arrow-back'} size={iconsize} color={white} />)})
         }}>
             <HomeStack.Screen name = "Home" component= {HomeScreen} options={{headerTitle: 'Meine Kurse'}}/>
             <HomeStack.Screen name = "AddCourse" component = {InputScreen} options={{headerTitle: 'Kurs hinzufügen'}}/>

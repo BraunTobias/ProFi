@@ -1,10 +1,11 @@
 import React, { useState, useContext } from 'react';
-import { View, TextInput, Text, Modal } from 'react-native';
+import { View, TextInput, Text, Modal, TouchableOpacity } from 'react-native';
 import { Button } from 'react-native-elements';
 import { BackHandler } from 'react-native';
 import { LogInContext } from '../data/LogInContext';
 import { USERS } from '../data/dummy-data'
 import DB from '../api/DB_API';
+import { styles, buttons, texts } from '../Styles'
 
 export default LoginScreen = ({navigation}) => {
     const [authentication, setAuthentication, user, setUser] = useContext(LogInContext);
@@ -15,8 +16,9 @@ export default LoginScreen = ({navigation}) => {
     // Benutzereingaben
     const changeMailHandler = (enteredText) => {
         setCurrentMail(enteredText);
-      };
-    const changePWHandler = (enteredText) => {
+    };
+    
+      const changePWHandler = (enteredText) => {
         setCurrentPW(enteredText);
     };
     
@@ -26,39 +28,60 @@ export default LoginScreen = ({navigation}) => {
     }
 
     return(
-        <View style={{flex:1, justifyContent: 'flex-start', alignItems: 'center'}}>
-            <View style={{flex:1, justifyContent: 'center', alignItems: 'center'}}>
+        <View style={styles.content}>
 
-                <Modal visible={errorVisibility} transparent = {true}>
-                    <View style={{flex: 1, margin: 100, marginBottom: 300, marginTop: 300, padding: 10, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white'}}>
-                        <Text>Falsche Mail oder PW.</Text>
-                        <Button title='OK'onPress={() => setErrorVisibility(false)}/>
-                    </View>
-                </Modal>
-                
-                <Text>E-Mail</Text>
-                <TextInput 
-                    placeholder="student@example.com"
-                    onChangeText={changeMailHandler}
-                />
-                <Text>Passwort</Text>
+            <Modal visible={errorVisibility} transparent = {true}>
+                <View style={styles.error}>
+                    <Text style= { texts.headlineCenter } >Falsche E-Mail oder Passwort eingegeben.</Text>
+                    <Button
+                        buttonStyle= { buttons.button1 }
+                        titleStyle= { texts.buttonBlue }
+                        title='OK'
+                        onPress={() => setErrorVisibility(false)}
+                    />
+                </View>
+            </Modal>
+            
+            <View style= { styles.loginInput } >
+                <Text style= { texts.headline } >E-Mail</Text>
                 <TextInput
-                    placeholder="####"
-                    onChangeText={changePWHandler}
-                />
-                <Button 
-                    title= "Login"
-                    onPress={checkAuth}
-                />
-                <Button 
-                    title= "Registrieren"
-                    onPress={() =>navigation.navigate("Registration")}
-                />
-                <Button 
-                    title= "Beenden"
-                    onPress={() =>BackHandler.exitApp()}
+                    textAlign= {'center'}
+                    style= { texts.inputText }
+                    placeholder= "benutzer@haw-hamburg.de"
+                    onChangeText= { changeMailHandler }
                 />
             </View>
+
+            <View style= { styles.loginInput } >
+                <Text style= { texts.headline } >Passwort</Text>
+                <TextInput
+                    textAlign= {'center'}
+                    style= { texts.inputText }
+                    placeholder="######"
+                    onChangeText={changePWHandler}
+                />
+            </View>
+
+            <Button 
+                buttonStyle= { buttons.button1 }
+                titleStyle= { texts.buttonBlue }
+                title= "Login"
+                onPress={checkAuth}
+            />
+
+            <Button 
+                buttonStyle={ buttons.button1 }
+                titleStyle= { texts.buttonBlue }
+                title= "Registrieren"
+                onPress={() =>navigation.navigate("Registration")}
+            />
+
+            <Button 
+                buttonStyle={ buttons.button1 }
+                titleStyle= { texts.buttonBlue }
+                title= "Beenden"
+                onPress={() =>BackHandler.exitApp()}
+            />
         </View>
     );
 }

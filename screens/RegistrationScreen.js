@@ -4,6 +4,7 @@ import { Button } from 'react-native-elements';
 import { LogInContext } from '../data/LogInContext';
 import { USERS } from '../data/dummy-data'
 import DB from '../api/DB_API';
+import { styles, buttons, texts } from '../Styles';
 
 export default RegistrationScreen = ({navigation}) => {
     const [authentication, setAuthentication, user, setUser] = useContext(LogInContext);
@@ -29,41 +30,62 @@ export default RegistrationScreen = ({navigation}) => {
     }
 
     return(
-        <View style={{flex:1, justifyContent: 'flex-start', alignItems: 'center'}}>
-            <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
-                <Modal visible={errorVisibility} transparent = {true}>
-                    <View style={{flex: 1, margin: 100, marginBottom: 300, marginTop: 300, padding: 10, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white'}}>
-                        <Text>Error.</Text>
-                        <Button title='OK'onPress={() => setErrorVisibility(false)}/>
-                    </View>
-                </Modal>
-                
-                <Text>Benutzername</Text>
+        <View style={styles.content}>
+
+            <Modal visible={errorVisibility} transparent = {true}>
+                <View style={ styles.error }>
+                <Text style= { texts.headlineCenter } >Eine gültige E-Mail und Passwort eingeben.</Text>
+                    <Button 
+                        buttonStyle= { buttons.button1 }
+                        titleStyle= { texts.buttonBlue }
+                        title='OK'
+                        onPress={() => setErrorVisibility(false)}
+                    />
+                </View>
+            </Modal>
+            
+            <View style= { styles.loginInput } >
+                <Text style= { texts.headline } >Benutzername</Text>
                 <TextInput
-                    placeholder="Benutzername"
+                    textAlign={'center'}
+                    style= { texts.inputText }
+                    placeholder='Benutzername'
                     onChangeText={changeNameHandler}
                 />
-                <Text>E-Mail</Text>
+            </View>
+
+            <View style= { styles.loginInput } >
+                <Text style= { texts.headline } >E-Mail</Text>
                 <TextInput
-                    placeholder="student@example.com"
+                    textAlign={'center'}
+                    style= { texts.inputText }
+                    placeholder='benutzer@haw-hamburg.de'
                     onChangeText={changeMailHandler}
                 />
-                <Text>Passwort</Text>
+            </View>
+
+            <View style= { styles.loginInput } >
+                <Text style= { texts.headline } >Passwort</Text>
                 <TextInput
-                    placeholder="####"
+                    textAlign={'center'}
+                    style= { texts.inputText }
+                    placeholder='min. 6 Zeichen'
                     onChangeText={changePWHandler}
                 />
-                <Button 
-                    title= "Registrieren"
-                    onPress={register}
-                    // onPress={() => {
-                    //     setUser(USERS[1])
-                    //     console.log("setUser(USERS[1])")
-                    //     setAuthentication(true)
-                    //     console.log("setAuthentication(true)")
-                    // }}
-                />
             </View>
+            
+            <Button 
+                buttonStyle= { buttons.button1 }
+                titleStyle= { texts.buttonBlue }
+                title= "Registrieren"
+                onPress={register}
+                // onPress={() => {
+                //     setUser(USERS[1])
+                //     console.log("setUser(USERS[1])")
+                //     setAuthentication(true)
+                //     console.log("setAuthentication(true)")
+                // }}
+            />
         </View>
     );
 }

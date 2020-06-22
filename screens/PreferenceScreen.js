@@ -18,7 +18,7 @@ export default PreferenceScreen = ({navigation}) => {
             headerRight : () => (
                 <Button 
                     type ='clear' 
-                    icon={<Ionicons name='ios-checkmark'size={32} color="rgb(0,122,255)"/>}
+                    icon={<Ionicons name='ios-checkmark'size={32} color="white"/>}
                     onPress={() =>navigation.navigate('Profil')}
                 />)
                 

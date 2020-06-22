@@ -7,6 +7,7 @@ import {Ionicons} from '@expo/vector-icons';
 import SkillSelect from '../components/SkillSelect';
 import DB from '../api/DB_API';
 import ProfileImageTile from '../components/ProfileImageTile';
+import { styles, buttons, texts, white, lightGrey, grey, black, iconsize, iconsizeAdd } from '../Styles';
 
 export default CourseScreen = ({route, navigation}) => {
     const {itemId} = route.params;
@@ -24,6 +25,8 @@ export default CourseScreen = ({route, navigation}) => {
     const [selectedSkillsList, setSelectedSkillsList] = useState([]);
 
     // Später noch getrennte Warnungsfelder anlegen
+    const [ideaError, setIdeaError] = useState("");
+    const [descriptionError, setDescriptionError] = useState("");
     const [currentWarning, setCurrentWarning] = useState("");
 
     // States für Kursinfo
@@ -69,12 +72,11 @@ export default CourseScreen = ({route, navigation}) => {
             headerRight : () => (
                 <Button 
                     type ='clear' 
-                    icon={<Ionicons name='ios-add'size={32} color="rgb(0,122,255)"/>}
+                    icon={<Ionicons name='ios-add'size={iconsizeAdd} color={white}/>}
                     onPress={() => {setAddIdeaVisibility(true)}}
                 />)
         });
     }, [navigation]);
-
 
     const clickIdeaHandler = (id, title, subtitle, skills) => {
         navigation.navigate("Project", {itemId: id, itemTitle: title, itemSubtitle: subtitle, skillsList: skills, courseId: itemId});
@@ -104,16 +106,17 @@ export default CourseScreen = ({route, navigation}) => {
         } else {
             setAddIdeaVisibility(false);
         }
-    }
+    };
     
     const setIdeaNameHandler = (enteredText) => {
         setCurrentIdeaName(enteredText);
         setCurrentWarning("");
-    }
+    };
+
     const setIdeaDesriptionHandler = (enteredText) => {
         setCurrentIdeaDescription(enteredText);
         setCurrentWarning("");
-    }
+    };
 
     const addSelectedSkillHandler = (skill) => {
         var oldList = selectedSkillsList;
@@ -126,37 +129,78 @@ export default CourseScreen = ({route, navigation}) => {
         if (selectedSkillsList.length > 0) {
             setCurrentWarning("");
         }
-    }
+    };
 
     return(
         <View>
             <Modal visible={addIdeaVisibility} animationType='slide'>
-                <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white'}}>
+                
+                <View style= { styles.modal } >
                     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
                         <View>
-                            <TextInput 
-                                placeholder={"Idee"} 
-                                onChangeText={setIdeaNameHandler}
-                                value={currentIdeaName}/>
-                            <TextInput 
-                                placeholder={"Kurze Beschreibung"} 
-                                onChangeText={setIdeaDesriptionHandler}
-                                value={currentIdeaDescription}/>
-                            <Text>
-                                {currentWarning}
-                            </Text>
-                            <ListTile
-                                title={"Fähigkeiten auswählen"}
-                                subtitle={selectedSkillsList.join(", ")}
-                                onClick={() => setSkillsVisibility(true)} 
-                            />
-                            <ListTile
-                                title={"Präferenzen auswählen"}
-                                subtitle={selectedSkillsList.join(", ")}
-                                onClick={() => setSkillsVisibility(true)} 
-                            />
-                            <Button title='OK' onPress={() => {addIdeaHandler(true)}}/>
-                            <Button title='Abbrechen'onPress={() => {addIdeaHandler(false)}}/>
+                            <View style= { styles.headerFake } >
+                                <Text style= { texts.headerText } >Idee hinzufügen</Text>
+                            </View>
+                            <View style= { styles.contentFake } >
+                                
+                                <View style= { styles.loginInput } >
+                                    <Text style= { texts.headline } >Idee-Name</Text>
+                                    <TextInput 
+                                        textAlign= {'left'}
+                                        style= { texts.inputText }
+                                        placeholder= { "Idee" } 
+                                        onChangeText= { setIdeaNameHandler }
+                                        value= { currentIdeaName }
+                                    />
+                                    <Text>
+                                        { ideaError }
+                                    </Text>
+                                </View>
+                                
+                                <View style= { styles.loginInput } >
+                                    <Text style= { texts.headline } >Kurzbeschreibung</Text>
+                                    <TextInput 
+                                        textAlign= {'left'}
+                                        style= { texts.inputText }
+                                        placeholder= { "Eine kurze Beschreibung der Idee" } 
+                                        onChangeText= { setIdeaDesriptionHandler }
+                                        value= { currentIdeaDescription }
+                                    />
+                                    <Text>
+                                        { descriptionError }
+                                    </Text>
+                                </View>
+                                
+                                <Text>
+                                    {currentWarning}
+                                </Text>
+                                
+                                <ListTile
+                                    title={"Fähigkeiten auswählen"}
+                                    subtitle={selectedSkillsList.join(", ")}
+                                    onClick={() => setSkillsVisibility(true)} 
+                                />
+                                <ListTile
+                                    title={"Präferenzen auswählen"}
+                                    subtitle={selectedSkillsList.join(", ")}
+                                    onClick={() => setSkillsVisibility(true)} 
+                                />
+
+                                <View style= { styles.row } >
+                                    <Button 
+                                        buttonStyle= { buttons.buttonRow }
+                                        titleStyle= { texts.buttonBlue }
+                                        title= 'OK' 
+                                        onPress= { () => { addIdeaHandler(true) } }
+                                    />
+                                    <Button 
+                                        buttonStyle= { buttons.buttonRow }
+                                        titleStyle= { texts.buttonBlue }
+                                        title= 'Abbrechen'
+                                        onPress= { () => { addIdeaHandler(false) } }
+                                    />
+                                </View>
+                            </View>
                         </View>
                     </TouchableWithoutFeedback>
                 </View>
@@ -184,7 +228,35 @@ export default CourseScreen = ({route, navigation}) => {
                     <Button title='OK' onPress={() => {setProfileVisibility(false)}}/>
             </Modal>
 
-            <Text>Datum: {date + "\n"}Gruppengröße: {minMembers}–{maxMembers} Personen</Text>
+            <View style= { styles.subHeader } >
+                <View style= { styles.courseHeaderRow } >
+                    <Text style= { texts.headline }>{date}</Text>
+                    <Text style= { texts.headline }>{minMembers}–{maxMembers} Personen</Text>
+                </View>
+
+                <View style= { styles.membersRow } >
+                </View>
+
+                <View style= { styles.row } >
+                    <Button 
+                        buttonStyle= { buttons.buttonRowGrey }
+                        titleStyle= { texts.buttonGrey }
+                        title= 'Mitglied  ' 
+                        icon= {<Ionicons name={'ios-checkbox-outline'} size={iconsize} color={black}/>}
+                        iconRight= 'true'
+                        onPress= { () => { setAddIdeaVisibility(true) } }
+                    />
+                    <Button 
+                        buttonStyle= { buttons.buttonRow }
+                        titleStyle= { texts.buttonBlue }
+                        title= 'Neue Idee  '
+                        icon= {<Ionicons name={'ios-add'} size={iconsize} color={white} />}
+                        iconRight= 'true'
+                        onPress= { () => { setAddIdeaVisibility(true) } }
+                    />
+                </View>
+            </View>
+            
             <FlatList
                 data={members}
                 horizontal={true}
@@ -227,7 +299,7 @@ export default CourseScreen = ({route, navigation}) => {
                             title={itemData.item.title}
                             subtitle={itemData.item.description}
                             skills={itemData.item.skills}
-                            backgroundColor = {itemData.index % 2 === 0 ? "#ffffff" : "#f5f7f7"}
+                            backgroundColor = {itemData.index % 2 === 0 ? white : lightGrey}
                         />
                     );
                 }}
