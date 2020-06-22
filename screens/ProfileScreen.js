@@ -31,10 +31,18 @@ export default ProfileScreen =  ({navigation})  => {
     // const [currentInterests, setCurrentInterests] = useState(user.interests);
     const [functionsVisibility, setFunctionsVisibility] = useState(false);
     const [interestsVisibility, setInterestsVisibility] = useState(false);
+    const [skillString, setSkillString] = useState("");
+    const [prefString, setPrefString] = useState("");
 
-
+  
     // Wird nur beim Laden der Seite einmalig ausgeführt
     useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            loadData();
+        });
+    }, []);
+
+    const loadData = () => {
         DB.getUserInfo((data) => {
             // setCurrentIdeas(ideasList);
             console.log(data);
@@ -43,8 +51,11 @@ export default ProfileScreen =  ({navigation})  => {
             setCurrentPW(data.password);
             setSelectedImage({localUri: data.image});
         });
-    }, []);
-
+        DB.userAttributesToString((skills, prefs) => {
+            setSkillString(skills);
+            setPrefString(prefs);
+        });
+    }
         
     // Benutzereingaben
     const changeNameHandler = (enteredText) => {
@@ -265,13 +276,13 @@ export default ProfileScreen =  ({navigation})  => {
             <View>
                 <ListTile
                         title={"Meine Fähigkeiten"}
-                        subtitle={"Skills"}
-                        onClick={() => navigation.navigate('Fähigkeiten')} 
+                        subtitle={skillString}
+                        onClick={() => navigation.navigate('Fähigkeiten', {attributeType: "skills", filter: []})}
                 />
                 <ListTile
-                        title={"Meine Fähigkeiten"}
-                        subtitle={"Prefs"}
-                        onClick={() => navigation.navigate('Fähigkeiten')} 
+                        title={"Meine Präferenzen"}
+                        subtitle={prefString}
+                        onClick={() => navigation.navigate('Präferenzen', {attributeType: "prefs", filter: []})} 
                 />
             </View>
         </View>

@@ -1,8 +1,7 @@
 import React from 'react';
 import  {createStackNavigator} from '@react-navigation/stack';
 import ProfileScreen from '../screens/ProfileScreen';
-import SkillSelect from '../components/SkillSelect';
-import PreferenceScreen from '../screens/PreferenceScreen';
+import AttributeScreen from '../components/AttributeScreen';
 
 const ProfileStack = createStackNavigator();
 
@@ -20,8 +19,8 @@ export default ProfileNavigator = () => {
             }
         }}>
             <ProfileStack.Screen name = "Mein Profil" component = {ProfileScreen}/>
-            <ProfileStack.Screen name = "Fähigkeiten" component = {SkillSelect} options={{headerBackTitle: ' '}}/>
-            <ProfileStack.Screen name = "Präferenzen" component = {PreferenceScreen} options={{headerBackTitle: ' '}}/>
+            <ProfileStack.Screen name = "Fähigkeiten" component = {AttributeScreen} options={{headerBackTitle: ' '}}/>
+            <ProfileStack.Screen name = "Präferenzen" component = {AttributeScreen} options={{headerBackTitle: ' '}}/>
         </ProfileStack.Navigator>
     );
 };

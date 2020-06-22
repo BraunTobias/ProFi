@@ -1,34 +1,33 @@
-import React, {useState} from "react";
+import React, {useState, useLayoutEffect, useCallback} from "react";
 import { StyleSheet, Text, TouchableOpacity} from "react-native";
 import {Ionicons} from '@expo/vector-icons';
 
 export default SkillsTile = props => {
-  const [currentIconState, setCurrentIconState] = useState(true);
-  const [currentIcon, setCurrentIcon] = useState("ios-square-outline");
+  const [currentIcon, setCurrentIcon] = useState(props.state ? "ios-checkbox" : "ios-square-outline");
+  const [currentIconState, setCurrentIconState] = useState(props.state);
   const [currentIconSize, setCurrentIconSize] = useState(36);
-  
+
   // Change Icon
-  const changeIconHandler = (currentIconState) => {
+  const changeIconHandler = () => {
+    
     if (currentIconState) {
-      setCurrentIcon("ios-checkbox")
+      setCurrentIcon("ios-square-outline")
       setCurrentIconSize(30)
       setCurrentIconState(false)
     }
     else {
-      setCurrentIcon("ios-square-outline")
+      setCurrentIcon("ios-checkbox")
       setCurrentIconSize(36)
       setCurrentIconState(true)
     }
+    props.onClick(props.text);
   }
-  
+
   return (
     // FlatList
     <TouchableOpacity
         style={styles.itemContainer}
-        onPress={()=>{
-          props.onClick(props.text);
-          changeIconHandler(currentIconState)
-        }}
+        onPress={changeIconHandler}
         >
         <Ionicons
             raised

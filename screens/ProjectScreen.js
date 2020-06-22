@@ -106,14 +106,14 @@ export default ProjectScreen = ({route, navigation}) => {
             <View>
                 <Text>{itemSubtitle}</Text>
                 <ListTile
-                    title={"Benötigte Fähigkeiten"}
+                    title={"Passende Fähigkeiten"}
                     subtitle={currentSkills.join(", ")}
-                    onClick={() => {}} 
+                    onClick={() => navigation.navigate('IdeaSkills', {attributeType: "skills", filter: currentSkills})} 
                 />
                 <ListTile
-                    title={"Benötigte Präferenzen"}
+                    title={"Passende Präferenzen"}
                     subtitle={currentSkills.join(", ")}
-                    onClick={() => {}} 
+                    onClick={() => navigation.navigate('IdeaPrefs', {attributeType: "prefs", filter: currentPrefs})} 
                 />
                 <View style={{flexDirection: "row"}}>
                     <Text style={{flex: 1, paddingStart: 15}}>Kommentare:</Text>
