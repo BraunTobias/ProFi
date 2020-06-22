@@ -13,14 +13,14 @@ export default ListTile = props => {
 
   return (
       <TouchableHighlight
-      style= {{width: "100%"}}
+        style= {{width: "100%"}}
         underlayColor="#aeb8c3"
         onPress={() => props.onClick(props.id, props.title, props.subtitle)}
       >
         <View style={[styles.itemContainer, colorStyle]}> 
           <View style={{flex: 9, justifyContent: "center"}}>
               <Text style = {styles.title}> {props.title} </Text>
-              <Text style = {styles.subtitle}> {props.subtitle} </Text>
+              <Text numberOfLines={2} ellipsizeMode="tail" style = {styles.subtitle}> {props.subtitle} </Text>
           </View>
           <View style={{flex: 1, justifyContent: "center", alignItems: "center", paddingEnd: 10}}>
               <Ionicons name="ios-arrow-forward" size={60} color={"#dae1e5"}/>

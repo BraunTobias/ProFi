@@ -50,13 +50,19 @@ const styles = StyleSheet.create({
     },
 
     subHeader: {
-        //justifyContent: 'center', 
-        //alignItems: 'flex-start', 
         paddingHorizontal: padding,
         paddingVertical: padding/2,
         height: 220,
         width: width,
         backgroundColor: darkGrey,
+    },
+
+    subHeaderIdea: {
+        paddingHorizontal: padding,
+        paddingVertical: padding/2,
+        width: width,
+        backgroundColor: darkGrey,
+        marginBottom: padding/2,
     },
 
     courseHeaderRow: {
@@ -72,6 +78,14 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between', 
         alignItems: 'stretch',
         height: 100,
+    },
+
+    commentRow: {
+        paddingHorizontal: padding,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        flex: 0,
+        alignItems: 'flex-end',
     },
 
     content: {
@@ -90,6 +104,13 @@ const styles = StyleSheet.create({
         alignItems: 'stretch',
         padding: padding,
         backgroundColor: lightBlue
+    },
+
+    commentField: {
+        width: '100%', 
+        backgroundColor: 'white', 
+        padding: 10, 
+        marginTop: 10
     },
 
     modal: {

@@ -31,10 +31,18 @@ export default ProfileScreen =  ({navigation})  => {
     // const [currentInterests, setCurrentInterests] = useState(user.interests);
     const [functionsVisibility, setFunctionsVisibility] = useState(false);
     const [interestsVisibility, setInterestsVisibility] = useState(false);
+    const [skillString, setSkillString] = useState("");
+    const [prefString, setPrefString] = useState("");
 
-
+  
     // Wird nur beim Laden der Seite einmalig ausgeführt
     useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            loadData();
+        });
+    }, []);
+
+    const loadData = () => {
         DB.getUserInfo((data) => {
             // setCurrentIdeas(ideasList);
             console.log(data);
@@ -43,8 +51,11 @@ export default ProfileScreen =  ({navigation})  => {
             setCurrentPW(data.password);
             setSelectedImage({localUri: data.image});
         });
-    }, []);
-
+        DB.userAttributesToString((skills, prefs) => {
+            setSkillString(skills);
+            setPrefString(prefs);
+        });
+    }
         
     // Benutzereingaben
     const changeNameHandler = (enteredText) => {
@@ -64,15 +75,15 @@ export default ProfileScreen =  ({navigation})  => {
     // }
     const commitChangesHandler = () => {
         DB.changeUsername(currentName);
-        // DB.changeEmail(currentMail, (error, oldMail) => {
-        //     console.log(error + ", alte Adresse wird beibehalten: " + oldMail)
-        //     setCurrentMail(oldMail);
-        // });
-        // DB.changePassword(currentPW, (error, oldPW) => {
-        //     console.log(error + ", altes Passwort wird beibehalten: " + oldPW)
-        //     setCurrentPW(oldPW);
-        // });
-        // DB.logIn(currentMail, currentPW, () => {});
+        DB.changeEmail(currentMail, (error, oldMail) => {
+            console.log(error + ", alte Adresse wird beibehalten: " + oldMail)
+            setCurrentMail(oldMail);
+        });
+        DB.changePassword(currentPW, (error, oldPW) => {
+            console.log(error + ", altes Passwort wird beibehalten: " + oldPW)
+            setCurrentPW(oldPW);
+        });
+        DB.logIn(currentMail, currentPW, () => {});
     }
     // Profilbild
     // const [imagePickerVisibility, setImagePickerVisibility] = useState(false);
@@ -133,7 +144,7 @@ export default ProfileScreen =  ({navigation})  => {
     return ( 
         <View>
             {/* // "Header" mit Profildaten */}
-            <View style={{padding: 20, flexDirection: "row", justifyContent: 'flexStart', alignItems: 'center', backgroundColor: "#aeb8c3"}}>
+            <View style={{padding: 20, flexDirection: "row", justifyContent: 'flex-start', alignItems: 'center', backgroundColor: "#aeb8c3"}}>
                     <Modal visible={false} animationType='slide'>
                         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white'}}>
                             <Text>Gespeichert.</Text>
@@ -265,13 +276,13 @@ export default ProfileScreen =  ({navigation})  => {
             <View>
                 <ListTile
                         title={"Meine Fähigkeiten"}
-                        subtitle={"Skills"}
-                        onClick={() => navigation.navigate('Fähigkeiten')} 
+                        subtitle={skillString}
+                        onClick={() => navigation.navigate('Fähigkeiten', {attributeType: "skills", filter: []})}
                 />
                 <ListTile
-                        title={"Meine Fähigkeiten"}
-                        subtitle={"Prefs"}
-                        onClick={() => navigation.navigate('Fähigkeiten')} 
+                        title={"Meine Präferenzen"}
+                        subtitle={prefString}
+                        onClick={() => navigation.navigate('Präferenzen', {attributeType: "prefs", filter: []})} 
                 />
             </View>
         </View>

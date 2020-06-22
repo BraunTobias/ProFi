@@ -10,7 +10,7 @@ import DB from '../api/DB_API';
 
 export default SkillSelect = props => {
     const [currentCategory, setCurrentCategory] = useState('Programmieren');
-    const displayedSkill = SKILLS.filter(item => item.category === currentCategory);
+    const displayedSkills = SKILLS.filter(item => item.category === currentCategory);
     
     // const updateSelectedSkillsList = (text) => {
     //     // var list = props.selectedSkillsList;
@@ -93,7 +93,7 @@ export default SkillSelect = props => {
                 </TouchableHighlight>
             </View>
             <FlatList style={{height: "90%"}}
-                data={displayedSkill}
+                data={displayedSkills}
                 renderItem={(itemData) => { 
                     return (
                         // FlatList

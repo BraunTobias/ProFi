@@ -438,7 +438,7 @@ const DB = {
     },
 
     // Liste aller Skills bzw. Präferenzen einer Kategorie ausgeben (zweidimensionales Array mit Info, ob der User diese hat oder nicht)
-    getUserAttributesFromCategory: async function(attributeType, categoryName, onSuccess, onError) {
+    getUserAttributesFromCategory: async function(attributeType, categoryName, filterList, onSuccess, onError) {
         const attributesList = [];
         const currentUserID = firebase.auth().currentUser.uid;
         const snapshot = await firebase.firestore().collection("users").doc(currentUserID).collection(attributeType).doc(categoryName).get();
@@ -447,27 +447,87 @@ const DB = {
         if (snapshotData) {            
             // Gibt Liste als (alphabetisch geordnetes) Array zurück
             for (var title in snapshotData) {
-                attributesList.push([title, snapshotData[title]]);
+                console.log("title: " + title);
+                if (filterList.length == 0 || filterList.indexOf(title) >= 0) {
+                    attributesList.push([title, snapshotData[title]]);
+                }
             }
             attributesList.sort();
             onSuccess(attributesList);
         } else {
             onError("Kategorie nicht gefunden");
         }
+    },
 
-        // HIER NOCH FILTERMÖGLICHKEIT EINBAUEN, UM NUR IN EINER IDEE BENÖTIGTE ANZUZEIGEN
+    // Liste aller Katgorien von Skills oder Prefs
+    getCategoriesFromAttribute: async function(attributeType, onSuccess) {
+        const categoryList = [];
+        const currentUserID = firebase.auth().currentUser.uid;
+        const snapshot = await firebase.firestore().collection("users").doc(currentUserID).collection(attributeType).get();
+
+        snapshot.forEach((doc) => {
+            categoryList.push(doc.id);
+        });    
+        onSuccess(categoryList);
+    },
+
+    userAttributesToString: async function(onSuccess) {
+        var skillString = "Bitte Fähigkeiten eintragen";
+        const skillArray = [];
+        var prefString = "Bitte Präferenzen eintragen";
+        const prefArray = [];
+        var prefCount = 0;
+        const currentUserID = firebase.auth().currentUser.uid;
+   
+        const snapshotSkills = await firebase.firestore().collection("users").doc(currentUserID).collection("skills").get();
+        snapshotSkills.forEach((doc) => {
+            const data = doc.data();
+            for (var key in data) {
+                if (data[key]) {
+                    skillArray.push(key);
+                }
+            }
+            skillArray.sort();
+            skillString = skillArray.join(", ");
+            console.log(skillString);
+        });            
+        const snapshotPrefs = await firebase.firestore().collection("users").doc(currentUserID).collection("prefs").get();
+        snapshotPrefs.forEach((doc) => {
+            const data = doc.data();
+            for (var key in data) {
+                if (data[key]) {
+                    prefCount += key.length;
+                        if (prefCount > 70) {
+                            break;
+                        }
+                    prefArray.push(key);
+                }
+            }
+            prefArray.sort();
+            prefString = prefArray.join(", ") + " …";
+            console.log(prefString);
+        });            
+
+        
+        onSuccess(skillString, prefString);
     },
 
     // Skill bzw. Präferenz markieren bzw. entmarkieren
     toggleAttributeState: async function(attributeType, categoryName, attributeName, onSuccess) {
         const currentUserID = firebase.auth().currentUser.uid;
         const snapshot = await firebase.firestore().collection("users").doc(currentUserID).collection(attributeType).doc(categoryName).get();
+        
         const snapshotData = snapshot.data();
-        var newState = !snapshotData[attributeName];
+        if (typeof snapshotData[attributeName] !== 'undefined') {
+            var newState = !snapshotData[attributeName];
 
-        firebase.firestore().collection("users").doc(currentUserID).collection(attributeType).doc(categoryName).set({
-            [attributeName]: newState
-        }, {merge: true});
+            firebase.firestore().collection("users").doc(currentUserID).collection(attributeType).doc(categoryName).set({
+                [attributeName]: newState
+            }, {merge: true});
+    
+        } else {
+            console.log("nee")
+        }
     },
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

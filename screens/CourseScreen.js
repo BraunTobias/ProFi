@@ -134,7 +134,6 @@ export default CourseScreen = ({route, navigation}) => {
     return(
         <View>
             <Modal visible={addIdeaVisibility} animationType='slide'>
-                
                 <View style= { styles.modal } >
                     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
                         <View>

@@ -1,10 +1,12 @@
 import React, {useState, useLayoutEffect, useEffect} from 'react';
-import {FlatList , View, Text, Button, Modal, TouchableWithoutFeedback, TextInput, Keyboard} from 'react-native';
+import {FlatList , View, Text, Modal, TouchableWithoutFeedback, TextInput, Keyboard} from 'react-native';
+import {Button} from 'react-native-elements';
 import ListTile from '../components/ListTile';
 import CommentTile from '../components/CommentTile';
 import ProfileView from '../components/ProfileView';
 import DB from '../api/DB_API';
 import { set } from 'react-native-reanimated';
+import { styles, texts, buttons, white } from '../Styles';
 
 export default ProjectScreen = ({route, navigation}) => {
     const {itemId} = route.params;
@@ -71,25 +73,50 @@ export default ProjectScreen = ({route, navigation}) => {
     }
 
     return(
-        <View style={{flexDirection: "column", height: "100%"}}>
+        <View>
             {/* // Kommentar schreiben */}
             <Modal visible={commentVisibility} animationType='slide'>
-            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white'}}>
-                <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-                    <View style={{flex:1, padding: 100}}>
-                        {/* <InputTile id="test" placeholderText="Kursname"/>
-                        <InputTile placeholderText="minimale Mitglieder" keyboardType="numeric"/>
-                        <InputTile placeholderText="maximale Mitglieder" keyboardType="numeric"/> */}
-                        <TextInput 
-                            placeholder={"Kommentar"} 
-                            onChangeText={setCommentHandler}
-                            value={currentCommentText}
-                        />
-                        <Button title='OK' onPress={() => {addCommentHandler(true)}}/>
-                        <Button title='Abbrechen'onPress={() => {addCommentHandler(false)}}/>
-                    </View>
-                </TouchableWithoutFeedback>
-            </View>
+                <View style= { styles.modal } >
+                    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+                        <View>
+                            <View style= { styles.headerFake } >
+                                <Text style= { texts.headerText } >Kommentar hinzufügen</Text>
+                            </View>
+                            <View style= { styles.contentFake } >
+                                <View style= { styles.loginInput } >
+                                    <Text style= { texts.headline } >Kommentar (max. 200 Zeichen)</Text>
+                                    <View style= { styles.commentField } >
+                                        <TextInput 
+                                            textAlign= { 'left' }
+                                            textAlignVertical= { 'top' }
+                                            style= { texts.inputText }
+                                            placeholder= { "Schreibe einen Kommentar" } 
+                                            onChangeText= { setCommentHandler }
+                                            value= { currentCommentText }
+                                            multiline
+                                            numberOfLines= { 10 }
+                                            maxLength= { 200 }
+                                        />
+                                    </View>
+                                </View>
+                                <View style= { styles.row } >
+                                    <Button 
+                                        buttonStyle= { buttons.buttonRow }
+                                        titleStyle= { texts.buttonBlue }
+                                        title= 'OK' 
+                                        onPress= { () => { addCommentHandler(true) } }
+                                    />
+                                    <Button 
+                                        buttonStyle= { buttons.buttonRow }
+                                        titleStyle= { texts.buttonBlue }
+                                        title= 'Abbrechen'
+                                        onPress= { () => { addCommentHandler(false) } }
+                                    />
+                                </View>
+                            </View>
+                        </View>
+                    </TouchableWithoutFeedback>
+                </View>
             </Modal>
 
             {/* // User-Profil ansehen */}
@@ -104,20 +131,30 @@ export default ProjectScreen = ({route, navigation}) => {
             </Modal>
 
             <View>
-                <Text>{itemSubtitle}</Text>
-                <ListTile
-                    title={"Benötigte Fähigkeiten"}
-                    subtitle={currentSkills.join(", ")}
-                    onClick={() => {}} 
-                />
-                <ListTile
-                    title={"Benötigte Präferenzen"}
-                    subtitle={currentSkills.join(", ")}
-                    onClick={() => {}} 
-                />
-                <View style={{flexDirection: "row"}}>
-                    <Text style={{flex: 1, paddingStart: 15}}>Kommentare:</Text>
-                    <Button title='Kommentar schreiben' onPress={() => {setCommentVisibility(true)}}/>
+                <View style= { styles.subHeaderIdea}>
+                    <Text style= { texts.headline } >Beschreibung</Text>
+                    <View style= { { height: 100 } } >
+                        <Text>{itemSubtitle}</Text>
+                    </View>
+                    <ListTile
+                        title={"Passende Fähigkeiten"}
+                        subtitle={currentSkills.join(", ")}
+                        onClick={() => navigation.navigate('IdeaSkills', {attributeType: "skills", filter: currentSkills})} 
+                    />
+                    <ListTile
+                        title={"Passende Präferenzen"}
+                        subtitle={currentSkills.join(", ")}
+                        onClick={() => navigation.navigate('IdeaPrefs', {attributeType: "prefs", filter: currentPrefs})} 
+                    />
+                </View>
+                
+                <View style={ styles.commentRow }>
+                    <Text style={texts.headline}>Kommentare:</Text>
+                    <Button 
+                        buttonStyle= { buttons.button1 }
+                        titleStyle= { { color: white } }
+                        title='Kommentar schreiben' 
+                        onPress={() => {setCommentVisibility(true)}}/>
                 </View>
             </View>
             <FlatList
