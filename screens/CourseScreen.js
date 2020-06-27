@@ -4,7 +4,7 @@ import ListTile from '../components/ListTile';
 import {Button} from 'react-native-elements';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import {Ionicons} from '@expo/vector-icons';
-import SkillSelect from '../components/SkillSelect';
+import AttributeSelect from '../components/AttributeSelect';
 import DB from '../api/DB_API';
 import ProfileImageTile from '../components/ProfileImageTile';
 import { styles, buttons, texts, white, lightGrey, grey, black, iconsize, iconsizeAdd } from '../Styles';
@@ -12,35 +12,48 @@ import { styles, buttons, texts, white, lightGrey, grey, black, iconsize, iconsi
 export default CourseScreen = ({route, navigation}) => {
     const {itemId} = route.params;
     const {itemTitle} = route.params;
+    const currentUserId = DB.getCurrentUserId();
 
     // States für Profil-Ansicht
     const [viewedUserId, setViewedUserId] = useState(false);
     const [profileVisibility, setProfileVisibility] = useState(false);
-
+    
     // States für Idea-Eingabe
     const [addIdeaVisibility, setAddIdeaVisibility] = useState(false);
     const [skillsVisibility, setSkillsVisibility] = useState(false);
+    const [prefsVisibility, setPrefsVisibility] = useState(false);
     const [currentIdeaName, setCurrentIdeaName] = useState("");
     const [currentIdeaDescription, setCurrentIdeaDescription] = useState("");
     const [selectedSkillsList, setSelectedSkillsList] = useState([]);
-
+    const [selectedPrefsList, setSelectedPrefsList] = useState([]);
+    
     // Später noch getrennte Warnungsfelder anlegen
     const [ideaError, setIdeaError] = useState("");
     const [descriptionError, setDescriptionError] = useState("");
     const [currentWarning, setCurrentWarning] = useState("");
-
+    
     // States für Kursinfo
     const [currentIdeas, setCurrentIdeas] = useState([]);
     const [members, setMembers] = useState([]);
     const [minMembers, setMinMembers] = useState(0);
     const [maxMembers, setMaxMembers] = useState(0);
     const [date, setDate] = useState("11.11.1111");
+    
+    const [currentFav, setCurrentFav] = useState();
+    const [currentNogo, setCurrentNogo] = useState();
 
     // Wird nur beim Laden der Seite einmalig ausgeführt
     useEffect(() => {
         DB.getIdeasList(itemId, (ideasList) => {
             setCurrentIdeas(ideasList);
             console.log(ideasList);
+            for (const idea in ideasList) {
+                if (ideasList[idea].favourites != null && ideasList[idea].favourites.indexOf(currentUserId) >= 0) {
+                    setCurrentFav(ideasList[idea].id);
+                } else if (ideasList[idea].nogos != null && ideasList[idea].nogos.indexOf(currentUserId) >= 0) {
+                    setCurrentNogo(ideasList[idea].id);
+                }
+            }
         });
         DB.getCourseData(itemId, (data) => {
 
@@ -130,6 +143,40 @@ export default CourseScreen = ({route, navigation}) => {
             setCurrentWarning("");
         }
     };
+    const addSelectedPrefHandler = (pref) => {
+        var oldList = selectedPrefsList;
+        if (oldList.indexOf(skill) < 0) {
+            oldList.push(skill);
+        } else {
+            var newList = oldList.filter(item => item !== skill);
+            setSelectedPrefsList(newList);
+        }
+        if (selectedPrefsList.length > 0) {
+            setCurrentWarning("");
+        }
+    };
+    const addFavHandler = (ideaId) => {
+        if (currentFav == ideaId) {
+            DB.deletePref("favourites", itemId, () => {
+                setCurrentFav("");
+            });
+        } else {
+            DB.addPref("favourites", itemId, ideaId, () => {
+                setCurrentFav(ideaId);
+            });
+        }
+    }
+    const addNogoHandler = (ideaId) => {
+        if (currentNogo == ideaId) {
+            DB.deletePref("nogos", itemId, () => {
+                setCurrentNogo("");
+            });
+        } else {
+            DB.addPref("nogos", itemId, ideaId, () => {
+                setCurrentNogo(ideaId);
+            });
+        }
+    }
 
     return(
         <View>
@@ -181,8 +228,8 @@ export default CourseScreen = ({route, navigation}) => {
                                 />
                                 <ListTile
                                     title={"Präferenzen auswählen"}
-                                    subtitle={selectedSkillsList.join(", ")}
-                                    onClick={() => setSkillsVisibility(true)} 
+                                    subtitle={selectedPrefsList.join(", ")}
+                                    onClick={() => setPrefsVisibility(true)} 
                                 />
 
                                 <View style= { styles.row } >
@@ -209,9 +256,28 @@ export default CourseScreen = ({route, navigation}) => {
                         <View style={{backgroundColor: "#222f56", height: 110, justifyContent: "center", alignItems: "center"}}>
                             <Text style={{fontSize: 30, top: 20, fontWeight: "bold", color: "white"}}>Fähigkeiten auswählen</Text>
                         </View>
-                        <SkillSelect selectedSkillsList={selectedSkillsList} addSelectedSkill={addSelectedSkillHandler} forIdea={true}></SkillSelect>
+                        <AttributeSelect 
+                            attributeType={"skills"} 
+                            selectedAttributesList={selectedSkillsList} 
+                            addSelectedAttribute={addSelectedSkillHandler} 
+                        >
+                        </AttributeSelect>
                     </View>
                     <Button title='OK' onPress={() => {setSkillsVisibility(false)}}/>
+                </Modal>
+                <Modal visible={prefsVisibility} animationType='slide'>
+                    <View style={{height: "85%"}}>
+                        <View style={{backgroundColor: "#222f56", height: 110, justifyContent: "center", alignItems: "center"}}>
+                            <Text style={{fontSize: 30, top: 20, fontWeight: "bold", color: "white"}}>Präferenzen auswählen</Text>
+                        </View>
+                        <AttributeSelect 
+                            attributeType={"prefs"} 
+                            selectedAttributesList={selectedPrefsList} 
+                            addSelectedAttribute={addSelectedPrefHandler} 
+                        >
+                        </AttributeSelect>
+                    </View>
+                    <Button title='OK' onPress={() => {setPrefsVisibility(false)}}/>
                 </Modal>
 
             </Modal>
@@ -272,24 +338,9 @@ export default CourseScreen = ({route, navigation}) => {
 
             </FlatList>
 
-            
-            {/* <FlatList
-            data={currentIdeas}
-            renderItem={(itemData) => { 
-                return (
-                    <ListTile
-                        onClick={clickHandler} 
-                        id={itemData.item.id}
-                        title={itemData.item.title}
-                        subtitle={itemData.item.description}
-                        skills={itemData.item.skills}
-                    />
-                );
-            }}
-            /> */}
-
             <SwipeListView
                 data={currentIdeas}
+                keyExtractor={(item, index) => index.toString()}
                 renderItem={(itemData) => { 
                     return (
                         <ListTile
@@ -298,20 +349,31 @@ export default CourseScreen = ({route, navigation}) => {
                             title={itemData.item.title}
                             subtitle={itemData.item.description}
                             skills={itemData.item.skills}
+                            isFavourite={itemData.item.id == currentFav}
+                            isNogo={itemData.item.id == currentNogo}
                             backgroundColor = {itemData.index % 2 === 0 ? white : lightGrey}
                         />
                     );
                 }}
                 renderHiddenItem={ (itemData) => {
                     return (
-                        <View style={{height: "100%", width: 150, flexDirection: "row", alignItems: "center", justifyContent: "center",}}>
-                            <FavButton ideaId={itemData.item.id} courseId={itemId}/>
-                            <NogoButton ideaId={itemData.item.id} courseId={itemId}/>
+                        <View style={{height: "100%", width: 120, flexDirection: "row", alignItems: "center", justifyContent: "center",}}>
+                            <FavButton 
+                                ideaId={itemData.item.id} 
+                                courseId={itemId} 
+                                backgroundColor={itemData.item.id == currentFav ? "blue" : "grey"}
+                                onClick={() => {addFavHandler(itemData.item.id)}}
+                            />
+                            <NogoButton 
+                                ideaId={itemData.item.id} 
+                                courseId={itemId} 
+                                backgroundColor={itemData.item.id == currentNogo ? "red" : "grey"}
+                                onClick={() => {addNogoHandler(itemData.item.id)}}
+                            />
                         </View>
                     )
                 }}
-                leftOpenValue={150}
-                rightOpenValue={-75}
+                leftOpenValue={120}
             />
 
         </View>

@@ -8,7 +8,7 @@ import DB from '../api/DB_API';
 import { set } from 'react-native-reanimated';
 import { styles, texts, buttons, white } from '../Styles';
 
-export default ProjectScreen = ({route, navigation}) => {
+export default IdeaScreen = ({route, navigation}) => {
     const {itemId} = route.params;
     const {courseId} = route.params;
     const {itemTitle} = route.params;

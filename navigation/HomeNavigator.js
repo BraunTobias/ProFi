@@ -3,7 +3,7 @@ import  {createStackNavigator, HeaderBackButton} from '@react-navigation/stack';
 import HomeScreen from '../screens/HomeScreen';
 import InputScreen from '../screens/InputScreen';
 import CourseScreen from '../screens/CourseScreen';
-import ProjectScreen from '../screens/ProjectScreen';
+import IdeaScreen from '../screens/IdeaScreen';
 import AttributeScreen from '../components/AttributeScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { styles, texts, white, iconsize } from '../Styles'
@@ -22,7 +22,7 @@ export default HomeNavigator = () => {
             <HomeStack.Screen name = "AddCourse" component = {InputScreen} options={{headerTitle: 'Kurs hinzufügen'}}/>
             <HomeStack.Screen name = "AddProject" component = {InputScreen} options={{headerTitle: 'Projekt hinzufügen'}}/>
             <HomeStack.Screen name = "Course" component = {CourseScreen} options={{headerTitle: 'Kurs', headerBackTitle: ' '}}/>
-            <HomeStack.Screen name = "Project" component= {ProjectScreen} options={{headerTitle: 'Idee', headerBackTitle: ' '}}/>
+            <HomeStack.Screen name = "Project" component= {IdeaScreen} options={{headerTitle: 'Idee', headerBackTitle: ' '}}/>
             <HomeStack.Screen name = "IdeaSkills" component= {AttributeScreen} options={{headerTitle: 'Passende Fähigkeiten', headerBackTitle: ' '}}/>
             <HomeStack.Screen name = "IdeaPrefs" component= {AttributeScreen} options={{headerTitle: 'Passende Präferenzen', headerBackTitle: ' '}}/>
 

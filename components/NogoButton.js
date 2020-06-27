@@ -1,32 +1,25 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import {Ionicons} from '@expo/vector-icons';
+import {MaterialIcons} from '@expo/vector-icons';
 import DB from "../api/DB_API";
 
 export default NogoButton = props => {
 
-  const addNogoHandler = () => {
-      DB.addPref("nogos", props.courseId, props.ideaId, () => {
-        console.log("Added as nogo");
-      });
-  }
-
   return (
       <TouchableOpacity
-        style={styles.itemContainer}
-        onPress={addNogoHandler}
+        style={[styles.itemContainer, {backgroundColor: props.backgroundColor}]}
+        onPress={props.onClick}
       >
-        <Text style = {styles.title}>Nogo</Text>
+        <MaterialIcons name={'do-not-disturb-alt'} size={40} color={"white"} />
       </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   itemContainer: {
-    backgroundColor: "red",
-    // width: "50%",
     height: "100%",
-    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
     flex: 1,
   },
   title: {

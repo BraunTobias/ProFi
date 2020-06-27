@@ -126,6 +126,9 @@ const DB = {
         }
         onSuccess(userName, userImage);
     },
+    getCurrentUserId: function() {
+        return(firebase.auth().currentUser.uid);
+    },
     changeUsername: function(newName) {
         const currentUserID = firebase.auth().currentUser.uid;
         firebase.firestore().collection("users").doc(currentUserID).set({
@@ -221,7 +224,7 @@ const DB = {
         });
     },
 
-    // Neue Idee erstellen (Objekt der Klasse idea übergeben)
+    // Neue Idee erstellen 
     addIdea: function(courseId, title, description, skills, interests, onSuccess) {
         const currentUserID = firebase.auth().currentUser.uid;
         firebase.firestore().collection("courses").doc(courseId).collection("ideas").add({
@@ -229,6 +232,9 @@ const DB = {
             description: description,
             interests: interests,
             skills: skills,
+            favourites: [],
+            nogos: [],
+            creator: currentUserID
         })
         .then((docRef) => {
             // Man favorisiert seine neu erstellte Idee automatisch
@@ -376,14 +382,13 @@ const DB = {
                 members: membersArray
             }, {merge: true}); 
 
-            console.log(membersArray);
             onSuccess();
         } else {
             onError("User ist schon im Kurs");
         }
     },
     // Der Kurs wird nicht mehr angezeigt und der User ggf. aus dem Kurs abgemeldet
-    removeCourseFromList: async function(courseId, OnSuccess) {
+    removeCourseFromList: async function(courseId, onSuccess) {
         const currentUserID = firebase.auth().currentUser.uid;
 
         const snapshotDoc = await firebase.firestore().collection("courses").doc(courseId).get();
@@ -405,7 +410,7 @@ const DB = {
             }, {merge: true});        
         }
     },
-    exitCourse: async function(courseId, OnSuccess) {
+    exitCourse: async function(courseId, onSuccess) {
         const currentUserID = firebase.auth().currentUser.uid;
 
         const snapshotDoc = await firebase.firestore().collection("courses").doc(courseId).get();
@@ -416,7 +421,8 @@ const DB = {
 
             firebase.firestore().collection("courses").doc(courseId).set({
                 members: newMembersArray
-            }, {merge: true});        
+            }, {merge: true});     
+            onSuccess();   
         }
     },
     // Sagt ob ein User im Kurs ist
@@ -450,6 +456,28 @@ const DB = {
                 console.log("title: " + title);
                 if (filterList.length == 0 || filterList.indexOf(title) >= 0) {
                     attributesList.push([title, snapshotData[title]]);
+                }
+            }
+            attributesList.sort();
+            onSuccess(attributesList);
+        } else {
+            onError("Kategorie nicht gefunden");
+        }
+    },
+
+    // Liste aller Skills bzw. Präferenzen einer Kategorie ausgeben (OHNE Info, ob der User diese hat oder nicht)
+    getNeutralAttributesFromCategory: async function(attributeType, categoryName, filterList, onSuccess, onError) {
+        const attributesList = [];
+        const currentUserID = firebase.auth().currentUser.uid;
+        const snapshot = await firebase.firestore().collection("users").doc(currentUserID).collection(attributeType).doc(categoryName).get();
+        const snapshotData = snapshot.data();
+
+        if (snapshotData) {            
+            // Gibt Liste als (alphabetisch geordnetes) Array zurück
+            for (var title in snapshotData) {
+                console.log("title: " + title);
+                if (filterList.length == 0 || filterList.indexOf(title) >= 0) {
+                    attributesList.push(title);
                 }
             }
             attributesList.sort();
@@ -571,6 +599,36 @@ const DB = {
             console.log("Kein gültiger Pref-Typ");
         }
     },
+    // // Eine Idee innerhalb eines Kurses wird als Favorit / No-Go entfernt
+    // deletePref: async function(prefType, courseId, ideaId, onSuccess) {
+    //     if (prefType === "favourites" || prefType === "nogos") {
+    //         const currentUserID = firebase.auth().currentUser.uid;
+                
+    //         const snapshotDoc = await firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaId).get();
+            
+    //         // Der gegensätzliche Pref-Type wird ggf. entfernt
+    //         if (snapshotDoc.data()[oppositePrefType]) {
+    //             const newOppositePrefArray = snapshotDoc.data()[oppositePrefType].filter(item => item !== currentUserID);
+    //             firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaId).set({
+    //                 [oppositePrefType]: newOppositePrefArray
+    //             }, {merge: true}); 
+    //         }
+            
+    //         if (snapshotDoc.data()[prefType]) {
+    //             prefArray = snapshotDoc.data()[prefType];
+    //         }
+    //         prefArray.push(currentUserID);
+    //         firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaId).set({
+    //             [prefType]: prefArray
+    //         }, {merge: true}); 
+    
+    //         console.log(prefArray);
+    //         onSuccess();            
+    //     } else {
+    //         console.log("Kein gültiger Pref-Typ");
+    //     }
+    // },
+    
     deletePref: async function(prefType, courseId, onSuccess) {
         if (prefType === "favourites" || prefType === "nogos") {
             const currentUserID = firebase.auth().currentUser.uid;

@@ -9,44 +9,28 @@ import { Icon } from 'react-native-elements';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 import DB from '../api/DB_API';
 
-export default AttributeScreen = ({route, navigation}) => {
-    const {filter} = route.params;
-    const {attributeType} = route.params;
+export default AttributeSelect = props => {
+    const attributeType = props.attributeType;
+    const filter = [];
+
     const [currentCategory, setCurrentCategory] = useState("");
     const [categoriesList, setCategoriesList] = useState([]);
     const [displayedSkills, setDisplayedSkills] = useState([]);
-    // const displayedSkills = SKILLS.filter(item => item.category === currentCategory);
     
-    // const updateSelectedSkillsList = (text) => {
-    //     // var list = props.selectedSkillsList;
-    //     // if (list.indexOf(text) <= 0) {
-    //     //     list.push(text);
-    //     // } else {
-    //     //     list = list.filter(item => item !== text);
-    //     // }
-    //     props.addSelectedSkill(text);
-    // }    
     useEffect(() => {
         DB.getCategoriesFromAttribute(attributeType, (categoriesList) => {
-            console.log(categoriesList);
             setCategoriesList(categoriesList);
             setCurrentCategory(categoriesList[0]);
-            DB.getUserAttributesFromCategory(attributeType, categoriesList[0], filter, (attributesList) => {
-                console.log(attributesList);
+
+            DB.getNeutralAttributesFromCategory(attributeType, categoriesList[0], filter, (attributesList) => {
                 setDisplayedSkills(attributesList);
             }, (error) => {console.log(error)});    
         });
     }, []);
     
-    const clickSkillHandler = (text) => {
-        DB.toggleAttributeState(attributeType, currentCategory, text, () => {
-            console.log("Toggled state of " + text);
-        });
-    }
     const clickCategoryHandler = (name) => {
         setCurrentCategory(name);
-        DB.getUserAttributesFromCategory(attributeType, name, filter, (attributesList) => {
-            console.log(attributesList);
+        DB.getNeutralAttributesFromCategory(attributeType, name, filter, (attributesList) => {
             setDisplayedSkills(attributesList);
         }, (error) => {console.log(error)});
     }
@@ -74,14 +58,14 @@ export default AttributeScreen = ({route, navigation}) => {
 
                 <FlatList style={{height: "90%"}}
                     data={displayedSkills}
-                    keyExtractor={(item, index) => item[0]}
+                    keyExtractor={(item, index) => item.toString()}
                     renderItem={(itemData) => { 
                         return (
                             // FlatList
                             <SkillsTile
-                                text={itemData.item[0]}  
-                                state={itemData.item[1]}
-                                onClick={clickSkillHandler}
+                                text={itemData.item}  
+                                state={props.selectedAttributesList.indexOf(itemData.item) >= 0}
+                                onClick={props.addSelectedAttribute}
                             />
                         );
                     }}

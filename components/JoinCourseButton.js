@@ -1,18 +1,21 @@
-import React, {useState} from "react";
+import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {Ionicons} from '@expo/vector-icons';
 import DB from "../api/DB_API";
 
-export default FavButton = props => {
-  
+export default JoinCourseButton = props => {
+  console.log(props.isActive);
   return (
-      <TouchableOpacity
-        style={[styles.itemContainer, {backgroundColor: props.backgroundColor}]}
-        onPress={props.onClick}
-      >
-        <Ionicons name="ios-star" size={40} color={"white"}/>
-      </TouchableOpacity>
-  );
+    <TouchableOpacity
+      style={[styles.itemContainer, {backgroundColor: props.backgroundColor}]}
+      onPress={props.onClick}
+    >
+        <Ionicons 
+          name={props.isActive ? "ios-close-circle" : "ios-checkmark-circle"} 
+          size={40} 
+          color={"white"}/>
+    </TouchableOpacity>
+);
 };
 
 const styles = StyleSheet.create({

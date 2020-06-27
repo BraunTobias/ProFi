@@ -6,12 +6,15 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 import {Ionicons} from '@expo/vector-icons';
 import DB from '../api/DB_API';
 import InputTile from "../components/InputTile";
-import NogoButton from "../components/NogoButton";
+import JoinCourseButton from "../components/JoinCourseButton";
 import { styles, buttons, texts, white, lightGrey, iconsizeAdd } from "../Styles"
 
 export default HomeScreen = ({navigation}) => {
+    const currentUserId = DB.getCurrentUserId();
 
     const [currentCourses, setCurrentCourses] = useState([]);
+    const [joinedCourses, setJoinedCourses] = useState([]);
+
     const [addCourseVisibility, setAddCourseVisibility] = useState(false);
     const [currentCourseName, setCurrentCourseName] = useState("");
     const [currentMinMembers, setCurrentMinMembers] = useState("");
@@ -26,10 +29,20 @@ export default HomeScreen = ({navigation}) => {
   
     // Wird nur beim Laden der Seite einmalig ausgeführt
     useEffect(() => {
-        DB.getCourseList((courseList) => {
-            console.log(courseList);
-            setCurrentCourses(courseList);
+        const unsubscribe = navigation.addListener('focus', () => {
+            DB.getCourseList((courseList) => {
+                // console.log(courseList);
+                setCurrentCourses(courseList);
+                var joined = [];
+                for (const course in courseList) {
+                    if (courseList[course].members.indexOf(currentUserId) >= 0) {
+                        joined.push(courseList[course].id);
+                    }
+                }
+                setJoinedCourses(joined);
+            });
         });
+
     }, []);
     
     // Button fürs Hinzufügen neuer Kurse
@@ -142,6 +155,23 @@ export default HomeScreen = ({navigation}) => {
             // parse enteredDate
         } else {
             setDateError("Bitte Datum eingeben");
+        }
+    }
+
+    const joinCourseHandler = (courseId) => {
+        if (joinedCourses.indexOf(courseId) < 0) {
+            DB.joinCourse(courseId, () => {
+                const joinedList = joinedCourses;
+                joinedList.push(courseId);    
+                console.log(joinedList);
+                setJoinedCourses(joinedList);
+            }, () => {})
+        } else {
+            DB.exitCourse(courseId, () => {
+                const newJoinedList = joinedCourses.filter(course => course !== courseId);
+                setJoinedCourses(newJoinedList);
+                console.log("Ausgetreten" + newJoinedList);
+            })
         }
     }
 
@@ -262,19 +292,22 @@ export default HomeScreen = ({navigation}) => {
                             title={itemData.item.title}
                             subtitle={"Gruppengröße: " + itemData.item.minMembers + " – " + itemData.item.maxMembers + " Personen\n "+ itemData.item.date}
                             backgroundColor = {itemData.index % 2 === 0 ? white : lightGrey}
+                            isMember = {joinedCourses.indexOf(itemData.item.id) >= 0}
                         />
                     )
                 }}
                 renderHiddenItem={ (itemData) => {
                     return (
-                        <View style={{height: "100%", width: 150, flexDirection: "row", alignItems: "center", justifyContent: "center",}}>
-                            <FavButton/>
-                            <NogoButton/>
+                        <View style={{height: "100%", width: 75, flexDirection: "row", alignItems: "center", justifyContent: "center",}}>
+                            <JoinCourseButton
+                                backgroundColor={"#222f56"}
+                                onClick={() => {joinCourseHandler(itemData.item.id)}}
+                                isActive={joinedCourses.indexOf(itemData.item.id) >= 0}
+                            />
                         </View>
                     )
                 }}
-                leftOpenValue={150}
-                rightOpenValue={-75}
+                leftOpenValue={75}
             />
 
         </View>
