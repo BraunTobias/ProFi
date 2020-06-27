@@ -13,6 +13,7 @@ export default CourseScreen = ({route, navigation}) => {
     const {itemId} = route.params;
     const {itemTitle} = route.params;
     const currentUserId = DB.getCurrentUserId();
+    const [swipeListView, setSwipeListView] = useState();
 
     // States für Profil-Ansicht
     const [viewedUserId, setViewedUserId] = useState(false);
@@ -92,6 +93,7 @@ export default CourseScreen = ({route, navigation}) => {
     }, [navigation]);
 
     const clickIdeaHandler = (id, title, subtitle, skills) => {
+        swipeListView.safeCloseOpenRow();
         navigation.navigate("Project", {itemId: id, itemTitle: title, itemSubtitle: subtitle, skillsList: skills, courseId: itemId});
     };
 
@@ -156,6 +158,7 @@ export default CourseScreen = ({route, navigation}) => {
         }
     };
     const addFavHandler = (ideaId) => {
+        swipeListView.safeCloseOpenRow();
         if (currentFav == ideaId) {
             DB.deletePref("favourites", itemId, () => {
                 setCurrentFav("");
@@ -167,6 +170,7 @@ export default CourseScreen = ({route, navigation}) => {
         }
     }
     const addNogoHandler = (ideaId) => {
+        swipeListView.safeCloseOpenRow();
         if (currentNogo == ideaId) {
             DB.deletePref("nogos", itemId, () => {
                 setCurrentNogo("");
@@ -339,6 +343,7 @@ export default CourseScreen = ({route, navigation}) => {
             </FlatList>
 
             <SwipeListView
+                ref = {ref => setSwipeListView(ref)}
                 data={currentIdeas}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={(itemData) => { 

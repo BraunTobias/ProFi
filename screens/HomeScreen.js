@@ -14,6 +14,7 @@ export default HomeScreen = ({navigation}) => {
 
     const [currentCourses, setCurrentCourses] = useState([]);
     const [joinedCourses, setJoinedCourses] = useState([]);
+    const [swipeListView, setSwipeListView] = useState();
 
     const [addCourseVisibility, setAddCourseVisibility] = useState(false);
     const [currentCourseName, setCurrentCourseName] = useState("");
@@ -59,6 +60,7 @@ export default HomeScreen = ({navigation}) => {
     
     const clickHandler = (id, title, date, members, minMembers, maxMembers) => {
         // DB.signOut(() => {console.log("SIGNED OUT");});
+        swipeListView.safeCloseOpenRow();
         navigation.navigate("Course", {itemId: id, itemTitle: title, itemDate: date, members: members, minMembers: minMembers, maxMembers: maxMembers});
     };
 
@@ -159,6 +161,7 @@ export default HomeScreen = ({navigation}) => {
     }
 
     const joinCourseHandler = (courseId) => {
+        swipeListView.safeCloseOpenRow();
         if (joinedCourses.indexOf(courseId) < 0) {
             DB.joinCourse(courseId, () => {
                 const joinedList = joinedCourses;
@@ -283,6 +286,7 @@ export default HomeScreen = ({navigation}) => {
                 }}
             /> */}
             <SwipeListView
+                ref = {ref => setSwipeListView(ref)}
                 data={currentCourses}
                 renderItem={(itemData) => { 
                     return (
@@ -301,7 +305,7 @@ export default HomeScreen = ({navigation}) => {
                         <View style={{height: "100%", width: 75, flexDirection: "row", alignItems: "center", justifyContent: "center",}}>
                             <JoinCourseButton
                                 backgroundColor={"#222f56"}
-                                onClick={() => {joinCourseHandler(itemData.item.id)}}
+                                onClick={(ref) => {joinCourseHandler(itemData.item.id)}}
                                 isActive={joinedCourses.indexOf(itemData.item.id) >= 0}
                             />
                         </View>
