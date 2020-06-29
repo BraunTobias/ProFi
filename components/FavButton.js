@@ -10,7 +10,7 @@ export default FavButton = props => {
         style={[styles.itemContainer, {backgroundColor: props.backgroundColor}]}
         onPress={props.onClick}
       >
-        <Ionicons name="ios-star" size={40} color={"white"}/>
+        <Ionicons name="ios-star" size={40} color={props.iconColor}/>
       </TouchableOpacity>
   );
 };

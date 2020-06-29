@@ -39,7 +39,7 @@ export default ProfileView = props => {
     return ( 
         <View>
             {/* // "Header" mit Profildaten */}
-            <View style={{padding: 20, flexDirection: "row", justifyContent: 'flexStart', alignItems: 'center', backgroundColor: "#aeb8c3"}}>
+            <View style={{padding: 20, flexDirection: "row", justifyContent: 'flex-start', alignItems: 'center', backgroundColor: "#aeb8c3"}}>
                     
                 <View style={{flex:1, flexDirection: "column", justifyContent: 'center', alignItems: 'center'}}>
                     <Image 

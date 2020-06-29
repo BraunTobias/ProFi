@@ -113,8 +113,9 @@ export default ProfileScreen =  ({navigation})  => {
         const smallImage = await ImageManipulator.manipulateAsync(
             pickerResult.uri,
             [{ resize: { height: 400 } }],
-            { compress: 0.2 }
+            { compress: 0.2, base64: true}
         );
+        console.log("------ URI: " + smallImage.uri);
         DB.changeProfileImage(smallImage.uri);
     };
     // const toggleCameraHandler = async () => {

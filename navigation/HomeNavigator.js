@@ -4,7 +4,7 @@ import HomeScreen from '../screens/HomeScreen';
 import InputScreen from '../screens/InputScreen';
 import CourseScreen from '../screens/CourseScreen';
 import IdeaScreen from '../screens/IdeaScreen';
-import AttributeScreen from '../components/AttributeScreen';
+import AttributeListScreen from '../components/AttributeListScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { styles, texts, white, iconsize } from '../Styles'
 
@@ -23,8 +23,8 @@ export default HomeNavigator = () => {
             <HomeStack.Screen name = "AddProject" component = {InputScreen} options={{headerTitle: 'Projekt hinzufügen'}}/>
             <HomeStack.Screen name = "Course" component = {CourseScreen} options={{headerTitle: 'Kurs', headerBackTitle: ' '}}/>
             <HomeStack.Screen name = "Project" component= {IdeaScreen} options={{headerTitle: 'Idee', headerBackTitle: ' '}}/>
-            <HomeStack.Screen name = "IdeaSkills" component= {AttributeScreen} options={{headerTitle: 'Passende Fähigkeiten', headerBackTitle: ' '}}/>
-            <HomeStack.Screen name = "IdeaPrefs" component= {AttributeScreen} options={{headerTitle: 'Passende Präferenzen', headerBackTitle: ' '}}/>
+            <HomeStack.Screen name = "IdeaSkills" component= {AttributeListScreen} options={{headerTitle: 'Passende Fähigkeiten', headerBackTitle: ' '}}/>
+            <HomeStack.Screen name = "IdeaPrefs" component= {AttributeListScreen} options={{headerTitle: 'Passende Präferenzen', headerBackTitle: ' '}}/>
 
         </HomeStack.Navigator>
     );

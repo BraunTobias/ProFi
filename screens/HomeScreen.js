@@ -3,10 +3,13 @@ import {FlatList, Modal, View, TextInput, Text, TouchableWithoutFeedback, Keyboa
 import ListTile from "../components/ListTile";
 import {Button} from 'react-native-elements';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import NumericInput from 'react-native-numeric-input'
+import ModalDatePicker from 'react-native-datepicker-modal'
 import {Ionicons} from '@expo/vector-icons';
 import DB from '../api/DB_API';
 import InputTile from "../components/InputTile";
-import JoinCourseButton from "../components/JoinCourseButton";
+
+import DeleteCourseButton from "../components/DeleteCourseButton";
 import { styles, buttons, texts, white, lightGrey, iconsizeAdd } from "../Styles"
 
 export default HomeScreen = ({navigation}) => {
@@ -16,10 +19,13 @@ export default HomeScreen = ({navigation}) => {
     const [joinedCourses, setJoinedCourses] = useState([]);
     const [swipeListView, setSwipeListView] = useState();
 
+    const [findVisibility, setFindVisibility] = useState(false);
+    const [currentFindName, setCurrentFindName] = useState("");
     const [addCourseVisibility, setAddCourseVisibility] = useState(false);
     const [currentCourseName, setCurrentCourseName] = useState("");
-    const [currentMinMembers, setCurrentMinMembers] = useState("");
-    const [currentMaxMembers, setCurrentMaxMembers] = useState("");
+    const [currentCourseId, setCurrentCourseId] = useState("");
+    const [currentMinMembers, setCurrentMinMembers] = useState();
+    const [currentMaxMembers, setCurrentMaxMembers] = useState();
     const [currentDate, setCurrentDate] = useState("");
     // Später noch getrennte Warnungsfelder anlegen
     const [currentWarning, setCurrentWarning] = useState("");
@@ -30,6 +36,8 @@ export default HomeScreen = ({navigation}) => {
   
     // Wird nur beim Laden der Seite einmalig ausgeführt
     useEffect(() => {
+        console.ignoredYellowBox = ['Setting a timer'];
+
         const unsubscribe = navigation.addListener('focus', () => {
             DB.getCourseList((courseList) => {
                 // console.log(courseList);
@@ -43,7 +51,6 @@ export default HomeScreen = ({navigation}) => {
                 setJoinedCourses(joined);
             });
         });
-
     }, []);
     
     // Button fürs Hinzufügen neuer Kurse
@@ -58,51 +65,51 @@ export default HomeScreen = ({navigation}) => {
         });
     }, [navigation]);
     
-    const clickHandler = (id, title, date, members, minMembers, maxMembers) => {
+    const clickHandler = (id, title) => {
         // DB.signOut(() => {console.log("SIGNED OUT");});
         swipeListView.safeCloseOpenRow();
-        navigation.navigate("Course", {itemId: id, itemTitle: title, itemDate: date, members: members, minMembers: minMembers, maxMembers: maxMembers});
+        const isMember = joinedCourses.indexOf(id) >= 0
+        navigation.navigate("Course", {itemId: id, itemTitle: title, isMember: isMember});
     };
 
-    const addCourseHandler = (isAdd) => {
-        if (isAdd) {
-            if (currentCourseName != "" && currentMinMembers != "" && currentMaxMembers != "") {
-                if (parseInt(currentMinMembers) <= parseInt(currentMaxMembers)) {
-                    if (currentDate !== "") {
-                        console.log("add");
-                        DB.addCourse(currentCourseName, currentDate, currentMinMembers, currentMaxMembers, () => {
-                            setAddCourseVisibility(false);
-                            setCurrentCourseName("");
-                            setCurrentMinMembers("");
-                            setCurrentMaxMembers("");
-                            setCurrentDate("");
-                            DB.getCourseList((courseList) => {
-                                console.log(courseList);
-                                setCurrentCourses(courseList);
-                            });
-                        });
-                    } else {
-                        console.log("add");
-                        DB.addCourse(currentCourseName, "00.00.0000", currentMinMembers, currentMaxMembers, () => {
-                            setAddCourseVisibility(false);
-                            setCurrentCourseName("");
-                            setCurrentMinMembers("");
-                            setCurrentDate("");
-                            DB.getCourseList((courseList) => {
-                                console.log(courseList);
-                                setCurrentCourses(courseList);
-                            });
-                        });
-                    }
-                } else {
-                    setMaxMembersError("Maximum muss größer sein als das Minimum");
-                }
+    const addCourseHandler = () => {
+        if (currentCourseName != "" && currentMaxMembers > 1 && currentCourseId != "") {
+            if (currentMinMembers <= currentMaxMembers) {
+                console.log("add");
+                DB.addCourse(currentCourseName, currentCourseId, currentDate, currentMinMembers, currentMaxMembers, () => {
+                    setAddCourseVisibility(false);
+                    setCurrentCourseName("");
+                    setCurrentMinMembers("");
+                    setCurrentMaxMembers("");
+                    setCurrentDate("");
+                    DB.getCourseList((courseList) => {
+                        console.log(courseList);
+                        setCurrentCourses(courseList);
+                    });
+                }, (error) => {setCurrentWarning(error)});
             } else {
-                setCurrentWarning("Eingabe nicht vollständig");
+                setMaxMembersError("Maximum muss größer sein als das Minimum");
             }
         } else {
-            setAddCourseVisibility(false);
+            setCurrentWarning("Eingabe nicht vollständig");
         }
+    };
+
+    const deleteCourseHandler = (id) => {
+        swipeListView.safeCloseOpenRow();
+        DB.removeCourseFromList(id, () => {
+            DB.getCourseList((courseList) => {
+                // console.log(courseList);
+                setCurrentCourses(courseList);
+                var joined = [];
+                for (const course in courseList) {
+                    if (courseList[course].members.indexOf(currentUserId) >= 0) {
+                        joined.push(courseList[course].id);
+                    }
+                }
+                setJoinedCourses(joined);
+            });
+        });
     };
 
     const setCourseNameHandler = (enteredText) => {
@@ -119,36 +126,34 @@ export default HomeScreen = ({navigation}) => {
         }
     };
 
-    const setMinMaxMembersHandler = (enteredNumber, isMin) => {
-        if (enteredNumber) {
-            if (parseInt(enteredNumber)) {
-                enteredNumber = parseInt(enteredNumber);
-                //console.log(parseInt(enteredNumber));
-                setCurrentWarning("");
-                if (enteredNumber < 1) {
-                    if (isMin) setCurrentMinMembers("1");
-                    else setCurrentMaxMembers("1");
-                } else if (enteredNumber > 20) {
-                    if (isMin) setCurrentMinMembers("20");
-                    else setCurrentMaxMembers("20");
-                } else {
-                    if (isMin) setCurrentMinMembers(String(enteredNumber));
-                    else setCurrentMaxMembers(String(enteredNumber));
-                }
+    const setCourseIdHandler = (enteredText) => {
+        if (enteredText) {
+            if (true) {
+                // CHECK name-scheme
+                setCurrentCourseId(enteredText);
             } else {
-                // setCurrentWarning("Das ist keine Zahl");
-                if (isMin) setCurrentMinMembers("");
-                else setCurrentMaxMembers("");
+                setNameError("Bitte ans Namens-Schema halten")
             }
         } else {
-            if (isMin) {
-                setCurrentMinMembers("");
-                setMinMemebersError("Bitte Zahl eingeben");
-            } else {
-                setCurrentMaxMembers("");
-                setMaxMembersError("Bitte Zahl eingeben");
-            }
+            setCurrentCourseId("")
+            setNameError("Bitte einen Kursnamen eingeben")
         }
+    };
+
+    const setMinMaxMembersHandler = (enteredNumber, isMin) => {
+        setCurrentWarning("");
+
+        if (enteredNumber < 1) {
+            if (isMin) setCurrentMinMembers(1);
+            else setCurrentMaxMembers(1);
+        } else if (enteredNumber > 20) {
+            if (isMin) setCurrentMinMembers(20);
+            else setCurrentMaxMembers(20);
+        } else {
+            if (isMin) setCurrentMinMembers(enteredNumber);
+            else setCurrentMaxMembers(enteredNumber);
+        }
+        if (currentMaxMembers >= currentMinMembers) setMaxMembersError("");
     }
   
     const setDateHandler = (enteredDate) => {
@@ -160,26 +165,41 @@ export default HomeScreen = ({navigation}) => {
         }
     }
 
-    const joinCourseHandler = (courseId) => {
-        swipeListView.safeCloseOpenRow();
-        if (joinedCourses.indexOf(courseId) < 0) {
-            DB.joinCourse(courseId, () => {
-                const joinedList = joinedCourses;
-                joinedList.push(courseId);    
-                console.log(joinedList);
-                setJoinedCourses(joinedList);
-            }, () => {})
-        } else {
-            DB.exitCourse(courseId, () => {
-                const newJoinedList = joinedCourses.filter(course => course !== courseId);
-                setJoinedCourses(newJoinedList);
-                console.log("Ausgetreten" + newJoinedList);
+    const setFindCourseHandler = (enteredId) => {
+        if (enteredId) {
+            setCurrentFindName(enteredId);
+        }
+    }
+    const findCourseHandler = () => {
+        if (currentFindName != "") {
+            DB.addCourseToList(currentFindName, () => {
+                setFindVisibility(false);
+            }, (error) => {
+                console.log(error);
             })
         }
     }
 
+    // const joinCourseHandler = (courseId) => {
+    //     swipeListView.safeCloseOpenRow();
+    //     if (joinedCourses.indexOf(courseId) < 0) {
+    //         DB.joinCourse(courseId, () => {
+    //             const joinedList = joinedCourses;
+    //             joinedList.push(courseId);    
+    //             console.log(joinedList);
+    //             setJoinedCourses(joinedList);
+    //         }, () => {})
+    //     } else {
+    //         DB.exitCourse(courseId, () => {
+    //             const newJoinedList = joinedCourses.filter(course => course !== courseId);
+    //             setJoinedCourses(newJoinedList);
+    //             console.log("Ausgetreten" + newJoinedList);
+    //         })
+    //     }
+    // }
+
     return (
-        <View>
+        <View style={{flex: 1}}>
             <Modal visible= { addCourseVisibility } animationType= 'slide'>
                 <View style= { styles.modal } >
                     <TouchableWithoutFeedback onPress= { () => Keyboard.dismiss() } >
@@ -194,9 +214,20 @@ export default HomeScreen = ({navigation}) => {
                                         <TextInput 
                                             textAlign= {'left'}
                                             style= { texts.inputText }
-                                            placeholder= { "KürzelSemesterJahr" } 
+                                            placeholder= { "Kursname" } 
                                             onChangeText= { setCourseNameHandler }
-                                            value= { currentCourseName }
+                                        />
+                                        <Text>
+                                            { nameError }
+                                        </Text>
+                                    </View>
+                                    <View style= { styles.loginInput } >
+                                        <Text style= { texts.headline } >Kurs-ID</Text>
+                                        <TextInput 
+                                            textAlign= {'left'}
+                                            style= { texts.inputText }
+                                            placeholder= { "KürzelSemesterJahr" } 
+                                            onChangeText= { setCourseIdHandler }
                                         />
                                         <Text>
                                             { nameError }
@@ -205,13 +236,10 @@ export default HomeScreen = ({navigation}) => {
                                     
                                     <View style= { styles.loginInput } >
                                         <Text style= { texts.headline } >Minimale Mitgliederzahl</Text>
-                                        <TextInput 
-                                            textAlign= { 'left' }
-                                            style= { texts.inputText }
-                                            placeholder= '2'
-                                            onChangeText= { (text) => { setMinMaxMembersHandler(text, true) } } 
-                                            keyboardType= 'numeric'
-                                            value= { currentMinMembers }
+                                        <NumericInput 
+                                            onChange={(text) => { setMinMaxMembersHandler(text, true) }} 
+                                            minValue = { 0 }
+                                            maxValue= { 20 }
                                         />
                                         <Text>
                                             { minMembersError }
@@ -220,13 +248,10 @@ export default HomeScreen = ({navigation}) => {
 
                                     <View style= { styles.loginInput } >
                                         <Text style= { texts.headline } >Maximale Mitgliederzahl</Text>
-                                        <TextInput 
-                                            textAlign= { 'left' }
-                                            style= { texts.inputText }
-                                            placeholder= 'n'
-                                            onChangeText= { (text) => { setMinMaxMembersHandler(text, false) } } 
-                                            keyboardType= 'numeric'
-                                            value= { currentMaxMembers }
+                                        <NumericInput 
+                                            onChange={(text) => { setMinMaxMembersHandler(text, false) }} 
+                                            minValue = { 0 }
+                                            maxValue= { 20 }
                                         />
                                         <Text>
                                             { maxMembersError }
@@ -241,7 +266,7 @@ export default HomeScreen = ({navigation}) => {
                                             placeholder= 'TT.MM.JJJJ'
                                             onChangeText= { (text) => { setDateHandler(text) } } 
                                             keyboardType= 'numeric'
-                                            value= { currentDate }
+                                            // value= { currentDate }
                                         />
                                         <Text>
                                             { dateError }
@@ -257,13 +282,54 @@ export default HomeScreen = ({navigation}) => {
                                         buttonStyle= { buttons.buttonRow }
                                         titleStyle= { texts.buttonBlue }
                                         title= 'OK' 
-                                        onPress= { () => { addCourseHandler(true) } }
+                                        onPress= {addCourseHandler}
                                     />
                                     <Button 
                                         buttonStyle= { buttons.buttonRow }
                                         titleStyle= { texts.buttonBlue }
                                         title= 'Abbrechen'
-                                        onPress= { () => { addCourseHandler(false) } }
+                                        onPress= { () => { setAddCourseVisibility(false); setCurrentWarning(""); } }
+                                    />
+                                </View>
+                            </View>
+                        </View>
+                    </TouchableWithoutFeedback>
+                </View>
+            </Modal>
+            <Modal visible= { findVisibility } animationType= 'slide'>
+                <View style= { styles.modal } >
+                    <TouchableWithoutFeedback onPress= { () => Keyboard.dismiss() } >
+                        <View>
+                            <View style= { styles.headerFake } >
+                                <Text style= { texts.headerText } >Kurs finden</Text>
+                            </View>
+                            <View style= { styles.contentFake } >
+                                <View>
+                                    <View style= { styles.loginInput } >
+                                        <Text style= { texts.headline } >Kurs-ID</Text>
+                                        <TextInput 
+                                            textAlign= {'left'}
+                                            style= { texts.inputText }
+                                            placeholder= { "KürzelSemesterJahr" } 
+                                            onChangeText= { setFindCourseHandler }
+                                        />
+                                        <Text>
+                                            { nameError }
+                                        </Text>
+                                    </View>
+                                </View>
+                                <View style= { styles.row } >
+                                    <Button 
+                                        buttonStyle= { buttons.buttonRow }
+                                        titleStyle= { texts.buttonBlue }
+                                        title= 'OK' 
+                                        onPress= {findCourseHandler}
+                                    />
+                                    <Button 
+                                        buttonStyle= { buttons.buttonRow }
+                                        titleStyle= { texts.buttonBlue }
+                                        title= 'Abbrechen'
+                                        onPress= { () => { setFindVisibility(false) } }
                                     />
                                 </View>
                             </View>
@@ -285,13 +351,38 @@ export default HomeScreen = ({navigation}) => {
                     )
                 }}
             /> */}
+            <View style= { [styles.subHeader , {height: 100}]} >
+                <View style= { styles.row } >
+                    <Button 
+                        buttonStyle= { buttons.buttonRowGrey }
+                        titleStyle= { texts.buttonGrey }
+                        title= 'Kurs finden  ' 
+                        icon= {<Ionicons name={'ios-search'} size={25} color="black"/>}
+                        iconRight= {true}
+                        onPress= { () => { setFindVisibility(true) } }
+                    />
+                    <Button 
+                        buttonStyle= { buttons.buttonRow }
+                        titleStyle= { texts.buttonBlue }
+                        title= 'Neuer Kurs  '
+                        icon= {<Ionicons name={'ios-add'} size={25} color={white} />}
+                        iconRight= {true}
+                        onPress= { () => { setAddCourseVisibility(true) } }
+                    />
+                </View>
+            </View>
+
             <SwipeListView
+                style={{flexGrow: 1}}
                 ref = {ref => setSwipeListView(ref)}
                 data={currentCourses}
+                disableLeftSwipe = {true}
+                keyExtractor={(item, index) => index.toString()}
+
                 renderItem={(itemData) => { 
                     return (
                         <ListTile
-                            onClick={clickHandler} 
+                            onClick={() => {clickHandler(itemData.item.id, itemData.item.title)}} 
                             id={itemData.item.id}
                             title={itemData.item.title}
                             subtitle={"Gruppengröße: " + itemData.item.minMembers + " – " + itemData.item.maxMembers + " Personen\n "+ itemData.item.date}
@@ -302,12 +393,10 @@ export default HomeScreen = ({navigation}) => {
                 }}
                 renderHiddenItem={ (itemData) => {
                     return (
-                        <View style={{height: "100%", width: 75, flexDirection: "row", alignItems: "center", justifyContent: "center",}}>
-                            <JoinCourseButton
-                                backgroundColor={"#222f56"}
-                                onClick={(ref) => {joinCourseHandler(itemData.item.id)}}
-                                isActive={joinedCourses.indexOf(itemData.item.id) >= 0}
-                            />
+                        <View style={{height: "100%", width: 500}}>
+                                <DeleteCourseButton
+                                    onClick={(ref) => {deleteCourseHandler(itemData.item.id)}}
+                                />
                         </View>
                     )
                 }}

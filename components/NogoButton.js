@@ -10,7 +10,7 @@ export default NogoButton = props => {
         style={[styles.itemContainer, {backgroundColor: props.backgroundColor}]}
         onPress={props.onClick}
       >
-        <MaterialIcons name={'do-not-disturb-alt'} size={40} color={"white"} />
+        <MaterialIcons name={'do-not-disturb-alt'} size={40} color={props.iconColor} />
       </TouchableOpacity>
   );
 };

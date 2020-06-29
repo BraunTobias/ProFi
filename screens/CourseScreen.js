@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useLayoutEffect} from 'react';
-import {View, Text, FlatList, Modal, TouchableWithoutFeedback, TextInput, Keyboard } from "react-native";
+import {View, SafeAreaView, Text, FlatList, Modal, TouchableWithoutFeedback, TextInput, Keyboard } from "react-native";
 import ListTile from '../components/ListTile';
 import {Button} from 'react-native-elements';
 import { SwipeListView } from 'react-native-swipe-list-view';
@@ -12,6 +12,8 @@ import { styles, buttons, texts, white, lightGrey, grey, black, iconsize, iconsi
 export default CourseScreen = ({route, navigation}) => {
     const {itemId} = route.params;
     const {itemTitle} = route.params;
+    const {isMember} = route.params;
+    console.log(isMember);
     const currentUserId = DB.getCurrentUserId();
     const [swipeListView, setSwipeListView] = useState();
 
@@ -38,7 +40,8 @@ export default CourseScreen = ({route, navigation}) => {
     const [members, setMembers] = useState([]);
     const [minMembers, setMinMembers] = useState(0);
     const [maxMembers, setMaxMembers] = useState(0);
-    const [date, setDate] = useState("11.11.1111");
+    const [date, setDate] = useState("");
+    const [userIsMember, setUserIsMember] = useState(isMember);
     
     const [currentFav, setCurrentFav] = useState();
     const [currentNogo, setCurrentNogo] = useState();
@@ -166,6 +169,9 @@ export default CourseScreen = ({route, navigation}) => {
         } else {
             DB.addPref("favourites", itemId, ideaId, () => {
                 setCurrentFav(ideaId);
+                if (currentNogo == ideaId) {
+                    setCurrentNogo("");
+                }
             });
         }
     }
@@ -178,14 +184,30 @@ export default CourseScreen = ({route, navigation}) => {
         } else {
             DB.addPref("nogos", itemId, ideaId, () => {
                 setCurrentNogo(ideaId);
+                if (currentFav == ideaId) {
+                    setCurrentFav("");
+                }
             });
+        }
+    }
+    const joinCourseHandler = () => {
+        if (!userIsMember) {
+            DB.joinCourse(itemId, () => {
+                console.log("Joined");
+                setUserIsMember(true);
+            }, () => {console.log("error")})
+        } else {
+            DB.exitCourse(itemId, () => {
+                console.log("Ausgetreten");
+                setUserIsMember(false);
+            })
         }
     }
 
     return(
-        <View>
+        <View style={{flex: 1}}>
             <Modal visible={addIdeaVisibility} animationType='slide'>
-                <View style= { styles.modal } >
+                <SafeAreaView style= { styles.modal } >
                     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
                         <View>
                             <View style= { styles.headerFake } >
@@ -253,7 +275,7 @@ export default CourseScreen = ({route, navigation}) => {
                             </View>
                         </View>
                     </TouchableWithoutFeedback>
-                </View>
+                </SafeAreaView>
 
                 <Modal visible={skillsVisibility} animationType='slide'>
                     <View style={{height: "85%"}}>
@@ -310,17 +332,17 @@ export default CourseScreen = ({route, navigation}) => {
                     <Button 
                         buttonStyle= { buttons.buttonRowGrey }
                         titleStyle= { texts.buttonGrey }
-                        title= 'Mitglied  ' 
-                        icon= {<Ionicons name={'ios-checkbox-outline'} size={iconsize} color={black}/>}
-                        iconRight= 'true'
-                        onPress= { () => { setAddIdeaVisibility(true) } }
+                        title= {userIsMember ? 'Mitglied  ' : "Beitreten" }
+                        icon= {<Ionicons name={userIsMember ? 'ios-checkbox' : 'ios-checkbox-outline'} size={iconsize} color={black}/>}
+                        iconRight= {true}
+                        onPress= {joinCourseHandler}
                     />
                     <Button 
                         buttonStyle= { buttons.buttonRow }
                         titleStyle= { texts.buttonBlue }
                         title= 'Neue Idee  '
                         icon= {<Ionicons name={'ios-add'} size={iconsize} color={white} />}
-                        iconRight= 'true'
+                        iconRight= {true}
                         onPress= { () => { setAddIdeaVisibility(true) } }
                     />
                 </View>
@@ -339,12 +361,13 @@ export default CourseScreen = ({route, navigation}) => {
                     );
                 }}
             >
-
             </FlatList>
 
             <SwipeListView
+                style={{flexGrow: 1}}
                 ref = {ref => setSwipeListView(ref)}
                 data={currentIdeas}
+                disableLeftSwipe = {true}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={(itemData) => { 
                     return (
@@ -362,19 +385,23 @@ export default CourseScreen = ({route, navigation}) => {
                 }}
                 renderHiddenItem={ (itemData) => {
                     return (
-                        <View style={{height: "100%", width: 120, flexDirection: "row", alignItems: "center", justifyContent: "center",}}>
-                            <FavButton 
-                                ideaId={itemData.item.id} 
-                                courseId={itemId} 
-                                backgroundColor={itemData.item.id == currentFav ? "blue" : "grey"}
-                                onClick={() => {addFavHandler(itemData.item.id)}}
-                            />
-                            <NogoButton 
-                                ideaId={itemData.item.id} 
-                                courseId={itemId} 
-                                backgroundColor={itemData.item.id == currentNogo ? "red" : "grey"}
-                                onClick={() => {addNogoHandler(itemData.item.id)}}
-                            />
+                        <View style={{width: "90%", backgroundColor: "#640023"}}>
+                            <View style={{height: "100%", width: 120, flexDirection: "row", alignItems: "center", justifyContent: "center"}}>
+                                <FavButton 
+                                    ideaId={itemData.item.id} 
+                                    courseId={itemId} 
+                                    backgroundColor={itemData.item.id == currentFav ? "#aeb8c3" : "#222f56"}
+                                    iconColor={itemData.item.id == currentFav ? "#f2f3f4" : "white"}
+                                    onClick={() => {addFavHandler(itemData.item.id)}}
+                                />
+                                <NogoButton 
+                                    ideaId={itemData.item.id} 
+                                    courseId={itemId} 
+                                    backgroundColor={itemData.item.id == currentNogo ? "#aeb8c3" : "#640023"}
+                                    iconColor={itemData.item.id == currentNogo ? "#f2f3f4" : "white"}
+                                    onClick={() => {addNogoHandler(itemData.item.id)}}
+                                />
+                            </View>
                         </View>
                     )
                 }}

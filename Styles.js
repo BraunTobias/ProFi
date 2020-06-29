@@ -4,10 +4,11 @@ const width = Dimensions.get('window').width; //full width
 
 const darkBlue = '#222f56';
 const lightBlue = '#f5f7f7';
-const lightGrey = '#d7dde3';
+const lightGrey = '#f2f3f4';
 const grey = '#bdc6cf';
 const darkGrey = '#aeb8c3';
-const black = 'black';
+const red = '#640023';
+const black = '#333333';
 const white = 'white';
 
 const iconsize = 45;
@@ -121,7 +122,7 @@ const styles = StyleSheet.create({
     loginInput: {
         justifyContent: 'flex-start', 
         alignItems: 'flex-start',
-        marginBottom: 10,
+        marginBottom: 0,
         //width: 300,
     },
 
@@ -169,41 +170,42 @@ const buttons = StyleSheet.create({
 const texts = StyleSheet.create({
     
     headerText: {
-        fontSize: 32,
+        fontSize: 24,
+        letterSpacing: 0.5,
         fontWeight: 'bold',
         color: white
     },
 
     headline: {
-        fontSize: 22,
+        fontSize: 18,
         fontWeight: 'bold',
         color: black
     },
 
     text: {
-        fontSize: 22,
+        fontSize: 18,
         color: black
     },
 
     headlineCenter: {
-        fontSize: 22,
+        fontSize: 18,
         fontWeight: 'bold',
         color: black,
         textAlign: 'center'
     },
 
     inputText: {
-        fontSize: 22,
+        fontSize: 18,
         color: black
     },
     
     buttonBlue: {
-        fontSize: 22, 
+        fontSize: 18, 
         color: white
     },
 
     buttonGrey: {
-        fontSize: 22, 
+        fontSize: 18, 
         color: black
     },
 })

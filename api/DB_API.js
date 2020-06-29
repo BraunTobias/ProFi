@@ -169,6 +169,11 @@ const DB = {
             onError(error, oldPassword);
         });
     },
+    testProfileImage: async function(uri) {
+        const response = await fetch(uri);
+        console.log("Success");
+    },
+    
     changeProfileImage: async function(newImageUri) {
         var oldImageName = "";
         const currentUserId = firebase.auth().currentUser.uid;
@@ -177,14 +182,17 @@ const DB = {
             oldImageName = userDoc.data().imageName;
         }
         const response = await fetch(newImageUri);
+        // console.log(response);
         const blob = await response.blob();
         const imageName = this.guidGenerator();
+
         const uploadTask = firebase.storage().ref().child("images/" + imageName).put(blob);
         uploadTask.on("state_changed", (snapshot) => {
             var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             console.log("snapshot: " + snapshot.state + " " + progress + "% done");
         }, (error) => {
             // Fehler beim Hochladen
+            console.log(error);
         }, () => {
             uploadTask.snapshot.ref.getDownloadURL()
             .then((downloadURL) => {
@@ -205,22 +213,31 @@ const DB = {
             })
         });
 
-        // ALTES PROFILBILD VON STORAGE LÖSCHEN!!
     },
 
     // Neuen Kurs erstellen (Objekt der Klasse course übergeben)
-    addCourse: function(title, date, minMembers, maxMembers, onSuccess) {
+    addCourse: function(title, id, date, minMembers, maxMembers, onSuccess, onError) {
         const currentUserID = firebase.auth().currentUser.uid;
 
-        firebase.firestore().collection("courses").add({
-            title: title,
-            date: date,
-            minMembers: minMembers,
-            maxMembers: maxMembers,
-            prospects: [currentUserID],
-        })
-        .then(() => {
-            onSuccess();
+        // checken ob es die ID schon gibt
+        const courseWithId = firebase.firestore().collection("courses").doc(id)
+        courseWithId.get()
+        .then((docSnapshot) => {
+            if (docSnapshot.exists) {
+                onError("Diese ID ist schon vergeben!");
+            } else {
+                firebase.firestore().collection("courses").doc(id).set({
+                    title: title,
+                    date: date,
+                    minMembers: minMembers,
+                    maxMembers: maxMembers,
+                    prospects: [currentUserID],
+                    members: []
+                })
+                .then(() => {
+                    onSuccess();
+                });
+            }
         });
     },
 
@@ -253,7 +270,6 @@ const DB = {
             currentUserName = currentUserDoc.data().username;
             currentUserImage = currentUserDoc.data().image;
         }
-
         firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaId).collection("comments").add({
             name: currentUserName,
             image: currentUserImage,
@@ -333,29 +349,39 @@ const DB = {
         const currentUserID = firebase.auth().currentUser.uid;
         var alreadyProspect = false;
 
-        const snapshotDoc = await firebase.firestore().collection("courses").doc(courseId).get();
+        // checken ob es die ID gibt
+        const courseWithId = firebase.firestore().collection("courses").doc(courseId)
+        courseWithId.get()
+        .then((docSnapshot) => {
+            if (docSnapshot.exists) {
+                if (docSnapshot.data().prospects) {
+                    prospectsArray = docSnapshot.data().prospects;
+                    prospectsArray.forEach((prospectId) => {
+                        if (prospectId == currentUserID) {
+                            alreadyProspect = true;
+                        }
+                    });
+                }
+                // Wenn der User noch nicht im Kurs ist, wird er ans Array angehängt und dieses neu hochgeladen.
+                if (!alreadyProspect) {
+                    prospectsArray.push(currentUserID);
+                    firebase.firestore().collection("courses").doc(courseId).set({
+                        prospects: prospectsArray
+                    }, {merge: true}); 
+        
+                    console.log(prospectsArray);
+                    onSuccess();
+                } else {
+                    onError("User ist schon am Kurs interessiert");
+                }         
+            } else {
+                onError("Diese ID existiert nicht.");
+            }
+        });
+
+        // const snapshotDoc = await firebase.firestore().collection("courses").doc(courseId).get();
 
         // Wenn schon eine Members-Liste existiert (tut sie höchstwahrscheinlich) wird geprüft ob der User schon darin enthalten ist
-        if (snapshotDoc.data().prospects) {
-            prospectsArray = snapshotDoc.data().prospects;
-            prospectsArray.forEach((prospectId) => {
-                if (prospectId == currentUserID) {
-                    alreadyProspect = true;
-                }
-            });
-        }
-        // Wenn der User noch nicht im Kurs ist, wird er ans Array angehängt und dieses neu hochgeladen.
-        if (!alreadyProspect) {
-            prospectsArray.push(currentUserID);
-            firebase.firestore().collection("courses").doc(courseId).set({
-                prospects: prospectsArray
-            }, {merge: true}); 
-
-            console.log(prospectsArray);
-            onSuccess();
-        } else {
-            onError("User ist schon am Kurs interessiert");
-        }
     },
 
     // Der User wird zur Members-Liste eines Kurses hinzugefügt bzw. entfernt
@@ -453,7 +479,6 @@ const DB = {
         if (snapshotData) {            
             // Gibt Liste als (alphabetisch geordnetes) Array zurück
             for (var title in snapshotData) {
-                console.log("title: " + title);
                 if (filterList.length == 0 || filterList.indexOf(title) >= 0) {
                     attributesList.push([title, snapshotData[title]]);
                 }
@@ -463,6 +488,31 @@ const DB = {
         } else {
             onError("Kategorie nicht gefunden");
         }
+    },
+
+    // Liste aller Skills bzw. Präferenzen ausgeben (kann gefiltert werden)
+    getAllAttributes: async function(attributeType, filterList, onSuccess, onError) {
+        const attributesList = [];
+        const currentUserID = firebase.auth().currentUser.uid;
+
+        const snapshot = await firebase.firestore().collection("users").doc(currentUserID).collection(attributeType).get();
+
+        snapshot.forEach((doc) => {
+            const tempArray = [doc.id];
+            const tempAtt = [];
+            for (const title in doc.data()) {
+                if (filterList.length == 0 || filterList.indexOf(title) >= 0) {
+                    console.log("title: " + title);
+                    tempAtt.push(title);
+                }
+            }
+            if (tempAtt.length > 0) {
+                const tempAttString = tempAtt.join("\n");
+                tempArray.push(tempAttString);
+                attributesList.push(tempArray);
+            }
+        });    
+        onSuccess(attributesList);
     },
 
     // Liste aller Skills bzw. Präferenzen einer Kategorie ausgeben (OHNE Info, ob der User diese hat oder nicht)
