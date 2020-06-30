@@ -5,6 +5,7 @@ import { LogInContext } from './data/LogInContext';
 import * as firebase from 'firebase';
 import 'firebase/firestore';
 import {decode, encode} from 'base-64';
+console.disableYellowBox = true;
 
 if (!global.btoa) { global.btoa = encode }
 if (!global.atob) { global.atob = decode }

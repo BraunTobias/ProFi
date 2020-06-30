@@ -46,7 +46,7 @@ export default ListTile = props => {
               <Text numberOfLines={2} ellipsizeMode="tail" style = {styles.subtitle}>{props.subtitle}</Text>
           </View>
           <View style={{flex: 1, justifyContent: "center", alignItems: "center", paddingEnd: 15}}>
-              <Image style={styles.arrow} source={require("../assets/Icons/arrow-right.png")} resizeMode="contain"/>
+              <Image style={styles.arrow} source={require("../assets/icons/arrow-right.png")} resizeMode="contain"/>
               {/* <Ionicons name="ios-arrow-forward" size={60} color={"#dae1e5"}/> */}
               {/* <Ionicons name="chevron-forward-outline" size="50" color="white" />; */}
           </View>
