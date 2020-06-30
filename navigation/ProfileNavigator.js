@@ -17,7 +17,6 @@ export default ProfileNavigator = () => {
         }}>
             <ProfileStack.Screen name = "Mein Profil" component = {ProfileScreen}/>
             <ProfileStack.Screen name = "Fähigkeiten" component = {AttributeScreen} options={{headerBackTitle: ' '}}/>
-            <ProfileStack.Screen name = "Präferenzen" component = {AttributeScreen} options={{headerBackTitle: ' '}}/>
         </ProfileStack.Navigator>
     );
 };

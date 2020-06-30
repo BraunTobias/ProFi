@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, TouchableHighlight, View } from "react-native";
+import { StyleSheet, Text, Image, TouchableOpacity, TouchableHighlight, View } from "react-native";
 import {Ionicons} from '@expo/vector-icons';
 import {MaterialIcons} from '@expo/vector-icons';
 import FavButton from './FavButton';
@@ -41,12 +41,13 @@ export default ListTile = props => {
           <View style={{flex: 9, justifyContent: "center"}}>
               <View style={{flexDirection: "row"}}>
                 <PrefIcon/>
-                <Text style = {styles.title}> {props.title} </Text>
+                <Text style = {styles.title}>{props.title}</Text>
               </View>
-              <Text numberOfLines={2} ellipsizeMode="tail" style = {styles.subtitle}> {props.subtitle} </Text>
+              <Text numberOfLines={2} ellipsizeMode="tail" style = {styles.subtitle}>{props.subtitle}</Text>
           </View>
-          <View style={{flex: 1, justifyContent: "center", alignItems: "center", paddingEnd: 10}}>
-              <Ionicons name="ios-arrow-forward" size={60} color={"#dae1e5"}/>
+          <View style={{flex: 1, justifyContent: "center", alignItems: "center", paddingEnd: 15}}>
+              <Image style={styles.arrow} source={require("../assets/Icons/arrow-right.png")} resizeMode="contain"/>
+              {/* <Ionicons name="ios-arrow-forward" size={60} color={"#dae1e5"}/> */}
               {/* <Ionicons name="chevron-forward-outline" size="50" color="white" />; */}
           </View>
         </View>
@@ -71,4 +72,8 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
   },
+  arrow: {
+    height: "60%",
+    tintColor: "#bec9d3"
+  }
 });

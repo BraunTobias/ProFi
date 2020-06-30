@@ -2,6 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from '../screens/LoginScreen';
+import {Ionicons} from '@expo/vector-icons';
 import RegistrationScreen from '../screens/RegistrationScreen';
 import { styles, texts, white, iconsize } from '../Styles';
 

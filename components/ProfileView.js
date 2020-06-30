@@ -18,20 +18,15 @@ import DB from '../api/DB_API';
 export default ProfileView = props => {
     // const [authentication, setAuthentication, user, setUser] = useContext(LogInContext);
     const [currentName, setCurrentName] = useState("");
-    const [currentMail, setCurrentMail] = useState("");
-    const [currentPW, setCurrentPW] = useState("");
-    const [acknowledgementVisibility, setAcknowledgementVisibility] = useState(false);
-    // const [currentFunctions, setCurrentFunctions] = useState(user.functions);
-    // const [currentInterests, setCurrentInterests] = useState(user.interests);
-    const [functionsVisibility, setFunctionsVisibility] = useState(false);
-    const [interestsVisibility, setInterestsVisibility] = useState(false);
+    const [currentBio, setCurrentBio] = useState("");
     const [selectedImage, setSelectedImage] = useState({});
 
 
     // Wird nur beim Laden der Seite einmalig ausgeführt
     useEffect(() => {
-        DB.getUserInfoById(props.userId, (name, imageUrl) => {
+        DB.getUserInfoById(props.userId, (name, imageUrl, bio) => {
             setCurrentName(name);
+            setCurrentBio(bio);
             setSelectedImage({localUri: imageUrl});
         });
     }, []);
@@ -53,6 +48,10 @@ export default ProfileView = props => {
                             <Text>Benutzername:</Text>
                             <Text>{currentName}</Text>
                         </View>
+                        <View style={{width: "90%"}} >
+                            <Text>Kurzbeschreibung:</Text>
+                            <Text>{currentBio}</Text>
+                        </View>
                             
                 </View>
                 
@@ -63,12 +62,6 @@ export default ProfileView = props => {
                             subtitle={"Skills"}
                             onClick={() => {}} 
                     />
-                    <ListTile
-                            title={"Präferenzen von " + currentName}
-                            subtitle={"Prefs"}
-                            onClick={() => {}} 
-                    />
-
             </View>
         </View>
      );

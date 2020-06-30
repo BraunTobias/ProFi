@@ -32,7 +32,11 @@ export default MainNavigator = () => {
                     inactiveTintColor: lightGrey,
                     activeBackgroundColor: darkGrey,
                     inactiveBackgroundColor: darkGrey,
-                    showLabel: false
+                    showLabel: false,
+                    style: {
+                        backgroundColor: darkGrey,
+                    },
+              
                 }}
             >
                 <Tab.Screen name = "Home" component ={HomeNavigator}/>

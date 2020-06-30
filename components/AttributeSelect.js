@@ -7,6 +7,7 @@ import {Button} from 'react-native-elements';
 import {Ionicons} from '@expo/vector-icons';
 import { Icon } from 'react-native-elements';
 import { TouchableHighlight } from 'react-native-gesture-handler';
+import { styles, buttons, texts, white, lightGrey, grey, black, iconsize, iconsizeAdd } from '../Styles';
 import DB from '../api/DB_API';
 
 export default AttributeSelect = props => {
@@ -37,24 +38,32 @@ export default AttributeSelect = props => {
 
         return(
             <View style={{height: "100%"}}>
-                {/* Fähigkeiten-Header: Icons */}
-                <FlatList
-                    data={categoriesList}
-                    horizontal={true}
-                    showsHorizontalScrollIndicator={false}
-                    keyExtractor={(item, index) => index.toString()}
-                    renderItem={(itemData) => { 
-                        return (
-                            <CategoryIcon
-                                onClick={() => {clickCategoryHandler(itemData.item)}} 
-                                title={itemData.item}
-                                // imageUrl={itemData.item.imageUrl}
-                            />
-                        );
-                    }}
-                />
 
-                <Text>{currentCategory}</Text>
+                <View style= { styles.subHeader } >
+                    <View style= {styles.membersRow} >
+                            {/* Fähigkeiten-Header: Icons */}
+                            <FlatList
+                                style ={{paddingLeft: 15, paddingRight: 15}}
+                                data={categoriesList}
+                                horizontal={true}
+                                showsHorizontalScrollIndicator={false}
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={(itemData) => { 
+                                    return (
+                                        <CategoryIcon
+                                            onClick={() => {clickCategoryHandler(itemData.item)}} 
+                                            title={itemData.item}
+                                            isActive={currentCategory == itemData.item}
+                                            // imageUrl={itemData.item.imageUrl}
+                                        />
+                                    );
+                                }}
+                            />
+
+                    </View>
+                </View>
+
+                <Text style={[texts.headline, {paddingLeft: 20, padding: 10}]}>{currentCategory}</Text>
 
                 <FlatList style={{height: "90%"}}
                     data={displayedSkills}

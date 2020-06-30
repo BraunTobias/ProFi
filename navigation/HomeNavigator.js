@@ -24,7 +24,6 @@ export default HomeNavigator = () => {
             <HomeStack.Screen name = "Course" component = {CourseScreen} options={{headerTitle: 'Kurs', headerBackTitle: ' '}}/>
             <HomeStack.Screen name = "Project" component= {IdeaScreen} options={{headerTitle: 'Idee', headerBackTitle: ' '}}/>
             <HomeStack.Screen name = "IdeaSkills" component= {AttributeListScreen} options={{headerTitle: 'Passende Fähigkeiten', headerBackTitle: ' '}}/>
-            <HomeStack.Screen name = "IdeaPrefs" component= {AttributeListScreen} options={{headerTitle: 'Passende Präferenzen', headerBackTitle: ' '}}/>
 
         </HomeStack.Navigator>
     );

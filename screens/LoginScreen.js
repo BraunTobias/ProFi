@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { View, TextInput, Text, Modal, TouchableOpacity } from 'react-native';
-import { Button } from 'react-native-elements';
+import Button from '../components/Button';
 import { BackHandler } from 'react-native';
 import { LogInContext } from '../data/LogInContext';
 import { USERS } from '../data/dummy-data'
@@ -33,12 +33,13 @@ export default LoginScreen = ({navigation}) => {
             <Modal visible={errorVisibility} transparent = {true}>
                 <View style={styles.error}>
                     <Text style= { texts.headlineCenter } >Falsche E-Mail oder Passwort eingegeben.</Text>
-                    <Button
-                        buttonStyle= { buttons.button1 }
-                        titleStyle= { texts.buttonBlue }
+                    <Button 
+                        buttonStyle= { buttons.buttonColumn }
+                        titleStyle= { texts.buttonBlueCenter }
                         title='OK'
-                        onPress={() => setErrorVisibility(false)}
+                        onClick={() => setErrorVisibility(false)}
                     />
+
                 </View>
             </Modal>
             
@@ -63,24 +64,24 @@ export default LoginScreen = ({navigation}) => {
             </View>
 
             <Button 
-                buttonStyle= { buttons.button1 }
-                titleStyle= { texts.buttonBlue }
+                buttonStyle= { buttons.buttonColumn }
+                titleStyle= { texts.buttonBlueCenter }
                 title= "Login"
-                onPress={checkAuth}
+                onClick={checkAuth}
             />
 
             <Button 
-                buttonStyle={ buttons.button1 }
-                titleStyle= { texts.buttonBlue }
+                buttonStyle={ buttons.buttonColumn }
+                titleStyle= { texts.buttonBlueCenter }
                 title= "Registrieren"
-                onPress={() =>navigation.navigate("Registration")}
+                onClick={() =>navigation.navigate("Registration")}
             />
 
             <Button 
-                buttonStyle={ buttons.button1 }
-                titleStyle= { texts.buttonBlue }
+                buttonStyle={ buttons.buttonColumn }
+                titleStyle= { texts.buttonBlueCenter }
                 title= "Beenden"
-                onPress={() =>BackHandler.exitApp()}
+                onClick={() =>BackHandler.exitApp()}
             />
         </View>
     );

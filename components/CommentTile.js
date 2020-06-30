@@ -31,10 +31,10 @@ export default CommentTile = props => {
       </TouchableOpacity>
       <View style={{width: "80%", justifyContent: "center", alignItems: "flex-start", paddingStart: 15}}>
           <View style={{flexDirection: "row", justifyContent: "space-between", width: "100%", alignItems: "baseline"}}>            
-            <Text style = {styles.title}> {currentUserName} </Text>
-            <Text style = {styles.time}> {date} </Text>
+            <Text style = {styles.title}>{currentUserName}</Text>
+            <Text style = {styles.time}>{date}</Text>
           </View>
-          <Text style = {styles.subtitle}> {props.subtitle} </Text>
+          <Text style = {styles.subtitle}>{props.subtitle}</Text>
       </View>
     </View>
   );

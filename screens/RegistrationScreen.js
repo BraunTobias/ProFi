@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { View, TextInput, Text, Modal } from 'react-native';
-import { Button } from 'react-native-elements';
+import Button from '../components/Button';
 import { LogInContext } from '../data/LogInContext';
 import { USERS } from '../data/dummy-data'
 import DB from '../api/DB_API';
@@ -35,12 +35,14 @@ export default RegistrationScreen = ({navigation}) => {
             <Modal visible={errorVisibility} transparent = {true}>
                 <View style={ styles.error }>
                 <Text style= { texts.headlineCenter } >Eine gültige E-Mail und Passwort eingeben.</Text>
+                
                     <Button 
-                        buttonStyle= { buttons.button1 }
-                        titleStyle= { texts.buttonBlue }
+                        buttonStyle= { buttons.buttonColumn }
+                        titleStyle= { texts.buttonBlueCenter }
                         title='OK'
-                        onPress={() => setErrorVisibility(false)}
+                        onClick={() => setErrorVisibility(false)}
                     />
+
                 </View>
             </Modal>
             
@@ -73,19 +75,14 @@ export default RegistrationScreen = ({navigation}) => {
                     onChangeText={changePWHandler}
                 />
             </View>
-            
+
             <Button 
-                buttonStyle= { buttons.button1 }
-                titleStyle= { texts.buttonBlue }
+                buttonStyle= { buttons.buttonColumn }
+                titleStyle= { texts.buttonBlueCenter }
                 title= "Registrieren"
-                onPress={register}
-                // onPress={() => {
-                //     setUser(USERS[1])
-                //     console.log("setUser(USERS[1])")
-                //     setAuthentication(true)
-                //     console.log("setAuthentication(true)")
-                // }}
+                onClick={register}
             />
+           
         </View>
     );
 }

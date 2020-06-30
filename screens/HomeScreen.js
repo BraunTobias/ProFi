@@ -1,7 +1,7 @@
 import React, {useState, useLayoutEffect, useEffect}from "react";
 import {FlatList, Modal, View, TextInput, Text, TouchableWithoutFeedback, Keyboard} from "react-native";
 import ListTile from "../components/ListTile";
-import {Button} from 'react-native-elements';
+import Button from '../components/Button';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import NumericInput from 'react-native-numeric-input'
 import ModalDatePicker from 'react-native-datepicker-modal'
@@ -37,7 +37,7 @@ export default HomeScreen = ({navigation}) => {
     // Wird nur beim Laden der Seite einmalig ausgeführt
     useEffect(() => {
         console.ignoredYellowBox = ['Setting a timer'];
-
+        DB.updateAttributesList();
         const unsubscribe = navigation.addListener('focus', () => {
             DB.getCourseList((courseList) => {
                 // console.log(courseList);
@@ -210,7 +210,7 @@ export default HomeScreen = ({navigation}) => {
                             <View style= { styles.contentFake } >
                                 <View>
                                     <View style= { styles.loginInput } >
-                                        <Text style= { texts.headline } >Kursname</Text>
+                                        <Text style= { texts.buttonGrey } >Kursname</Text>
                                         <TextInput 
                                             textAlign= {'left'}
                                             style= { texts.inputText }
@@ -222,7 +222,7 @@ export default HomeScreen = ({navigation}) => {
                                         </Text>
                                     </View>
                                     <View style= { styles.loginInput } >
-                                        <Text style= { texts.headline } >Kurs-ID</Text>
+                                        <Text style= { texts.buttonGrey } >Kurs-ID</Text>
                                         <TextInput 
                                             textAlign= {'left'}
                                             style= { texts.inputText }
@@ -235,7 +235,7 @@ export default HomeScreen = ({navigation}) => {
                                     </View>
                                     
                                     <View style= { styles.loginInput } >
-                                        <Text style= { texts.headline } >Minimale Mitgliederzahl</Text>
+                                        <Text style= { texts.buttonGrey } >Minimale Mitgliederzahl</Text>
                                         <NumericInput 
                                             onChange={(text) => { setMinMaxMembersHandler(text, true) }} 
                                             minValue = { 0 }
@@ -247,7 +247,7 @@ export default HomeScreen = ({navigation}) => {
                                     </View>
 
                                     <View style= { styles.loginInput } >
-                                        <Text style= { texts.headline } >Maximale Mitgliederzahl</Text>
+                                        <Text style= { texts.buttonGrey } >Maximale Mitgliederzahl</Text>
                                         <NumericInput 
                                             onChange={(text) => { setMinMaxMembersHandler(text, false) }} 
                                             minValue = { 0 }
@@ -259,7 +259,7 @@ export default HomeScreen = ({navigation}) => {
                                     </View>
 
                                     <View style= { styles.loginInput } >
-                                        <Text style= { texts.headline } >Enddatum (optional)</Text>
+                                        <Text style= { texts.buttonGrey } >Enddatum (optional)</Text>
                                         <TextInput 
                                             textAlign= { 'left' }
                                             style= { texts.inputText }
@@ -280,15 +280,15 @@ export default HomeScreen = ({navigation}) => {
                                 <View style= { styles.row } >
                                     <Button 
                                         buttonStyle= { buttons.buttonRow }
-                                        titleStyle= { texts.buttonBlue }
+                                        titleStyle= { texts.buttonBlueCenter }
                                         title= 'OK' 
-                                        onPress= {addCourseHandler}
+                                        onClick= {addCourseHandler}
                                     />
                                     <Button 
                                         buttonStyle= { buttons.buttonRow }
-                                        titleStyle= { texts.buttonBlue }
+                                        titleStyle= { texts.buttonBlueCenter }
                                         title= 'Abbrechen'
-                                        onPress= { () => { setAddCourseVisibility(false); setCurrentWarning(""); } }
+                                        onClick= { () => { setAddCourseVisibility(false); setCurrentWarning(""); } }
                                     />
                                 </View>
                             </View>
@@ -321,15 +321,15 @@ export default HomeScreen = ({navigation}) => {
                                 <View style= { styles.row } >
                                     <Button 
                                         buttonStyle= { buttons.buttonRow }
-                                        titleStyle= { texts.buttonBlue }
+                                        titleStyle= { texts.buttonBlueCenter }
                                         title= 'OK' 
-                                        onPress= {findCourseHandler}
+                                        onClick= {findCourseHandler}
                                     />
                                     <Button 
                                         buttonStyle= { buttons.buttonRow }
-                                        titleStyle= { texts.buttonBlue }
+                                        titleStyle= { texts.buttonBlueCenter }
                                         title= 'Abbrechen'
-                                        onPress= { () => { setFindVisibility(false) } }
+                                        onClick= { () => { setFindVisibility(false) } }
                                     />
                                 </View>
                             </View>
@@ -351,23 +351,21 @@ export default HomeScreen = ({navigation}) => {
                     )
                 }}
             /> */}
-            <View style= { [styles.subHeader , {height: 100}]} >
-                <View style= { styles.row } >
+            <View style= {styles.subHeader} >
+                <View style= { styles.paddedRow } >
                     <Button 
                         buttonStyle= { buttons.buttonRowGrey }
                         titleStyle= { texts.buttonGrey }
                         title= 'Kurs finden  ' 
-                        icon= {<Ionicons name={'ios-search'} size={25} color="black"/>}
-                        iconRight= {true}
-                        onPress= { () => { setFindVisibility(true) } }
+                        icon= "find"
+                        onClick= { () => { setFindVisibility(true) } }
                     />
                     <Button 
                         buttonStyle= { buttons.buttonRow }
                         titleStyle= { texts.buttonBlue }
                         title= 'Neuer Kurs  '
-                        icon= {<Ionicons name={'ios-add'} size={25} color={white} />}
-                        iconRight= {true}
-                        onPress= { () => { setAddCourseVisibility(true) } }
+                        icon= "plus"
+                        onClick= { () => { setAddCourseVisibility(true) } }
                     />
                 </View>
             </View>

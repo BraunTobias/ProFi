@@ -24,6 +24,7 @@ import DB from '../api/DB_API';
 export default ProfileScreen =  ({navigation})  => {
     // const [authentication, setAuthentication, user, setUser] = useContext(LogInContext);
     const [currentName, setCurrentName] = useState("");
+    const [currentBio, setCurrentBio] = useState("");
     const [currentMail, setCurrentMail] = useState("");
     const [currentPW, setCurrentPW] = useState("");
     const [acknowledgementVisibility, setAcknowledgementVisibility] = useState(false);
@@ -47,6 +48,7 @@ export default ProfileScreen =  ({navigation})  => {
             // setCurrentIdeas(ideasList);
             console.log(data);
             setCurrentName(data.username);
+            setCurrentBio(data.bio);
             setCurrentMail(data.email);
             setCurrentPW(data.password);
             setSelectedImage({localUri: data.image});
@@ -61,6 +63,9 @@ export default ProfileScreen =  ({navigation})  => {
     const changeNameHandler = (enteredText) => {
         setCurrentName(enteredText);
     };
+    const changeBioHandler = (enteredText) => {
+        setCurrentBio(enteredText);
+    };
     const changeMailHandler = (enteredText) => {
         setCurrentMail(enteredText);
     };
@@ -74,22 +79,20 @@ export default ProfileScreen =  ({navigation})  => {
     //     setCurrentInterests(updatedInterests);
     // }
     const commitChangesHandler = () => {
-        DB.changeUsername(currentName);
-        DB.changeEmail(currentMail, (error, oldMail) => {
-            console.log(error + ", alte Adresse wird beibehalten: " + oldMail)
-            setCurrentMail(oldMail);
-        });
-        DB.changePassword(currentPW, (error, oldPW) => {
-            console.log(error + ", altes Passwort wird beibehalten: " + oldPW)
-            setCurrentPW(oldPW);
-        });
-        DB.logIn(currentMail, currentPW, () => {});
+        DB.changeUsername(currentName, currentBio);
+        // DB.changeEmail(currentMail, (error, oldMail) => {
+        //     console.log(error + ", alte Adresse wird beibehalten: " + oldMail)
+        //     setCurrentMail(oldMail);
+        // });
+        // DB.changePassword(currentPW, (error, oldPW) => {
+        //     console.log(error + ", altes Passwort wird beibehalten: " + oldPW)
+        //     setCurrentPW(oldPW);
+        // });
+        // DB.logIn(currentMail, currentPW, () => {});
     }
     // Profilbild
     // const [imagePickerVisibility, setImagePickerVisibility] = useState(false);
     const [selectedImage, setSelectedImage] = useState({});
-    // const [isCameraOn, setIsCameraOn] = useState(false);
-    // const [type, setType] = useState(Camera.Constants.Type.back);
     const verifyPermissions = async (permission) => {
         const result = await Permissions.askAsync(permission);
         if (result.status !== "granted") {
@@ -118,21 +121,6 @@ export default ProfileScreen =  ({navigation})  => {
         console.log("------ URI: " + smallImage.uri);
         DB.changeProfileImage(smallImage.uri);
     };
-    // const toggleCameraHandler = async () => {
-    //     const hasPermission = await verifyPermissions(Permissions.CAMERA);
-    //     if (!hasPermission) return;
-    
-    //     setIsCameraOn(!isCameraOn);
-    // };
-    // const flipCameraHandler = () => {
-    //     if (isCameraOn) {
-    //         setType(
-    //             type === Camera.Constants.Type.back
-    //                 ? Camera.Constants.Type.front
-    //                 : Camera.Constants.Type.back
-    //         );
-    //     }
-    // };
 
     const authHandler = (auth) => {
         if (auth) {
@@ -238,6 +226,17 @@ export default ProfileScreen =  ({navigation})  => {
                             />
                         </View>
                     </TouchableWithoutFeedback>
+
+                    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+                        <View style={{width: "90%"}} >
+                            <Text>Kurzbeschreibung:</Text>
+                            <TextInput 
+                                style={styles.textInputField}
+                                onChangeText={changeBioHandler}
+                                value={currentBio}
+                            />
+                        </View>
+                    </TouchableWithoutFeedback>
                     
                     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
                         <View style={{width: "90%"}}>
@@ -279,11 +278,6 @@ export default ProfileScreen =  ({navigation})  => {
                         title={"Meine Fähigkeiten"}
                         subtitle={skillString}
                         onClick={() => navigation.navigate('Fähigkeiten', {attributeType: "skills", filter: []})}
-                />
-                <ListTile
-                        title={"Meine Präferenzen"}
-                        subtitle={prefString}
-                        onClick={() => navigation.navigate('Präferenzen', {attributeType: "prefs", filter: []})} 
                 />
             </View>
         </View>

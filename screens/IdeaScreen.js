@@ -1,6 +1,6 @@
 import React, {useState, useLayoutEffect, useEffect} from 'react';
 import {FlatList , View, Text, Modal, TouchableWithoutFeedback, TextInput, Keyboard} from 'react-native';
-import {Button} from 'react-native-elements';
+import Button from '../components/Button';
 import ListTile from '../components/ListTile';
 import CommentTile from '../components/CommentTile';
 import ProfileView from '../components/ProfileView';
@@ -24,8 +24,6 @@ export default IdeaScreen = ({route, navigation}) => {
     
     // States für Ideen-Info
     const [currentSkills, setCurrentSkills] = useState([]);
-    const [currentPrefs, setCurrentPrefs] = useState([]);
-    
     const [currentComments, setCurrentComments] = useState([]);
 
     useEffect(() => {
@@ -102,15 +100,15 @@ export default IdeaScreen = ({route, navigation}) => {
                                 <View style= { styles.row } >
                                     <Button 
                                         buttonStyle= { buttons.buttonRow }
-                                        titleStyle= { texts.buttonBlue }
+                                        titleStyle= { texts.buttonBlueCenter }
                                         title= 'OK' 
-                                        onPress= { () => { addCommentHandler(true) } }
+                                        onClick= { () => { addCommentHandler(true) } }
                                     />
                                     <Button 
                                         buttonStyle= { buttons.buttonRow }
-                                        titleStyle= { texts.buttonBlue }
+                                        titleStyle= { texts.buttonBlueCenter }
                                         title= 'Abbrechen'
-                                        onPress= { () => { addCommentHandler(false) } }
+                                        onClick= { () => { addCommentHandler(false) } }
                                     />
                                 </View>
                             </View>
@@ -121,18 +119,24 @@ export default IdeaScreen = ({route, navigation}) => {
 
             {/* // User-Profil ansehen */}
             <Modal visible={profileVisibility} animationType='slide'>
-                    <View style={{height: "85%"}}>
+                    <View>
                         <View style={{backgroundColor: "#222f56", height: 110, justifyContent: "center", alignItems: "center"}}>
                             <Text style={{fontSize: 30, top: 20, fontWeight: "bold", color: "white"}}>Profil ansehen</Text>
                         </View>
                         <ProfileView userId={viewedUserId}></ProfileView>
                     </View>
-                    <Button title='OK' onPress={() => {setProfileVisibility(false)}}/>
+                    <View style={{alignItems: "center"}}>
+                        <Button 
+                            buttonStyle= { buttons.buttonRow }
+                            titleStyle= { texts.buttonBlueCenter }
+                            title='OK' 
+                            onClick={() => {setProfileVisibility(false)}}
+                        />
+                    </View>
             </Modal>
 
             <View>
                 <View style= { styles.subHeaderIdea}>
-                    <Text style= { texts.headline } >Beschreibung</Text>
                     <View style= { { height: 100 } } >
                         <Text>{itemSubtitle}</Text>
                     </View>
@@ -141,20 +145,17 @@ export default IdeaScreen = ({route, navigation}) => {
                         subtitle={currentSkills.join(", ")}
                         onClick={() => navigation.navigate('IdeaSkills', {attributeType: "skills", filter: currentSkills})} 
                     />
-                    <ListTile
-                        title={"Passende Präferenzen"}
-                        subtitle={currentSkills.join(", ")}
-                        onClick={() => navigation.navigate('IdeaPrefs', {attributeType: "prefs", filter: currentPrefs})} 
-                    />
                 </View>
-                
+
                 <View style={ styles.commentRow }>
                     <Text style={texts.headline}>Kommentare:</Text>
                     <Button 
-                        buttonStyle= { buttons.button1 }
-                        titleStyle= { { color: white } }
-                        title='Kommentar schreiben' 
-                        onPress={() => {setCommentVisibility(true)}}/>
+                        buttonStyle= { buttons.buttonRow }
+                        titleStyle= { texts.buttonBlue }
+                        title= 'Kommentar'
+                        icon= "plus"
+                        onClick= { () => { setCommentVisibility(true) } }
+                    />
                 </View>
             </View>
             <FlatList

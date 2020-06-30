@@ -1,9 +1,12 @@
 import React, {useState, useLayoutEffect, useCallback} from "react";
-import { StyleSheet, Text, TouchableOpacity} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, Image} from "react-native";
 import {Ionicons} from '@expo/vector-icons';
+import checkfalse from '../assets/check-false.png';
+import checktrue from '../assets/check-true.png';
+import { black, darkGrey, icons } from "../Styles";
 
 export default SkillsTile = props => {
-  const [currentIcon, setCurrentIcon] = useState(props.state ? "ios-checkbox" : "ios-square-outline");
+  const [currentIcon, setCurrentIcon] = useState(props.state ? checktrue : checkfalse);
   const [currentIconState, setCurrentIconState] = useState(props.state);
   const [currentIconSize, setCurrentIconSize] = useState(36);
 
@@ -11,12 +14,12 @@ export default SkillsTile = props => {
   const changeIconHandler = () => {
     
     if (currentIconState) {
-      setCurrentIcon("ios-square-outline")
+      setCurrentIcon(checkfalse)
       setCurrentIconSize(30)
       setCurrentIconState(false)
     }
     else {
-      setCurrentIcon("ios-checkbox")
+      setCurrentIcon(checktrue)
       setCurrentIconSize(36)
       setCurrentIconState(true)
     }
@@ -26,17 +29,23 @@ export default SkillsTile = props => {
   return (
     // FlatList
     <TouchableOpacity
-        style={styles.itemContainer}
+        style={[styles.itemContainer, {backgroundColor: props.backgroundColor}]}
         onPress={changeIconHandler}
         >
-        <Ionicons
+          <Image
+            source={currentIcon}
+            style={styles.checkmark}
+          />
+        {/* <Ionicons
             raised
             name={currentIcon} 
             size={currentIconSize} 
             type="ionicon"
             color={"tomato"}
-        />
-        <Text style = {styles.tileText}> {props.text} </Text>
+        /> */}
+        <Text 
+          style = {[styles.tileText, {color: currentIconState ? black : darkGrey}]}
+        > {props.text} </Text>
     </TouchableOpacity>
   );
 };
@@ -45,18 +54,22 @@ const styles = StyleSheet.create({
   itemContainer: {
     flex: 1,
     flexDirection: 'row',
-    marginVertical: 2,
-    padding: 20,
-    height: 100,
+    paddingVertical: 10,
+    paddingLeft: 20,
+    height: 50,
     alignItems: "center",
     justifyContent: "flex-start",
     backgroundColor: "white",
   },
   tileText:{
-      marginLeft: 15,
-      fontSize: 18,
+      marginLeft: 10,
+      fontSize: 16,
       fontWeight: 'bold',
       textAlign: 'right',
-      color: 'grey'
+      color: black
+  },
+  checkmark: {
+    width: 22,
+    height: 22
   }
 });

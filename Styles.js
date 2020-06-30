@@ -11,7 +11,7 @@ const red = '#640023';
 const black = '#333333';
 const white = 'white';
 
-const iconsize = 45;
+const iconsize = 35;
 const iconsizeAdd = 60;
 
 const headerHeight = 100;
@@ -24,10 +24,15 @@ const styles = StyleSheet.create({
     },
 
     row: {
-        flex: 1,
+        // flex: 1,
         flexDirection: 'row',
-        justifyContent: 'space-between', 
-        alignItems: 'stretch',
+        justifyContent: 'space-between',
+    },
+    paddedRow: {
+        // flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 15,
     },
 
     column: {
@@ -51,11 +56,12 @@ const styles = StyleSheet.create({
     },
 
     subHeader: {
-        paddingHorizontal: padding,
-        paddingVertical: padding/2,
-        height: 220,
-        width: width,
+        // paddingHorizontal: padding,
+        // paddingVertical: padding/4,
+        // height: 220,
+        // width: width,
         backgroundColor: darkGrey,
+        paddingVertical: 15
     },
 
     subHeaderIdea: {
@@ -67,18 +73,20 @@ const styles = StyleSheet.create({
     },
 
     courseHeaderRow: {
-        flex: 1,
+        // flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between', 
         alignItems: 'stretch',
+        paddingHorizontal: 15
     },
 
     membersRow: {
-        flex: 1,
+        // flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between', 
         alignItems: 'stretch',
-        height: 100,
+        // height: 100,
+        paddingVertical: 15,
     },
 
     commentRow: {
@@ -139,31 +147,46 @@ const styles = StyleSheet.create({
 
 const buttons = StyleSheet.create({
     
-    button1: {
-        height: 50,
-        width: 200,
-        marginTop: 10,
-        marginBottom: 10,
-        backgroundColor: darkBlue,
-        borderRadius:10,
-    },
+    // button1: {
+        // height: 50,
+        // width: 200,
+    //     // marginTop: 10,
+    //     // marginBottom: 10,
+    //     backgroundColor: darkBlue,
+    //     borderRadius:10,
+    // },
     
     buttonRow: {
         width: width/7*3,
         height: 50,
-        marginTop: 10,
-        marginBottom: 10,
+        paddingHorizontal: 10,
         backgroundColor: darkBlue,
         borderRadius:10,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between"
+    },
+
+    buttonColumn: {
+        width: "50%",
+        height: 50,
+        marginVertical: 5,
+        backgroundColor: darkBlue,
+        borderRadius:10,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between"
     },
 
     buttonRowGrey: {
         width: width/7*3,
         height: 50,
-        marginTop: 10,
-        marginBottom: 10,
+        paddingHorizontal: 10,
         backgroundColor: lightGrey,
         borderRadius:10,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between"
     }
 })
 
@@ -177,9 +200,9 @@ const texts = StyleSheet.create({
     },
 
     headline: {
-        fontSize: 18,
+        fontSize: 22,
         fontWeight: 'bold',
-        color: black
+        color: darkBlue
     },
 
     text: {
@@ -201,13 +224,30 @@ const texts = StyleSheet.create({
     
     buttonBlue: {
         fontSize: 18, 
-        color: white
+        fontWeight: 'bold',
+        color: white,
+    },
+    
+    buttonBlueCenter: {
+        fontSize: 18, 
+        fontWeight: 'bold',
+        color: white,
+        textAlign: "center",
+        width: "100%"
     },
 
     buttonGrey: {
         fontSize: 18, 
-        color: black
+        fontWeight: 'bold',
+        color: black,
     },
 })
 
-export { styles, buttons, texts, darkBlue, lightBlue, darkGrey, grey, lightGrey, white, black, iconsize, iconsizeAdd }
+const icons = {
+    checkTrue: require("./assets/check-true.png"),
+    checkFalse: require("./assets/check-false.png"),
+    plus: require("./assets/icons/plus.png"),
+    find: require("./assets/icons/find.png"),
+}
+
+export { styles, buttons, texts, darkBlue, lightBlue, darkGrey, grey, lightGrey, white, black, iconsize, iconsizeAdd, icons }

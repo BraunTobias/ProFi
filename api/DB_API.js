@@ -20,6 +20,7 @@ const DB = {
 
             firebase.firestore().collection("users").doc(userInfo.user.uid).set({
                 username: name,
+                bio: "",
                 email: email,
                 password: password
             })        
@@ -47,28 +48,12 @@ const DB = {
         }
     },
     // Neue Attribute hinzufügen falls vorhanden
-    updateAttributesList: async function(attributeType) {
+    updateAttributesList: async function() {
         const currentUserID = firebase.auth().currentUser.uid;
         const oldAttributesArray = [];
-        var newList = prefsList;
-
-        if (attributeType == "skills") {
-            newList = {
-                "Audio": {
-                    "Komposition": false,
-                    "Voice Acting": false,
-                    "Voice Acting2": false,
-                },
-                "Test": {
-                    "Test1": false,
-                    "Test2": false,
-                    "Test3": false,
-                }
-            }
-        }
 
         // Alle Attribut-Namen die der User schon hat in ein Array speichern
-        const snapshot = await firebase.firestore().collection("users").doc(currentUserID).collection(attributeType).get();
+        const snapshot = await firebase.firestore().collection("users").doc(currentUserID).collection("skills").get();
         snapshot.forEach((doc) => {
             for (var att in doc.data()) {
                 oldAttributesArray.push(att);
@@ -76,9 +61,9 @@ const DB = {
         });    
 
         // Prüfen ob das Attribut aus der neuen Liste beim User schon existiert; wenn nicht, dann hinzufügen
-        for (var category in newList) {
+        for (var category in skillsList) {
             console.log("---" + category + "---");
-            for (var att in newList[category]) {
+            for (var att in skillsList[category]) {
                 console.log(att);
                 if (oldAttributesArray.indexOf(att) < 0) {
                     console.log("Gibts noch nich");
@@ -118,21 +103,24 @@ const DB = {
     getUserInfoById: async function(userId, onSuccess) {
         var userName = "";
         var userImage = "";
+        var bio = "";
         const snapshotDoc = await firebase.firestore().collection("users").doc(userId).get();
         if (snapshotDoc.data()) {
             const userInfo = snapshotDoc.data();
                 userName = userInfo.username;
                 userImage = userInfo.image;
+                bio = userInfo.bio;
         }
-        onSuccess(userName, userImage);
+        onSuccess(userName, userImage, bio);
     },
     getCurrentUserId: function() {
         return(firebase.auth().currentUser.uid);
     },
-    changeUsername: function(newName) {
+    changeUsername: function(newName, newBio) {
         const currentUserID = firebase.auth().currentUser.uid;
         firebase.firestore().collection("users").doc(currentUserID).set({
-            username: newName
+            username: newName,
+            bio: newBio
         }, {merge: true}); 
     },
     changeEmail: function(newEmail, onError) {

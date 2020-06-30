@@ -1,13 +1,13 @@
 import React, {useState, useEffect, useLayoutEffect} from 'react';
 import {View, SafeAreaView, Text, FlatList, Modal, TouchableWithoutFeedback, TextInput, Keyboard } from "react-native";
 import ListTile from '../components/ListTile';
-import {Button} from 'react-native-elements';
+import Button from '../components/Button';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import {Ionicons} from '@expo/vector-icons';
 import AttributeSelect from '../components/AttributeSelect';
 import DB from '../api/DB_API';
 import ProfileImageTile from '../components/ProfileImageTile';
-import { styles, buttons, texts, white, lightGrey, grey, black, iconsize, iconsizeAdd } from '../Styles';
+import { styles, buttons, texts, white, lightGrey, grey, black, iconsize, iconsizeAdd, darkGrey, icons } from '../Styles';
 
 export default CourseScreen = ({route, navigation}) => {
     const {itemId} = route.params;
@@ -24,7 +24,6 @@ export default CourseScreen = ({route, navigation}) => {
     // States für Idea-Eingabe
     const [addIdeaVisibility, setAddIdeaVisibility] = useState(false);
     const [skillsVisibility, setSkillsVisibility] = useState(false);
-    const [prefsVisibility, setPrefsVisibility] = useState(false);
     const [currentIdeaName, setCurrentIdeaName] = useState("");
     const [currentIdeaDescription, setCurrentIdeaDescription] = useState("");
     const [selectedSkillsList, setSelectedSkillsList] = useState([]);
@@ -86,12 +85,6 @@ export default CourseScreen = ({route, navigation}) => {
     useLayoutEffect(() => {
         navigation.setOptions({
             headerTitle: itemTitle,
-            headerRight : () => (
-                <Button 
-                    type ='clear' 
-                    icon={<Ionicons name='ios-add'size={iconsizeAdd} color={white}/>}
-                    onPress={() => {setAddIdeaVisibility(true)}}
-                />)
         });
     }, [navigation]);
 
@@ -145,18 +138,6 @@ export default CourseScreen = ({route, navigation}) => {
             setSelectedSkillsList(newList);
         }
         if (selectedSkillsList.length > 0) {
-            setCurrentWarning("");
-        }
-    };
-    const addSelectedPrefHandler = (pref) => {
-        var oldList = selectedPrefsList;
-        if (oldList.indexOf(skill) < 0) {
-            oldList.push(skill);
-        } else {
-            var newList = oldList.filter(item => item !== skill);
-            setSelectedPrefsList(newList);
-        }
-        if (selectedPrefsList.length > 0) {
             setCurrentWarning("");
         }
     };
@@ -252,24 +233,19 @@ export default CourseScreen = ({route, navigation}) => {
                                     subtitle={selectedSkillsList.join(", ")}
                                     onClick={() => setSkillsVisibility(true)} 
                                 />
-                                <ListTile
-                                    title={"Präferenzen auswählen"}
-                                    subtitle={selectedPrefsList.join(", ")}
-                                    onClick={() => setPrefsVisibility(true)} 
-                                />
 
                                 <View style= { styles.row } >
                                     <Button 
                                         buttonStyle= { buttons.buttonRow }
-                                        titleStyle= { texts.buttonBlue }
+                                        titleStyle= { texts.buttonBlueCenter }
                                         title= 'OK' 
-                                        onPress= { () => { addIdeaHandler(true) } }
+                                        onClick= { () => { addIdeaHandler(true) } }
                                     />
                                     <Button 
                                         buttonStyle= { buttons.buttonRow }
-                                        titleStyle= { texts.buttonBlue }
+                                        titleStyle= { texts.buttonBlueCenter }
                                         title= 'Abbrechen'
-                                        onPress= { () => { addIdeaHandler(false) } }
+                                        onClick= { () => { addIdeaHandler(false) } }
                                     />
                                 </View>
                             </View>
@@ -289,79 +265,79 @@ export default CourseScreen = ({route, navigation}) => {
                         >
                         </AttributeSelect>
                     </View>
-                    <Button title='OK' onPress={() => {setSkillsVisibility(false)}}/>
-                </Modal>
-                <Modal visible={prefsVisibility} animationType='slide'>
-                    <View style={{height: "85%"}}>
-                        <View style={{backgroundColor: "#222f56", height: 110, justifyContent: "center", alignItems: "center"}}>
-                            <Text style={{fontSize: 30, top: 20, fontWeight: "bold", color: "white"}}>Präferenzen auswählen</Text>
-                        </View>
-                        <AttributeSelect 
-                            attributeType={"prefs"} 
-                            selectedAttributesList={selectedPrefsList} 
-                            addSelectedAttribute={addSelectedPrefHandler} 
-                        >
-                        </AttributeSelect>
+                    <View style={{alignItems: "center"}}>
+                        <Button 
+                            buttonStyle= { buttons.buttonRow }
+                            titleStyle= { texts.buttonBlueCenter }
+                            title='OK' 
+                            onClick={() => {setSkillsVisibility(false)}}
+                        />
                     </View>
-                    <Button title='OK' onPress={() => {setPrefsVisibility(false)}}/>
                 </Modal>
-
             </Modal>
 
             {/* // User-Profil ansehen */}
             <Modal visible={profileVisibility} animationType='slide'>
-                    <View style={{height: "85%"}}>
+                    <View>
                         <View style={{backgroundColor: "#222f56", height: 110, justifyContent: "center", alignItems: "center"}}>
                             <Text style={{fontSize: 30, top: 20, fontWeight: "bold", color: "white"}}>Profil ansehen</Text>
                         </View>
                         <ProfileView userId={viewedUserId}></ProfileView>
                     </View>
-                    <Button title='OK' onPress={() => {setProfileVisibility(false)}}/>
+                    <View style={{alignItems: "center"}}>
+                        <Button 
+                            buttonStyle= { buttons.buttonRow }
+                            titleStyle= { texts.buttonBlueCenter }
+                            title='OK' 
+                            onClick={() => {setProfileVisibility(false)}}
+                        />
+                    </View>
             </Modal>
 
             <View style= { styles.subHeader } >
                 <View style= { styles.courseHeaderRow } >
-                    <Text style= { texts.headline }>{date}</Text>
-                    <Text style= { texts.headline }>{minMembers}–{maxMembers} Personen</Text>
+                    <Text style= { texts.headlineCenter }>{date}</Text>
+                    <Text style= { texts.headlineCenter }>{itemId}</Text>
+                </View>
+                <View style= { styles.courseHeaderRow } >
+                    <Text style= { texts.headlineCenter }>{minMembers}–{maxMembers} Personen</Text>
                 </View>
 
                 <View style= { styles.membersRow } >
+                    <FlatList
+                        data={members}
+                        horizontal={true}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={(itemData) => { 
+                            return (
+                                <ProfileImageTile
+                                    onClick={() => {clickProfileHandler(itemData.item.userId)}} 
+                                    imageUrl={itemData.item.imageUrl}
+                                />
+                            );
+                        }}
+                    >
+                    </FlatList>
                 </View>
 
-                <View style= { styles.row } >
+                <View style= { styles.paddedRow } >
                     <Button 
                         buttonStyle= { buttons.buttonRowGrey }
                         titleStyle= { texts.buttonGrey }
-                        title= {userIsMember ? 'Mitglied  ' : "Beitreten" }
-                        icon= {<Ionicons name={userIsMember ? 'ios-checkbox' : 'ios-checkbox-outline'} size={iconsize} color={black}/>}
-                        iconRight= {true}
-                        onPress= {joinCourseHandler}
+                        title= {userIsMember ? "Mitglied" : "Beitreten" }
+                        icon= {userIsMember ? "checkTrue" : "checkFalse"}
+                        onClick= {joinCourseHandler}
                     />
                     <Button 
                         buttonStyle= { buttons.buttonRow }
                         titleStyle= { texts.buttonBlue }
-                        title= 'Neue Idee  '
-                        icon= {<Ionicons name={'ios-add'} size={iconsize} color={white} />}
-                        iconRight= {true}
-                        onPress= { () => { setAddIdeaVisibility(true) } }
+                        title= "Neue Idee"
+                        icon= "plus"
+                        onClick= { () => { setAddIdeaVisibility(true) } }
                     />
                 </View>
             </View>
             
-            <FlatList
-                data={members}
-                horizontal={true}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={(itemData) => { 
-                    return (
-                        <ProfileImageTile
-                            onClick={() => {clickProfileHandler(itemData.item.userId)}} 
-                            imageUrl={itemData.item.imageUrl}
-                        />
-                    );
-                }}
-            >
-            </FlatList>
 
             <SwipeListView
                 style={{flexGrow: 1}}
@@ -390,15 +366,15 @@ export default CourseScreen = ({route, navigation}) => {
                                 <FavButton 
                                     ideaId={itemData.item.id} 
                                     courseId={itemId} 
-                                    backgroundColor={itemData.item.id == currentFav ? "#aeb8c3" : "#222f56"}
-                                    iconColor={itemData.item.id == currentFav ? "#f2f3f4" : "white"}
+                                    backgroundColor={itemData.item.id == currentFav ? lightGrey : "#222f56"}
+                                    iconColor={itemData.item.id == currentFav ? darkGrey : "white"}
                                     onClick={() => {addFavHandler(itemData.item.id)}}
                                 />
                                 <NogoButton 
                                     ideaId={itemData.item.id} 
                                     courseId={itemId} 
-                                    backgroundColor={itemData.item.id == currentNogo ? "#aeb8c3" : "#640023"}
-                                    iconColor={itemData.item.id == currentNogo ? "#f2f3f4" : "white"}
+                                    backgroundColor={itemData.item.id == currentNogo ? lightGrey : "#640023"}
+                                    iconColor={itemData.item.id == currentNogo ? darkGrey : "white"}
                                     onClick={() => {addNogoHandler(itemData.item.id)}}
                                 />
                             </View>
