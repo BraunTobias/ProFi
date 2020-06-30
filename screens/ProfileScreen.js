@@ -19,6 +19,7 @@ import * as ImagePicker from "expo-image-picker"
 import { LogInContext } from '../data/LogInContext';
 import { FunctionsScreen } from './#FunctionsScreen';
 import DB from '../api/DB_API';
+import { styles, buttons, texts, profileImage } from '../Styles'
 
 
 export default ProfileScreen =  ({navigation})  => {
@@ -133,11 +134,16 @@ export default ProfileScreen =  ({navigation})  => {
     return ( 
         <View>
             {/* // "Header" mit Profildaten */}
-            <View style={{padding: 20, flexDirection: "row", justifyContent: 'flex-start', alignItems: 'center', backgroundColor: "#aeb8c3"}}>
+            <View style={styles.subHeaderProfile}>
                     <Modal visible={false} animationType='slide'>
-                        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white'}}>
-                            <Text>Gespeichert.</Text>
-                            <Button title='OK'onPress={() => setAcknowledgementVisibility(false)}/>
+                        <View style={styles.error}>
+                            <Text style= { texts.headlineCenter }>Gespeichert.</Text>
+                            <Button 
+                                buttonStyle= {buttons.buttonColumn}
+                                titleStyle= {texts.buttonBlueCenter}
+                                title='OK'
+                                onPress={() => setAcknowledgementVisibility(false)}
+                            />
                         </View>
                     </Modal>
                     
@@ -181,26 +187,13 @@ export default ProfileScreen =  ({navigation})  => {
                     {/* <Modal visible={functionsVisibility} animationType='slide'>
                         < FunctionsScreen user={user} />
                     </Modal> */}
-                <View style={{flex:1, flexDirection: "column", justifyContent: 'center', alignItems: 'center'}}>
+                <View style={styles.contentProfile}>
                     <TouchableOpacity onPress={selectImageHandler}>
                         <Image 
-                            style={[styles.imageTile, styles.cameraPreview]} 
+                            style={[profileImage.imageTile, profileImage.cameraPreview]} 
                             source={{ uri: selectedImage.localUri}} 
                         />
                     </TouchableOpacity>
-                    <Button 
-                            title= " Logout"
-                            onPress={() => {
-                                DB.signOut(() => {console.log("Signed Out")});
-                                    }}
-                            icon={
-                                <Ionicons
-                                    name="md-log-out"
-                                    size={30}
-                                    color="white"
-                                />
-                            }
-                    />
                     {/* <Button
                         type="clear"
                         onPress={() => setImagePickerVisibility(true)}
@@ -215,12 +208,11 @@ export default ProfileScreen =  ({navigation})  => {
                         */}
                 </View>
                 {/* // Rechte Spalte */}
-                <View style={{flex:2, flexDirection: "column", justifyContent: 'center', alignItems: 'center'}}>
+                <View style={styles.rightContentProfile}>
                     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
                         <View style={{width: "90%"}} >
-                            <Text>Benutzername:</Text>
                             <TextInput 
-                                style={styles.textInputField}
+                                style={texts.inputTextProfile}
                                 onChangeText={changeNameHandler}
                                 value={currentName}
                             />
@@ -229,50 +221,64 @@ export default ProfileScreen =  ({navigation})  => {
 
                     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
                         <View style={{width: "90%"}} >
-                            <Text>Kurzbeschreibung:</Text>
+                            <Text style={texts.textProfile}>Kurzbeschreibung:</Text>
                             <TextInput 
-                                style={styles.textInputField}
+                                style={texts.textBold}
                                 onChangeText={changeBioHandler}
                                 value={currentBio}
                             />
                         </View>
                     </TouchableWithoutFeedback>
-                    
                     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
                         <View style={{width: "90%"}}>
-                            <Text>E-Mail:</Text>
-                            <TextInput
-                                style={styles.textInputField}
-                                onChangeText={changeMailHandler}
-                                value={currentMail}
-                            />
+                            <Text style={texts.textProfile}>E-Mail:</Text>
+                            <Text style={texts.textBold}>{currentMail}</Text>
                         </View>
-                    </TouchableWithoutFeedback>
-                    
-                    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-                        <View style={{width: "90%"}}>
-                            <Text>Passwort:</Text>
-                            <TextInput
-                                style={styles.textInputField}
-                                onChangeText={changePWHandler}
-                                value={currentPW}
-                                secureTextEntry={true} 
-                            />
-                        </View>
-                    </TouchableWithoutFeedback>
-                    <Button                     
-                        title= " Übernehmen"
-                        onPress={commitChangesHandler}
-                        icon={
-                            <Ionicons
-                                name="md-checkmark"
-                                size={30}
-                                color="white"
-                            />
-                        }
-                    />
+                    </TouchableWithoutFeedback>  
+                        {/* <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+                            <View style={{width: "90%"}}>
+                                <Text>Passwort:</Text>
+                                <TextInput
+                                    style={styles.textInputField}
+                                    onChangeText={changePWHandler}
+                                    value={currentPW}
+                                    secureTextEntry={true} 
+                                />
+                            </View>
+                        </TouchableWithoutFeedback> */}
                 </View>
             </View>
+            <View style= {styles.subHeader} >
+                <View style={styles.paddedRow}>
+                        <Button
+                            buttonStyle= { buttons.buttonRowGrey }
+                            titleStyle= { texts.buttonGrey }                    
+                            title= "Übernehmen"
+                            onPress={commitChangesHandler}
+                            icon={
+                                <Ionicons
+                                    name="md-checkmark"
+                                    size={30}
+                                />
+                            }
+                        />
+                        <Button 
+                                buttonStyle= { buttons.buttonRow }
+                                titleStyle= { texts.buttonBlue }
+                                title= "Abmelden"
+                                onPress={() => {
+                                    DB.signOut(() => {console.log("Signed Out")});
+                                        }}
+                                icon={
+                                    <Ionicons
+                                        name="md-log-out"
+                                        size={30}
+                                        color="white"
+                                    />
+                                }
+                        />
+                </View>
+            </View>  
             <View>
                 <ListTile
                         title={"Meine Fähigkeiten"}
@@ -284,45 +290,45 @@ export default ProfileScreen =  ({navigation})  => {
      );
 }
 
-const styles = StyleSheet.create({
-    view: {
-      position: 'absolute',
-      backgroundColor: 'transparent'
-    },
-    touchable: {
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    imageContainer: {
-        flexDirection: "row",
-        width: "100%",
-        alignItems: "center",
-        justifyContent: "space-evenly",
-      },
-    verticalContainer: {
-        alignItems: "center",
-    },
-    cameraPreview: {
-        width: 100,
-        height: 100,
-        borderRadius: 100,
-    },
-    imageTile: {
-        shadowColor: "black",
-        shadowOpacity: 0.2,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 10,
-        borderRadius: 10,
-        padding: 15,
-        backgroundColor: "white",
-        alignItems: "center",
-        justifyContent: "center",
-        marginBottom: 30,
-      },
-    textInputField: {
-        left: 0,
-        width: "100%",
-        backgroundColor: "white",
-        marginBottom: 10
-    }
-})
+// const styles = StyleSheet.create({
+//     view: {
+//       position: 'absolute',
+//       backgroundColor: 'transparent'
+//     },
+//     touchable: {
+//         alignItems: 'center',
+//         justifyContent: 'center'
+//     },
+//     imageContainer: {
+//         flexDirection: "row",
+//         width: "100%",
+//         alignItems: "center",
+//         justifyContent: "space-evenly",
+//       },
+//     verticalContainer: {
+//         alignItems: "center",
+//     },
+//     cameraPreview: {
+//         width: 100,
+//         height: 100,
+//         borderRadius: 100,
+//     },
+//     imageTile: {
+//         shadowColor: "black",
+//         shadowOpacity: 0.2,
+//         shadowOffset: { width: 0, height: 2 },
+//         shadowRadius: 10,
+//         borderRadius: 10,
+//         padding: 15,
+//         backgroundColor: "white",
+//         alignItems: "center",
+//         justifyContent: "center",
+//         marginBottom: 30,
+//       },
+//     textInputField: {
+//         left: 0,
+//         width: "100%",
+//         backgroundColor: "white",
+//         marginBottom: 10
+//     }
+// })
