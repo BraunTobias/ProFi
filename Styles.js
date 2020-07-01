@@ -105,6 +105,14 @@ const styles = StyleSheet.create({
         
     },
 
+    contentAttribute: {
+        flex: 1,
+        height: "90%",
+        padding: "5%",
+        justifyContent: "space-evenly",
+        // backgroundColor: white
+    },
+
     courseHeaderRow: {
         // flex: 1,
         flexDirection: 'row',
@@ -211,6 +219,12 @@ const styles = StyleSheet.create({
 
     backIcon: {
         paddingLeft: 5,
+    },
+
+    border: {
+        borderRadius: 10,
+        borderBottomColor: darkBlue,
+        borderBottomWidth: 1
     }
 })
 
@@ -298,6 +312,21 @@ const texts = StyleSheet.create({
         color: black,
         marginTop: 15
     },
+
+    textBoldAttribute: {
+        fontWeight: "bold",
+        fontSize: 24,
+        color: darkBlue
+    },
+
+    textAttribute: {
+        fontSize: 18,
+        fontWeight: "bold",
+        color: black,
+        marginLeft: 30,
+        lineHeight: 30,
+        textAlign: "justify",
+    },
     
     textBold: {
         fontSize: 18,
@@ -346,40 +375,25 @@ const texts = StyleSheet.create({
 })
 
 const profileImage = {
-    view: {
-        position: 'absolute',
-        backgroundColor: 'transparent'
-      },
-      touchable: {
-          alignItems: 'center',
-          justifyContent: 'center'
-      },
-      imageContainer: {
-          flexDirection: "row",
-          width: "100%",
-          alignItems: "center",
-          justifyContent: "space-evenly",
-        },
-      verticalContainer: {
-          alignItems: "center",
-      },
-      cameraPreview: {
-          width: 100,
-          height: 100,
-          borderRadius: 100,
-      },
-      imageTile: {
-          shadowColor: "black",
-          shadowOpacity: 0.2,
-          shadowOffset: { width: 0, height: 2 },
-          shadowRadius: 10,
-          borderRadius: 10,
-          padding: 15,
-          backgroundColor: "white",
-          alignItems: "center",
-          justifyContent: "center",
-          marginBottom: 30,
-        }
+      
+    cameraPreview: {
+        width: 100,
+        height: 100,
+        borderRadius: 100,
+    },
+
+    imageTile: {
+        shadowColor: "black",
+        shadowOpacity: 0.2,
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: 10,
+        borderRadius: 10,
+        padding: 15,
+        backgroundColor: "white",
+        alignItems: "center",
+        justifyContent: "center",
+        marginBottom: 30,
+    }
 }
 
 const icons = {

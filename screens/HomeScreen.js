@@ -2,7 +2,6 @@ import React, {useState, useLayoutEffect, useEffect}from "react";
 import { Modal, View, TextInput, Text } from "react-native";
 import { SwipeListView } from 'react-native-swipe-list-view';
 import NumericInput from 'react-native-numeric-input'
-import ModalDatePicker from 'react-native-datepicker-modal'
 import { Ionicons } from '@expo/vector-icons';
 import DB from '../api/DB_API';
 import ModalComponent from "../components/ModalComponent";
@@ -10,7 +9,9 @@ import InputTile from "../components/InputTile";
 import ListTile from "../components/ListTile";
 import Button from '../components/Button';
 import DeleteCourseButton from "../components/DeleteCourseButton";
+import ModalDatePicker from 'react-native-datepicker-modal'
 import { styles, buttons, texts, white, lightGrey, iconsizeAdd } from "../Styles"
+import DatePicker from "react-native-datepicker";
 
 export default HomeScreen = ({navigation}) => {
     const currentUserId = DB.getCurrentUserId();
@@ -160,7 +161,22 @@ export default HomeScreen = ({navigation}) => {
         }
         if (currentMaxMembers >= currentMinMembers) setMaxMembersError("");
     }
-  
+    
+    //Modal für Datum
+    // const datePicker = () => (
+    //     <ModalDatePicker
+    //       style={styles.datepicker}
+    //       renderDate={({ year, month, day, date }) => {
+    //         if (!date) {
+    //           return <Text style={[styles.text, styles.placeholderText]}>Datum eingeben</Text>
+    //         }
+
+    //         const dateStr = `${day}-${month}-${year}`
+    //         return <Text style={styles.text}>{dateStr}</Text>
+    //       }}
+    //     />
+    //   )
+
     const setDateHandler = (enteredDate) => {
         if (enteredDate) {
             setCurrentDate(enteredDate)
@@ -259,14 +275,27 @@ export default HomeScreen = ({navigation}) => {
                                     </View>
                                     <View style= { styles.loginInput } >
                                         <Text style= { texts.buttonGrey } >Enddatum (optional)</Text>
-                                        <TextInput 
-                                            textAlign= { 'left' }
-                                            style= { texts.inputText }
-                                            placeholder= 'TT.MM.JJJJ'
-                                            onChangeText= { (text) => { setDateHandler(text) } } 
-                                            keyboardType= 'numeric'
-                                            // value= { currentDate }
-                                        />
+                                            <DatePicker
+                                                style={{width: 200}}
+                                                date={currentDate}
+                                                format="DD-MM-YYYY"
+                                                minDate="02-02-2020"
+                                                maxDate="02-02-2021"
+                                                confirmBtnText="OK"
+                                                cancelBtnText="Abbrechen"
+                                                // customStyles={{
+                                                //     // dateIcon: {
+                                                //     //   position: 'absolute',
+                                                //     //   left: 0,
+                                                //     //   top: 4,
+                                                //     //   marginLeft: 0
+                                                //     // },
+                                                //     // dateInput: {
+                                                //     //   marginLeft: 36
+                                                //     // }
+                                                // }}
+                                                onDateChange={(date) => { setDateHandler(date)}}
+                                            />
                                         <Text>
                                             { dateError }
                                         </Text>
