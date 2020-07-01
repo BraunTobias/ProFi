@@ -13,12 +13,11 @@ export default AuthenticationNavigator = () => {
         <NavigationContainer>
             <AuthenticationStack.Navigator initialRouteName="Login" screenOptions={{
                 headerStyle: styles.header,
-                headerTitleStyle: texts.headerText,
                 headerTintColor: 'white',
                 headerBackImage: (()=>{return(<Ionicons name={'ios-arrow-back'} size={iconsize} color={white} />)})
             }}>
-                <AuthenticationStack.Screen name = "Login" component= {LoginScreen} options={{headerTitle: 'Login'}}/>
-                <AuthenticationStack.Screen name = "Registration" component = {RegistrationScreen} options={{headerTitle: 'Registrieren' }}/>
+                <AuthenticationStack.Screen name = "Login" component= {LoginScreen} options={{headerTitle: 'Login', headerTitleStyle: texts.header}}/>
+                <AuthenticationStack.Screen name = "Registration" component = {RegistrationScreen} options={{headerTitle: 'Registrieren', headerBackTitle: ' ' , headerTitleStyle: texts.header}}/>
             </AuthenticationStack.Navigator>
         </NavigationContainer>
     );

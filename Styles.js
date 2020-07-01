@@ -46,14 +46,14 @@ const styles = StyleSheet.create({
 
     header: {
         height: headerHeight,
-        backgroundColor: darkBlue
+        backgroundColor: darkBlue,
     },
 
     headerFake: {
-        justifyContent: 'center', 
+        justifyContent: "flex-end", 
         alignItems: 'flex-start', 
         padding: padding,
-        height: headerHeight - 24,
+        height: Platform.OS === 'ios' ? headerHeight : headerHeight - 24,
         backgroundColor: darkBlue
     },
 
@@ -136,8 +136,9 @@ const styles = StyleSheet.create({
         flexDirection: 'column', 
         justifyContent: 'flex-start', 
         alignItems: 'flex-start',
+        paddingTop: 50,
         marginHorizontal: 20,
-        backgroundColor: lightBlue
+        // backgroundColor: lightBlue
     },
 
     contentFake: {
@@ -167,7 +168,7 @@ const styles = StyleSheet.create({
         width: '100%', 
         //marginTop: 20,
         //paddingTop: 20,
-        backgroundColor: '#f5f7f7',
+        // backgroundColor: '#f5f7f7',
         height: '100%',
     },
 
@@ -267,14 +268,18 @@ const texts = StyleSheet.create({
         letterSpacing: 0.5,
         fontWeight: 'bold',
         color: white,
-    },
+        alignSelf: (Platform.OS === 'android') ? 'flex-start' : 'center'
 
+    },
+    
     headerWithBackIcon: {
         fontSize: 24,
         letterSpacing: 0.5,
         fontWeight: 'bold',
         color: white,
-        marginLeft: -30,
+        marginLeft: (Platform.OS === 'android') ? -30 : 0,
+        alignSelf: (Platform.OS === 'android') ? 'flex-start' : 'center'
+
     },
 
     headline: {

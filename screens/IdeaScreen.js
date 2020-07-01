@@ -44,22 +44,16 @@ export default IdeaScreen = ({route, navigation}) => {
         });
     }, [navigation]);
 
-    const addCommentHandler = (isAdd) => {
-        if (isAdd) {
-            if (currentCommentText.length > 5) {
-                console.log("add");
-                DB.addComment(courseId, itemId, currentCommentText, () => {
-                    setCommentVisibility(false);
-                    setCurrentCommentText("");
-                    DB.getCommentsList(courseId, itemId, (commentsList) => {
-                        setCurrentComments(commentsList);
-                        console.log(commentsList);
-                    });
-                });
-            }
-        } else {
+    const addCommentHandler = () => {
+        console.log("add");
+        DB.addComment(courseId, itemId, currentCommentText, () => {
             setCommentVisibility(false);
-        }
+            setCurrentCommentText("");
+            DB.getCommentsList(courseId, itemId, (commentsList) => {
+                setCurrentComments(commentsList);
+                console.log(commentsList);
+            });
+        });
     }
 
     const setCommentHandler = (text) => {
@@ -103,13 +97,13 @@ export default IdeaScreen = ({route, navigation}) => {
                                         buttonStyle= { buttons.buttonRow }
                                         titleStyle= { texts.buttonBlueCenter }
                                         title= 'OK' 
-                                        onClick= { () => { addCommentHandler(true) } }
+                                        onClick= { () => { addCommentHandler() } }
                                     />
                                     <Button 
                                         buttonStyle= { buttons.buttonRow }
                                         titleStyle= { texts.buttonBlueCenter }
                                         title= 'Abbrechen'
-                                        onClick= { () => { addCommentHandler(false) } }
+                                        onClick= { () => { setCommentVisibility(false) } }
                                     />
                                 </View>
                             </View>
@@ -141,7 +135,7 @@ export default IdeaScreen = ({route, navigation}) => {
             </Modal>
 
             {/* // Idee & Kommentar-Liste */}
-            <ScrollView>
+            <ScrollView style={{height: "100%"}}>
             <View>
                 <View style= { styles.subHeaderIdea}>
                     <View style= { { height: 100 } } >

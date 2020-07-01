@@ -32,21 +32,23 @@ const DB = {
             .catch(error => {
                 onError(error);
             });
+
+            // SKILLS COLLECTION ANLEGEN!!
         })
         .catch(error => {
             onError(error);
         });
     },
     // Listen fürs Profil ausfüllen 
-    fillAttributesList: function() {
-        const currentUserID = firebase.auth().currentUser.uid;
-        for (var category in skillsList) {
-            firebase.firestore().collection("users").doc(currentUserID).collection("skills").doc(category).set(skillsList[category], {merge: true});        
-        }
-        for (var category in prefsList) {
-            firebase.firestore().collection("users").doc(currentUserID).collection("prefs").doc(category).set(prefsList[category], {merge: true});        
-        }
-    },
+    // fillAttributesList: function() {
+    //     const currentUserID = firebase.auth().currentUser.uid;
+    //     for (var category in skillsList) {
+    //         firebase.firestore().collection("users").doc(currentUserID).collection("skills").doc(category).set(skillsList[category], {merge: true});        
+    //     }
+    //     for (var category in prefsList) {
+    //         firebase.firestore().collection("users").doc(currentUserID).collection("prefs").doc(category).set(prefsList[category], {merge: true});        
+    //     }
+    // },
     // Neue Attribute hinzufügen falls vorhanden
     updateAttributesList: async function() {
         const currentUserID = firebase.auth().currentUser.uid;

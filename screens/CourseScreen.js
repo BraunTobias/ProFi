@@ -271,30 +271,33 @@ export default CourseScreen = ({route, navigation}) => {
                         )
                     }}
                 />
+                {/* // Idee hinzufügen: Fähigkeiten auswählen */}
+                <Modal visible={skillsVisibility} animationType='slide'>
+                            <View style= { styles.headerFake }>
+                                <Text style= { texts.header }>Fähigkeiten auswählen</Text>
+                            </View>
+                    <View style={{height: "100%"}}>
+                        <View style={{height: "80%"}}>
+                            <AttributeSelect 
+                                
+                                attributeType={"skills"} 
+                                selectedAttributesList={selectedSkillsList} 
+                                addSelectedAttribute={addSelectedSkillHandler} 
+                            >
+                            </AttributeSelect>
+                        </View>
+                        <View style={{height: "30%", justifyContent:"flex-start", alignItems: "center", backgroundColor: "red"}}>
+                            <Button 
+                                buttonStyle= { buttons.buttonRow }
+                                titleStyle= { texts.buttonBlueCenter }
+                                title='OK' 
+                                onClick={() => {setSkillsVisibility(false)}}
+                            />
+                        </View>
+                    </View>
+                </Modal>
             </Modal>
             
-            {/* // Idee hinzufügen: Fähigkeiten auswählen */}
-            <Modal visible={skillsVisibility} animationType='slide'>
-                <View style={{height: "85%"}}>
-                    <View style= { styles.headerFake }>
-                        <Text style= { texts.header }>Fähigkeiten auswählen</Text>
-                    </View>
-                    <AttributeSelect 
-                        attributeType={"skills"} 
-                        selectedAttributesList={selectedSkillsList} 
-                        addSelectedAttribute={addSelectedSkillHandler} 
-                    >
-                    </AttributeSelect>
-                </View>
-                <View style={{alignItems: "center"}}>
-                    <Button 
-                        buttonStyle= { buttons.buttonRow }
-                        titleStyle= { texts.buttonBlueCenter }
-                        title='OK' 
-                        onClick={() => {setSkillsVisibility(false)}}
-                    />
-                </View>
-            </Modal>
 
             {/* // User-Profil ansehen */}
             <Modal visible={profileVisibility} animationType='slide'>

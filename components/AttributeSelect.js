@@ -37,7 +37,7 @@ export default AttributeSelect = props => {
     }
 
     return(
-        <View >
+        <View style={{height: "100%", backgroundColor: "green"}}>
             <View style= { styles.subHeader } >
                 <View style= {styles.membersRow} >
                         {/* Fähigkeiten-Header: Icons */}
@@ -65,6 +65,7 @@ export default AttributeSelect = props => {
             <Text style={[texts.headline, {paddingLeft: 20, padding: 10}]}>{currentCategory}</Text>
 
             <FlatList 
+            style={{flex: 1, paddingBottom: 50}}
                 data={displayedSkills}
                 keyExtractor={(item, index) => item.toString()}
                 renderItem={(itemData) => { 
