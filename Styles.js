@@ -322,6 +322,7 @@ const texts = StyleSheet.create({
         fontSize: 18, 
         fontWeight: 'bold',
         color: white,
+        maxWidth: "85%"
     },
     
     buttonBlueCenter: {

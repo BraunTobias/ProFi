@@ -193,13 +193,15 @@ const DB = {
                 }, {merge: true}); 
             })
             .then(() => {
-                firebase.storage().ref().child("images/" + oldImageName).delete()
-                .then(() => {
-                    console.log("Deleted old image");
-                })
-                .catch((error) => {
-                    console.log(error);
-                })
+                if (oldImageName) {
+                    firebase.storage().ref().child("images/" + oldImageName).delete()
+                    .then(() => {
+                        console.log("Deleted old image");
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    })
+                }
             })
         });
 
