@@ -1,14 +1,14 @@
 import React, {useState, useLayoutEffect, useEffect}from "react";
-import {FlatList, Modal, View, TextInput, Text, TouchableWithoutFeedback, Keyboard} from "react-native";
-import ListTile from "../components/ListTile";
-import Button from '../components/Button';
+import { Modal, View, TextInput, Text } from "react-native";
 import { SwipeListView } from 'react-native-swipe-list-view';
 import NumericInput from 'react-native-numeric-input'
 import ModalDatePicker from 'react-native-datepicker-modal'
-import {Ionicons} from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import DB from '../api/DB_API';
+import ModalComponent from "../components/ModalComponent";
 import InputTile from "../components/InputTile";
-
+import ListTile from "../components/ListTile";
+import Button from '../components/Button';
 import DeleteCourseButton from "../components/DeleteCourseButton";
 import { styles, buttons, texts, white, lightGrey, iconsizeAdd } from "../Styles"
 
@@ -27,12 +27,14 @@ export default HomeScreen = ({navigation}) => {
     const [currentMinMembers, setCurrentMinMembers] = useState();
     const [currentMaxMembers, setCurrentMaxMembers] = useState();
     const [currentDate, setCurrentDate] = useState("");
-    // Später noch getrennte Warnungsfelder anlegen
+    // Warnungsfelder
+    const [findCourseWarning, setFindCurseWarning] = useState("");
     const [currentWarning, setCurrentWarning] = useState("");
     const [nameError, setNameError] = useState("");
+    const [idError, setIdError] = useState("");
     const [minMembersError, setMinMemebersError] = useState("");
     const [maxMembersError, setMaxMembersError] = useState("");
-    const [dateError, setDateError] = useState("");
+    const [dateError, setDateError] = useState("Offenes Projekt ohne Datumsangabe");
   
     // Wird nur beim Laden der Seite einmalig ausgeführt
     useEffect(() => {
@@ -79,9 +81,15 @@ export default HomeScreen = ({navigation}) => {
                 DB.addCourse(currentCourseName, currentCourseId, currentDate, currentMinMembers, currentMaxMembers, () => {
                     setAddCourseVisibility(false);
                     setCurrentCourseName("");
+                    setCurrentCourseId("");
                     setCurrentMinMembers("");
                     setCurrentMaxMembers("");
                     setCurrentDate("");
+                    setNameError("");
+                    setIdError("");
+                    setMinMemebersError("");
+                    setMaxMembersError("");
+                    setDateError("");
                     DB.getCourseList((courseList) => {
                         console.log(courseList);
                         setCurrentCourses(courseList);
@@ -114,12 +122,8 @@ export default HomeScreen = ({navigation}) => {
 
     const setCourseNameHandler = (enteredText) => {
         if (enteredText) {
-            if (true) {
-                // CHECK name-scheme
-                setCurrentCourseName(enteredText);
-            } else {
-                setNameError("Bitte ans Namens-Schema halten")
-            }
+            setCurrentCourseName(enteredText);
+            setNameError("")
         } else {
             setCurrentCourseName("")
             setNameError("Bitte einen Kursnamen eingeben")
@@ -131,12 +135,13 @@ export default HomeScreen = ({navigation}) => {
             if (true) {
                 // CHECK name-scheme
                 setCurrentCourseId(enteredText);
+                setIdError("")
             } else {
-                setNameError("Bitte ans Namens-Schema halten")
+                setIdError("Bitte ans Kürzel-Schema halten")
             }
         } else {
             setCurrentCourseId("")
-            setNameError("Bitte einen Kursnamen eingeben")
+            setIdError("Bitte ein Kürzel eingeben")
         }
     };
 
@@ -159,9 +164,10 @@ export default HomeScreen = ({navigation}) => {
     const setDateHandler = (enteredDate) => {
         if (enteredDate) {
             setCurrentDate(enteredDate)
+            setDateError("");
             // parse enteredDate
         } else {
-            setDateError("Bitte Datum eingeben");
+            setDateError("Offenes Projekt ohne Datumsangabe");
         }
     }
 
@@ -170,6 +176,7 @@ export default HomeScreen = ({navigation}) => {
             setCurrentFindName(enteredId);
         }
     }
+    
     const findCourseHandler = () => {
         if (currentFindName != "") {
             DB.addCourseToList(currentFindName, () => {
@@ -200,40 +207,34 @@ export default HomeScreen = ({navigation}) => {
 
     return (
         <View style={{flex: 1}}>
+            {/* Kurs erstellen */}
             <Modal visible= { addCourseVisibility } animationType= 'slide'>
-                <View style= { styles.modal } >
-                    <TouchableWithoutFeedback onPress= { () => Keyboard.dismiss() } >
-                        <View>
-                            <View style= { styles.headerFake } >
-                                <Text style= { texts.headerText } >Kurs erstellen</Text>
-                            </View>
-                            <View style= { styles.contentFake } >
-                                <View>
-                                    <View style= { styles.loginInput } >
-                                        <Text style= { texts.buttonGrey } >Kursname</Text>
-                                        <TextInput 
-                                            textAlign= {'left'}
-                                            style= { texts.inputText }
-                                            placeholder= { "Kursname" } 
-                                            onChangeText= { setCourseNameHandler }
-                                        />
-                                        <Text>
-                                            { nameError }
-                                        </Text>
-                                    </View>
-                                    <View style= { styles.loginInput } >
-                                        <Text style= { texts.buttonGrey } >Kurs-ID</Text>
-                                        <TextInput 
-                                            textAlign= {'left'}
-                                            style= { texts.inputText }
-                                            placeholder= { "KürzelSemesterJahr" } 
-                                            onChangeText= { setCourseIdHandler }
-                                        />
-                                        <Text>
-                                            { nameError }
-                                        </Text>
-                                    </View>
-                                    
+                <ModalComponent
+                    title= 'Kurs erstellen'
+                    subheader= { () => {}}
+                    content= { () => {
+                        return(
+                            <View >
+                                <Text></Text>{/* Text-Absatz */}
+                                <View style= { styles.center }>
+                                    <InputTile 
+                                        title= "Kursname"
+                                        placeholderText= "Kursname"
+                                        value= { currentCourseName }
+                                        onChangeText= { setCourseNameHandler }
+                                    />
+                                    <Text>
+                                        { nameError }
+                                    </Text>
+                                    <InputTile 
+                                        title= "Kurs-ID"
+                                        placeholderText= "KürzelSemesterJahr"
+                                        value= { currentCourseId }
+                                        onChangeText= { setCourseIdHandler }
+                                    />
+                                    <Text>
+                                        { idError }
+                                    </Text>
                                     <View style= { styles.loginInput } >
                                         <Text style= { texts.buttonGrey } >Minimale Mitgliederzahl</Text>
                                         <NumericInput 
@@ -245,7 +246,6 @@ export default HomeScreen = ({navigation}) => {
                                             { minMembersError }
                                         </Text>
                                     </View>
-
                                     <View style= { styles.loginInput } >
                                         <Text style= { texts.buttonGrey } >Maximale Mitgliederzahl</Text>
                                         <NumericInput 
@@ -257,7 +257,6 @@ export default HomeScreen = ({navigation}) => {
                                             { maxMembersError }
                                         </Text>
                                     </View>
-
                                     <View style= { styles.loginInput } >
                                         <Text style= { texts.buttonGrey } >Enddatum (optional)</Text>
                                         <TextInput 
@@ -272,10 +271,6 @@ export default HomeScreen = ({navigation}) => {
                                             { dateError }
                                         </Text>
                                     </View>
-
-                                    <Text>
-                                    { currentWarning }
-                                </Text>
                                 </View>
                                 <View style= { styles.row } >
                                     <Button 
@@ -292,33 +287,32 @@ export default HomeScreen = ({navigation}) => {
                                     />
                                 </View>
                             </View>
-                        </View>
-                    </TouchableWithoutFeedback>
-                </View>
+                        )
+                    }}
+                />
             </Modal>
+
+            {/* Kurs finden */}
             <Modal visible= { findVisibility } animationType= 'slide'>
-                <View style= { styles.modal } >
-                    <TouchableWithoutFeedback onPress= { () => Keyboard.dismiss() } >
-                        <View>
-                            <View style= { styles.headerFake } >
-                                <Text style= { texts.headerText } >Kurs finden</Text>
-                            </View>
-                            <View style= { styles.contentFake } >
-                                <View>
-                                    <View style= { styles.loginInput } >
-                                        <Text style= { texts.headline } >Kurs-ID</Text>
-                                        <TextInput 
-                                            textAlign= {'left'}
-                                            style= { texts.inputText }
-                                            placeholder= { "KürzelSemesterJahr" } 
-                                            onChangeText= { setFindCourseHandler }
-                                        />
-                                        <Text>
-                                            { nameError }
-                                        </Text>
-                                    </View>
+                <ModalComponent
+                    title= 'Kurs finden'
+                    subheader= { () => {}}
+                    content= { () => {
+                        return(
+                            <View >
+                                <Text></Text>{/* Text-Absatz */}
+                                <View style= { styles.center }>
+                                    <InputTile 
+                                        title= "Kurs-ID"
+                                        placeholderText= "KürzelSemesterJahr"
+                                        value= { currentFindName }
+                                        onChangeText= { setFindCourseHandler }
+                                    />
+                                    <Text>
+                                        { findCourseWarning }
+                                    </Text>
                                 </View>
-                                <View style= { styles.row } >
+                                <View style= { styles.paddedRow } >
                                     <Button 
                                         buttonStyle= { buttons.buttonRow }
                                         titleStyle= { texts.buttonBlueCenter }
@@ -333,37 +327,25 @@ export default HomeScreen = ({navigation}) => {
                                     />
                                 </View>
                             </View>
-                        </View>
-                    </TouchableWithoutFeedback>
-                </View>
+                        )
+                    }}
+                />
             </Modal>
 
-            {/* <FlatList
-                data = {currentCourses}
-                renderItem={(itemData) => { 
-                    return (
-                        <ListTile
-                            onClick={clickHandler} 
-                            id={itemData.item.id}
-                            title={itemData.item.title}
-                            subtitle={"Gruppengröße: " + itemData.item.minMembers + " – " + itemData.item.maxMembers + " Personen\n "+ itemData.item.date}
-                        />
-                    )
-                }}
-            /> */}
+            {/* Meine Kurse */}
             <View style= {styles.subHeader} >
                 <View style= { styles.paddedRow } >
                     <Button 
                         buttonStyle= { buttons.buttonRowGrey }
                         titleStyle= { texts.buttonGrey }
-                        title= 'Kurs finden  ' 
+                        title= 'Kurs finden' 
                         icon= "find"
                         onClick= { () => { setFindVisibility(true) } }
                     />
                     <Button 
                         buttonStyle= { buttons.buttonRow }
                         titleStyle= { texts.buttonBlue }
-                        title= 'Neuer Kurs  '
+                        title= 'Neuer Kurs'
                         icon= "plus"
                         onClick= { () => { setAddCourseVisibility(true) } }
                     />

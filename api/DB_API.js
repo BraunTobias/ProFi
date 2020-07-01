@@ -104,14 +104,16 @@ const DB = {
         var userName = "";
         var userImage = "";
         var bio = "";
+        var email = "";
         const snapshotDoc = await firebase.firestore().collection("users").doc(userId).get();
         if (snapshotDoc.data()) {
             const userInfo = snapshotDoc.data();
                 userName = userInfo.username;
                 userImage = userInfo.image;
                 bio = userInfo.bio;
+                email = userInfo.email;
         }
-        onSuccess(userName, userImage, bio);
+        onSuccess(userName, userImage, bio, email);
     },
     getCurrentUserId: function() {
         return(firebase.auth().currentUser.uid);

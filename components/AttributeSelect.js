@@ -36,50 +36,48 @@ export default AttributeSelect = props => {
         }, (error) => {console.log(error)});
     }
 
-        return(
-            <View style={{height: "100%"}}>
+    return(
+        <View >
+            <View style= { styles.subHeader } >
+                <View style= {styles.membersRow} >
+                        {/* Fähigkeiten-Header: Icons */}
+                        <FlatList
+                            style ={{paddingLeft: 15, paddingRight: 15}}
+                            data={categoriesList}
+                            horizontal={true}
+                            showsHorizontalScrollIndicator={false}
+                            keyExtractor={(item, index) => index.toString()}
+                            renderItem={(itemData) => { 
+                                return (
+                                    <CategoryIcon
+                                        onClick={() => {clickCategoryHandler(itemData.item)}} 
+                                        title={itemData.item}
+                                        isActive={currentCategory == itemData.item}
+                                        // imageUrl={itemData.item.imageUrl}
+                                    />
+                                );
+                            }}
+                        />
 
-                <View style= { styles.subHeader } >
-                    <View style= {styles.membersRow} >
-                            {/* Fähigkeiten-Header: Icons */}
-                            <FlatList
-                                style ={{paddingLeft: 15, paddingRight: 15}}
-                                data={categoriesList}
-                                horizontal={true}
-                                showsHorizontalScrollIndicator={false}
-                                keyExtractor={(item, index) => index.toString()}
-                                renderItem={(itemData) => { 
-                                    return (
-                                        <CategoryIcon
-                                            onClick={() => {clickCategoryHandler(itemData.item)}} 
-                                            title={itemData.item}
-                                            isActive={currentCategory == itemData.item}
-                                            // imageUrl={itemData.item.imageUrl}
-                                        />
-                                    );
-                                }}
-                            />
-
-                    </View>
                 </View>
-
-                <Text style={[texts.headline, {paddingLeft: 20, padding: 10}]}>{currentCategory}</Text>
-
-                <FlatList style={{height: "90%"}}
-                    data={displayedSkills}
-                    keyExtractor={(item, index) => item.toString()}
-                    renderItem={(itemData) => { 
-                        return (
-                            // FlatList
-                            <SkillsTile
-                                text={itemData.item}  
-                                state={props.selectedAttributesList.indexOf(itemData.item) >= 0}
-                                onClick={props.addSelectedAttribute}
-                            />
-                        );
-                    }}
-                />
             </View>
-        );
-  
+
+            <Text style={[texts.headline, {paddingLeft: 20, padding: 10}]}>{currentCategory}</Text>
+
+            <FlatList 
+                data={displayedSkills}
+                keyExtractor={(item, index) => item.toString()}
+                renderItem={(itemData) => { 
+                    return (
+                        // FlatList
+                        <SkillsTile
+                            text={itemData.item}  
+                            state={props.selectedAttributesList.indexOf(itemData.item) >= 0}
+                            onClick={props.addSelectedAttribute}
+                        />
+                    );
+                }}
+            />
+        </View>
+    );
 }

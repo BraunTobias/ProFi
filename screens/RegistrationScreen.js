@@ -1,13 +1,14 @@
 import React, { useContext, useState } from 'react';
 import { View, TextInput, Text, Modal } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import Button from '../components/Button';
-import { LogInContext } from '../data/LogInContext';
-import { USERS } from '../data/dummy-data'
+//import { LogInContext } from '../data/LogInContext';
+//import { USERS } from '../data/dummy-data'
 import DB from '../api/DB_API';
 import { styles, buttons, texts } from '../Styles';
 
 export default RegistrationScreen = ({navigation}) => {
-    const [authentication, setAuthentication, user, setUser] = useContext(LogInContext);
+    //const [authentication, setAuthentication, user, setUser] = useContext(LogInContext);
     const [currentName, setCurrentName] = useState("");
     const [currentMail, setCurrentMail] = useState("");
     const [currentPW, setCurrentPW] = useState("");
@@ -31,58 +32,48 @@ export default RegistrationScreen = ({navigation}) => {
 
     return(
         <View style={styles.content}>
-
             <Modal visible={errorVisibility} transparent = {true}>
-                <View style={ styles.error }>
-                <Text style= { texts.headlineCenter } >Eine gültige E-Mail und Passwort eingeben.</Text>
-                
-                    <Button 
-                        buttonStyle= { buttons.buttonColumn }
-                        titleStyle= { texts.buttonBlueCenter }
-                        title='OK'
-                        onClick={() => setErrorVisibility(false)}
-                    />
-
+                <View style={styles.errorView}>
+                    <View style={styles.errorContainer}>
+                        <Text style= { texts.headlineCenter } >
+                            Eine gültige E-Mail und Passwort eingeben.
+                        </Text>
+                        <ButtonSimple
+                            title='OK'
+                            onClick={() => setErrorVisibility(false)}
+                        />
+                    </View>
                 </View>
             </Modal>
             
-            <View style= { styles.loginInput } >
-                <Text style= { texts.headline } >Benutzername</Text>
-                <TextInput
-                    textAlign={'center'}
-                    style= { texts.inputText }
-                    placeholder='Benutzername'
-                    onChangeText={changeNameHandler}
-                />
-            </View>
-
-            <View style= { styles.loginInput } >
-                <Text style= { texts.headline } >E-Mail</Text>
-                <TextInput
-                    textAlign={'center'}
-                    style= { texts.inputText }
-                    placeholder='benutzer@haw-hamburg.de'
-                    onChangeText={changeMailHandler}
-                />
-            </View>
-
-            <View style= { styles.loginInput } >
-                <Text style= { texts.headline } >Passwort</Text>
-                <TextInput
-                    textAlign={'center'}
-                    style= { texts.inputText }
-                    placeholder='min. 6 Zeichen'
-                    onChangeText={changePWHandler}
-                />
-            </View>
-
-            <Button 
-                buttonStyle= { buttons.buttonColumn }
-                titleStyle= { texts.buttonBlueCenter }
-                title= "Registrieren"
-                onClick={register}
-            />
-           
+            <ScrollView style= { styles.scrollView }>
+                <View style= { styles.center }>
+                    <InputTile 
+                        title= "Benutzername"
+                        placeholderText= "Benutzername"
+                        value= { currentName }
+                        onChangeText= { changeNameHandler }
+                    />
+                    <InputTile 
+                        title= "E-Mail"
+                        placeholderText= "benutzer@haw-hamburg.de"
+                        value= { currentMail }
+                        onChangeText= { changeMailHandler }
+                    />
+                    <InputTile 
+                        title= "Passwort"
+                        placeholderText= "######"
+                        value= { currentPW }
+                        onChangeText= { changePWHandler }
+                    />
+                </View>
+                <View style= { styles.center }>
+                    <ButtonSimple 
+                        title= "Registrieren"
+                        onClick= { register }
+                    />
+                </View>
+            </ScrollView>
         </View>
     );
 }

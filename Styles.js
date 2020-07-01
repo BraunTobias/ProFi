@@ -15,7 +15,7 @@ const iconsize = 35;
 const iconsizeAdd = 60;
 
 const headerHeight = 100;
-const padding = 25;
+const padding = 15;
 
 const styles = StyleSheet.create({
     
@@ -25,8 +25,10 @@ const styles = StyleSheet.create({
 
     row: {
         // flex: 1,
+        marginTop: 20,
         flexDirection: 'row',
         justifyContent: 'space-between',
+        paddingHorizontal: padding,
     },
     paddedRow: {
         // flex: 1,
@@ -121,6 +123,7 @@ const styles = StyleSheet.create({
     },
 
     commentRow: {
+        paddingVertical: padding,
         paddingHorizontal: padding,
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -131,8 +134,9 @@ const styles = StyleSheet.create({
     content: {
         flex: 1, 
         flexDirection: 'column', 
-        justifyContent: 'center', 
-        alignItems: 'center',
+        justifyContent: 'flex-start', 
+        alignItems: 'flex-start',
+        marginHorizontal: 20,
         backgroundColor: lightBlue
     },
 
@@ -150,26 +154,44 @@ const styles = StyleSheet.create({
         width: '100%', 
         backgroundColor: 'white', 
         padding: 10, 
-        marginTop: 10
+        marginHorizontal: 20
     },
+
 
     modal: {
         justifyContent: 'flex-start', 
         alignItems: 'flex-start',
     },
 
+    scrollView: {
+        width: '100%', 
+        //marginTop: 20,
+        //paddingTop: 20,
+        backgroundColor: '#f5f7f7',
+        height: '100%',
+    },
+
+    center: {
+        alignSelf: 'center'
+    },
+
     loginInput: {
         justifyContent: 'flex-start', 
         alignItems: 'flex-start',
-        marginBottom: 0,
-        //width: 300,
+        marginBottom: 10,
     },
 
-    error: {
+    errorView: {
         flex: 1, 
+        marginTop: 80, 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+    },
+
+    errorContainer: {
+        flex: 0.25, 
         margin: 50, 
-        marginTop: 130, 
-        padding: 10, 
+        padding: 20,
         justifyContent: 'center', 
         alignItems: 'center', 
         backgroundColor: 'white'
@@ -184,35 +206,19 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderRadius: 2,
         height: 50
+    },
+
+    backIcon: {
+        paddingLeft: 5,
     }
 })
 
 const buttons = StyleSheet.create({
     
-    button1: {
-        height: 50,
-        width: 150,
-        marginTop: 10,
-        marginBottom: 10,
-        backgroundColor: darkBlue,
-        borderRadius:10,
-    },
-    
     buttonRow: {
         width: width/7*3,
         height: 50,
-        paddingHorizontal: 10,
-        backgroundColor: darkBlue,
-        borderRadius:10,
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between"
-    },
-
-    buttonColumn: {
-        width: "50%",
-        height: 50,
-        marginVertical: 5,
+        paddingHorizontal: 20,
         backgroundColor: darkBlue,
         borderRadius:10,
         flexDirection: "row",
@@ -223,22 +229,52 @@ const buttons = StyleSheet.create({
     buttonRowGrey: {
         width: width/7*3,
         height: 50,
-        paddingHorizontal: 10,
+        paddingHorizontal: 20,
         backgroundColor: lightGrey,
         borderRadius:10,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between"
-    }
+    },
+
+    buttonColumn: {
+        width: "50%",
+        height: 50,
+        marginVertical: 10,
+        backgroundColor: darkBlue,
+        borderRadius:10,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between"
+    },
+
+    buttonSimple: {
+        width: "50%",
+        height: 50,
+        marginVertical: 10,
+        backgroundColor: darkBlue,
+        borderRadius:10,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between"
+    },
 })
 
 const texts = StyleSheet.create({
     
-    headerText: {
+    header: {
         fontSize: 24,
         letterSpacing: 0.5,
         fontWeight: 'bold',
-        color: white
+        color: white,
+    },
+
+    headerWithBackIcon: {
+        fontSize: 24,
+        letterSpacing: 0.5,
+        fontWeight: 'bold',
+        color: white,
+        marginLeft: -30,
     },
 
     headline: {

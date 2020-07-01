@@ -15,7 +15,7 @@ export default MainNavigator = () => {
     return(
         <NavigationContainer>
             <Tab.Navigator screenOptions={({ route }) => ({
-                    tabBarIcon: ({ focused, color, size }) => {
+                tabBarIcon: ({ focused, color, size }) => {
                     let iconName;
         
                     if (route.name === 'Home') {
@@ -25,7 +25,7 @@ export default MainNavigator = () => {
                     }
                     
                     return <Ionicons name={iconName} size={size} color={color} />;
-                    },
+                },
                 })}
                 tabBarOptions={{
                     activeTintColor: darkBlue,
@@ -36,9 +36,9 @@ export default MainNavigator = () => {
                     style: {
                         backgroundColor: darkGrey,
                     },
-              
                 }}
             >
+
                 <Tab.Screen name = "Home" component ={HomeNavigator}/>
                 <Tab.Screen name = "Profile" component={ProfileNavigator}/>
                                 

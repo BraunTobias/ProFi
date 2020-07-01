@@ -11,12 +11,19 @@ export default ProfileNavigator = () => {
     return (
         <ProfileStack.Navigator initialRouteName="Profil" screenOptions={{
             headerStyle: styles.header,
-            headerTitleStyle: texts.headerText,
             headerTintColor: 'white',
-            headerBackImage: (()=>{return(<Ionicons name={'ios-arrow-back'} size={iconsize} color={white} />)})
+            headerBackImage: ( () => { return ( <Ionicons name= { 'ios-arrow-back' } size= { iconsize } color= { white } />)})
         }}>
-            <ProfileStack.Screen name = "Mein Profil" component = {ProfileScreen}/>
-            <ProfileStack.Screen name = "Fähigkeiten" component = {AttributeScreen} options={{headerBackTitle: ' '}}/>
+            <ProfileStack.Screen 
+                name = "Mein Profil" 
+                component = { ProfileScreen } 
+                options= { { headerTitleStyle: texts.header } }
+            />
+            <ProfileStack.Screen 
+                name = "Fähigkeiten" 
+                component = { AttributeScreen }
+                 options= { { headerBackTitle: ' ', headerTitleStyle: texts.headerWithBackIcon } }
+            />
         </ProfileStack.Navigator>
     );
 };

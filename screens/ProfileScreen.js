@@ -135,58 +135,60 @@ export default ProfileScreen =  ({navigation})  => {
         <View>
             {/* // "Header" mit Profildaten */}
             <View style={styles.subHeaderProfile}>
-                    <Modal visible={false} animationType='slide'>
-                        <View style={styles.error}>
-                            <Text style= { texts.headlineCenter }>Gespeichert.</Text>
-                            <Button 
-                                buttonStyle= {buttons.buttonColumn}
-                                titleStyle= {texts.buttonBlueCenter}
-                                title='OK'
-                                onPress={() => setAcknowledgementVisibility(false)}
-                            />
-                        </View>
-                    </Modal>
-                    
-                    {/* <Modal visible={imagePickerVisibility} animationType='slide'>
-                        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white'}}>
-                            <Text>Foto aufnehmen</Text>
-                            
-                            <View style={styles.imageContainer}>
-                                <View style={styles.verticalContainer}>
-                                    <Text>mit Kamera aufnehmen</Text>
-                                    <TouchableWithoutFeedback 
-                                        style={[styles.imageTile, styles.cameraPreview]}
-                                        onPress={toggleCameraHandler} >
-                                        {!isCameraOn ? (
-                                                    <Button
-                                            type="clear"
-                                            onPress={toggleCameraHandler}
-                                            icon={
-                                                <Ionicons
-                                                    name="ios-camera"
-                                                    size={50}
-                                                    color="rgb(0, 0, 0)"
-                                                />
-                                            }
-                                        />
-                                        ) : (
-                                        <TouchableOpacity onPress={flipCameraHandler}>
-                                            <View style={{ borderRadius: 10, overflow: "hidden" }}>
-                                            <Camera style={styles.cameraPreview} type={type} />
-                                            </View>
-                                        </TouchableOpacity>
-                                        )}
-                                    </TouchableWithoutFeedback>
-                                </View>
-                            </View>
-
-                            <Button title='OK'onPress={() => setImagePickerVisibility(false)}/>
-                        </View>
-                    </Modal> */}
+                <Modal visible={false} animationType='slide'>
+                    <View style={styles.error}>
+                        <Text style= { texts.headlineCenter }>Gespeichert.</Text>
+                        <Button 
+                            buttonStyle= {buttons.buttonColumn}
+                            titleStyle= {texts.buttonBlueCenter}
+                            title='OK'
+                            onPress={() => setAcknowledgementVisibility(false)}
+                        />
+                    </View>
+                </Modal>
+                
+                {/* <Modal visible={imagePickerVisibility} animationType='slide'>
+                    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white'}}>
+                        <Text>Foto aufnehmen</Text>
                         
-                    {/* <Modal visible={functionsVisibility} animationType='slide'>
-                        < FunctionsScreen user={user} />
-                    </Modal> */}
+                        <View style={styles.imageContainer}>
+                            <View style={styles.verticalContainer}>
+                                <Text>mit Kamera aufnehmen</Text>
+                                <TouchableWithoutFeedback 
+                                    style={[styles.imageTile, styles.cameraPreview]}
+                                    onPress={toggleCameraHandler} >
+                                    {!isCameraOn ? (
+                                                <Button
+                                        type="clear"
+                                        onPress={toggleCameraHandler}
+                                        icon={
+                                            <Ionicons
+                                                name="ios-camera"
+                                                size={50}
+                                                color="rgb(0, 0, 0)"
+                                            />
+                                        }
+                                    />
+                                    ) : (
+                                    <TouchableOpacity onPress={flipCameraHandler}>
+                                        <View style={{ borderRadius: 10, overflow: "hidden" }}>
+                                        <Camera style={styles.cameraPreview} type={type} />
+                                        </View>
+                                    </TouchableOpacity>
+                                    )}
+                                </TouchableWithoutFeedback>
+                            </View>
+                        </View>
+
+                        <Button title='OK'onPress={() => setImagePickerVisibility(false)}/>
+                    </View>
+                </Modal> */}
+                    
+                {/* <Modal visible={functionsVisibility} animationType='slide'>
+                    < FunctionsScreen user={user} />
+                </Modal> */}
+                
+                {/* Linke Spalte: Profilbild */}
                 <View style={styles.contentProfile}>
                     <TouchableOpacity onPress={selectImageHandler}>
                         <Image 
@@ -194,19 +196,8 @@ export default ProfileScreen =  ({navigation})  => {
                             source={{ uri: selectedImage.localUri}} 
                         />
                     </TouchableOpacity>
-                    {/* <Button
-                        type="clear"
-                        onPress={() => setImagePickerVisibility(true)}
-                        icon={
-                            <Ionicons
-                                name="ios-camera"
-                                size={50}
-                                color="rgb(0, 0, 0)"
-                            />
-                        }
-                    />
-                        */}
                 </View>
+
                 {/* // Rechte Spalte */}
                 <View style={styles.rightContentProfile}>
                     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -229,54 +220,56 @@ export default ProfileScreen =  ({navigation})  => {
                             />
                         </View>
                     </TouchableWithoutFeedback>
+
                     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
                         <View style={{width: "90%"}}>
                             <Text style={texts.textProfile}>E-Mail:</Text>
                             <Text style={texts.textBold}>{currentMail}</Text>
                         </View>
-                    </TouchableWithoutFeedback>  
-                        {/* <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-                            <View style={{width: "90%"}}>
-                                <Text>Passwort:</Text>
-                                <TextInput
-                                    style={styles.textInputField}
-                                    onChangeText={changePWHandler}
-                                    value={currentPW}
-                                    secureTextEntry={true} 
-                                />
-                            </View>
-                        </TouchableWithoutFeedback> */}
+                    </TouchableWithoutFeedback> 
+                    
+                    {/* <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+                        <View style={{width: "90%"}}>
+                            <Text>Passwort:</Text>
+                            <TextInput
+                                style={styles.textInputField}
+                                onChangeText={changePWHandler}
+                                value={currentPW}
+                                secureTextEntry={true} 
+                            />
+                        </View>
+                    </TouchableWithoutFeedback> */}
                 </View>
             </View>
             <View style= {styles.subHeader} >
                 <View style={styles.paddedRow}>
-                        <Button
-                            buttonStyle= { buttons.buttonRowGrey }
-                            titleStyle= { texts.buttonGrey }                    
-                            title= "Übernehmen"
-                            onPress={commitChangesHandler}
-                            icon={
-                                <Ionicons
-                                    name="md-checkmark"
-                                    size={30}
-                                />
-                            }
-                        />
-                        <Button 
-                                buttonStyle= { buttons.buttonRow }
-                                titleStyle= { texts.buttonBlue }
-                                title= "Abmelden"
-                                onPress={() => {
-                                    DB.signOut(() => {console.log("Signed Out")});
-                                        }}
-                                icon={
-                                    <Ionicons
-                                        name="md-log-out"
-                                        size={30}
-                                        color="white"
-                                    />
-                                }
-                        />
+                    <Button
+                        buttonStyle= { buttons.buttonRowGrey }
+                        titleStyle= { texts.buttonGrey }                    
+                        title= "Übernehmen"
+                        onPress={commitChangesHandler}
+                        icon={
+                            <Ionicons
+                                name="md-checkmark"
+                                size={30}
+                            />
+                        }
+                    />
+                    <Button 
+                        buttonStyle= { buttons.buttonRow }
+                        titleStyle= { texts.buttonBlue }
+                        title= "Abmelden"
+                        onPress={() => {
+                            DB.signOut(() => {console.log("Signed Out")});
+                                }}
+                        icon={
+                            <Ionicons
+                                name="md-log-out"
+                                size={30}
+                                color="white"
+                            />
+                        }
+                    />
                 </View>
             </View>  
             <View>
@@ -287,7 +280,7 @@ export default ProfileScreen =  ({navigation})  => {
                 />
             </View>
         </View>
-     );
+    );
 }
 
 // const styles = StyleSheet.create({

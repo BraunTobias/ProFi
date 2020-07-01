@@ -2,6 +2,7 @@ import React, {useState, useEffect, useLayoutEffect} from 'react';
 import {View, SafeAreaView, Text, FlatList, Modal, TouchableWithoutFeedback, TextInput, Keyboard } from "react-native";
 import ListTile from '../components/ListTile';
 import Button from '../components/Button';
+import ButtonSimple from '../components/ButtonSimple';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import {Ionicons} from '@expo/vector-icons';
 import AttributeSelect from '../components/AttributeSelect';
@@ -22,6 +23,7 @@ export default CourseScreen = ({route, navigation}) => {
     const [profileVisibility, setProfileVisibility] = useState(false);
     
     // States für Idea-Eingabe
+    const [errorVisibility, setErrorVisibility] = useState(false);
     const [addIdeaVisibility, setAddIdeaVisibility] = useState(false);
     const [skillsVisibility, setSkillsVisibility] = useState(false);
     const [currentIdeaName, setCurrentIdeaName] = useState("");
@@ -99,34 +101,43 @@ export default CourseScreen = ({route, navigation}) => {
         console.log("User ID: " + viewedUserId);
     };
 
-    const addIdeaHandler = (isAdd) => {
-        if (isAdd) {
-            if (currentIdeaName != "" && currentIdeaDescription != "" && selectedSkillsList.length > 1) {
-                    DB.addIdea(itemId, currentIdeaName, currentIdeaDescription, selectedSkillsList, [], () => {
-                        setAddIdeaVisibility(false);
-                        setCurrentIdeaName("");
-                        setCurrentIdeaDescription("");
-                        setSelectedSkillsList([]);
-                        DB.getIdeasList(itemId, (ideasList) => {
-                            setCurrentIdeas(ideasList);
-                        });
-                    });
-            } else {
-                setCurrentWarning("Eingabe nicht vollständig");
-            }
+    const addIdeaHandler = () => {
+        if (currentIdeaName != "" && currentIdeaDescription != "" && selectedSkillsList.length > 1) {
+            console.log ('OK')
+            DB.addIdea(itemId, currentIdeaName, currentIdeaDescription, selectedSkillsList, [], () => {
+                setAddIdeaVisibility(false);
+                setCurrentIdeaName("");
+                setCurrentIdeaDescription("");
+                setSelectedSkillsList([]);
+                DB.getIdeasList(itemId, (ideasList) => {
+                    setCurrentIdeas(ideasList);
+                });
+            });
         } else {
-            setAddIdeaVisibility(false);
+            console.log ('Error')
+            setCurrentWarning("Eingabe nicht vollständig");
+            setErrorVisibility(true);
         }
     };
     
     const setIdeaNameHandler = (enteredText) => {
-        setCurrentIdeaName(enteredText);
-        setCurrentWarning("");
+        if (enteredText) {
+            setCurrentIdeaName(enteredText);
+            setIdeaError("")
+        } else {
+            setCurrentIdeaName("")
+            setIdeaError("Bitte einen Ideenamen eingeben")
+        }
     };
 
     const setIdeaDesriptionHandler = (enteredText) => {
-        setCurrentIdeaDescription(enteredText);
-        setCurrentWarning("");
+        if (enteredText) {
+            setCurrentIdeaDescription(enteredText);
+            setDescriptionError("")
+        } else {
+            setCurrentIdeaDescription("")
+            setDescriptionError("Bitte eine Kurzbeschreibung eingeben")
+        }
     };
 
     const addSelectedSkillHandler = (skill) => {
@@ -187,113 +198,127 @@ export default CourseScreen = ({route, navigation}) => {
 
     return(
         <View style={{flex: 1}}>
+            {/* // Error Popup */}
+            <Modal visible={errorVisibility} transparent = {true}>
+                <View style={styles.errorView}>
+                    <View style={styles.errorContainer}>
+                        <Text style= { texts.headlineCenter } >
+                            {currentWarning}
+                        </Text>
+                        <ButtonSimple
+                            title='OK'
+                            onClick={() => setErrorVisibility(false)}
+                        />
+                    </View>
+                </View>
+            </Modal>
+            
+            {/* // Idee hinzufügen */}
             <Modal visible={addIdeaVisibility} animationType='slide'>
-                <SafeAreaView style= { styles.modal } >
-                    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-                        <View>
-                            <View style= { styles.headerFake } >
-                                <Text style= { texts.headerText } >Idee hinzufügen</Text>
-                            </View>
-                            <View style= { styles.contentFake } >
-                                
-                                <View style= { styles.loginInput } >
-                                    <Text style= { texts.headline } >Idee-Name</Text>
-                                    <TextInput 
-                                        textAlign= {'left'}
-                                        style= { texts.inputText }
-                                        placeholder= { "Idee" } 
-                                        onChangeText= { setIdeaNameHandler }
+                <ModalComponent
+                    title= 'Idee hinzufügen'
+                    subheader= { () => {}}
+                    content= { () => {
+                        return(
+                            <View style= { { backgroundColor: lightGrey }}>
+                                <View style= { styles.content }>
+                                <Text></Text>{/* // Text-Absatz */}
+                                    <InputTile 
+                                        title= "Idee-Name"
+                                        placeholderText= "Idee"
                                         value= { currentIdeaName }
+                                        onChangeText= { setIdeaNameHandler }
                                     />
                                     <Text>
                                         { ideaError }
                                     </Text>
-                                </View>
-                                
-                                <View style= { styles.loginInput } >
-                                    <Text style= { texts.headline } >Kurzbeschreibung</Text>
-                                    <TextInput 
-                                        textAlign= {'left'}
-                                        style= { texts.inputText }
-                                        placeholder= { "Eine kurze Beschreibung der Idee" } 
-                                        onChangeText= { setIdeaDesriptionHandler }
+                                    <InputTile 
+                                        title= "Kurzbeschreibung"
+                                        placeholderText= "Eine kurze Beschreibung der Idee"
                                         value= { currentIdeaDescription }
+                                        onChangeText= { setIdeaDesriptionHandler }
                                     />
                                     <Text>
                                         { descriptionError }
                                     </Text>
                                 </View>
                                 
-                                <Text>
-                                    {currentWarning}
-                                </Text>
-                                
-                                <ListTile
-                                    title={"Fähigkeiten auswählen"}
-                                    subtitle={selectedSkillsList.join(", ")}
-                                    onClick={() => setSkillsVisibility(true)} 
-                                />
+                                <View>
+                                    <ListTile
+                                        title= { "Fähigkeiten auswählen" }
+                                        subtitle= { selectedSkillsList.join(", ") }
+                                        onClick= { () => setSkillsVisibility(true) } 
+                                    />
+                                </View>
 
-                                <View style= { styles.row } >
+                                <View style= { styles.paddedRow } >
                                     <Button 
                                         buttonStyle= { buttons.buttonRow }
                                         titleStyle= { texts.buttonBlueCenter }
                                         title= 'OK' 
-                                        onClick= { () => { addIdeaHandler(true) } }
+                                        onClick= { () => { addIdeaHandler() } }
                                     />
                                     <Button 
                                         buttonStyle= { buttons.buttonRow }
                                         titleStyle= { texts.buttonBlueCenter }
                                         title= 'Abbrechen'
-                                        onClick= { () => { addIdeaHandler(false) } }
+                                        onClick= { () => { 
+                                            console.log ('Error');
+                                            setAddIdeaVisibility(false); } }
                                     />
                                 </View>
                             </View>
-                        </View>
-                    </TouchableWithoutFeedback>
-                </SafeAreaView>
-
-                <Modal visible={skillsVisibility} animationType='slide'>
-                    <View style={{height: "85%"}}>
-                        <View style={{backgroundColor: "#222f56", height: 110, justifyContent: "center", alignItems: "center"}}>
-                            <Text style={{fontSize: 30, top: 20, fontWeight: "bold", color: "white"}}>Fähigkeiten auswählen</Text>
-                        </View>
-                        <AttributeSelect 
-                            attributeType={"skills"} 
-                            selectedAttributesList={selectedSkillsList} 
-                            addSelectedAttribute={addSelectedSkillHandler} 
-                        >
-                        </AttributeSelect>
+                        )
+                    }}
+                />
+            </Modal>
+            
+            {/* // Idee hinzufügen: Fähigkeiten auswählen */}
+            <Modal visible={skillsVisibility} animationType='slide'>
+                <View style={{height: "85%"}}>
+                    <View style= { styles.headerFake }>
+                        <Text style= { texts.header }>Fähigkeiten auswählen</Text>
                     </View>
-                    <View style={{alignItems: "center"}}>
-                        <Button 
-                            buttonStyle= { buttons.buttonRow }
-                            titleStyle= { texts.buttonBlueCenter }
-                            title='OK' 
-                            onClick={() => {setSkillsVisibility(false)}}
-                        />
-                    </View>
-                </Modal>
+                    <AttributeSelect 
+                        attributeType={"skills"} 
+                        selectedAttributesList={selectedSkillsList} 
+                        addSelectedAttribute={addSelectedSkillHandler} 
+                    >
+                    </AttributeSelect>
+                </View>
+                <View style={{alignItems: "center"}}>
+                    <Button 
+                        buttonStyle= { buttons.buttonRow }
+                        titleStyle= { texts.buttonBlueCenter }
+                        title='OK' 
+                        onClick={() => {setSkillsVisibility(false)}}
+                    />
+                </View>
             </Modal>
 
             {/* // User-Profil ansehen */}
             <Modal visible={profileVisibility} animationType='slide'>
-                    <View>
-                        <View style={{backgroundColor: "#222f56", height: 110, justifyContent: "center", alignItems: "center"}}>
-                            <Text style={{fontSize: 30, top: 20, fontWeight: "bold", color: "white"}}>Profil ansehen</Text>
-                        </View>
-                        <ProfileView userId={viewedUserId}></ProfileView>
-                    </View>
-                    <View style={{alignItems: "center"}}>
-                        <Button 
-                            buttonStyle= { buttons.buttonRow }
-                            titleStyle= { texts.buttonBlueCenter }
-                            title='OK' 
-                            onClick={() => {setProfileVisibility(false)}}
-                        />
-                    </View>
+                <ModalComponent
+                    title= 'Profil'
+                    subheader= { () => {
+                        return( <ProfileView userId={viewedUserId}/> )
+                    }}
+                    content= { () => {
+                        return(
+                            <View styles= {{ backgroundColor: lightGrey }}>
+                                <View style= { styles.center }>
+                                    <ButtonSimple 
+                                        title= 'OK' 
+                                        onClick= { () => { setProfileVisibility(false) } }
+                                    />
+                                </View>
+                            </View>
+                        )
+                    }}
+                />
             </Modal>
 
+            {/* Kursansicht */}
             <View style= { styles.subHeader } >
                 <View style= { styles.courseHeaderRow } >
                     <Text style= { texts.headlineCenter }>{date}</Text>
@@ -303,6 +328,7 @@ export default CourseScreen = ({route, navigation}) => {
                     <Text style= { texts.headlineCenter }>{minMembers}–{maxMembers} Personen</Text>
                 </View>
 
+                {/* Membericons */}
                 <View style= { styles.membersRow } >
                     <FlatList
                         data={members}
@@ -338,7 +364,6 @@ export default CourseScreen = ({route, navigation}) => {
                 </View>
             </View>
             
-
             <SwipeListView
                 style={{flexGrow: 1}}
                 ref = {ref => setSwipeListView(ref)}

@@ -6,7 +6,8 @@ import CommentTile from '../components/CommentTile';
 import ProfileView from '../components/ProfileView';
 import DB from '../api/DB_API';
 import { set } from 'react-native-reanimated';
-import { styles, texts, buttons, white } from '../Styles';
+import { styles, texts, buttons, lightGrey } from '../Styles';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default IdeaScreen = ({route, navigation}) => {
     const {itemId} = route.params;
@@ -74,28 +75,28 @@ export default IdeaScreen = ({route, navigation}) => {
         <View>
             {/* // Kommentar schreiben */}
             <Modal visible={commentVisibility} animationType='slide'>
-                <View style= { styles.modal } >
-                    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-                        <View>
-                            <View style= { styles.headerFake } >
-                                <Text style= { texts.headerText } >Kommentar hinzufügen</Text>
-                            </View>
-                            <View style= { styles.contentFake } >
-                                <View style= { styles.loginInput } >
+            <ModalComponent
+                    title= 'Kommentar hinzufügen'
+                    subheader= { () => {} }
+                    content= { () => {
+                        return(
+                            <View styles= {{ backgroundColor: lightGrey }}>
+                                <View style= { styles.contentFake } >
+                                    <Text></Text>{/* Text-Absatz */}
                                     <Text style= { texts.headline } >Kommentar (max. 200 Zeichen)</Text>
-                                    <View style= { styles.commentField } >
-                                        <TextInput 
-                                            textAlign= { 'left' }
-                                            textAlignVertical= { 'top' }
-                                            style= { texts.inputText }
-                                            placeholder= { "Schreibe einen Kommentar" } 
-                                            onChangeText= { setCommentHandler }
-                                            value= { currentCommentText }
-                                            multiline
-                                            numberOfLines= { 10 }
-                                            maxLength= { 200 }
-                                        />
-                                    </View>
+                                </View>
+                                <View style= { styles.commentField } >
+                                    <TextInput 
+                                        textAlign= { 'left' }
+                                        textAlignVertical= { 'top' }
+                                        style= { texts.inputText }
+                                        placeholder= { "Schreibe einen Kommentar" } 
+                                        onChangeText= { setCommentHandler }
+                                        value= { currentCommentText }
+                                        multiline
+                                        numberOfLines= { 10 }
+                                        maxLength= { 200 }
+                                    />
                                 </View>
                                 <View style= { styles.row } >
                                     <Button 
@@ -112,29 +113,35 @@ export default IdeaScreen = ({route, navigation}) => {
                                     />
                                 </View>
                             </View>
-                        </View>
-                    </TouchableWithoutFeedback>
-                </View>
+                        )
+                    }}
+                />
             </Modal>
 
             {/* // User-Profil ansehen */}
             <Modal visible={profileVisibility} animationType='slide'>
-                    <View>
-                        <View style={{backgroundColor: "#222f56", height: 110, justifyContent: "center", alignItems: "center"}}>
-                            <Text style={{fontSize: 30, top: 20, fontWeight: "bold", color: "white"}}>Profil ansehen</Text>
-                        </View>
-                        <ProfileView userId={viewedUserId}></ProfileView>
-                    </View>
-                    <View style={{alignItems: "center"}}>
-                        <Button 
-                            buttonStyle= { buttons.buttonRow }
-                            titleStyle= { texts.buttonBlueCenter }
-                            title='OK' 
-                            onClick={() => {setProfileVisibility(false)}}
-                        />
-                    </View>
+                <ModalComponent
+                    title= 'Profil'
+                    subheader= { () => {
+                        return( <ProfileView userId={viewedUserId}/> )
+                    }}
+                    content= { () => {
+                        return(
+                            <View styles= {{ backgroundColor: lightGrey }}>
+                                <View style= { styles.center }>
+                                    <ButtonSimple 
+                                        title= 'OK' 
+                                        onClick= { () => { setProfileVisibility(false) } }
+                                    />
+                                </View>
+                            </View>
+                        )
+                    }}
+                />
             </Modal>
 
+            {/* // Idee & Kommentar-Liste */}
+            <ScrollView>
             <View>
                 <View style= { styles.subHeaderIdea}>
                     <View style= { { height: 100 } } >
@@ -146,7 +153,6 @@ export default IdeaScreen = ({route, navigation}) => {
                         onClick={() => navigation.navigate('IdeaSkills', {attributeType: "skills", filter: currentSkills})} 
                     />
                 </View>
-
                 <View style={ styles.commentRow }>
                     <Text style={texts.headline}>Kommentare:</Text>
                     <Button 
@@ -173,6 +179,7 @@ export default IdeaScreen = ({route, navigation}) => {
                 );
             }}
             />
+            </ScrollView>
         </View>
   );
 
