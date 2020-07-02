@@ -60,6 +60,16 @@ export default CourseScreen = ({route, navigation}) => {
                 }
             }
         });
+        getCourseData();
+    }, []);
+
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerTitle: itemId,
+        });
+    }, [navigation]);
+
+    const getCourseData = () => {
         DB.getCourseData(itemId, (data) => {
 
             setDate(data.date);
@@ -82,13 +92,7 @@ export default CourseScreen = ({route, navigation}) => {
                 }
             }
         });
-    }, []);
-
-    useLayoutEffect(() => {
-        navigation.setOptions({
-            headerTitle: itemTitle,
-        });
-    }, [navigation]);
+    }
 
     const clickIdeaHandler = (id, title, subtitle, skills) => {
         swipeListView.safeCloseOpenRow();
@@ -187,11 +191,14 @@ export default CourseScreen = ({route, navigation}) => {
             DB.joinCourse(itemId, () => {
                 console.log("Joined");
                 setUserIsMember(true);
+                getCourseData();
+
             }, () => {console.log("error")})
         } else {
             DB.exitCourse(itemId, () => {
                 console.log("Ausgetreten");
                 setUserIsMember(false);
+                getCourseData();
             })
         }
     }
@@ -273,26 +280,29 @@ export default CourseScreen = ({route, navigation}) => {
                 />
                 {/* // Idee hinzufügen: Fähigkeiten auswählen */}
                 <Modal visible={skillsVisibility} animationType='slide'>
-                            <View style= { styles.headerFake }>
-                                <Text style= { texts.header }>Fähigkeiten auswählen</Text>
-                            </View>
-                    <View style={{height: "100%"}}>
-                        <View style={{height: "80%"}}>
-                            <AttributeSelect 
-                                
-                                attributeType={"skills"} 
-                                selectedAttributesList={selectedSkillsList} 
-                                addSelectedAttribute={addSelectedSkillHandler} 
-                            >
-                            </AttributeSelect>
+                    <View style={{flex: 1}}>
+                        <View style= { styles.headerFake }>
+                            <Text style= { texts.header }>Fähigkeiten auswählen</Text>
                         </View>
-                        <View style={{height: "30%", justifyContent:"flex-start", alignItems: "center", backgroundColor: "red"}}>
-                            <Button 
-                                buttonStyle= { buttons.buttonRow }
-                                titleStyle= { texts.buttonBlueCenter }
-                                title='OK' 
-                                onClick={() => {setSkillsVisibility(false)}}
-                            />
+
+                        <View style={{flex: 1}}>
+                            <View style={{height: "85%"}}>
+                                <AttributeSelect 
+                                    
+                                    attributeType={"skills"} 
+                                    selectedAttributesList={selectedSkillsList} 
+                                    addSelectedAttribute={addSelectedSkillHandler} 
+                                >
+                                </AttributeSelect>
+                            </View>
+                            <View style={{height: "15%", justifyContent:"center", alignItems: "center", backgroundColor: lightGrey}}>
+                                <Button 
+                                    buttonStyle= { buttons.buttonRow }
+                                    titleStyle= { texts.buttonBlueCenter }
+                                    title='OK' 
+                                    onClick={() => {setSkillsVisibility(false)}}
+                                />
+                            </View>
                         </View>
                     </View>
                 </Modal>
@@ -324,16 +334,16 @@ export default CourseScreen = ({route, navigation}) => {
             {/* Kursansicht */}
             <View style= { styles.subHeader } >
                 <View style= { styles.courseHeaderRow } >
-                    <Text style= { texts.headlineCenter }>{date}</Text>
-                    <Text style= { texts.headlineCenter }>{itemId}</Text>
+                    <Text style= { texts.headlineCenter }>{itemTitle}</Text>
                 </View>
                 <View style= { styles.courseHeaderRow } >
+                    <Text style= { texts.headlineCenter }>{date}</Text>
                     <Text style= { texts.headlineCenter }>{minMembers}–{maxMembers} Personen</Text>
                 </View>
 
                 {/* Membericons */}
                 <View style= { styles.membersRow } >
-                    <FlatList
+                    <FlatList style={{paddingLeft: 5}}
                         data={members}
                         horizontal={true}
                         keyExtractor={(item, index) => index.toString()}

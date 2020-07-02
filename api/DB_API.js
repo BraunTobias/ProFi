@@ -17,7 +17,7 @@ const DB = {
         firebase.auth().createUserWithEmailAndPassword(email, password)
         .then((userInfo) => {
             console.log("User angelegt");
-
+            this.fillAttributesList(userInfo.user.uid);
             firebase.firestore().collection("users").doc(userInfo.user.uid).set({
                 username: name,
                 bio: "",
@@ -25,8 +25,14 @@ const DB = {
                 password: password
             })        
             .then(() => {
-                this.fillAttributesList();
+                // this.fillAttributesList();
                 console.log("User account created & signed in!");
+                // for (var category in skillsList) {
+                //     console.log("SKILLS: " + category + skillsList[category]);
+                //     firebase.firestore().collection("users").doc(userInfo.user.uid).collection("skills").doc(category).set(skillsList[category], {merge: true});        
+                // }
+                console.log("skills eingesetzt");
+    
                 onSuccess();
             })
             .catch(error => {
@@ -40,19 +46,22 @@ const DB = {
         });
     },
     // Listen fürs Profil ausfüllen 
-    // fillAttributesList: function() {
-    //     const currentUserID = firebase.auth().currentUser.uid;
-    //     for (var category in skillsList) {
-    //         firebase.firestore().collection("users").doc(currentUserID).collection("skills").doc(category).set(skillsList[category], {merge: true});        
-    //     }
-    //     for (var category in prefsList) {
-    //         firebase.firestore().collection("users").doc(currentUserID).collection("prefs").doc(category).set(prefsList[category], {merge: true});        
-    //     }
-    // },
+    fillAttributesList: function(uid) {
+        // const currentUserID = firebase.auth().currentUser.uid;
+        // for (var category in prefsList) {
+        //     firebase.firestore().collection("users").doc(currentUserID).collection("prefs").doc(category).set(prefsList[category], {merge: true});        
+        // }
+        // console.log(skillsList);
+        for (var category in skillsList) {
+            console.log("SKILLS: " + category + skillsList[category]);
+            firebase.firestore().collection("users").doc(uid).collection("skills").doc(category).set(skillsList[category], {merge: true});        
+        }
+
+    },
     // Neue Attribute hinzufügen falls vorhanden
     updateAttributesList: async function() {
         const currentUserID = firebase.auth().currentUser.uid;
-        const oldAttributesArray = [];
+        var oldAttributesArray = [];
 
         // Alle Attribut-Namen die der User schon hat in ein Array speichern
         const snapshot = await firebase.firestore().collection("users").doc(currentUserID).collection("skills").get();
@@ -67,14 +76,28 @@ const DB = {
             console.log("---" + category + "---");
             for (var att in skillsList[category]) {
                 console.log(att);
-                if (oldAttributesArray.indexOf(att) < 0) {
+                const index = oldAttributesArray.indexOf(att);
+                if (index < 0) {
                     console.log("Gibts noch nich");
-                    firebase.firestore().collection("users").doc(currentUserID).collection(attributeType).doc(category).set({
+                    firebase.firestore().collection("users").doc(currentUserID).collection("skills").doc(category).set({
                         [att]: false
                     }, {merge: true});
+                } else {
+                    // Alle verwendeten Attribute als der alten Liste entfernen. Nur die die nicht mehr benötigt werden bleiben übrig
+                    oldAttributesArray.splice(index, 1);
                 }
             }
         }
+        // Skills vom User löschen, die nicht mehr in der SkillsList sind
+        for (var oldAtt in oldAttributesArray) {
+            console.log("Wird gelöscht: " + oldAttributesArray);
+            for (var category in skillsList) {
+                firebase.firestore().collection("users").doc(currentUserID).collection("skills").doc(category).update({
+                    [oldAttributesArray[oldAtt]]: firebase.firestore.FieldValue.delete()
+                });
+            }
+        }
+        
     },
 
     // Einloggen
@@ -100,7 +123,7 @@ const DB = {
         if (snapshotDoc.data()) {
             userInfo = snapshotDoc.data();
         }
-        onSuccess(userInfo);
+        onSuccess(userInfo, currentUserID);
     },
     getUserInfoById: async function(userId, onSuccess) {
         var userName = "";
@@ -364,7 +387,11 @@ const DB = {
                     }, {merge: true}); 
         
                     console.log(prospectsArray);
-                    onSuccess();
+
+                    // Der neue Kurs wird zurückgegeben um sofort angezeigt zu werden
+                    const addedCourse = docSnapshot.data();
+                    addedCourse["id"] = docSnapshot.id;
+                    onSuccess(addedCourse);
                 } else {
                     onError("User ist schon am Kurs interessiert");
                 }         
@@ -429,6 +456,7 @@ const DB = {
                 members: newMembersArray
             }, {merge: true});        
         }
+        onSuccess();
     },
     exitCourse: async function(courseId, onSuccess) {
         const currentUserID = firebase.auth().currentUser.uid;

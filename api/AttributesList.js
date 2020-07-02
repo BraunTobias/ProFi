@@ -1,13 +1,13 @@
 export const skillsList = {
     "Audio": {
-        "Komposition": true,
+        "Komposition": false,
         "Voice Acting": false,
         "Audio Editing": false, 
         "Musiker/in": false, 
         "Sänger/in": false, 
         "Ambient Sound Desinger": false, 
         "Audio Foley": false, 
-        "Produktion": false
+        "Produktion": false,
     },
     "Design": {
         "Editorial Design": false,
@@ -92,7 +92,7 @@ export const skillsList = {
         "Präsentationen": false,
     }, 
     "Hardware":{
-        "Mikroprozessor(Arduiono)": false, 
+        "Mikroprozessor(Arduino)": false, 
         "KUTI": false,
         "Smart Home": false,
         "PC Hardware": false,

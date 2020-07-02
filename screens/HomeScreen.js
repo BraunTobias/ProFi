@@ -40,7 +40,8 @@ export default HomeScreen = ({navigation}) => {
     // Wird nur beim Laden der Seite einmalig ausgeführt
     useEffect(() => {
         console.ignoredYellowBox = ['Setting a timer'];
-        DB.updateAttributesList();
+        // DB.fillAttributesList();
+        // DB.updateAttributesList();
         const unsubscribe = navigation.addListener('focus', () => {
             DB.getCourseList((courseList) => {
                 // console.log(courseList);
@@ -102,23 +103,6 @@ export default HomeScreen = ({navigation}) => {
         } else {
             setCurrentWarning("Eingabe nicht vollständig");
         }
-    };
-
-    const deleteCourseHandler = (id) => {
-        swipeListView.safeCloseOpenRow();
-        DB.removeCourseFromList(id, () => {
-            DB.getCourseList((courseList) => {
-                // console.log(courseList);
-                setCurrentCourses(courseList);
-                var joined = [];
-                for (const course in courseList) {
-                    if (courseList[course].members.indexOf(currentUserId) >= 0) {
-                        joined.push(courseList[course].id);
-                    }
-                }
-                setJoinedCourses(joined);
-            });
-        });
     };
 
     const setCourseNameHandler = (enteredText) => {
@@ -195,13 +179,40 @@ export default HomeScreen = ({navigation}) => {
     
     const findCourseHandler = () => {
         if (currentFindName != "") {
-            DB.addCourseToList(currentFindName, () => {
+            DB.addCourseToList(currentFindName, (addedCourse) => {
+                var courseList = currentCourses;
+                courseList.push(addedCourse);
+                setCurrentCourses(courseList);
                 setFindVisibility(false);
             }, (error) => {
                 console.log(error);
             })
         }
     }
+
+    const deleteCourseHandler = (id) => {
+        swipeListView.safeCloseOpenRow();
+        console.log("HEEEEY" + id);
+        
+        DB.removeCourseFromList(id, () => {
+            DB.getCourseList((courseList) => {
+                // console.log(courseList);
+                setCurrentCourses(courseList);
+                var joined = [];
+                for (const course in courseList) {
+                    if (courseList[course].members.indexOf(currentUserId) >= 0) {
+                        joined.push(courseList[course].id);
+                    }
+                }
+                setJoinedCourses(joined);
+            });
+            // console.log("HEEEEY");
+            // var courseList = currentCourses;
+            // var removeIndex = courseList.map((course) => { return course.id; }).indexOf(id);
+            // courseList.splice(removeIndex, 1);
+            // setCurrentCourses(courseList);
+        });
+    };
 
     // const joinCourseHandler = (courseId) => {
     //     swipeListView.safeCloseOpenRow();
@@ -394,7 +405,7 @@ export default HomeScreen = ({navigation}) => {
                             onClick={() => {clickHandler(itemData.item.id, itemData.item.title)}} 
                             id={itemData.item.id}
                             title={itemData.item.title}
-                            subtitle={"Gruppengröße: " + itemData.item.minMembers + " – " + itemData.item.maxMembers + " Personen\n "+ itemData.item.date}
+                            subtitle={"Gruppengröße: " + itemData.item.minMembers + " – " + itemData.item.maxMembers + " Personen\n"+ itemData.item.date}
                             backgroundColor = {itemData.index % 2 === 0 ? white : lightGrey}
                             isMember = {joinedCourses.indexOf(itemData.item.id) >= 0}
                         />

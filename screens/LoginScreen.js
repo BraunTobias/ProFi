@@ -52,7 +52,7 @@ export default LoginScreen = ({navigation}) => {
             
             <ScrollView style= { styles.scrollView }>
                 <View style= { styles.center }>
-                    <InputTile 
+                    <InputTile style= { styles.inputTile }
                         title= "E-Mail"
                         placeholderText= "benutzer@haw-hamburg.de"
                         value= { currentMail }

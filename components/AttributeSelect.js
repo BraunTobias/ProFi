@@ -37,7 +37,7 @@ export default AttributeSelect = props => {
     }
 
     return(
-        <View style={{height: "100%", backgroundColor: "green"}}>
+        <View style={{height: "100%"}}>
             <View style= { styles.subHeader } >
                 <View style= {styles.membersRow} >
                         {/* Fähigkeiten-Header: Icons */}

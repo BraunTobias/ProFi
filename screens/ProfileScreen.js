@@ -10,7 +10,7 @@ import {
     Alert, 
     Image, 
     StyleSheet } from 'react-native';
-import { Button } from 'react-native-elements';
+import Button from '../components/Button';
 import { Ionicons } from "@expo/vector-icons";
 import { Camera } from "expo-camera";
 import * as ImageManipulator from "expo-image-manipulator";
@@ -33,6 +33,7 @@ export default ProfileScreen =  ({navigation})  => {
     // const [currentInterests, setCurrentInterests] = useState(user.interests);
     const [functionsVisibility, setFunctionsVisibility] = useState(false);
     const [interestsVisibility, setInterestsVisibility] = useState(false);
+    const [changesSaved, setChangesSaved] = useState(true);
     const [skillString, setSkillString] = useState("");
     const [prefString, setPrefString] = useState("");
 
@@ -62,17 +63,19 @@ export default ProfileScreen =  ({navigation})  => {
         
     // Benutzereingaben
     const changeNameHandler = (enteredText) => {
+        setChangesSaved(false);
         setCurrentName(enteredText);
     };
     const changeBioHandler = (enteredText) => {
+        setChangesSaved(false);
         setCurrentBio(enteredText);
     };
-    const changeMailHandler = (enteredText) => {
-        setCurrentMail(enteredText);
-    };
-    const changePWHandler = (enteredText) => {
-        setCurrentPW(enteredText);
-    };
+    // const changeMailHandler = (enteredText) => {
+    //     setCurrentMail(enteredText);
+    // };
+    // const changePWHandler = (enteredText) => {
+    //     setCurrentPW(enteredText);
+    // };
     // const changeFunctionsHandler = (updatedFunctions) => {
     //     setCurrentFunctions(updatedFunctions);
     // }
@@ -81,6 +84,7 @@ export default ProfileScreen =  ({navigation})  => {
     // }
     const commitChangesHandler = () => {
         DB.changeUsername(currentName, currentBio);
+        setChangesSaved(true);
         // DB.changeEmail(currentMail, (error, oldMail) => {
         //     console.log(error + ", alte Adresse wird beibehalten: " + oldMail)
         //     setCurrentMail(oldMail);
@@ -139,10 +143,10 @@ export default ProfileScreen =  ({navigation})  => {
                     <View style={styles.error}>
                         <Text style= { texts.headlineCenter }>Gespeichert.</Text>
                         <Button 
-                            buttonStyle= {buttons.buttonColumn}
-                            titleStyle= {texts.buttonBlueCenter}
-                            title='OK'
-                            onPress={() => setAcknowledgementVisibility(false)}
+                            buttonStyle= { buttons.buttonColumn }
+                            titleStyle= { texts.buttonBlueCenter }
+                            title= 'OK' 
+                            onClick= {() => setAcknowledgementVisibility(false)}
                         />
                     </View>
                 </Modal>
@@ -243,7 +247,22 @@ export default ProfileScreen =  ({navigation})  => {
             </View>
             <View style= {styles.subHeader} >
                 <View style={styles.paddedRow}>
-                    <Button
+                    {/* <Button 
+                        buttonStyle= { buttons.buttonRowGrey }
+                        titleStyle= { texts.buttonGrey }
+                        title= 'Übernehmen' 
+                        onClick= {commitChangesHandler}
+                        icon= {changesSaved ? "checkTrue" : "checkFalse"}
+                    /> */}
+                    <Button 
+                        buttonStyle= { buttons.buttonRowGrey }
+                        titleStyle= { texts.buttonGrey }
+                        title= {changesSaved ? "Aktuell" : "Speichern" }
+                        icon= {changesSaved ? "checkTrue" : "checkFalse"}
+                        onClick= {changesSaved ? () => {} : commitChangesHandler}
+                    />
+
+                    {/* <Button
                         buttonStyle= { buttons.buttonRowGrey }
                         titleStyle= { texts.buttonGrey }                    
                         title= "Übernehmen"
@@ -254,22 +273,15 @@ export default ProfileScreen =  ({navigation})  => {
                                 size={30}
                             />
                         }
-                    />
-                    <Button 
+                    /> */}
+                     <Button 
                         buttonStyle= { buttons.buttonRow }
                         titleStyle= { texts.buttonBlue }
                         title= "Abmelden"
-                        onPress={() => {
-                            DB.signOut(() => {console.log("Signed Out")});
-                                }}
-                        icon={
-                            <Ionicons
-                                name="md-log-out"
-                                size={30}
-                                color="white"
-                            />
-                        }
+                        onClick={() => {DB.signOut(() => {console.log("Signed Out")});}}
+                        icon= {"exit"}
                     />
+
                 </View>
             </View>  
             <View>

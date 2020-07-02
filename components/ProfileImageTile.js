@@ -17,7 +17,7 @@ export default ProfileImageTile = props => {
 
 const styles = StyleSheet.create({
   itemContainer: {
-    paddingLeft: 15,
+    paddingLeft: 10,
   },
   profileImage: {
     borderRadius: 100,

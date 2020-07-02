@@ -10,6 +10,7 @@ export default Button = props => {
     case "checkFalse": image = icons.checkFalse; break;
     case "plus": image = icons.plus; break;
     case "find": image = icons.find; break;
+    case "exit": image = icons.exit; break;
   }
 
   return (
@@ -22,7 +23,7 @@ export default Button = props => {
         { props.title }
       </Text>
       <Image 
-        style= { { width: 30, height: 30 } }
+        style= { { width: 30, height: 30} }
         source= { image }
         resizeMode= { "contain" }
       />

@@ -107,8 +107,8 @@ const styles = StyleSheet.create({
 
     contentAttribute: {
         flex: 1,
-        height: "90%",
-        padding: "5%",
+        // height: "90%",
+        // padding: "5%",
         justifyContent: "space-evenly",
         // backgroundColor: white
     },
@@ -144,7 +144,6 @@ const styles = StyleSheet.create({
         flexDirection: 'column', 
         justifyContent: 'flex-start', 
         alignItems: 'flex-start',
-        paddingTop: 50,
         marginHorizontal: 20,
         // backgroundColor: lightBlue
     },
@@ -166,7 +165,6 @@ const styles = StyleSheet.create({
         marginHorizontal: 20
     },
 
-
     modal: {
         justifyContent: 'flex-start', 
         alignItems: 'flex-start',
@@ -174,6 +172,8 @@ const styles = StyleSheet.create({
 
     scrollView: {
         width: '100%', 
+        paddingTop: 50,
+
         //marginTop: 20,
         //paddingTop: 20,
         // backgroundColor: '#f5f7f7',
@@ -188,6 +188,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start', 
         alignItems: 'flex-start',
         marginBottom: 10,
+        minWidth: 250,
     },
 
     errorView: {
@@ -222,9 +223,9 @@ const styles = StyleSheet.create({
     },
 
     border: {
+        borderBottomWidth: 1,
         borderRadius: 10,
         borderBottomColor: darkBlue,
-        borderBottomWidth: 1
     }
 })
 
@@ -232,8 +233,9 @@ const buttons = StyleSheet.create({
     
     buttonRow: {
         width: width/7*3,
-        height: 50,
-        paddingHorizontal: 20,
+        height: 45,
+        paddingLeft: 15,
+        paddingRight: 10,
         backgroundColor: darkBlue,
         borderRadius:10,
         flexDirection: "row",
@@ -243,8 +245,9 @@ const buttons = StyleSheet.create({
 
     buttonRowGrey: {
         width: width/7*3,
-        height: 50,
-        paddingHorizontal: 20,
+        height: 45,
+        paddingLeft: 15,
+        paddingRight: 10,
         backgroundColor: lightGrey,
         borderRadius:10,
         flexDirection: "row",
@@ -254,7 +257,7 @@ const buttons = StyleSheet.create({
 
     buttonColumn: {
         width: "50%",
-        height: 50,
+        height: 45,
         marginVertical: 10,
         backgroundColor: darkBlue,
         borderRadius:10,
@@ -265,7 +268,7 @@ const buttons = StyleSheet.create({
 
     buttonSimple: {
         width: "50%",
-        height: 50,
+        height: 45,
         marginVertical: 10,
         backgroundColor: darkBlue,
         borderRadius:10,
@@ -299,7 +302,7 @@ const texts = StyleSheet.create({
     headline: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: darkBlue
+        color: darkBlue,
     },
 
     text: {
@@ -316,16 +319,19 @@ const texts = StyleSheet.create({
     textBoldAttribute: {
         fontWeight: "bold",
         fontSize: 24,
-        color: darkBlue
+        color: darkBlue,    
+        paddingVertical: 7,
+        paddingHorizontal: "5%"
     },
 
     textAttribute: {
         fontSize: 18,
         fontWeight: "bold",
         color: black,
-        marginLeft: 30,
-        lineHeight: 30,
+        lineHeight: 25,
         textAlign: "justify",
+        paddingVertical: 7,
+        paddingHorizontal: "5%"
     },
     
     textBold: {
@@ -343,7 +349,12 @@ const texts = StyleSheet.create({
 
     inputText: {
         fontSize: 18,
-        color: black
+        color: black,
+        backgroundColor: white,
+        width: "100%",
+        paddingVertical: 5,
+        paddingLeft: 5,
+        marginTop: 3
     },
 
     inputTextProfile: {
@@ -353,14 +364,14 @@ const texts = StyleSheet.create({
     },
     
     buttonBlue: {
-        fontSize: 18, 
+        fontSize: 17, 
         fontWeight: 'bold',
         color: white,
         maxWidth: "85%"
     },
     
     buttonBlueCenter: {
-        fontSize: 18, 
+        fontSize: 17, 
         fontWeight: 'bold',
         color: white,
         textAlign: "center",
@@ -368,7 +379,7 @@ const texts = StyleSheet.create({
     },
 
     buttonGrey: {
-        fontSize: 18, 
+        fontSize: 17, 
         fontWeight: 'bold',
         color: black,
     },
@@ -401,6 +412,7 @@ const icons = {
     checkFalse: require("./assets/check-false.png"),
     plus: require("./assets/icons/plus.png"),
     find: require("./assets/icons/find.png"),
+    exit: require("./assets/icons/exit.png"),
 }
 
 export { styles, buttons, texts, darkBlue, lightBlue, darkGrey, grey, lightGrey, white, black, iconsize, iconsizeAdd, icons, profileImage }
