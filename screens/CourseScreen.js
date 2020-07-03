@@ -311,24 +311,25 @@ export default CourseScreen = ({route, navigation}) => {
 
             {/* // User-Profil ansehen */}
             <Modal visible={profileVisibility} animationType='slide'>
-                <ModalComponent
-                    title= 'Profil'
-                    subheader= { () => {
-                        return( <ProfileView userId={viewedUserId}/> )
-                    }}
-                    content= { () => {
-                        return(
-                            <View styles= {{ backgroundColor: lightGrey }}>
-                                <View style= { styles.center }>
-                                    <ButtonSimple 
-                                        title= 'OK' 
-                                        onClick= { () => { setProfileVisibility(false) } }
-                                    />
-                                </View>
-                            </View>
-                        )
-                    }}
-                />
+                <View style={{flex: 1}}>
+                    <View style= { styles.headerFake }>
+                        <Text style= { texts.header }>Profil</Text>
+                    </View>
+
+                    <View style={{flex: 1}}>
+                        <View style={{height: "85%"}}>
+                            <ProfileView userId={viewedUserId}/>
+                        </View>
+                        <View style={{height: "15%", justifyContent:"center", alignItems: "center", backgroundColor: lightGrey}}>
+                            <Button 
+                                buttonStyle= { buttons.buttonRow }
+                                titleStyle= { texts.buttonBlueCenter }
+                                title='OK' 
+                                onClick={() => {setProfileVisibility(false)}}
+                            />
+                        </View>
+                    </View>
+                </View>
             </Modal>
 
             {/* Kursansicht */}

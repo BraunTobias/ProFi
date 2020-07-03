@@ -326,7 +326,7 @@ const texts = StyleSheet.create({
 
     textAttribute: {
         fontSize: 18,
-        fontWeight: "bold",
+        // fontWeight: "bold",
         color: black,
         lineHeight: 25,
         textAlign: "justify",

@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { styles, texts, profileImage } from '../Styles'
+import {FlatList } from "react-native";
+import { styles, texts, profileImage, lightGrey } from '../Styles'
 import { 
     View, 
     Modal, 
@@ -13,7 +14,9 @@ import {
     StyleSheet } from 'react-native';
 import { Button } from 'react-native-elements';
 import { Ionicons } from "@expo/vector-icons";
+import AttributeList from './AttributeList';
 import DB from '../api/DB_API';
+import { ScrollView } from 'react-native-gesture-handler';
 
 
 export default ProfileView = props => {
@@ -22,6 +25,8 @@ export default ProfileView = props => {
     const [currentBio, setCurrentBio] = useState("");
     const [currentEmail, setCurrentEmail] = useState("");
     const [selectedImage, setSelectedImage] = useState({});
+    const [filterList, setFilterList] = useState([]);
+    const [skillsList, setSkillsList] = useState([]);
 
 
     // Wird nur beim Laden der Seite einmalig ausgeführt
@@ -32,10 +37,20 @@ export default ProfileView = props => {
             setCurrentEmail(email);
             setSelectedImage({localUri: imageUrl});
         });
+        DB.getAttributesFromUser(props.userId, (list) => {
+            setFilterList(list);
+            console.log("LIST: " + list);
+            if (list.length > 0) {
+                DB.getAllAttributes("skills", list, (attributesList) => {
+                    setSkillsList(attributesList);
+                    console.log(attributesList);
+                }, () => {});
+            }
+        })
     }, []);
 
     return ( 
-        <View>
+        <View style={{height: "100%", paddingBottom: "30%"}}>
             {/* // "Header" mit Profildaten */}
             <View style={{padding: 20, flexDirection: "row", justifyContent: 'flex-start', alignItems: 'center', backgroundColor: "#aeb8c3"}}>
                 
@@ -66,12 +81,36 @@ export default ProfileView = props => {
                     
                 </View>
             </View>
-            <View>
+            {/* <View>
                 <ListTile
                     title={"Fähigkeiten von " + currentName}
                     subtitle={"Skills"}
                     onClick={() => {}} 
                 />
+            </View> */}
+            <View style={{paddingBottom: 10, backgroundColor: lightGrey}}>
+                {/* <AttributeList
+                    filterList = {skillsList}
+                /> */}
+                <FlatList style={{height: "100%"}}
+                    data={skillsList}
+                    keyExtractor={(item, index) => index.toString()}
+                    renderItem={(itemData) => { 
+                        return (
+                            // FlatList
+                            <View style={styles.contentAttribute}>
+                                {/* Black Borders */}
+                                <Text style={[texts.textBoldAttribute, ]}>{itemData.item[0]}</Text> 
+                                <Text style={[texts.textAttribute, {backgroundColor: "white"}]}>{itemData.item[1]}</Text>
+                                {/* <Image
+                                    source={currentIcon}
+                                    style={styles.checkmark}
+                                />  */}
+                            </View>
+                        );
+                    }}
+                />
+
             </View>
         </View>
      );
