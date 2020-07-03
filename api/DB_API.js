@@ -519,10 +519,10 @@ const DB = {
 
         const snapshot = await firebase.firestore().collection("users").doc(currentUserID).collection(attributeType).get();
 
-        snapshot.forEach((doc) => {
-            const tempArray = [doc.id];
+        snapshot.forEach((categoryDoc) => {
+            const tempArray = [categoryDoc.id];
             const tempAtt = [];
-            for (const title in doc.data()) {
+            for (const title in categoryDoc.data()) {
                 if (filterList.length == 0 || filterList.indexOf(title) >= 0) {
                     console.log("title: " + title);
                     tempAtt.push(title);
@@ -532,6 +532,22 @@ const DB = {
                 const tempAttString = tempAtt.join("\n");
                 tempArray.push(tempAttString);
                 attributesList.push(tempArray);
+            }
+        });    
+        onSuccess(attributesList);
+    },
+
+    getAttributesFromUser: async function(userId, onSuccess) {
+        const attributesList = [];
+        const snapshot = await firebase.firestore().collection("users").doc(userId).collection("skills").get();
+
+        snapshot.forEach((categoryDoc) => {
+            const tempArray = [categoryDoc.id];
+            const tempAtt = [];
+            for (const title in categoryDoc.data()) {
+                if (categoryDoc.data()[title] == true) {
+                    attributesList.push(title);
+                }
             }
         });    
         onSuccess(attributesList);
@@ -671,35 +687,6 @@ const DB = {
             console.log("Kein gültiger Pref-Typ");
         }
     },
-    // // Eine Idee innerhalb eines Kurses wird als Favorit / No-Go entfernt
-    // deletePref: async function(prefType, courseId, ideaId, onSuccess) {
-    //     if (prefType === "favourites" || prefType === "nogos") {
-    //         const currentUserID = firebase.auth().currentUser.uid;
-                
-    //         const snapshotDoc = await firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaId).get();
-            
-    //         // Der gegensätzliche Pref-Type wird ggf. entfernt
-    //         if (snapshotDoc.data()[oppositePrefType]) {
-    //             const newOppositePrefArray = snapshotDoc.data()[oppositePrefType].filter(item => item !== currentUserID);
-    //             firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaId).set({
-    //                 [oppositePrefType]: newOppositePrefArray
-    //             }, {merge: true}); 
-    //         }
-            
-    //         if (snapshotDoc.data()[prefType]) {
-    //             prefArray = snapshotDoc.data()[prefType];
-    //         }
-    //         prefArray.push(currentUserID);
-    //         firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaId).set({
-    //             [prefType]: prefArray
-    //         }, {merge: true}); 
-    
-    //         console.log(prefArray);
-    //         onSuccess();            
-    //     } else {
-    //         console.log("Kein gültiger Pref-Typ");
-    //     }
-    // },
     
     deletePref: async function(prefType, courseId, onSuccess) {
         if (prefType === "favourites" || prefType === "nogos") {
@@ -733,10 +720,101 @@ const DB = {
     },
 
 
+    // Funktion zum automatischen Erstellen eines Test-Kurses
+    createTestCourse: async function() {
+        const allUserIds = [];
+        const snapshot = await firebase.firestore().collection("users").get();
+        snapshot.forEach((userDoc) => {
+            // const idea = userDoc.data();
+            // idea["id"] = userDoc.id;
+            allUserIds.push(userDoc.id);
+        });    
+        console.log(allUserIds);
 
-    // Profilnamen und -Bild erhalten
+        const randomCreatorId = Math.floor((Math.random() * (allUserIds.length - 1)));
+        firebase.firestore().collection("courses").doc("TEST").set({
+            title: "Test-Kurs",
+            date: "31.12.2020",
+            minMembers: 2,
+            maxMembers: 4,
+            prospects: [allUserIds[randomCreatorId]],
+            members: [allUserIds[0], allUserIds[1], allUserIds[2], allUserIds[3], allUserIds[4], allUserIds[5]]
+        })
+        .then(() => {
+            var randomCreatorId = Math.floor((Math.random() * (allUserIds.length - 1)));
+            firebase.firestore().collection("courses").doc("TEST").collection("ideas").add({
+                title: "Show-Idee",
+                description: "Show-Idee Beschreibungstext",
+                skills: ["Bühnenbild", "Rätsel Design", "Lichtwirkung", "Komposition"],
+                favourites: [allUserIds[0], allUserIds[1]],
+                nogos: [allUserIds[5]],
+                creator: allUserIds[randomCreatorId]
+            })
+            randomCreatorId = Math.floor((Math.random() * (allUserIds.length - 1)));
+            firebase.firestore().collection("courses").doc("TEST").collection("ideas").add({
+                title: "Buch-Idee",
+                description: "Buch-Idee Beschreibungstext",
+                skills: ["Fotografie", "Illustration", "Texten", "Storytelling"],
+                favourites: [allUserIds[2], allUserIds[3]],
+                nogos: [allUserIds[4]],
+                creator: allUserIds[randomCreatorId]
+            })
+            randomCreatorId = Math.floor((Math.random() * (allUserIds.length - 1)));
+            firebase.firestore().collection("courses").doc("TEST").collection("ideas").add({
+                title: "Progammier-Idee",
+                description: "Progammier-Idee Beschreibungstext",
+                skills: ["HTML", "CSS", "Git", "Smart Home"],
+                favourites: [allUserIds[4], allUserIds[5]],
+                nogos: [allUserIds[3]],
+                creator: allUserIds[randomCreatorId]
+            })
+        });
+    },
 
     // Alle Mitglieder und Ideen eines Kurses sammeln mitsamt deren Skills und Interessen
+    collectCourseData: async function(courseId, onSuccess) {
+        var courseData = {};
+        var ideaIds = [];
+        var ideaSkills = [];
+        var ideaFavs = [];
+        var ideaNogos = [];
+        var memberIds = [];
+        var memberSkills = [];
+
+        // Eigenschaften der Ideen abrufen
+        const snapshot = await firebase.firestore().collection("courses").doc(courseId).collection("ideas").get();
+        snapshot.forEach((ideaDoc) => {
+            ideaIds.push(ideaDoc.id);
+            ideaSkills.push(ideaDoc.data().skills);
+            ideaFavs.push(ideaDoc.data().favourites);
+            ideaNogos.push(ideaDoc.data().nogos);
+
+        });    
+        console.log("------------------------");
+        console.log("Idea IDs:" + ideaIds);
+        console.log("Idea Skills:" + ideaSkills);
+        console.log("Idea Favs:" + ideaFavs);
+        console.log("Idea No-Gos:" + ideaNogos);
+
+        // Eigenschaften der Mitglieder abrufen
+        const snapshotDoc = await firebase.firestore().collection("courses").doc(courseId).get();
+
+        if (snapshotDoc.data()) {
+            memberIds = snapshotDoc.data().members;
+        }
+        memberIds.forEach(member => {
+            this.getAttributesFromUser(member, (attList) => {
+                console.log(attList);
+                memberSkills.push(attList);
+            })
+        });
+        console.log("Member IDs: " + memberIds);
+        console.log("Member Skills: " + memberSkills);
+
+        onSuccess(courseData, ideaIds, ideaSkills, ideaFavs, ideaNogos, memberIds, memberSkills);
+    },
+
+
 }
 
 export default DB;

@@ -346,6 +346,7 @@ export default CourseScreen = ({route, navigation}) => {
                     <FlatList style={{paddingLeft: 5}}
                         data={members}
                         horizontal={true}
+                        showsHorizontalScrollIndicator={false}
                         keyExtractor={(item, index) => index.toString()}
                         renderItem={(itemData) => { 
                             return (

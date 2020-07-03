@@ -39,6 +39,7 @@ export default HomeScreen = ({navigation}) => {
   
     // Wird nur beim Laden der Seite einmalig ausgeführt
     useEffect(() => {
+        
         console.ignoredYellowBox = ['Setting a timer'];
         // DB.fillAttributesList();
         // DB.updateAttributesList();
@@ -55,8 +56,10 @@ export default HomeScreen = ({navigation}) => {
                 setJoinedCourses(joined);
             });
         });
+        // DB.createTestCourse();
+        DB.collectCourseData("TEST");
     }, []);
-    
+
     // Button fürs Hinzufügen neuer Kurse
     useLayoutEffect(() => {
         navigation.setOptions({
