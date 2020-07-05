@@ -83,7 +83,7 @@ export default HomeScreen = ({navigation}) => {
         if (currentCourseName != "" && currentMaxMembers > 1 && currentCourseId != "") {
             if (currentMinMembers <= currentMaxMembers) {
                 console.log("add");
-                DB.addCourse(currentCourseName, currentCourseId, currentDate, currentMinMembers, currentMaxMembers, () => {
+                DB.addCourse(currentUserId, currentCourseName, currentCourseId, currentDate, currentMinMembers, currentMaxMembers, () => {
                     setAddCourseVisibility(false);
                     setCurrentCourseName("");
                     setCurrentCourseId("");

@@ -45,6 +45,7 @@ export default LoginScreen = ({navigation}) => {
                         <ButtonSimple
                             title='OK'
                             onClick={() => setErrorVisibility(false)}
+                            style= { buttons.buttonSimple }
                         />
                     </View>
                 </View>
@@ -69,14 +70,17 @@ export default LoginScreen = ({navigation}) => {
                     <ButtonSimple 
                         title= "Login"
                         onClick= { checkAuth }
+                        style= { buttons.buttonSimple }
                     />
                     <ButtonSimple 
                         title= "Registrieren"
                         onClick= { () => navigation.navigate("Registration") }
+                        style= { buttons.buttonSimple }
                     />
                     <ButtonSimple 
                         title= "Beenden"
                         onClick= { () => BackHandler.exitApp() }
+                        style= { buttons.buttonSimple }
                     />
                 </View>
             </ScrollView>

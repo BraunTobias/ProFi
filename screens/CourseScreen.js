@@ -18,6 +18,9 @@ export default CourseScreen = ({route, navigation}) => {
     const currentUserId = DB.getCurrentUserId();
     const [swipeListView, setSwipeListView] = useState();
 
+    // States für Auswertungs-Ansicht
+    const [evaluated, setEvaluated] = useState(false);
+
     // States für Profil-Ansicht
     const [viewedUserId, setViewedUserId] = useState(false);
     const [profileVisibility, setProfileVisibility] = useState(false);
@@ -37,6 +40,8 @@ export default CourseScreen = ({route, navigation}) => {
     const [currentWarning, setCurrentWarning] = useState("");
     
     // States für Kursinfo
+    const [founderId, setFounderId] = useState("");
+    const [founder, setFounder] = useState("");
     const [currentIdeas, setCurrentIdeas] = useState([]);
     const [members, setMembers] = useState([]);
     const [minMembers, setMinMembers] = useState(0);
@@ -72,6 +77,7 @@ export default CourseScreen = ({route, navigation}) => {
     const getCourseData = () => {
         DB.getCourseData(itemId, (data) => {
 
+            setFounderId(data.founder);
             setDate(data.date);
             setMinMembers(data.minMembers);
             setMaxMembers(data.maxMembers);
@@ -92,11 +98,20 @@ export default CourseScreen = ({route, navigation}) => {
                 }
             }
         });
+        DB.getUserInfoById (founderId, (userName, userImage, bio, email) => {
+            setFounder(userName)
+        });
+    }
+
+    const setEvaluatedHandler = (state) => {
+        setEvaluated(state);
+        console.log("evaluated: " + evaluated)
     }
 
     const clickIdeaHandler = (id, title, subtitle, skills) => {
         swipeListView.safeCloseOpenRow();
-        navigation.navigate("Project", {itemId: id, itemTitle: title, itemSubtitle: subtitle, skillsList: skills, courseId: itemId});
+        if (evaluated) navigation.navigate("Evaluation", {itemId: id, itemTitle: title, itemSubtitle: subtitle, skillsList: skills, courseId: itemId});
+        else navigation.navigate("Project", {itemId: id, itemTitle: title, itemSubtitle: subtitle, skillsList: skills, courseId: itemId});
     };
 
     const clickProfileHandler = (userId) => {
@@ -203,6 +218,22 @@ export default CourseScreen = ({route, navigation}) => {
         }
     }
 
+// !!! Benötigt Einbindung der ProFi-Funktion
+    const EvaluateButton = () => {
+        if (founderId === currentUserId && !evaluated) {
+            return (
+                <View style= { styles.center } >
+                    <ButtonSimple 
+                        title= { "Teams einteilen" }
+                        // !!! Benötigt Einbindung der ProFi-Funktion
+                        onClick= { () => { setEvaluatedHandler(!evaluated) } }
+                        style= { buttons.buttonEvaluate }
+                    />
+                </View>
+            )
+        } else { return null }
+    }
+
     return(
         <View style={{flex: 1}}>
             {/* // Error Popup */}
@@ -215,6 +246,7 @@ export default CourseScreen = ({route, navigation}) => {
                         <ButtonSimple
                             title='OK'
                             onClick={() => setErrorVisibility(false)}
+                            style= { buttons.buttonSimple }
                         />
                     </View>
                 </View>
@@ -308,7 +340,6 @@ export default CourseScreen = ({route, navigation}) => {
                 </Modal>
             </Modal>
             
-
             {/* // User-Profil ansehen */}
             <Modal visible={profileVisibility} animationType='slide'>
                 <View style={{flex: 1}}>
@@ -336,6 +367,7 @@ export default CourseScreen = ({route, navigation}) => {
             <View style= { styles.subHeader } >
                 <View style= { styles.courseHeaderRow } >
                     <Text style= { texts.headlineCenter }>{itemTitle}</Text>
+                    <Text style= { texts.headlineCenter }>{founderId === currentUserId ? "Mein Kurs" : founder}</Text>
                 </View>
                 <View style= { styles.courseHeaderRow } >
                     <Text style= { texts.headlineCenter }>{date}</Text>
@@ -360,7 +392,7 @@ export default CourseScreen = ({route, navigation}) => {
                     >
                     </FlatList>
                 </View>
-
+                {/* Buttons */}
                 <View style= { styles.paddedRow } >
                     <Button 
                         buttonStyle= { buttons.buttonRowGrey }
@@ -377,8 +409,9 @@ export default CourseScreen = ({route, navigation}) => {
                         onClick= { () => { setAddIdeaVisibility(true) } }
                     />
                 </View>
+                {/* Auswerten-Button */}
+                <EvaluateButton />
             </View>
-            
             <SwipeListView
                 style={{flexGrow: 1}}
                 ref = {ref => setSwipeListView(ref)}
@@ -423,7 +456,6 @@ export default CourseScreen = ({route, navigation}) => {
                 }}
                 leftOpenValue={120}
             />
-
         </View>
   );
 

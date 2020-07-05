@@ -1,19 +1,19 @@
 import React, {useState, useLayoutEffect, useEffect} from 'react';
-import {FlatList , View, Text, Modal, TouchableWithoutFeedback, TextInput, Keyboard} from 'react-native';
+import { FlatList , View, Text, Modal } from 'react-native';
 import Button from '../components/Button';
 import ListTile from '../components/ListTile';
 import CommentTile from '../components/CommentTile';
 import ProfileView from '../components/ProfileView';
 import DB from '../api/DB_API';
-import { set } from 'react-native-reanimated';
 import { styles, texts, buttons, lightGrey } from '../Styles';
 import { ScrollView } from 'react-native-gesture-handler';
 
-export default IdeaScreen = ({route, navigation}) => {
+export default EvaluationScreen = ({route, navigation}) => {
     const {itemId} = route.params;
     const {courseId} = route.params;
     const {itemTitle} = route.params;
     const {itemSubtitle} = route.params;
+    const [members, setMembers] = useState([]);
 
     // States für Profil-Ansicht
     const [viewedUserId, setViewedUserId] = useState(false);
@@ -27,6 +27,8 @@ export default IdeaScreen = ({route, navigation}) => {
     const [currentSkills, setCurrentSkills] = useState([]);
     const [currentComments, setCurrentComments] = useState([]);
 
+// !!! Benötigt neuen Datenbank-Eintrag und -Abruf 
+// für Team-Mitglieder
     useEffect(() => {
         DB.getCommentsList(courseId, itemId, (commentsList) => {
             setCurrentComments(commentsList);
@@ -34,7 +36,21 @@ export default IdeaScreen = ({route, navigation}) => {
         DB.getIdeaData(courseId, itemId, (data) => {
             console.log(data);
             setCurrentSkills(data.skills);
-            // setCurrentPrefs(data.prefs);
+            if (data.members && data.members.length > 0) {
+                const memberUidList = data.members;
+                var newMembersList = [];
+                for (const member in memberUidList) {
+                    const uid = memberUidList[member];
+                    DB.getUserInfoById(uid, (name, url) => {
+                        newMembersList.push({
+                            "userId": uid,
+                            "username": name,
+                            "imageUrl": url
+                        });
+                        setMembers(newMembersList);
+                    });
+                }
+            }
         });
     }, []);
     
@@ -44,74 +60,19 @@ export default IdeaScreen = ({route, navigation}) => {
         });
     }, [navigation]);
 
-    const addCommentHandler = () => {
-        console.log("add");
-        DB.addComment(courseId, itemId, currentCommentText, () => {
-            setCommentVisibility(false);
-            setCurrentCommentText("");
-            DB.getCommentsList(courseId, itemId, (commentsList) => {
-                setCurrentComments(commentsList);
-                console.log(commentsList);
-            });
-        });
-    }
-
-    const setCommentHandler = (text) => {
-        setCurrentCommentText(text);
-    }
-
     const commentClickHandler = (userId) => {
         setProfileVisibility(true);
         setViewedUserId(userId);
     }
+    const clickProfileHandler = (userId) => {
+        setProfileVisibility(true);
+        setViewedUserId(userId);
+        console.log("User ID: " + viewedUserId);
+    };
+
 
     return(
         <View>
-            {/* // Kommentar schreiben */}
-            <Modal visible={commentVisibility} animationType='slide'>
-            <ModalComponent
-                    title= 'Kommentar hinzufügen'
-                    subheader= { () => {} }
-                    content= { () => {
-                        return(
-                            <View styles= {{ backgroundColor: lightGrey }}>
-                                <View style= { styles.contentFake } >
-                                    <Text></Text>{/* Text-Absatz */}
-                                    <Text style= { texts.headline } >Kommentar (max. 200 Zeichen)</Text>
-                                </View>
-                                <View style= { styles.commentField } >
-                                    <TextInput 
-                                        textAlign= { 'left' }
-                                        textAlignVertical= { 'top' }
-                                        style= { texts.inputText }
-                                        placeholder= { "Schreibe einen Kommentar" } 
-                                        onChangeText= { setCommentHandler }
-                                        value= { currentCommentText }
-                                        multiline
-                                        numberOfLines= { 10 }
-                                        maxLength= { 200 }
-                                    />
-                                </View>
-                                <View style= { styles.row } >
-                                    <Button 
-                                        buttonStyle= { buttons.buttonRow }
-                                        titleStyle= { texts.buttonBlueCenter }
-                                        title= 'OK' 
-                                        onClick= { () => { addCommentHandler() } }
-                                    />
-                                    <Button 
-                                        buttonStyle= { buttons.buttonRow }
-                                        titleStyle= { texts.buttonBlueCenter }
-                                        title= 'Abbrechen'
-                                        onClick= { () => { setCommentVisibility(false) } }
-                                    />
-                                </View>
-                            </View>
-                        )
-                    }}
-                />
-            </Modal>
-
             {/* // User-Profil ansehen */}
             <Modal visible={profileVisibility} animationType='slide'>
                 <View style={{flex: 1}}>
@@ -142,6 +103,24 @@ export default IdeaScreen = ({route, navigation}) => {
                     <View style= { { height: 100 } } >
                         <Text>{itemSubtitle}</Text>
                     </View>
+                    {/* Membericons */}
+                    <View style= { styles.membersRow } >
+                        <FlatList style={{paddingLeft: 5}}
+                            data={members}
+                            horizontal={true}
+                            showsHorizontalScrollIndicator={false}
+                            keyExtractor={(item, index) => index.toString()}
+                            renderItem={(itemData) => { 
+                                return (
+                                    <ProfileImageTile
+                                        onClick={() => {clickProfileHandler(itemData.item.userId)}} 
+                                        imageUrl={itemData.item.imageUrl}
+                                    />
+                                );
+                            }}
+                        >
+                        </FlatList>
+                    </View>
                     <ListTile
                         title={"Passende Fähigkeiten"}
                         subtitle={currentSkills.join(", ")}
@@ -150,29 +129,29 @@ export default IdeaScreen = ({route, navigation}) => {
                 </View>
                 <View style={ styles.commentRow }>
                     <Text style={texts.headline}>Kommentare:</Text>
-                    <Button 
+                    {/* <Button 
                         buttonStyle= { buttons.buttonRow }
                         titleStyle= { texts.buttonBlue }
                         title= 'Kommentar'
                         icon= "plus"
                         onClick= { () => { setCommentVisibility(true) } }
-                    />
+                    /> */}
                 </View>
             </View>
             <FlatList
-            data={currentComments}
-            renderItem={(itemData) => { 
-                return (
-                    <CommentTile
-                        id={itemData.item.id}
-                        userId={itemData.item.user}
-                        subtitle={itemData.item.text}
-                        timestamp={itemData.item.time}
-                        onClick={commentClickHandler}
-                        backgroundColor = {itemData.index % 2 === 0 ? "#ffffff" : "#f5f7f7"}
-                    />
-                );
-            }}
+                data={currentComments}
+                renderItem={(itemData) => { 
+                    return (
+                        <CommentTile
+                            id={itemData.item.id}
+                            userId={itemData.item.user}
+                            subtitle={itemData.item.text}
+                            timestamp={itemData.item.time}
+                            onClick={commentClickHandler}
+                            backgroundColor = {itemData.index % 2 === 0 ? "#ffffff" : "#f5f7f7"}
+                        />
+                    );
+                }}
             />
             </ScrollView>
         </View>

@@ -276,6 +276,17 @@ const buttons = StyleSheet.create({
         alignItems: "center",
         justifyContent: "space-between"
     },
+
+    buttonEvaluate: {
+        width: "50%",
+        height: 45,
+        marginTop: 10,
+        backgroundColor: darkBlue,
+        borderRadius:10,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between"
+    },
 })
 
 const texts = StyleSheet.create({

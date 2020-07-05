@@ -19,7 +19,7 @@ import * as ImagePicker from "expo-image-picker"
 import { LogInContext } from '../data/LogInContext';
 import { FunctionsScreen } from './#FunctionsScreen';
 import DB from '../api/DB_API';
-import { styles, buttons, texts, profileImage } from '../Styles'
+import { styles, buttons, texts, profileImage, lightGrey } from '../Styles'
 
 
 export default ProfileScreen =  ({navigation})  => {
@@ -127,17 +127,9 @@ export default ProfileScreen =  ({navigation})  => {
         DB.changeProfileImage(smallImage.uri);
     };
 
-    const authHandler = (auth) => {
-        if (auth) {
-            
-        } else {
-            return ( <AuthenticationNavigator /> )
-        }
-    }
-
     return ( 
         <View>
-            {/* // "Header" mit Profildaten */}
+            {/* Header mit Profildaten */}
             <View style={styles.subHeaderProfile}>
                 <Modal visible={false} animationType='slide'>
                     <View style={styles.error}>
@@ -150,47 +142,6 @@ export default ProfileScreen =  ({navigation})  => {
                         />
                     </View>
                 </Modal>
-                
-                {/* <Modal visible={imagePickerVisibility} animationType='slide'>
-                    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white'}}>
-                        <Text>Foto aufnehmen</Text>
-                        
-                        <View style={styles.imageContainer}>
-                            <View style={styles.verticalContainer}>
-                                <Text>mit Kamera aufnehmen</Text>
-                                <TouchableWithoutFeedback 
-                                    style={[styles.imageTile, styles.cameraPreview]}
-                                    onPress={toggleCameraHandler} >
-                                    {!isCameraOn ? (
-                                                <Button
-                                        type="clear"
-                                        onPress={toggleCameraHandler}
-                                        icon={
-                                            <Ionicons
-                                                name="ios-camera"
-                                                size={50}
-                                                color="rgb(0, 0, 0)"
-                                            />
-                                        }
-                                    />
-                                    ) : (
-                                    <TouchableOpacity onPress={flipCameraHandler}>
-                                        <View style={{ borderRadius: 10, overflow: "hidden" }}>
-                                        <Camera style={styles.cameraPreview} type={type} />
-                                        </View>
-                                    </TouchableOpacity>
-                                    )}
-                                </TouchableWithoutFeedback>
-                            </View>
-                        </View>
-
-                        <Button title='OK'onPress={() => setImagePickerVisibility(false)}/>
-                    </View>
-                </Modal> */}
-                    
-                {/* <Modal visible={functionsVisibility} animationType='slide'>
-                    < FunctionsScreen user={user} />
-                </Modal> */}
                 
                 {/* Linke Spalte: Profilbild */}
                 <View style={styles.contentProfile}>
@@ -205,7 +156,7 @@ export default ProfileScreen =  ({navigation})  => {
                 {/* // Rechte Spalte */}
                 <View style={styles.rightContentProfile}>
                     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-                        <View style={{width: "90%"}} >
+                        <View style={{width: "90%", backgroundColor: lightGrey, paddingLeft: 5, borderRadius: 0, }} >
                             <TextInput 
                                 style={texts.inputTextProfile}
                                 onChangeText={changeNameHandler}
@@ -215,13 +166,15 @@ export default ProfileScreen =  ({navigation})  => {
                     </TouchableWithoutFeedback>
 
                     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-                        <View style={{width: "90%"}} >
+                        <View style={{width: "90%", }} >
                             <Text style={texts.textProfile}>Kurzbeschreibung:</Text>
-                            <TextInput 
-                                style={texts.textBold}
-                                onChangeText={changeBioHandler}
-                                value={currentBio}
-                            />
+                            <View style={{backgroundColor: lightGrey, paddingLeft: 5, borderRadius: 0, }} >
+                                <TextInput 
+                                    style={texts.textBold}
+                                    onChangeText={changeBioHandler}
+                                    value={currentBio}
+                                />
+                            </View>
                         </View>
                     </TouchableWithoutFeedback>
 
@@ -231,29 +184,11 @@ export default ProfileScreen =  ({navigation})  => {
                             <Text style={texts.textBold}>{currentMail}</Text>
                         </View>
                     </TouchableWithoutFeedback> 
-                    
-                    {/* <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-                        <View style={{width: "90%"}}>
-                            <Text>Passwort:</Text>
-                            <TextInput
-                                style={styles.textInputField}
-                                onChangeText={changePWHandler}
-                                value={currentPW}
-                                secureTextEntry={true} 
-                            />
-                        </View>
-                    </TouchableWithoutFeedback> */}
                 </View>
             </View>
+            {/* Buttons */}
             <View style= {styles.subHeader} >
                 <View style={styles.paddedRow}>
-                    {/* <Button 
-                        buttonStyle= { buttons.buttonRowGrey }
-                        titleStyle= { texts.buttonGrey }
-                        title= 'Übernehmen' 
-                        onClick= {commitChangesHandler}
-                        icon= {changesSaved ? "checkTrue" : "checkFalse"}
-                    /> */}
                     <Button 
                         buttonStyle= { buttons.buttonRowGrey }
                         titleStyle= { texts.buttonGrey }
@@ -261,19 +196,6 @@ export default ProfileScreen =  ({navigation})  => {
                         icon= {changesSaved ? "checkTrue" : "checkFalse"}
                         onClick= {changesSaved ? () => {} : commitChangesHandler}
                     />
-
-                    {/* <Button
-                        buttonStyle= { buttons.buttonRowGrey }
-                        titleStyle= { texts.buttonGrey }                    
-                        title= "Übernehmen"
-                        onPress={commitChangesHandler}
-                        icon={
-                            <Ionicons
-                                name="md-checkmark"
-                                size={30}
-                            />
-                        }
-                    /> */}
                      <Button 
                         buttonStyle= { buttons.buttonRow }
                         titleStyle= { texts.buttonBlue }
@@ -284,56 +206,14 @@ export default ProfileScreen =  ({navigation})  => {
 
                 </View>
             </View>  
+            {/* Meine Fähigkeiten */}
             <View>
                 <ListTile
-                        title={"Meine Fähigkeiten"}
-                        subtitle={skillString}
-                        onClick={() => navigation.navigate('Fähigkeiten', {attributeType: "skills", filter: []})}
+                    title={"Meine Fähigkeiten"}
+                    subtitle={skillString}
+                    onClick={() => navigation.navigate('Fähigkeiten', {attributeType: "skills", filter: []})}
                 />
             </View>
         </View>
     );
 }
-
-// const styles = StyleSheet.create({
-//     view: {
-//       position: 'absolute',
-//       backgroundColor: 'transparent'
-//     },
-//     touchable: {
-//         alignItems: 'center',
-//         justifyContent: 'center'
-//     },
-//     imageContainer: {
-//         flexDirection: "row",
-//         width: "100%",
-//         alignItems: "center",
-//         justifyContent: "space-evenly",
-//       },
-//     verticalContainer: {
-//         alignItems: "center",
-//     },
-//     cameraPreview: {
-//         width: 100,
-//         height: 100,
-//         borderRadius: 100,
-//     },
-//     imageTile: {
-//         shadowColor: "black",
-//         shadowOpacity: 0.2,
-//         shadowOffset: { width: 0, height: 2 },
-//         shadowRadius: 10,
-//         borderRadius: 10,
-//         padding: 15,
-//         backgroundColor: "white",
-//         alignItems: "center",
-//         justifyContent: "center",
-//         marginBottom: 30,
-//       },
-//     textInputField: {
-//         left: 0,
-//         width: "100%",
-//         backgroundColor: "white",
-//         marginBottom: 10
-//     }
-// })

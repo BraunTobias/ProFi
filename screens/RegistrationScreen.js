@@ -41,6 +41,7 @@ export default RegistrationScreen = ({navigation}) => {
                         <ButtonSimple
                             title='OK'
                             onClick={() => setErrorVisibility(false)}
+                            style= { buttons.buttonSimple }
                         />
                     </View>
                 </View>

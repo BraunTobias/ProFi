@@ -4,6 +4,7 @@ import HomeScreen from '../screens/HomeScreen';
 import InputScreen from '../screens/InputScreen';
 import CourseScreen from '../screens/CourseScreen';
 import IdeaScreen from '../screens/IdeaScreen';
+import EvaluationScreen from '../screens/EvaluationScreen';
 import AttributeListScreen from '../components/AttributeListScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { styles, texts, white, iconsize } from '../Styles'
@@ -23,6 +24,7 @@ export default HomeNavigator = () => {
             <HomeStack.Screen name = "AddProject" component = {InputScreen} options={{headerTitle: 'Projekt hinzufügen'}}/>
             <HomeStack.Screen name = "Course" component = {CourseScreen} options={{headerTitle: 'Kurs', headerBackTitle: ' '}}/>
             <HomeStack.Screen name = "Project" component= {IdeaScreen} options={{headerTitle: 'Idee', headerBackTitle: ' '}}/>
+            <HomeStack.Screen name = "Evaluation" component= {EvaluationScreen} options={{headerTitle: 'Dein Team', headerBackTitle: ' '}}/>
             <HomeStack.Screen name = "IdeaSkills" component= {AttributeListScreen} options={{headerTitle: 'Passende Fähigkeiten', headerBackTitle: ' '}}/>
 
         </HomeStack.Navigator>

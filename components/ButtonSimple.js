@@ -6,7 +6,7 @@ import { Button } from "react-native-elements";
 export default ButtonSimple = props => {
   return (
     <TouchableOpacity 
-      style= { buttons.buttonSimple } 
+      style= { props.style } 
       onPress= { () => props.onClick() }
     >
       <Text style= { texts.buttonBlueCenter }>

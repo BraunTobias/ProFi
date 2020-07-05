@@ -233,7 +233,7 @@ const DB = {
     },
 
     // Neuen Kurs erstellen (Objekt der Klasse course übergeben)
-    addCourse: function(title, id, date, minMembers, maxMembers, onSuccess, onError) {
+    addCourse: function(founder, title, id, date, minMembers, maxMembers, onSuccess, onError) {
         const currentUserID = firebase.auth().currentUser.uid;
 
         // checken ob es die ID schon gibt
@@ -244,6 +244,7 @@ const DB = {
                 onError("Diese ID ist schon vergeben!");
             } else {
                 firebase.firestore().collection("courses").doc(id).set({
+                    founder: founder,
                     title: title,
                     date: date,
                     minMembers: minMembers,
