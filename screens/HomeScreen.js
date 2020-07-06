@@ -282,7 +282,7 @@ export default HomeScreen = ({navigation}) => {
                                                         marginTop:15,
                                                     },
                                                     dateText : {
-                                                        fontWeight: "bold",
+                                                        fontFamily: 'Inter_700Bold',
                                                         fontSize: 22
                                                     }
                                                 }}

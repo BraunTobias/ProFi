@@ -67,11 +67,12 @@ const stylesFile = StyleSheet.create({
   title: {
     fontSize: 22,
     color: "#222f56",
-    fontWeight: 'bold',
+    fontFamily: 'Inter_700Bold',
     marginBottom: 5
   },
   subtitle: {
     fontSize: 16,
+    fontFamily: 'Inter_400Regular',
   },
   arrow: {
     height: "60%",

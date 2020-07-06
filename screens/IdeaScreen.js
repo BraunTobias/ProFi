@@ -155,8 +155,8 @@ export default IdeaScreen = ({route, navigation}) => {
 
             {/* // Idee & Kommentar-Liste */}
             <View style= { styles.subHeader}>
-                <View style= {styles.headerRow}>
-                    <Text>{itemSubtitle}</Text>
+                <View style= {[styles.headerRow, {paddingBottom: 10}]}>
+                    <Text style={texts.text}>{itemSubtitle}</Text>
                 </View>
                 {/* Membericons */}
                 <View style= { styles.membersRow } >

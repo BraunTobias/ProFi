@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import AuthenticationNavigator from './navigation/AuthenticationNavigator';
 import MainNavigator from './navigation/MainNavigator';
 import { LogInContext } from './data/LogInContext';
+import { useFonts, Inter_400Regular, Inter_700Bold } from '@expo-google-fonts/inter';
+import { AppLoading } from 'expo';
 import * as firebase from 'firebase';
 import 'firebase/firestore';
 import {decode, encode} from 'base-64';
@@ -11,6 +13,12 @@ if (!global.btoa) { global.btoa = encode }
 if (!global.atob) { global.atob = decode }
 
 export default App => {
+
+  let [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_700Bold,
+  });
+
   const [user, setUser] = useState(null);
   const [authentication, setAuthentication] = useState(false);
 
@@ -31,6 +39,9 @@ export default App => {
   }
 
   const authHandler = (auth) => {
+    if (!fontsLoaded) {
+      return <AppLoading />;
+    }  
     if (auth) {
       return ( <MainNavigator /> )
     } else {

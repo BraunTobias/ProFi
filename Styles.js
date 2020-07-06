@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between', 
         alignItems: 'stretch',
-        paddingHorizontal: 15
+        paddingHorizontal: 15,
     },
 
     membersRow: {
@@ -274,7 +274,7 @@ const texts = StyleSheet.create({
     header: {
         fontSize: 24,
         letterSpacing: 0.5,
-        fontWeight: 'bold',
+        fontFamily: 'Inter_700Bold',
         color: white,
         alignSelf: (Platform.OS === 'android') ? 'flex-start' : 'center'
 
@@ -283,7 +283,7 @@ const texts = StyleSheet.create({
     headerWithBackIcon: {
         fontSize: 24,
         letterSpacing: 0.5,
-        fontWeight: 'bold',
+        fontFamily: 'Inter_700Bold',
         color: white,
         marginLeft: (Platform.OS === 'android') ? -30 : 0,
         alignSelf: (Platform.OS === 'android') ? 'flex-start' : 'center'
@@ -292,23 +292,25 @@ const texts = StyleSheet.create({
 
     headline: {
         fontSize: 22,
-        fontWeight: 'bold',
+        fontFamily: 'Inter_700Bold',
         color: darkBlue,
     },
 
     text: {
-        fontSize: 18,
+        fontFamily: 'Inter_400Regular',
+        fontSize: 16,
         color: darkGrey
     },
 
     textProfile: {
+        fontFamily: 'Inter_400Regular',
         fontSize: 18,
         color: darkGrey,
         marginTop: 15
     },
 
     textBoldAttribute: {
-        fontWeight: "bold",
+        fontFamily: 'Inter_700Bold',
         fontSize: 24,
         color: darkBlue,    
         paddingVertical: 7,
@@ -316,6 +318,7 @@ const texts = StyleSheet.create({
     },
 
     textAttribute: {
+        fontFamily: 'Inter_400Regular',
         fontSize: 18,
         color: darkGrey,
         lineHeight: 25,
@@ -327,17 +330,18 @@ const texts = StyleSheet.create({
     textBold: {
         fontSize: 18,
         color: darkGrey,
-        fontWeight: "bold"
+        fontFamily: 'Inter_700Bold',
     },
 
     headlineCenter: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontFamily: 'Inter_700Bold',
         color: darkGrey,
         textAlign: 'center'
     },
 
     inputText: {
+        fontFamily: 'Inter_400Regular',
         fontSize: 18,
         color: darkGrey,
         backgroundColor: white,
@@ -351,19 +355,19 @@ const texts = StyleSheet.create({
     inputTextProfile: {
         fontSize: 24,
         color: darkGrey,
-        fontWeight: "bold"
+        fontFamily: 'Inter_700Bold',
     },
     
     buttonBlue: {
         fontSize: 17, 
-        fontWeight: 'bold',
+        fontFamily: 'Inter_700Bold',
         color: white,
         maxWidth: "85%"
     },
     
     buttonBlueCenter: {
         fontSize: 17, 
-        fontWeight: 'bold',
+        fontFamily: 'Inter_700Bold',
         color: white,
         textAlign: "center",
         width: "100%"
@@ -371,7 +375,7 @@ const texts = StyleSheet.create({
 
     buttonGrey: {
         fontSize: 17, 
-        fontWeight: 'bold',
+        fontFamily: 'Inter_700Bold',
         color: darkGrey,
     },
 })
