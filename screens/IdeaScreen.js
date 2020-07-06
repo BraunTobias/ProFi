@@ -110,7 +110,7 @@ export default IdeaScreen = ({route, navigation}) => {
                                         maxLength= { 200 }
                                     />
                                 </View>
-                                <View style= { styles.row } >
+                                <View style= { styles.paddedRow } >
                                     <Button 
                                         buttonStyle= { buttons.buttonRow }
                                         titleStyle= { texts.buttonBlueCenter }

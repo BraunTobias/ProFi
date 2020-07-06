@@ -22,7 +22,7 @@ export default CategoryIcon = props => {
   return (
         <TouchableHighlight 
             underlayColor={darkBlue}
-            style={styles.itemContainer} 
+            style={[styles.itemContainer, {marginEnd: props.isLast ? 30 : 15}]} 
             onPress={() => props.onClick()}
             underlayColor="#aeb8c3"
         >

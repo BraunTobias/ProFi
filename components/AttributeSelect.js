@@ -48,12 +48,11 @@ export default AttributeSelect = props => {
                                         onClick={() => {clickCategoryHandler(itemData.item)}} 
                                         title={itemData.item}
                                         isActive={currentCategory == itemData.item}
-                                        // imageUrl={itemData.item.imageUrl}
+                                        isLast={itemData.index == categoriesList.length - 1 ? true : false}
                                     />
                                 );
                             }}
                         />
-
                 </View>
             </View>
 

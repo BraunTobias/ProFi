@@ -56,6 +56,7 @@ export default AttributeScreen = ({route, navigation}) => {
                                             onClick={() => {clickCategoryHandler(itemData.item)}} 
                                             title={itemData.item}
                                             isActive={currentCategory == itemData.item}
+                                            isLast={itemData.index == categoriesList.length - 1 ? true : false}
                                         />
                                     );
                                 }}

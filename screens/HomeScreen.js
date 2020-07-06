@@ -107,10 +107,10 @@ export default HomeScreen = ({navigation}) => {
     const setCourseNameHandler = (enteredText) => {
         if (enteredText) {
             setCurrentCourseName(enteredText);
-            setNameError("")
+            setNameError("");
         } else {
-            setCurrentCourseName("")
-            setNameError("Bitte einen Kursnamen eingeben")
+            setCurrentCourseName("");
+            setNameError("Bitte einen Kursnamen eingeben");
         }
     };
 
@@ -121,11 +121,11 @@ export default HomeScreen = ({navigation}) => {
                 setCurrentCourseId(enteredText);
                 setIdError("")
             } else {
-                setIdError("Bitte ans Kürzel-Schema halten")
+                setIdError("Bitte ans Kürzel-Schema halten");
             }
         } else {
-            setCurrentCourseId("")
-            setIdError("Bitte ein Kürzel eingeben")
+            setCurrentCourseId("");
+            setIdError("Bitte ein Kürzel eingeben");
         }
     };
 
@@ -147,7 +147,7 @@ export default HomeScreen = ({navigation}) => {
 
     const setDateHandler = (enteredDate) => {
         if (enteredDate) {
-            setCurrentDate(enteredDate)
+            setCurrentDate(enteredDate);
             setDateError("");
             // parse enteredDate
         } else {
@@ -156,14 +156,13 @@ export default HomeScreen = ({navigation}) => {
     }
 
     const setFindCourseHandler = (enteredId) => {
-        if (enteredId) {
-            setCurrentFindName(enteredId);
-        }
+        setCurrentFindName(enteredId);
     }
     
     const findCourseHandler = () => {
         if (currentFindName != "") {
             DB.addCourseToList(currentFindName, (addedCourse) => {
+                setCurrentFindName("");
                 var courseList = currentCourses;
                 courseList.push(addedCourse);
                 setCurrentCourses(courseList);
