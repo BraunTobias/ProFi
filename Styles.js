@@ -275,9 +275,9 @@ const buttons = StyleSheet.create({
     },
 
     buttonEvaluate: {
-        width: "50%",
         height: 45,
         marginTop: 10,
+        marginHorizontal: 15,
         backgroundColor: darkBlue,
         borderRadius:10,
         flexDirection: "row",
@@ -425,6 +425,8 @@ const icons = {
     plus: require("./assets/icons/plus.png"),
     find: require("./assets/icons/find.png"),
     exit: require("./assets/icons/exit.png"),
+    fav: require("./assets/icons/favourite.png"),
+    nogo: require("./assets/icons/nogo.png"),
 }
 
 export { styles, buttons, texts, darkBlue, lightBlue, darkGrey, grey, lightGrey, white, black, iconsize, iconsizeAdd, icons, profileImage }

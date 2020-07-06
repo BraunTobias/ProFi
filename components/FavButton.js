@@ -1,6 +1,6 @@
 import React, {useState} from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import {Ionicons} from '@expo/vector-icons';
+import { StyleSheet, Text, TouchableOpacity, View, Image } from "react-native";
+import { icons } from '../Styles';
 import DB from "../api/DB_API";
 
 export default FavButton = props => {
@@ -10,7 +10,11 @@ export default FavButton = props => {
         style={[styles.itemContainer, {backgroundColor: props.backgroundColor}]}
         onPress={props.onClick}
       >
-        <Ionicons name="ios-star" size={40} color={props.iconColor}/>
+        <Image 
+          style= { { width: 33, height: 33, tintColor: props.iconColor} }
+          source= { icons.fav }
+          resizeMode= { "contain" }
+        />
       </TouchableOpacity>
   );
 };

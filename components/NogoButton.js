@@ -1,6 +1,6 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import {MaterialIcons} from '@expo/vector-icons';
+import { StyleSheet, Text, TouchableOpacity, View, Image } from "react-native";
+import { icons } from '../Styles';
 import DB from "../api/DB_API";
 
 export default NogoButton = props => {
@@ -10,7 +10,11 @@ export default NogoButton = props => {
         style={[styles.itemContainer, {backgroundColor: props.backgroundColor}]}
         onPress={props.onClick}
       >
-        <MaterialIcons name={'do-not-disturb-alt'} size={40} color={props.iconColor} />
+      <Image 
+        style= { { width: 30, height: 30, tintColor: props.iconColor} }
+        source= { icons.nogo }
+        resizeMode= { "contain" }
+      />
       </TouchableOpacity>
   );
 };

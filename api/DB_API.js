@@ -768,8 +768,8 @@ const DB = {
             })
             randomCreatorId = Math.floor((Math.random() * (allUserIds.length - 1)));
             firebase.firestore().collection("courses").doc("TEST").collection("ideas").add({
-                title: "Progammier-Idee",
-                description: "Progammier-Idee Beschreibungstext",
+                title: "Programmier-Idee",
+                description: "Programmier-Idee Beschreibungstext",
                 skills: ["HTML", "CSS", "Git", "Smart Home"],
                 favourites: [allUserIds[4], allUserIds[5]],
                 nogos: [allUserIds[3]],

@@ -17,11 +17,19 @@ export default ListTile = props => {
   const PrefIcon = () => {
     if (props.isFavourite) {
       return (
-        <Ionicons name={"ios-star"} size={25} color={"#222f56"} style={{paddingEnd: 5}}/>
+          <Image 
+            style= { { width: 24, height: 24, tintColor: darkBlue, marginEnd: 5,} }
+            source= { icons.fav }
+            resizeMode= { "contain" }
+          />
       )
     } else if (props.isNogo) {
       return (
-        <MaterialIcons name={"do-not-disturb-alt"} size={25} color={"#222f56"} style={{paddingEnd: 5}}/>
+          <Image 
+          style= { { width: 21, height: 21, tintColor: darkBlue, marginEnd: 8, marginTop: 2.5} }
+          source= { icons.nogo }
+          resizeMode= { "contain" }
+          />
       )
     } else if (props.isMember) {
       return (
