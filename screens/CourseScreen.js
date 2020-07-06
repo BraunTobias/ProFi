@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useLayoutEffect} from 'react';
-import {View, SafeAreaView, Text, FlatList, Modal, TouchableWithoutFeedback, TextInput, Keyboard } from "react-native";
+import {View, SafeAreaView, Text, FlatList, Modal, TouchableWithoutFeedback, TextInput, Keyboard, ActivityIndicator } from "react-native";
 import ListTile from '../components/ListTile';
 import Button from '../components/Button';
 import ButtonSimple from '../components/ButtonSimple';
@@ -8,7 +8,8 @@ import {Ionicons} from '@expo/vector-icons';
 import AttributeSelect from '../components/AttributeSelect';
 import DB from '../api/DB_API';
 import ProfileImageTile from '../components/ProfileImageTile';
-import { styles, buttons, texts, white, lightGrey, grey, black, iconsize, iconsizeAdd, darkGrey, icons } from '../Styles';
+import { styles, buttons, texts, white, lightGrey, grey, black, iconsize, iconsizeAdd, darkGrey, icons, darkBlue } from '../Styles';
+import ProFiFunction from '../api/ProFiFunction';
 
 export default CourseScreen = ({route, navigation}) => {
     const {itemId} = route.params;
@@ -19,7 +20,8 @@ export default CourseScreen = ({route, navigation}) => {
     const [swipeListView, setSwipeListView] = useState();
 
     // States für Auswertungs-Ansicht
-    const [evaluated, setEvaluated] = useState(false);
+    const [evaluating, setEvaluating] = useState(false);
+    const [evaluated, setEvaluated] = useState(true);
 
     // States für Profil-Ansicht
     const [viewedUserId, setViewedUserId] = useState(false);
@@ -43,7 +45,7 @@ export default CourseScreen = ({route, navigation}) => {
     const [founderId, setFounderId] = useState("");
     const [founder, setFounder] = useState("");
     const [currentIdeas, setCurrentIdeas] = useState([]);
-    const [members, setMembers] = useState([]);
+    const [members, setMembers] = useState([""]);
     const [minMembers, setMinMembers] = useState(0);
     const [maxMembers, setMaxMembers] = useState(0);
     const [date, setDate] = useState("");
@@ -54,6 +56,17 @@ export default CourseScreen = ({route, navigation}) => {
 
     // Wird nur beim Laden der Seite einmalig ausgeführt
     useEffect(() => {
+        getIdeasData();
+        getCourseData();
+    }, []);
+
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerTitle: itemId,
+        });
+    }, [navigation]);
+
+    const getIdeasData = () => {
         DB.getIdeasList(itemId, (ideasList) => {
             setCurrentIdeas(ideasList);
             console.log(ideasList);
@@ -65,14 +78,7 @@ export default CourseScreen = ({route, navigation}) => {
                 }
             }
         });
-        getCourseData();
-    }, []);
-
-    useLayoutEffect(() => {
-        navigation.setOptions({
-            headerTitle: itemId,
-        });
-    }, [navigation]);
+    }
 
     const getCourseData = () => {
         DB.getCourseData(itemId, (data) => {
@@ -81,6 +87,9 @@ export default CourseScreen = ({route, navigation}) => {
             setDate(data.date);
             setMinMembers(data.minMembers);
             setMaxMembers(data.maxMembers);
+            if (!data.evaluated) {
+                setEvaluated(false);
+            }
 
             if (data.members && data.members.length > 0) {
                 const memberUidList = data.members;
@@ -97,21 +106,30 @@ export default CourseScreen = ({route, navigation}) => {
                     });
                 }
             }
-        });
-        DB.getUserInfoById (founderId, (userName, userImage, bio, email) => {
-            setFounder(userName)
+            DB.getUserInfoById (data.founder, (userName, userImage, bio, email) => {
+                setFounder(userName);
+            });
+    
         });
     }
 
-    const setEvaluatedHandler = (state) => {
-        setEvaluated(state);
-        console.log("evaluated: " + evaluated)
+    const setEvaluationHandler = () => {
+        setEvaluating(true);
+        ProFiFunction(itemId, () => {
+
+            getIdeasData();
+            setTimeout(() => {       
+                setCurrentFav("");
+                setCurrentNogo("");
+                setEvaluating(false);
+                setEvaluated(true);
+            }, 1000);
+        });
     }
 
     const clickIdeaHandler = (id, title, subtitle, skills) => {
         swipeListView.safeCloseOpenRow();
-        if (evaluated) navigation.navigate("Evaluation", {itemId: id, itemTitle: title, itemSubtitle: subtitle, skillsList: skills, courseId: itemId});
-        else navigation.navigate("Project", {itemId: id, itemTitle: title, itemSubtitle: subtitle, skillsList: skills, courseId: itemId});
+        navigation.navigate("Project", {itemId: id, itemTitle: title, itemSubtitle: subtitle, skillsList: skills, courseId: itemId});
     };
 
     const clickProfileHandler = (userId) => {
@@ -218,16 +236,39 @@ export default CourseScreen = ({route, navigation}) => {
         }
     }
 
-// !!! Benötigt Einbindung der ProFi-Funktion
     const EvaluateButton = () => {
         if (founderId === currentUserId && !evaluated) {
             return (
                 <View style= { styles.center } >
                     <ButtonSimple 
                         title= { "Teams einteilen" }
-                        // !!! Benötigt Einbindung der ProFi-Funktion
-                        onClick= { () => { setEvaluatedHandler(!evaluated) } }
+                        onClick= {setEvaluationHandler}
                         style= { buttons.buttonEvaluate }
+                    />
+                </View>
+            )
+        } else { return null }
+    }
+
+    const PreEvaluateButtons = () => {
+        if (!evaluated) {
+            return (
+                <View style= { styles.paddedRow } >
+                    <Button 
+                        buttonStyle= { buttons.buttonRowGrey }
+                        titleStyle= { texts.buttonGrey }
+                        title= {userIsMember ? "Mitglied" : "Beitreten" }
+                        icon= {userIsMember ? "checkTrue" : "checkFalse"}
+                        onClick= {joinCourseHandler}
+                        disabled= {evaluated}
+                    />
+                    <Button 
+                        buttonStyle= { buttons.buttonRow }
+                        titleStyle= { texts.buttonBlue }
+                        title= "Neue Idee"
+                        icon= "plus"
+                        onClick= { () => { setAddIdeaVisibility(true) } }
+                        disabled= {evaluated}
                     />
                 </View>
             )
@@ -236,6 +277,16 @@ export default CourseScreen = ({route, navigation}) => {
 
     return(
         <View style={{flex: 1}}>
+
+            {/* // Idee hinzufügen: Fähigkeiten auswählen */}
+            <Modal visible={evaluating} animationType='fade'>
+                <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+                    <ActivityIndicator size="large" color={darkBlue} style={{paddingBottom: 20}}/>
+                    <Text style= { texts.headlineCenter }>Berechne Teams…</Text>
+
+                </View>
+            </Modal>
+
             {/* // Error Popup */}
             <Modal visible={errorVisibility} transparent = {true}>
                 <View style={styles.errorView}>
@@ -259,27 +310,29 @@ export default CourseScreen = ({route, navigation}) => {
                     subheader= { () => {}}
                     content= { () => {
                         return(
-                            <View style= { { backgroundColor: lightGrey }}>
+                            <View style= {{ backgroundColor: lightGrey }}>
                                 <View style= { styles.content }>
                                 <Text></Text>{/* // Text-Absatz */}
-                                    <InputTile 
-                                        title= "Idee-Name"
-                                        placeholderText= "Idee"
-                                        value= { currentIdeaName }
-                                        onChangeText= { setIdeaNameHandler }
-                                    />
-                                    <Text>
-                                        { ideaError }
-                                    </Text>
-                                    <InputTile 
-                                        title= "Kurzbeschreibung"
-                                        placeholderText= "Eine kurze Beschreibung der Idee"
-                                        value= { currentIdeaDescription }
-                                        onChangeText= { setIdeaDesriptionHandler }
-                                    />
-                                    <Text>
-                                        { descriptionError }
-                                    </Text>
+                                    <View style= { [styles.center, {width: "100%"}] }>
+                                        <InputTile 
+                                            title= "Idee-Name"
+                                            placeholderText= "Idee"
+                                            value= { currentIdeaName }
+                                            onChangeText= { setIdeaNameHandler }
+                                        />
+                                        <Text>
+                                            { ideaError }
+                                        </Text>
+                                        <InputTile 
+                                            title= "Kurzbeschreibung"
+                                            placeholderText= "Eine kurze Beschreibung der Idee"
+                                            value= { currentIdeaDescription }
+                                            onChangeText= { setIdeaDesriptionHandler }
+                                            />
+                                        <Text>
+                                            { descriptionError }
+                                        </Text>
+                                    </View>
                                 </View>
                                 
                                 <View>
@@ -365,11 +418,11 @@ export default CourseScreen = ({route, navigation}) => {
 
             {/* Kursansicht */}
             <View style= { styles.subHeader } >
-                <View style= { styles.courseHeaderRow } >
+                <View style= { styles.headerRow } >
                     <Text style= { texts.headlineCenter }>{itemTitle}</Text>
                     <Text style= { texts.headlineCenter }>{founderId === currentUserId ? "Mein Kurs" : founder}</Text>
                 </View>
-                <View style= { styles.courseHeaderRow } >
+                <View style= { styles.headerRow } >
                     <Text style= { texts.headlineCenter }>{date}</Text>
                     <Text style= { texts.headlineCenter }>{minMembers}–{maxMembers} Personen</Text>
                 </View>
@@ -393,22 +446,8 @@ export default CourseScreen = ({route, navigation}) => {
                     </FlatList>
                 </View>
                 {/* Buttons */}
-                <View style= { styles.paddedRow } >
-                    <Button 
-                        buttonStyle= { buttons.buttonRowGrey }
-                        titleStyle= { texts.buttonGrey }
-                        title= {userIsMember ? "Mitglied" : "Beitreten" }
-                        icon= {userIsMember ? "checkTrue" : "checkFalse"}
-                        onClick= {joinCourseHandler}
-                    />
-                    <Button 
-                        buttonStyle= { buttons.buttonRow }
-                        titleStyle= { texts.buttonBlue }
-                        title= "Neue Idee"
-                        icon= "plus"
-                        onClick= { () => { setAddIdeaVisibility(true) } }
-                    />
-                </View>
+                <PreEvaluateButtons/>
+
                 {/* Auswerten-Button */}
                 <EvaluateButton />
             </View>
@@ -428,7 +467,8 @@ export default CourseScreen = ({route, navigation}) => {
                             skills={itemData.item.skills}
                             isFavourite={itemData.item.id == currentFav}
                             isNogo={itemData.item.id == currentNogo}
-                            backgroundColor = {itemData.index % 2 === 0 ? white : lightGrey}
+                            backgroundColor = {itemData.item.myTeam ? darkBlue : itemData.index % 2 === 0 ? white : lightGrey}
+                            myTeam = {itemData.item.myTeam}
                         />
                     );
                 }}

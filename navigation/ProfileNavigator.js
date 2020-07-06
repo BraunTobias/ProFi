@@ -22,7 +22,7 @@ export default ProfileNavigator = () => {
             <ProfileStack.Screen 
                 name = "Fähigkeiten" 
                 component = { AttributeScreen }
-                 options= { { headerBackTitle: ' ', headerTitleStyle: texts.headerWithBackIcon } }
+                 options= { { headerBackTitleVisible: false, headerLeftContainerStyle: {paddingLeft: 10}, headerTitleStyle: texts.headerWithBackIcon } }
             />
         </ProfileStack.Navigator>
     );

@@ -53,7 +53,7 @@ export default LoginScreen = ({navigation}) => {
             
             <ScrollView style= { styles.scrollView }>
                 <View style= { styles.center }>
-                    <InputTile style= { styles.inputTile }
+                    <InputTile
                         title= "E-Mail"
                         placeholderText= "benutzer@haw-hamburg.de"
                         value= { currentMail }
@@ -61,7 +61,8 @@ export default LoginScreen = ({navigation}) => {
                     />
                     <InputTile 
                         title= "Passwort"
-                        placeholderText= "######"
+                        secureTextEntry={true}
+                        placeholderText= "mind. 6 Zeichen"
                         value= { currentPW }
                         onChangeText= { changePWHandler }
                     />

@@ -16,6 +16,7 @@ export default IdeaScreen = ({route, navigation}) => {
     const {itemSubtitle} = route.params;
 
     // States für Profil-Ansicht
+    const [team, setTeam] = useState([]);
     const [viewedUserId, setViewedUserId] = useState(false);
     const [profileVisibility, setProfileVisibility] = useState(false);
 
@@ -35,6 +36,23 @@ export default IdeaScreen = ({route, navigation}) => {
             console.log(data);
             setCurrentSkills(data.skills);
             // setCurrentPrefs(data.prefs);
+
+            if (data.team && data.team.length > 0) {
+                const teamUidList = data.team;
+                var newTeamList = [];
+                for (const member in teamUidList) {
+                    const uid = teamUidList[member];
+                    DB.getUserInfoById(uid, (name, url) => {
+                        newTeamList.push({
+                            "userId": uid,
+                            "username": name,
+                            "imageUrl": url
+                        });
+                        setTeam(newTeamList);
+                    });
+                }
+            }
+
         });
     }, []);
     
@@ -74,7 +92,7 @@ export default IdeaScreen = ({route, navigation}) => {
                     subheader= { () => {} }
                     content= { () => {
                         return(
-                            <View styles= {{ backgroundColor: lightGrey }}>
+                            <View styles= {{backgroundColor: lightGrey }}>
                                 <View style= { styles.contentFake } >
                                     <Text></Text>{/* Text-Absatz */}
                                     <Text style= { texts.headline } >Kommentar (max. 200 Zeichen)</Text>
@@ -136,17 +154,36 @@ export default IdeaScreen = ({route, navigation}) => {
             </Modal>
 
             {/* // Idee & Kommentar-Liste */}
-            <ScrollView style={{height: "100%"}}>
+            {/* <ScrollView style={{height: "100%"}}> */}
             <View>
                 <View style= { styles.subHeaderIdea}>
-                    <View style= { { height: 100 } } >
+                    <View style= {styles.headerRow}>
                         <Text>{itemSubtitle}</Text>
+                    </View>
+                                    {/* Membericons */}
+                    <View style= { styles.membersRow } >
+                        <FlatList style={{paddingLeft: 5}}
+                            data={team}
+                            horizontal={true}
+                            showsHorizontalScrollIndicator={false}
+                            keyExtractor={(item, index) => index.toString()}
+                            renderItem={(itemData) => { 
+                                return (
+                                    <ProfileImageTile
+                                        onClick={() => {clickProfileHandler(itemData.item.userId)}} 
+                                        imageUrl={itemData.item.imageUrl}
+                                    />
+                                );
+                            }}
+                        >
+                        </FlatList>
                     </View>
                     <ListTile
                         title={"Passende Fähigkeiten"}
                         subtitle={currentSkills.join(", ")}
                         onClick={() => navigation.navigate('IdeaSkills', {attributeType: "skills", filter: currentSkills})} 
                     />
+
                 </View>
                 <View style={ styles.commentRow }>
                     <Text style={texts.headline}>Kommentare:</Text>
@@ -174,7 +211,7 @@ export default IdeaScreen = ({route, navigation}) => {
                 );
             }}
             />
-            </ScrollView>
+            {/* </ScrollView> */}
         </View>
   );
 

@@ -63,13 +63,15 @@ export default RegistrationScreen = ({navigation}) => {
                     />
                     <InputTile 
                         title= "Passwort"
-                        placeholderText= "######"
+                        secureTextEntry={true}
+                        placeholderText= "mind. 6 Zeichen"
                         value= { currentPW }
                         onChangeText= { changePWHandler }
                     />
                 </View>
                 <View style= { styles.center }>
                     <ButtonSimple 
+                        style= { buttons.buttonSimple }
                         title= "Registrieren"
                         onClick= { register }
                     />

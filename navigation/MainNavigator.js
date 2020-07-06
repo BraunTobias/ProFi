@@ -1,10 +1,10 @@
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
-import { StatusBar } from 'react-native';
+import { StatusBar, Image } from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Ionicons} from '@expo/vector-icons';
 import DB from '../api/DB_API';
-import { darkBlue, lightBlue, lightGrey, darkGrey } from '../Styles';
+import { darkBlue, lightBlue, lightGrey, darkGrey, icons } from '../Styles';
 
 import HomeNavigator from './HomeNavigator';
 import ProfileNavigator from './ProfileNavigator';
@@ -22,12 +22,15 @@ export default MainNavigator = () => {
                     let iconName;
         
                     if (route.name === 'Home') {
-                        iconName = 'ios-home';
+                        iconName = icons.home;
+                        // iconName = 'ios-list';
                     } else if (route.name === 'Profile') {
-                        iconName = 'ios-contact';
+                        iconName = icons.profile;
+                        // iconName = 'ios-person';
                     }
                     
-                    return <Ionicons name={iconName} size={size} color={color} />;
+                    return <Image source={iconName} style= { { width: 25, height: 25, tintColor: color}}/>;
+                    // return <Ionicons name={iconName} size={size} color={color} />;
                 },
                 })}
                 tabBarOptions={{

@@ -10,8 +10,9 @@ import ListTile from "../components/ListTile";
 import Button from '../components/Button';
 import DeleteCourseButton from "../components/DeleteCourseButton";
 import ModalDatePicker from 'react-native-datepicker-modal'
-import { styles, buttons, texts, white, lightGrey, iconsizeAdd } from "../Styles"
+import { styles, buttons, texts, white, lightGrey, darkBlue, iconsizeAdd, lightBlue, darkGrey } from "../Styles"
 import DatePicker from "react-native-datepicker";
+import ProFiFunction from "../api/ProFiFunction";
 
 export default HomeScreen = ({navigation}) => {
     const currentUserId = DB.getCurrentUserId();
@@ -35,7 +36,7 @@ export default HomeScreen = ({navigation}) => {
     const [idError, setIdError] = useState("");
     const [minMembersError, setMinMemebersError] = useState("");
     const [maxMembersError, setMaxMembersError] = useState("");
-    const [dateError, setDateError] = useState("Offenes Projekt ohne Datumsangabe");
+    const [dateError, setDateError] = useState("");
   
     // Wird nur beim Laden der Seite einmalig ausgeführt
     useEffect(() => {
@@ -57,7 +58,6 @@ export default HomeScreen = ({navigation}) => {
             });
         });
         // DB.createTestCourse();
-        DB.collectCourseData("TEST");
     }, []);
 
     // Button fürs Hinzufügen neuer Kurse
@@ -83,7 +83,7 @@ export default HomeScreen = ({navigation}) => {
         if (currentCourseName != "" && currentMaxMembers > 1 && currentCourseId != "") {
             if (currentMinMembers <= currentMaxMembers) {
                 console.log("add");
-                DB.addCourse(currentUserId, currentCourseName, currentCourseId, currentDate, currentMinMembers, currentMaxMembers, () => {
+                DB.addCourse(currentCourseName, currentCourseId, currentDate, currentMinMembers, currentMaxMembers, () => {
                     setAddCourseVisibility(false);
                     setCurrentCourseName("");
                     setCurrentCourseId("");
@@ -244,9 +244,9 @@ export default HomeScreen = ({navigation}) => {
                     subheader= { () => {}}
                     content= { () => {
                         return(
-                            <View >
+                            <View>
                                 <Text></Text>{/* Text-Absatz */}
-                                <View style= { styles.center }>
+                                <View style= { [styles.center, {width: "90%"}] }>
                                     <InputTile 
                                         title= "Kursname"
                                         placeholderText= "Kursname"
@@ -266,22 +266,36 @@ export default HomeScreen = ({navigation}) => {
                                         { idError }
                                     </Text>
                                     <View style= { styles.loginInput } >
-                                        <Text style= { texts.buttonGrey } >Minimale Mitgliederzahl</Text>
+                                        <Text style= { [texts.buttonGrey, {paddingBottom: 5}] } >Minimale Mitgliederzahl</Text>
                                         <NumericInput 
                                             onChange={(text) => { setMinMaxMembersHandler(text, true) }} 
                                             minValue = { 0 }
                                             maxValue= { 20 }
+                                            rounded
+                                            totalHeight={45} 
+                                            containerStyle={{borderWidth: 0, backgroundColor: white}}
+                                            separatorWidth={0}
+                                            rightButtonBackgroundColor={darkGrey}
+                                            leftButtonBackgroundColor={darkGrey}
+                                            inputStyle={{fontWeight: "bold"}}
                                         />
                                         <Text>
                                             { minMembersError }
                                         </Text>
                                     </View>
                                     <View style= { styles.loginInput } >
-                                        <Text style= { texts.buttonGrey } >Maximale Mitgliederzahl</Text>
+                                        <Text style= { [texts.buttonGrey, {paddingBottom: 5}] }  >Maximale Mitgliederzahl</Text>
                                         <NumericInput 
                                             onChange={(text) => { setMinMaxMembersHandler(text, false) }} 
                                             minValue = { 0 }
                                             maxValue= { 20 }
+                                            rounded
+                                            totalHeight={45} 
+                                            containerStyle={{borderWidth: 0, backgroundColor: white}}
+                                            separatorWidth={0}
+                                            rightButtonBackgroundColor={darkGrey}
+                                            leftButtonBackgroundColor={darkGrey}
+                                            inputStyle={{fontWeight: "bold"}}
                                         />
                                         <Text>
                                             { maxMembersError }
@@ -290,24 +304,37 @@ export default HomeScreen = ({navigation}) => {
                                     <View style= { styles.loginInput } >
                                         <Text style= { texts.buttonGrey } >Enddatum (optional)</Text>
                                             <DatePicker
-                                                style={{width: 200}}
+                                                style={{width: "100%"}}
                                                 date={currentDate}
-                                                format="DD-MM-YYYY"
-                                                minDate="02-02-2020"
-                                                maxDate="02-02-2021"
+                                                format="DD.MM.YYYY"
+                                                minDate="07.07.2020"
+                                                maxDate="07.07.2021"
                                                 confirmBtnText="OK"
                                                 cancelBtnText="Abbrechen"
-                                                // customStyles={{
-                                                //     // dateIcon: {
-                                                //     //   position: 'absolute',
-                                                //     //   left: 0,
-                                                //     //   top: 4,
-                                                //     //   marginLeft: 0
-                                                //     // },
-                                                //     // dateInput: {
-                                                //     //   marginLeft: 36
-                                                //     // }
-                                                // }}
+                                                showIcon={false}
+                                                customStyles={{
+                                                    dateInput: {
+                                                        borderRadius: 10,
+                                                        borderWidth: 0,
+                                                        backgroundColor: white,
+                                                        height: 45,
+                                                        marginTop:15,
+                                                    },
+                                                    dateText : {
+                                                        fontWeight: "bold",
+                                                        fontSize: 22
+                                                    }
+                                                    
+                                                    // dateIcon: {
+                                                    //   position: 'absolute',
+                                                    //   left: 0,
+                                                    //   top: 4,
+                                                    //   marginLeft: 0
+                                                    // },
+                                                    // dateInput: {
+                                                    //   marginLeft: 36
+                                                    // }
+                                                }}
                                                 onDateChange={(date) => { setDateHandler(date)}}
                                             />
                                         <Text>
@@ -344,7 +371,7 @@ export default HomeScreen = ({navigation}) => {
                         return(
                             <View >
                                 <Text></Text>{/* Text-Absatz */}
-                                <View style= { styles.center }>
+                                <View style= { [styles.center, {width: "90%"}] }>
                                     <InputTile 
                                         title= "Kurs-ID"
                                         placeholderText= "KürzelSemesterJahr"

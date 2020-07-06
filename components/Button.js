@@ -15,15 +15,16 @@ export default Button = props => {
 
   return (
     <TouchableOpacity 
+      disabled={props.disabled}
       underlayColor= { darkBlue }
       style= { props.buttonStyle } 
       onPress= { () => props.onClick() }
     >
-      <Text style= { props.titleStyle }>
+      <Text style= { [props.titleStyle, {opacity: props.disabled ? 0.2 : 1}] }>
         { props.title }
       </Text>
       <Image 
-        style= { { width: 30, height: 30} }
+        style= { { width: 30, height: 30, opacity: props.disabled ? 0.2 : 1} }
         source= { image }
         resizeMode= { "contain" }
       />

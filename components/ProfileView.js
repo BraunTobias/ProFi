@@ -52,7 +52,7 @@ export default ProfileView = props => {
     return ( 
         <View style={{height: "100%", paddingBottom: "30%"}}>
             {/* // "Header" mit Profildaten */}
-            <View style={{padding: 20, flexDirection: "row", justifyContent: 'flex-start', alignItems: 'center', backgroundColor: "#aeb8c3"}}>
+            <View style={styles.subHeaderProfile}>
                 
                 {/* Linke Spalte: Profilbild */}
                 <View style={styles.contentProfile}>

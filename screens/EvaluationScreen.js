@@ -97,7 +97,7 @@ export default EvaluationScreen = ({route, navigation}) => {
             </Modal>
 
             {/* // Idee & Kommentar-Liste */}
-            <ScrollView style={{height: "100%"}}>
+            {/* <ScrollView style={{height: "100%"}}> */}
             <View>
                 <View style= { styles.subHeaderIdea}>
                     <View style= { { height: 100 } } >
@@ -153,7 +153,7 @@ export default EvaluationScreen = ({route, navigation}) => {
                     );
                 }}
             />
-            </ScrollView>
+            {/* </ScrollView> */}
         </View>
   );
 

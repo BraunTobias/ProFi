@@ -58,35 +58,29 @@ const styles = StyleSheet.create({
     },
 
     subHeader: {
-        // paddingHorizontal: padding,
-        // paddingVertical: padding/4,
-        // height: 220,
-        // width: width,
         backgroundColor: darkGrey,
         paddingVertical: 15
     },
 
     subHeaderIdea: {
-        paddingHorizontal: padding,
-        paddingVertical: padding/2,
-        width: width,
+        // paddingHorizontal: 15,
         backgroundColor: darkGrey,
-        marginBottom: padding/2,
+        paddingVertical: 15
     },
 
     subHeaderProfile: {
-        padding: 20, 
+        padding: 15, 
         flexDirection: "row", 
         justifyContent: 'flex-start', 
-        alignItems: 'center', 
-        backgroundColor: "#aeb8c3"
+        alignItems: 'flex-start', 
+        backgroundColor: darkGrey
     },
 
     contentProfile: {
         flex: 1, 
         flexDirection: "column", 
-        justifyContent: 'center', 
-        alignItems: 'center'
+        justifyContent: 'flex-start', 
+        alignItems: 'flex-start',
     },
 
     rightContentProfile: {
@@ -94,7 +88,6 @@ const styles = StyleSheet.create({
         flexDirection: "column", 
         justifyContent: 'flex-end', 
         alignItems: 'flex-end',
-
     },
 
     contentButton: {
@@ -113,7 +106,7 @@ const styles = StyleSheet.create({
         // backgroundColor: white
     },
 
-    courseHeaderRow: {
+    headerRow: {
         // flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between', 
@@ -127,7 +120,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between', 
         alignItems: 'stretch',
         // height: 100,
-        paddingVertical: 15,
+        paddingVertical: 15, 
     },
 
     commentRow: {
@@ -149,20 +142,16 @@ const styles = StyleSheet.create({
     },
 
     contentFake: {
-        width: width,
+        width: "100%",
         flex: 1, 
         flexDirection: 'column', 
         justifyContent: 'center', 
         alignItems: 'stretch',
         padding: padding,
-        backgroundColor: lightBlue
     },
 
     commentField: {
-        width: '100%', 
-        backgroundColor: 'white', 
-        padding: 10, 
-        marginHorizontal: 20
+        paddingHorizontal: 20
     },
 
     modal: {
@@ -181,7 +170,7 @@ const styles = StyleSheet.create({
     },
 
     center: {
-        alignSelf: 'center'
+        alignSelf: 'center',
     },
 
     loginInput: {
@@ -189,6 +178,13 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
         marginBottom: 10,
         minWidth: 250,
+        maxWidth: "100%",
+    },
+
+    inputField: {
+        padding: 5,
+        backgroundColor: "rgba(225,231,235,0.6)",
+        borderRadius: 3,
     },
 
     errorView: {
@@ -226,7 +222,8 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderRadius: 10,
         borderBottomColor: darkBlue,
-    }
+    },
+
 })
 
 const buttons = StyleSheet.create({
@@ -365,11 +362,12 @@ const texts = StyleSheet.create({
         width: "100%",
         paddingVertical: 5,
         paddingLeft: 5,
-        marginTop: 3
+        marginTop: 3,
+        borderRadius: 3,
     },
 
     inputTextProfile: {
-        fontSize: 30,
+        fontSize: 24,
         color: black,
         fontWeight: "bold"
     },
@@ -419,8 +417,11 @@ const profileImage = {
 }
 
 const icons = {
+    profilePlaceholder: require("./assets/profile.png"),
     checkTrue: require("./assets/check-true.png"),
     checkFalse: require("./assets/check-false.png"),
+    home: require("./assets/icons/home.png"),
+    profile: require("./assets/icons/profile.png"),
     plus: require("./assets/icons/plus.png"),
     find: require("./assets/icons/find.png"),
     exit: require("./assets/icons/exit.png"),

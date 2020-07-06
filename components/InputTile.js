@@ -12,6 +12,7 @@ export default InputTile = props => {
           placeholder= { props.placeholderText }
           value= { props.value }
           onChangeText= { (text) => props.onChangeText(text)}
+          secureTextEntry={props.secureTextEntry}
       />
     </View>
   );

@@ -156,7 +156,7 @@ export default ProfileScreen =  ({navigation})  => {
                 {/* // Rechte Spalte */}
                 <View style={styles.rightContentProfile}>
                     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-                        <View style={{width: "90%", backgroundColor: lightGrey, paddingLeft: 5, borderRadius: 0, }} >
+                        <View style={[styles.inputField, {width: "95%"}]} >
                             <TextInput 
                                 style={texts.inputTextProfile}
                                 onChangeText={changeNameHandler}
@@ -166,9 +166,9 @@ export default ProfileScreen =  ({navigation})  => {
                     </TouchableWithoutFeedback>
 
                     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-                        <View style={{width: "90%", }} >
+                        <View style={{width: "95%", }} >
                             <Text style={texts.textProfile}>Kurzbeschreibung:</Text>
-                            <View style={{backgroundColor: lightGrey, paddingLeft: 5, borderRadius: 0, }} >
+                            <View style={styles.inputField} >
                                 <TextInput 
                                     style={texts.textBold}
                                     onChangeText={changeBioHandler}
@@ -179,7 +179,7 @@ export default ProfileScreen =  ({navigation})  => {
                     </TouchableWithoutFeedback>
 
                     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-                        <View style={{width: "90%"}}>
+                        <View style={{width: "95%"}}>
                             <Text style={texts.textProfile}>E-Mail:</Text>
                             <Text style={texts.textBold}>{currentMail}</Text>
                         </View>

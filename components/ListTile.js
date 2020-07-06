@@ -4,7 +4,7 @@ import {Ionicons} from '@expo/vector-icons';
 import {MaterialIcons} from '@expo/vector-icons';
 import FavButton from './FavButton';
 import NogoButton from './NogoButton';
-import { styles, buttons, texts, white, lightGrey, grey, black, iconsize, iconsizeAdd, darkGrey, icons } from '../Styles';
+import { styles, buttons, texts, white, lightGrey, grey, black, iconsize, iconsizeAdd, darkGrey, icons, darkBlue } from '../Styles';
 
 export default ListTile = props => {
 
@@ -42,9 +42,9 @@ export default ListTile = props => {
         <View style={{flex: 9, justifyContent: "center"}}>
             <View style={{flexDirection: "row"}}>
               <PrefIcon/>
-              <Text style = {stylesFile.title}>{props.title}</Text>
+              <Text style = {[stylesFile.title, {color: props.myTeam ? white : darkBlue}]}>{props.title}</Text>
             </View>
-            <Text numberOfLines={2} ellipsizeMode="tail" style = {stylesFile.subtitle}>{props.subtitle}</Text>
+            <Text numberOfLines={2} ellipsizeMode="tail" style = {[stylesFile.subtitle, {color: props.myTeam ? white : black}]}>{props.subtitle}</Text>
         </View>
         <View style={{flex: 1, justifyContent: "center", alignItems: "center", paddingEnd: 15}}>
             <Image style={stylesFile.arrow} source={require("../assets/icons/arrow-right.png")} resizeMode="contain"/>

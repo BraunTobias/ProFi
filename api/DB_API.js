@@ -25,7 +25,7 @@ const DB = {
                 password: password
             })        
             .then(() => {
-                // this.fillAttributesList();
+                // this.fillAttributesList(userInfo.user.uid);
                 console.log("User account created & signed in!");
                 // for (var category in skillsList) {
                 //     console.log("SKILLS: " + category + skillsList[category]);
@@ -233,7 +233,7 @@ const DB = {
     },
 
     // Neuen Kurs erstellen (Objekt der Klasse course übergeben)
-    addCourse: function(founder, title, id, date, minMembers, maxMembers, onSuccess, onError) {
+    addCourse: function(title, id, date, minMembers, maxMembers, onSuccess, onError) {
         const currentUserID = firebase.auth().currentUser.uid;
 
         // checken ob es die ID schon gibt
@@ -244,7 +244,7 @@ const DB = {
                 onError("Diese ID ist schon vergeben!");
             } else {
                 firebase.firestore().collection("courses").doc(id).set({
-                    founder: founder,
+                    founder: currentUserID,
                     title: title,
                     date: date,
                     minMembers: minMembers,
@@ -323,6 +323,11 @@ const DB = {
         snapshot.forEach((doc) => {
             const idea = doc.data();
             idea["id"] = doc.id;
+            if (idea.team && idea.team.indexOf(firebase.auth().currentUser.uid) >= 0) {
+                idea["myTeam"] = true;
+            } else {
+                idea["myTeam"] = false;
+            }
             ideasList.push(idea);
         });    
         
@@ -738,7 +743,8 @@ const DB = {
             date: "31.12.2020",
             minMembers: 2,
             maxMembers: 4,
-            prospects: [allUserIds[randomCreatorId]],
+            founder: "jO01nq0aMeMTAmTxgT7PY9lErqt1",
+            prospects: [allUserIds[0], allUserIds[1], allUserIds[2], allUserIds[3], allUserIds[4], allUserIds[5]],
             members: [allUserIds[0], allUserIds[1], allUserIds[2], allUserIds[3], allUserIds[4], allUserIds[5]]
         })
         .then(() => {
@@ -773,7 +779,8 @@ const DB = {
     },
 
     // Alle Mitglieder und Ideen eines Kurses sammeln mitsamt deren Skills und Interessen
-    collectCourseData: async function(courseId, onSuccess) {
+    collectCourseData: async function(courseId, onSuccess, onError) {
+        var canEvaluate = true;
         var courseData = {};
         var ideaIds = [];
         var ideaSkills = [];
@@ -786,33 +793,71 @@ const DB = {
         const snapshot = await firebase.firestore().collection("courses").doc(courseId).collection("ideas").get();
         snapshot.forEach((ideaDoc) => {
             ideaIds.push(ideaDoc.id);
+            if (!ideaDoc.data().skills) {
+                canEvaluate = false;
+                onError("Keine Idee vorhanden");
+            }
+            if (ideaDoc.data().team) {
+                canEvaluate = false;
+                onError("Teams wurden schon berechnet");
+            }
             ideaSkills.push(ideaDoc.data().skills);
             ideaFavs.push(ideaDoc.data().favourites);
             ideaNogos.push(ideaDoc.data().nogos);
-
         });    
-        console.log("------------------------");
-        console.log("Idea IDs:" + ideaIds);
-        console.log("Idea Skills:" + ideaSkills);
-        console.log("Idea Favs:" + ideaFavs);
-        console.log("Idea No-Gos:" + ideaNogos);
 
         // Eigenschaften der Mitglieder abrufen
         const snapshotDoc = await firebase.firestore().collection("courses").doc(courseId).get();
 
         if (snapshotDoc.data()) {
             memberIds = snapshotDoc.data().members;
+            courseData["minMembers"] = snapshotDoc.data().minMembers;
+            courseData["maxMembers"]= snapshotDoc.data().maxMembers;
         }
-        memberIds.forEach(member => {
-            this.getAttributesFromUser(member, (attList) => {
-                console.log(attList);
+        for (var i = 0; i < memberIds.length; i++) {
+            await this.getAttributesFromUser(memberIds[i], (attList) => {
                 memberSkills.push(attList);
             })
-        });
-        console.log("Member IDs: " + memberIds);
-        console.log("Member Skills: " + memberSkills);
+        }
+        const allData = {
+            course: courseData,
+            ideaIds: ideaIds,
+            ideaSkills: ideaSkills,
+            ideaFavs: ideaFavs,
+            ideaNogos: ideaNogos,
+            memberIds: memberIds,
+            memberSkills: memberSkills,
+        }
+        if (canEvaluate) {
+            onSuccess(allData);
+        } 
+    },
 
-        onSuccess(courseData, ideaIds, ideaSkills, ideaFavs, ideaNogos, memberIds, memberSkills);
+    // Nach der Berechnung werden die User den Ideen zugeordnet
+    saveIdeaTeams: function(courseId, ideaIds, teams, onSuccess) {
+        for (var i = 0; i < teams.length; i++) {
+            if (teams[i].length > 0) {
+                if (ideaIds[i]) {
+                    firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaIds[i]).set({
+                        team: teams[i],
+                        favourites: null,
+                        nogos: null,
+                    }, {merge: true}); 
+                } else {
+                    firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc("Idee" + i).set({
+                        team: teams[i],
+                        title: "Zusatz-Gruppe",
+                        description: "Noch keine Idee vorhanden",
+                    }, {merge: true}); 
+                }
+
+
+            }
+        }
+        firebase.firestore().collection("courses").doc(courseId).set({
+            evaluated: true,
+        }, {merge: true}); 
+        onSuccess();
     },
 
 

@@ -1,15 +1,16 @@
 import React , {useState, useEffect} from "react";
 import { StyleSheet, Text, TouchableOpacity, View, Image } from "react-native";
+import { icons } from '../Styles';
 import DB from '../api/DB_API';
 
 export default ProfileImageTile = props => {
 
-  const imageUrl = props.imageUrl;
+  const source = props.imageUrl ? {uri: props.imageUrl} : icons.profilePlaceholder;
 
   return (
       <TouchableOpacity style={styles.itemContainer} onPress={() => props.onClick()} >
         <Image style={styles.profileImage}
-          source={{ uri: imageUrl}} 
+          source={source}
         />
       </TouchableOpacity>
   );
