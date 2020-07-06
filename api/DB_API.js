@@ -1,7 +1,7 @@
 import * as firebase from 'firebase';
 import 'firebase/firestore';
 import "firebase/storage";
-import {skillsList, prefsList} from './AttributesList';
+import {skillsList} from '../data/AttributesList';
 
 const DB = {
     // Kopiert von https://stackoverflow.com/questions/48006903/react-unique-id-generation
@@ -25,12 +25,7 @@ const DB = {
                 password: password
             })        
             .then(() => {
-                // this.fillAttributesList(userInfo.user.uid);
                 console.log("User account created & signed in!");
-                // for (var category in skillsList) {
-                //     console.log("SKILLS: " + category + skillsList[category]);
-                //     firebase.firestore().collection("users").doc(userInfo.user.uid).collection("skills").doc(category).set(skillsList[category], {merge: true});        
-                // }
                 console.log("skills eingesetzt");
     
                 onSuccess();
@@ -38,8 +33,6 @@ const DB = {
             .catch(error => {
                 onError(error);
             });
-
-            // SKILLS COLLECTION ANLEGEN!!
         })
         .catch(error => {
             onError(error);
@@ -47,11 +40,6 @@ const DB = {
     },
     // Listen fürs Profil ausfüllen 
     fillAttributesList: function(uid) {
-        // const currentUserID = firebase.auth().currentUser.uid;
-        // for (var category in prefsList) {
-        //     firebase.firestore().collection("users").doc(currentUserID).collection("prefs").doc(category).set(prefsList[category], {merge: true});        
-        // }
-        // console.log(skillsList);
         for (var category in skillsList) {
             console.log("SKILLS: " + category + skillsList[category]);
             firebase.firestore().collection("users").doc(uid).collection("skills").doc(category).set(skillsList[category], {merge: true});        
@@ -102,7 +90,6 @@ const DB = {
 
     // Einloggen
     logIn: function(email, password, onError) {
-        // console.log("Logged in user with email: " + email + " and password: " + password);
         firebase.auth().signInWithEmailAndPassword(email, password)
         .catch(e => {
             onError(e);
@@ -236,7 +223,7 @@ const DB = {
     addCourse: function(title, id, date, minMembers, maxMembers, onSuccess, onError) {
         const currentUserID = firebase.auth().currentUser.uid;
 
-        // checken ob es die ID schon gibt
+        // Checken ob es die ID schon gibt
         const courseWithId = firebase.firestore().collection("courses").doc(id)
         courseWithId.get()
         .then((docSnapshot) => {
@@ -302,7 +289,7 @@ const DB = {
     
     // Gibt Liste mit allen Kursen des aktuellen Users für Home-Seite zurück
     getCourseList: async function(courseListRetrieved) {
-        const courseList = [];//{"title": "Kurs", "date": "11.01.2221", "id": "XJYOaVAUvxhAm8lK96lR", "maxMembers": 4, "members": Array}];
+        const courseList = [];
         const currentUserID = firebase.auth().currentUser.uid;
         
         // Liste aller Kurse nach User-ID filtern und abspeichern
@@ -405,10 +392,6 @@ const DB = {
                 onError("Diese ID existiert nicht.");
             }
         });
-
-        // const snapshotDoc = await firebase.firestore().collection("courses").doc(courseId).get();
-
-        // Wenn schon eine Members-Liste existiert (tut sie höchstwahrscheinlich) wird geprüft ob der User schon darin enthalten ist
     },
 
     // Der User wird zur Members-Liste eines Kurses hinzugefügt bzw. entfernt

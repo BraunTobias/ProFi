@@ -1,13 +1,11 @@
 import React, {useState, useLayoutEffect, useEffect} from 'react';
-import {FlatList , View, Text, Modal, TouchableWithoutFeedback, TextInput, Keyboard} from 'react-native';
+import {FlatList , View, Text, Modal, TextInput} from 'react-native';
 import Button from '../components/Button';
 import ListTile from '../components/ListTile';
 import CommentTile from '../components/CommentTile';
 import ProfileView from '../components/ProfileView';
 import DB from '../api/DB_API';
-import { set } from 'react-native-reanimated';
 import { styles, texts, buttons, lightGrey } from '../Styles';
-import { ScrollView } from 'react-native-gesture-handler';
 
 export default IdeaScreen = ({route, navigation}) => {
     const {itemId} = route.params;
@@ -35,7 +33,6 @@ export default IdeaScreen = ({route, navigation}) => {
         DB.getIdeaData(courseId, itemId, (data) => {
             console.log(data);
             setCurrentSkills(data.skills);
-            // setCurrentPrefs(data.prefs);
 
             if (data.team && data.team.length > 0) {
                 const teamUidList = data.team;
@@ -64,27 +61,30 @@ export default IdeaScreen = ({route, navigation}) => {
 
     const addCommentHandler = () => {
         console.log("add");
-        DB.addComment(courseId, itemId, currentCommentText, () => {
-            setCommentVisibility(false);
-            setCurrentCommentText("");
-            DB.getCommentsList(courseId, itemId, (commentsList) => {
-                setCurrentComments(commentsList);
-                console.log(commentsList);
+        if (currentCommentText != "") {
+            DB.addComment(courseId, itemId, currentCommentText, () => {
+                setCommentVisibility(false);
+                setCurrentCommentText("");
+                DB.getCommentsList(courseId, itemId, (commentsList) => {
+                    setCurrentComments(commentsList);
+                    console.log(commentsList);
+                });
             });
-        });
+        }
     }
 
     const setCommentHandler = (text) => {
         setCurrentCommentText(text);
     }
 
-    const commentClickHandler = (userId) => {
+    const clickProfileHandler = (userId) => {
         setProfileVisibility(true);
         setViewedUserId(userId);
     }
 
     return(
-        <View>
+        <View style={{flex: 1}}>
+
             {/* // Kommentar schreiben */}
             <Modal visible={commentVisibility} animationType='slide'>
             <ModalComponent
@@ -154,47 +154,44 @@ export default IdeaScreen = ({route, navigation}) => {
             </Modal>
 
             {/* // Idee & Kommentar-Liste */}
-            {/* <ScrollView style={{height: "100%"}}> */}
-            <View>
-                <View style= { styles.subHeaderIdea}>
-                    <View style= {styles.headerRow}>
-                        <Text>{itemSubtitle}</Text>
-                    </View>
-                                    {/* Membericons */}
-                    <View style= { styles.membersRow } >
-                        <FlatList style={{paddingLeft: 5}}
-                            data={team}
-                            horizontal={true}
-                            showsHorizontalScrollIndicator={false}
-                            keyExtractor={(item, index) => index.toString()}
-                            renderItem={(itemData) => { 
-                                return (
-                                    <ProfileImageTile
-                                        onClick={() => {clickProfileHandler(itemData.item.userId)}} 
-                                        imageUrl={itemData.item.imageUrl}
-                                    />
-                                );
-                            }}
-                        >
-                        </FlatList>
-                    </View>
-                    <ListTile
-                        title={"Passende Fähigkeiten"}
-                        subtitle={currentSkills.join(", ")}
-                        onClick={() => navigation.navigate('IdeaSkills', {attributeType: "skills", filter: currentSkills})} 
-                    />
+            <View style= { styles.subHeader}>
+                <View style= {styles.headerRow}>
+                    <Text>{itemSubtitle}</Text>
+                </View>
+                {/* Membericons */}
+                <View style= { styles.membersRow } >
+                    <FlatList style={{paddingLeft: 5}}
+                        data={team}
+                        horizontal={true}
+                        showsHorizontalScrollIndicator={false}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={(itemData) => { 
+                            return (
+                                <ProfileImageTile
+                                    onClick={() => {clickProfileHandler(itemData.item.userId)}} 
+                                    imageUrl={itemData.item.imageUrl}
+                                />
+                            );
+                        }}
+                    >
+                    </FlatList>
+                </View>
+                <ListTile
+                    title={"Passende Fähigkeiten"}
+                    subtitle={currentSkills.join(", ")}
+                    onClick={() => navigation.navigate('IdeaSkills', {attributeType: "skills", filter: currentSkills})} 
+                />
 
-                </View>
-                <View style={ styles.commentRow }>
-                    <Text style={texts.headline}>Kommentare:</Text>
-                    <Button 
-                        buttonStyle= { buttons.buttonRow }
-                        titleStyle= { texts.buttonBlue }
-                        title= 'Kommentar'
-                        icon= "plus"
-                        onClick= { () => { setCommentVisibility(true) } }
-                    />
-                </View>
+            </View>
+            <View style={ styles.commentRow }>
+                <Text style={texts.headline}>Kommentare:</Text>
+                <Button 
+                    buttonStyle= { buttons.buttonRow }
+                    titleStyle= { texts.buttonBlue }
+                    title= 'Kommentar'
+                    icon= "plus"
+                    onClick= { () => { setCommentVisibility(true) } }
+                />
             </View>
             <FlatList
             data={currentComments}
@@ -205,13 +202,12 @@ export default IdeaScreen = ({route, navigation}) => {
                         userId={itemData.item.user}
                         subtitle={itemData.item.text}
                         timestamp={itemData.item.time}
-                        onClick={commentClickHandler}
+                        onClick={clickProfileHandler}
                         backgroundColor = {itemData.index % 2 === 0 ? "#ffffff" : "#f5f7f7"}
                     />
                 );
             }}
             />
-            {/* </ScrollView> */}
         </View>
   );
 

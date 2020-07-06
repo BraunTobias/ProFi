@@ -27,9 +27,8 @@ export default App => {
   try {
       firebase.initializeApp(firebaseConfig);
   } catch(err) {
+    console.log(err);
   }
-
-  // DB.logIn("nicolas@1.de", "test123");
 
   const authHandler = (auth) => {
     if (auth) {

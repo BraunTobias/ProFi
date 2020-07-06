@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import {FlatList, View, Text, RefreshControl} from "react-native";
+import {FlatList, View, Text} from "react-native";
 import DB from '../api/DB_API';
-import { styles, texts, buttons, darkGrey, lightGrey, lightBlue, white } from '../Styles';
+import { styles, texts } from '../Styles';
 
 export default AttributeListScreen = props => {
     const filterList = props.filterList;
@@ -20,15 +20,9 @@ export default AttributeListScreen = props => {
             keyExtractor={(item, index) => index.toString()}
             renderItem={(itemData) => { 
                 return (
-                    // FlatList
                     <View style={styles.contentAttribute}>
-                        {/* Black Borders */}
                         <Text style={[texts.textBoldAttribute, ]}>{itemData.item[0]}</Text> 
                         <Text style={[texts.textAttribute, {backgroundColor: "white"}]}>{itemData.item[1]}</Text>
-                        {/* <Image
-                            source={currentIcon}
-                            style={styles.checkmark}
-                        />  */}
                     </View>
                 );
             }}

@@ -1,9 +1,6 @@
-import React , {useState, useEffect} from "react";
-import { StyleSheet, Text, TouchableHighlight, View, Image } from "react-native";
-import {Ionicons} from '@expo/vector-icons';
-import { Icon } from 'react-native-elements';
-import { buttons, texts, white, darkBlue, lightGrey, darkGrey, black, iconsize, iconsizeAdd } from '../Styles';
-import DB from '../api/DB_API';
+import React from "react";
+import { StyleSheet, TouchableHighlight, Image } from "react-native";
+import { darkBlue, lightGrey, lightBlue } from '../Styles';
 
 export default CategoryIcon = props => {
 
@@ -29,18 +26,11 @@ export default CategoryIcon = props => {
             onPress={() => props.onClick()}
             underlayColor="#aeb8c3"
         >
-        <Image
-            source={iconName}
-            style={[styles.icon, {tintColor: props.isActive ? darkBlue : darkGrey}]} 
-            resizeMode="contain"
-        />
-        {/* <Ionicons style={styles.icon}
-            raised 
-            name={iconName} 
-            size={35} 
-            type="ionicon"
-            color={"#222f56"} 
-        /> */}
+          <Image
+              source={iconName}
+              style={[styles.icon, {tintColor: props.isActive ? darkBlue : lightBlue}]} 
+              resizeMode="contain"
+          />
         </TouchableHighlight>
   );
 };
@@ -48,7 +38,6 @@ export default CategoryIcon = props => {
 const styles = StyleSheet.create({
   itemContainer: {
     marginRight: 15,
-    // marginVertical: 10,
     backgroundColor: lightGrey,
     borderRadius: 10,
     justifyContent: "center",

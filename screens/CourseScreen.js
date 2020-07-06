@@ -1,14 +1,15 @@
 import React, {useState, useEffect, useLayoutEffect} from 'react';
-import {View, SafeAreaView, Text, FlatList, Modal, TouchableWithoutFeedback, TextInput, Keyboard, ActivityIndicator } from "react-native";
+import {View, Text, FlatList, Modal, ActivityIndicator } from "react-native";
 import ListTile from '../components/ListTile';
 import Button from '../components/Button';
 import ButtonSimple from '../components/ButtonSimple';
 import { SwipeListView } from 'react-native-swipe-list-view';
-import {Ionicons} from '@expo/vector-icons';
 import AttributeSelect from '../components/AttributeSelect';
 import DB from '../api/DB_API';
 import ProfileImageTile from '../components/ProfileImageTile';
-import { styles, buttons, texts, white, lightGrey, grey, black, iconsize, iconsizeAdd, darkGrey, icons, darkBlue } from '../Styles';
+import FavButton from '../components/FavButton';
+import NogoButton from '../components/NogoButton';
+import { styles, buttons, texts, white, lightGrey, lightBlue, darkBlue } from '../Styles';
 import ProFiFunction from '../api/ProFiFunction';
 
 export default CourseScreen = ({route, navigation}) => {
@@ -45,7 +46,7 @@ export default CourseScreen = ({route, navigation}) => {
     const [founderId, setFounderId] = useState("");
     const [founder, setFounder] = useState("");
     const [currentIdeas, setCurrentIdeas] = useState([]);
-    const [members, setMembers] = useState([""]);
+    const [members, setMembers] = useState([]);
     const [minMembers, setMinMembers] = useState(0);
     const [maxMembers, setMaxMembers] = useState(0);
     const [date, setDate] = useState("");
@@ -105,11 +106,12 @@ export default CourseScreen = ({route, navigation}) => {
                         setMembers(newMembersList);
                     });
                 }
+            } else {
+                setMembers([]);
             }
             DB.getUserInfoById (data.founder, (userName, userImage, bio, email) => {
                 setFounder(userName);
             });
-    
         });
     }
 
@@ -225,7 +227,6 @@ export default CourseScreen = ({route, navigation}) => {
                 console.log("Joined");
                 setUserIsMember(true);
                 getCourseData();
-
             }, () => {console.log("error")})
         } else {
             DB.exitCourse(itemId, () => {
@@ -286,22 +287,6 @@ export default CourseScreen = ({route, navigation}) => {
 
                 </View>
             </Modal>
-
-            {/* // Error Popup */}
-            <Modal visible={errorVisibility} transparent = {true}>
-                <View style={styles.errorView}>
-                    <View style={styles.errorContainer}>
-                        <Text style= { texts.headlineCenter } >
-                            {currentWarning}
-                        </Text>
-                        <ButtonSimple
-                            title='OK'
-                            onClick={() => setErrorVisibility(false)}
-                            style= { buttons.buttonSimple }
-                        />
-                    </View>
-                </View>
-            </Modal>
             
             {/* // Idee hinzufügen */}
             <Modal visible={addIdeaVisibility} animationType='slide'>
@@ -359,6 +344,23 @@ export default CourseScreen = ({route, navigation}) => {
                                             setAddIdeaVisibility(false); } }
                                     />
                                 </View>
+
+                                {/* // Error Popup */}
+                                <Modal visible={errorVisibility} transparent = {true}>
+                                    <View style={styles.errorView}>
+                                        <View style={styles.errorContainer}>
+                                            <Text style= { texts.headlineCenter } >
+                                                {currentWarning}
+                                            </Text>
+                                            <ButtonSimple
+                                                title='OK'
+                                                onClick={() => setErrorVisibility(false)}
+                                                style= { buttons.buttonSimple }
+                                            />
+                                        </View>
+                                    </View>
+                                </Modal>
+
                             </View>
                         )
                     }}
@@ -480,14 +482,14 @@ export default CourseScreen = ({route, navigation}) => {
                                     ideaId={itemData.item.id} 
                                     courseId={itemId} 
                                     backgroundColor={itemData.item.id == currentFav ? lightGrey : "#222f56"}
-                                    iconColor={itemData.item.id == currentFav ? darkGrey : "white"}
+                                    iconColor={itemData.item.id == currentFav ? lightBlue : "white"}
                                     onClick={() => {addFavHandler(itemData.item.id)}}
                                 />
                                 <NogoButton 
                                     ideaId={itemData.item.id} 
                                     courseId={itemId} 
                                     backgroundColor={itemData.item.id == currentNogo ? lightGrey : "#640023"}
-                                    iconColor={itemData.item.id == currentNogo ? darkGrey : "white"}
+                                    iconColor={itemData.item.id == currentNogo ? lightBlue : "white"}
                                     onClick={() => {addNogoHandler(itemData.item.id)}}
                                 />
                             </View>

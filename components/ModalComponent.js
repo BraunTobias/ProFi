@@ -6,7 +6,7 @@ import { styles, texts, lightGrey } from "../Styles"
 export default ModalComponent = props => {
     return (
         <TouchableWithoutFeedback onPress= { () => Keyboard.dismiss() }>
-            <View style={{backgroundColor: lightGrey}}>
+            <View style={{flex: 1, backgroundColor: lightGrey}}>
                 <View style= { styles.headerFake }>
                     <Text style= { texts.header }>{ props.title }</Text>
                 </View>

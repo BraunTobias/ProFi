@@ -1,6 +1,6 @@
 import React , {useState, useEffect} from "react";
 import { StyleSheet, Text, TouchableOpacity, View, Image } from "react-native";
-import {Ionicons} from '@expo/vector-icons';
+import { icons } from '../Styles';
 import DB from '../api/DB_API';
 
 export default CommentTile = props => {
@@ -8,7 +8,7 @@ export default CommentTile = props => {
   const userId = props.userId;
   const date = props.timestamp.toDate().toLocaleDateString('de-DE');
   const [currentUserName, setCurrentUserName] = useState("");
-  const [currentUserImageUrl, setCurrentUserImageUrl] = useState("https://firebasestorage.googleapis.com/v0/b/teamfinder-be2e3.appspot.com/o/images%2Fempty.png?alt=media&token=454a1213-54e0-4402-a5e9-9cfa98901980");
+  const [currentUserImage, setCurrentUserImage] = useState(icons.profilePlaceholder);
 
   const colorStyle = {
     backgroundColor: props.backgroundColor
@@ -17,7 +17,7 @@ export default CommentTile = props => {
   useEffect(() => {
     DB.getUserInfoById(userId, (name, imageUrl) => {
       setCurrentUserName(name);
-      setCurrentUserImageUrl(imageUrl);
+      if (imageUrl) setCurrentUserImage({ uri: imageUrl});
       console.log(name, imageUrl);
     });
   }, []);
@@ -26,7 +26,7 @@ export default CommentTile = props => {
     <View style={[styles.itemContainer, colorStyle]}>
       <TouchableOpacity onPress={() => props.onClick(userId)} >
         <Image style={styles.profileImage}
-          source={{ uri: currentUserImageUrl}} 
+          source={currentUserImage} 
         />
       </TouchableOpacity>
       <View style={{width: "80%", justifyContent: "center", alignItems: "flex-start", paddingStart: 15}}>

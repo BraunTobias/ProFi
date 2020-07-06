@@ -1,17 +1,14 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { View, Text, Modal } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { BackHandler } from 'react-native';
 import DB from '../api/DB_API';
-//import { LogInContext } from '../data/LogInContext';
-import Button from '../components/Button';
 import ButtonSimple from '../components/ButtonSimple';
 import InputTile from '../components/InputTile';
 import { styles, texts, buttons } from '../Styles';
 
 
 export default LoginScreen = ({navigation}) => {
-    //const [authentication, setAuthentication, user, setUser] = useContext(LogInContext);
     const [currentMail, setCurrentMail] = useState("");
     const [currentPW, setCurrentPW] = useState("");
     const [errorVisibility, setErrorVisibility] = useState(false);
@@ -31,8 +28,6 @@ export default LoginScreen = ({navigation}) => {
         //console.log(currentMail + " " + currentPW)
         DB.logIn(currentMail, currentPW, (error) => { setErrorVisibility(true) });
     }
-
-    // tobias.braun@haw-hamburg.de
 
     return(
         <View style={styles.content}>

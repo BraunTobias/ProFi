@@ -1,8 +1,6 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import {Ionicons} from '@expo/vector-icons';
-
-import DB from "../api/DB_API";
 
 export default DeleteCourseButton = props => {
   return (
@@ -17,7 +15,7 @@ export default DeleteCourseButton = props => {
             color={"white"}/>
         </View>
     </TouchableOpacity>
-);
+  );
 };
 
 const styles = StyleSheet.create({

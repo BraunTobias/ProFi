@@ -1,7 +1,7 @@
 import React from 'react';
-import  {createStackNavigator} from '@react-navigation/stack';
+import {createStackNavigator} from '@react-navigation/stack';
 import ProfileScreen from '../screens/ProfileScreen';
-import AttributeScreen from '../components/AttributeScreen';
+import AttributeScreen from '../screens/AttributeScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { styles, texts, white, iconsize } from '../Styles'
 

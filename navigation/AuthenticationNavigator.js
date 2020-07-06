@@ -17,7 +17,7 @@ export default AuthenticationNavigator = () => {
                 headerBackImage: (()=>{return(<Ionicons name={'ios-arrow-back'} size={iconsize} color={white} />)})
             }}>
                 <AuthenticationStack.Screen name = "Login" component= {LoginScreen} options={{headerTitle: 'Login', headerTitleStyle: texts.header}}/>
-                <AuthenticationStack.Screen name = "Registration" component = {RegistrationScreen} options={{headerTitle: 'Registrieren', headerBackTitle: ' ' , headerTitleStyle: texts.header}}/>
+                <AuthenticationStack.Screen name = "Registration" component = {RegistrationScreen} options={{headerTitle: 'Registrieren', headerBackTitleVisible: false, headerLeftContainerStyle: {paddingHorizontal: 10}, headerTitleStyle: texts.header}}/>
             </AuthenticationStack.Navigator>
         </NavigationContainer>
     );

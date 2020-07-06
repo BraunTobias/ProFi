@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import {FlatList, View, Text, RefreshControl} from "react-native";
-import {SKILLS} from'../data/dummy-data';
-import SkillsTile from './SkillsTile';
-import CategoryIcon from './CategoryIcon';
-import {Button} from 'react-native-elements';
-import {Ionicons} from '@expo/vector-icons';
-import { Icon } from 'react-native-elements';
-import { TouchableHighlight } from 'react-native-gesture-handler';
-import { styles, buttons, texts, white, lightGrey, grey, black, iconsize, iconsizeAdd } from '../Styles';
+import {FlatList, View, Text} from "react-native";
+import SkillsTile from '../components/SkillsTile';
+import CategoryIcon from '../components/CategoryIcon';
+import { styles, texts } from '../Styles';
 import DB from '../api/DB_API';
 
 export default AttributeScreen = ({route, navigation}) => {
@@ -16,17 +11,7 @@ export default AttributeScreen = ({route, navigation}) => {
     const [currentCategory, setCurrentCategory] = useState("");
     const [categoriesList, setCategoriesList] = useState([]);
     const [displayedSkills, setDisplayedSkills] = useState([]);
-    // const displayedSkills = SKILLS.filter(item => item.category === currentCategory);
-    
-    // const updateSelectedSkillsList = (text) => {
-    //     // var list = props.selectedSkillsList;
-    //     // if (list.indexOf(text) <= 0) {
-    //     //     list.push(text);
-    //     // } else {
-    //     //     list = list.filter(item => item !== text);
-    //     // }
-    //     props.addSelectedSkill(text);
-    // }    
+
     useEffect(() => {
         DB.getCategoriesFromAttribute(attributeType, (categoriesList) => {
             console.log(categoriesList);
@@ -71,7 +56,6 @@ export default AttributeScreen = ({route, navigation}) => {
                                             onClick={() => {clickCategoryHandler(itemData.item)}} 
                                             title={itemData.item}
                                             isActive={currentCategory == itemData.item}
-                                            // imageUrl={itemData.item.imageUrl}
                                         />
                                     );
                                 }}
@@ -87,7 +71,6 @@ export default AttributeScreen = ({route, navigation}) => {
                     keyExtractor={(item, index) => item[0] }
                     renderItem={(itemData) => { 
                         return (
-                            // FlatList
                             <SkillsTile
                                 text={itemData.item[0]}  
                                 state={itemData.item[1]}

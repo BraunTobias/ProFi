@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     View, 
     Modal, 
@@ -8,56 +8,39 @@ import {
     TextInput, 
     Keyboard, 
     Alert, 
-    Image, 
-    StyleSheet } from 'react-native';
+    Image } from 'react-native';
 import Button from '../components/Button';
-import { Ionicons } from "@expo/vector-icons";
-import { Camera } from "expo-camera";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as Permissions from "expo-permissions";
 import * as ImagePicker from "expo-image-picker"
-import { LogInContext } from '../data/LogInContext';
-import { FunctionsScreen } from './#FunctionsScreen';
 import DB from '../api/DB_API';
-import { styles, buttons, texts, profileImage, lightGrey } from '../Styles'
-
+import { styles, buttons, texts, profileImage, icons } from '../Styles'
 
 export default ProfileScreen =  ({navigation})  => {
-    // const [authentication, setAuthentication, user, setUser] = useContext(LogInContext);
     const [currentName, setCurrentName] = useState("");
     const [currentBio, setCurrentBio] = useState("");
     const [currentMail, setCurrentMail] = useState("");
-    const [currentPW, setCurrentPW] = useState("");
-    const [acknowledgementVisibility, setAcknowledgementVisibility] = useState(false);
-    // const [currentFunctions, setCurrentFunctions] = useState(user.functions);
-    // const [currentInterests, setCurrentInterests] = useState(user.interests);
-    const [functionsVisibility, setFunctionsVisibility] = useState(false);
-    const [interestsVisibility, setInterestsVisibility] = useState(false);
     const [changesSaved, setChangesSaved] = useState(true);
     const [skillString, setSkillString] = useState("");
-    const [prefString, setPrefString] = useState("");
-
-  
+    const [currentImage, setCurrentImage] = useState(icons.profilePlaceholder);
+ 
     // Wird nur beim Laden der Seite einmalig ausgeführt
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             loadData();
-        });
+        });    
     }, []);
 
     const loadData = () => {
         DB.getUserInfo((data) => {
-            // setCurrentIdeas(ideasList);
             console.log(data);
             setCurrentName(data.username);
             setCurrentBio(data.bio);
             setCurrentMail(data.email);
-            setCurrentPW(data.password);
-            setSelectedImage({localUri: data.image});
+            if (data.image) setCurrentImage({uri: data.image});
         });
         DB.userAttributesToString((skills, prefs) => {
             setSkillString(skills);
-            setPrefString(prefs);
         });
     }
         
@@ -70,34 +53,12 @@ export default ProfileScreen =  ({navigation})  => {
         setChangesSaved(false);
         setCurrentBio(enteredText);
     };
-    // const changeMailHandler = (enteredText) => {
-    //     setCurrentMail(enteredText);
-    // };
-    // const changePWHandler = (enteredText) => {
-    //     setCurrentPW(enteredText);
-    // };
-    // const changeFunctionsHandler = (updatedFunctions) => {
-    //     setCurrentFunctions(updatedFunctions);
-    // }
-    // const changeInterestsHandler = (updatedInterests) => {
-    //     setCurrentInterests(updatedInterests);
-    // }
     const commitChangesHandler = () => {
         DB.changeUsername(currentName, currentBio);
         setChangesSaved(true);
-        // DB.changeEmail(currentMail, (error, oldMail) => {
-        //     console.log(error + ", alte Adresse wird beibehalten: " + oldMail)
-        //     setCurrentMail(oldMail);
-        // });
-        // DB.changePassword(currentPW, (error, oldPW) => {
-        //     console.log(error + ", altes Passwort wird beibehalten: " + oldPW)
-        //     setCurrentPW(oldPW);
-        // });
-        // DB.logIn(currentMail, currentPW, () => {});
     }
+
     // Profilbild
-    // const [imagePickerVisibility, setImagePickerVisibility] = useState(false);
-    const [selectedImage, setSelectedImage] = useState({});
     const verifyPermissions = async (permission) => {
         const result = await Permissions.askAsync(permission);
         if (result.status !== "granted") {
@@ -117,7 +78,7 @@ export default ProfileScreen =  ({navigation})  => {
     
         let pickerResult = await ImagePicker.launchImageLibraryAsync();
         if (pickerResult.cancelled === true) return;
-        setSelectedImage({ localUri: pickerResult.uri });
+        setCurrentImage({ uri: pickerResult.uri });
         const smallImage = await ImageManipulator.manipulateAsync(
             pickerResult.uri,
             [{ resize: { height: 400 } }],
@@ -148,7 +109,7 @@ export default ProfileScreen =  ({navigation})  => {
                     <TouchableOpacity onPress={selectImageHandler}>
                         <Image 
                             style={[profileImage.imageTile, profileImage.cameraPreview]} 
-                            source={{ uri: selectedImage.localUri}} 
+                            source={currentImage} 
                         />
                     </TouchableOpacity>
                 </View>
@@ -203,7 +164,6 @@ export default ProfileScreen =  ({navigation})  => {
                         onClick={() => {DB.signOut(() => {console.log("Signed Out")});}}
                         icon= {"exit"}
                     />
-
                 </View>
             </View>  
             {/* Meine Fähigkeiten */}

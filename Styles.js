@@ -3,12 +3,10 @@ import { StyleSheet, Dimensions } from "react-native";
 const width = Dimensions.get('window').width; //full width
 
 const darkBlue = '#222f56';
-const lightBlue = '#f5f7f7';
+const lightBlue = '#aeb8c3';
 const lightGrey = '#f2f3f4';
-const grey = '#bdc6cf';
-const darkGrey = '#aeb8c3';
+const darkGrey = '#333333';
 const red = '#640023';
-const black = '#333333';
 const white = 'white';
 
 const iconsize = 35;
@@ -24,17 +22,16 @@ const styles = StyleSheet.create({
     },
 
     row: {
-        // flex: 1,
-        marginTop: 20,
+        width: "100%",
+        // marginTop: 20,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingHorizontal: padding,
     },
     paddedRow: {
-        // flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
         paddingHorizontal: 15,
+        marginTop: 20
     },
 
     column: {
@@ -58,22 +55,17 @@ const styles = StyleSheet.create({
     },
 
     subHeader: {
-        backgroundColor: darkGrey,
-        paddingVertical: 15
-    },
-
-    subHeaderIdea: {
-        // paddingHorizontal: 15,
-        backgroundColor: darkGrey,
+        backgroundColor: lightBlue,
         paddingVertical: 15
     },
 
     subHeaderProfile: {
         padding: 15, 
+        paddingVertical: 25, 
         flexDirection: "row", 
         justifyContent: 'flex-start', 
         alignItems: 'flex-start', 
-        backgroundColor: darkGrey
+        backgroundColor: lightBlue
     },
 
     contentProfile: {
@@ -100,14 +92,10 @@ const styles = StyleSheet.create({
 
     contentAttribute: {
         flex: 1,
-        // height: "90%",
-        // padding: "5%",
         justifyContent: "space-evenly",
-        // backgroundColor: white
     },
 
     headerRow: {
-        // flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between', 
         alignItems: 'stretch',
@@ -115,12 +103,10 @@ const styles = StyleSheet.create({
     },
 
     membersRow: {
-        // flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between', 
         alignItems: 'stretch',
-        // height: 100,
-        paddingVertical: 15, 
+        // paddingVertical: 15, 
     },
 
     commentRow: {
@@ -128,7 +114,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: padding,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        flex: 0,
+        // flex: 1,
+        // height: 50,
         alignItems: 'flex-end',
     },
 
@@ -138,7 +125,6 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start', 
         alignItems: 'flex-start',
         marginHorizontal: 20,
-        // backgroundColor: lightBlue
     },
 
     contentFake: {
@@ -161,12 +147,9 @@ const styles = StyleSheet.create({
 
     scrollView: {
         width: '100%', 
-        paddingTop: 50,
-
-        //marginTop: 20,
-        //paddingTop: 20,
-        // backgroundColor: '#f5f7f7',
         height: '100%',
+        paddingVertical: "10%",
+        // flexGrow: 1
     },
 
     center: {
@@ -177,7 +160,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start', 
         alignItems: 'flex-start',
         marginBottom: 10,
-        minWidth: 250,
+        // minWidth: 250,
         maxWidth: "100%",
     },
 
@@ -205,7 +188,7 @@ const styles = StyleSheet.create({
 
     datepicker: {
         backgroundColor: white,
-        borderBottomColor: grey,
+        borderBottomColor: lightBlue,
         borderBottomWidth: 1,
         marginVertical: 1,
         marginHorizontal: 0,
@@ -315,12 +298,12 @@ const texts = StyleSheet.create({
 
     text: {
         fontSize: 18,
-        color: black
+        color: darkGrey
     },
 
     textProfile: {
         fontSize: 18,
-        color: black,
+        color: darkGrey,
         marginTop: 15
     },
 
@@ -334,8 +317,7 @@ const texts = StyleSheet.create({
 
     textAttribute: {
         fontSize: 18,
-        // fontWeight: "bold",
-        color: black,
+        color: darkGrey,
         lineHeight: 25,
         textAlign: "justify",
         paddingVertical: 7,
@@ -344,20 +326,20 @@ const texts = StyleSheet.create({
     
     textBold: {
         fontSize: 18,
-        color: black,
+        color: darkGrey,
         fontWeight: "bold"
     },
 
     headlineCenter: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: black,
+        color: darkGrey,
         textAlign: 'center'
     },
 
     inputText: {
         fontSize: 18,
-        color: black,
+        color: darkGrey,
         backgroundColor: white,
         width: "100%",
         paddingVertical: 5,
@@ -368,7 +350,7 @@ const texts = StyleSheet.create({
 
     inputTextProfile: {
         fontSize: 24,
-        color: black,
+        color: darkGrey,
         fontWeight: "bold"
     },
     
@@ -390,7 +372,7 @@ const texts = StyleSheet.create({
     buttonGrey: {
         fontSize: 17, 
         fontWeight: 'bold',
-        color: black,
+        color: darkGrey,
     },
 })
 
@@ -417,9 +399,9 @@ const profileImage = {
 }
 
 const icons = {
-    profilePlaceholder: require("./assets/profile.png"),
-    checkTrue: require("./assets/check-true.png"),
-    checkFalse: require("./assets/check-false.png"),
+    profilePlaceholder: require("./assets/icons/user.png"),
+    checkTrue: require("./assets/icons/check-true.png"),
+    checkFalse: require("./assets/icons/check-false.png"),
     home: require("./assets/icons/home.png"),
     profile: require("./assets/icons/profile.png"),
     plus: require("./assets/icons/plus.png"),
@@ -429,4 +411,4 @@ const icons = {
     nogo: require("./assets/icons/nogo.png"),
 }
 
-export { styles, buttons, texts, darkBlue, lightBlue, darkGrey, grey, lightGrey, white, black, iconsize, iconsizeAdd, icons, profileImage }
+export { styles, buttons, texts, darkBlue, lightBlue, lightGrey, white, darkGrey, iconsize, iconsizeAdd, icons, profileImage }

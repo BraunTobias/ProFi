@@ -1,14 +1,10 @@
-import React, { useContext, useState } from 'react';
-import { View, TextInput, Text, Modal } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Modal } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import Button from '../components/Button';
-//import { LogInContext } from '../data/LogInContext';
-//import { USERS } from '../data/dummy-data'
 import DB from '../api/DB_API';
 import { styles, buttons, texts } from '../Styles';
 
 export default RegistrationScreen = ({navigation}) => {
-    //const [authentication, setAuthentication, user, setUser] = useContext(LogInContext);
     const [currentName, setCurrentName] = useState("");
     const [currentMail, setCurrentMail] = useState("");
     const [currentPW, setCurrentPW] = useState("");

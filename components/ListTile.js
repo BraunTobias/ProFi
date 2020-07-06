@@ -1,10 +1,7 @@
 import React from "react";
-import { StyleSheet, Text, Image, TouchableOpacity, TouchableHighlight, View } from "react-native";
+import { StyleSheet, Text, Image, TouchableHighlight, View } from "react-native";
 import {Ionicons} from '@expo/vector-icons';
-import {MaterialIcons} from '@expo/vector-icons';
-import FavButton from './FavButton';
-import NogoButton from './NogoButton';
-import { styles, buttons, texts, white, lightGrey, grey, black, iconsize, iconsizeAdd, darkGrey, icons, darkBlue } from '../Styles';
+import { white, lightGrey, darkGrey, icons, darkBlue } from '../Styles';
 
 export default ListTile = props => {
 
@@ -12,8 +9,6 @@ export default ListTile = props => {
   const colorStyle = {
     backgroundColor: bgColor
   }
-  var iconName = "";
-
   const PrefIcon = () => {
     if (props.isFavourite) {
       return (
@@ -52,12 +47,10 @@ export default ListTile = props => {
               <PrefIcon/>
               <Text style = {[stylesFile.title, {color: props.myTeam ? white : darkBlue}]}>{props.title}</Text>
             </View>
-            <Text numberOfLines={2} ellipsizeMode="tail" style = {[stylesFile.subtitle, {color: props.myTeam ? white : black}]}>{props.subtitle}</Text>
+            <Text numberOfLines={2} ellipsizeMode="tail" style = {[stylesFile.subtitle, {color: props.myTeam ? white : darkGrey}]}>{props.subtitle}</Text>
         </View>
         <View style={{flex: 1, justifyContent: "center", alignItems: "center", paddingEnd: 15}}>
             <Image style={stylesFile.arrow} source={require("../assets/icons/arrow-right.png")} resizeMode="contain"/>
-            {/* <Ionicons name="ios-arrow-forward" size={60} color={"#dae1e5"}/> */}
-            {/* <Ionicons name="chevron-forward-outline" size="50" color="white" />; */}
         </View>
       </View>
     </TouchableHighlight>
@@ -70,7 +63,6 @@ const stylesFile = StyleSheet.create({
     paddingLeft: 15,
     height: 100,
     width: "100%",
-    // marginVertical: 2
   },
   title: {
     fontSize: 22,

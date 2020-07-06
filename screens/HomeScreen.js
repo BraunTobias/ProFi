@@ -1,5 +1,5 @@
 import React, {useState, useLayoutEffect, useEffect}from "react";
-import { Modal, View, TextInput, Text } from "react-native";
+import { Modal, View, Text } from "react-native";
 import { SwipeListView } from 'react-native-swipe-list-view';
 import NumericInput from 'react-native-numeric-input'
 import { Ionicons } from '@expo/vector-icons';
@@ -9,10 +9,8 @@ import InputTile from "../components/InputTile";
 import ListTile from "../components/ListTile";
 import Button from '../components/Button';
 import DeleteCourseButton from "../components/DeleteCourseButton";
-import ModalDatePicker from 'react-native-datepicker-modal'
-import { styles, buttons, texts, white, lightGrey, darkBlue, iconsizeAdd, lightBlue, darkGrey } from "../Styles"
+import { styles, buttons, texts, white, lightGrey, darkBlue, iconsizeAdd, lightBlue } from "../Styles"
 import DatePicker from "react-native-datepicker";
-import ProFiFunction from "../api/ProFiFunction";
 
 export default HomeScreen = ({navigation}) => {
     const currentUserId = DB.getCurrentUserId();
@@ -40,10 +38,7 @@ export default HomeScreen = ({navigation}) => {
   
     // Wird nur beim Laden der Seite einmalig ausgeführt
     useEffect(() => {
-        
         console.ignoredYellowBox = ['Setting a timer'];
-        // DB.fillAttributesList();
-        // DB.updateAttributesList();
         const unsubscribe = navigation.addListener('focus', () => {
             DB.getCourseList((courseList) => {
                 // console.log(courseList);
@@ -58,6 +53,8 @@ export default HomeScreen = ({navigation}) => {
             });
         });
         // DB.createTestCourse();
+        // DB.fillAttributesList();
+        // DB.updateAttributesList();
     }, []);
 
     // Button fürs Hinzufügen neuer Kurse
@@ -73,7 +70,6 @@ export default HomeScreen = ({navigation}) => {
     }, [navigation]);
     
     const clickHandler = (id, title) => {
-        // DB.signOut(() => {console.log("SIGNED OUT");});
         swipeListView.safeCloseOpenRow();
         const isMember = joinedCourses.indexOf(id) >= 0
         navigation.navigate("Course", {itemId: id, itemTitle: title, isMember: isMember});
@@ -148,21 +144,6 @@ export default HomeScreen = ({navigation}) => {
         }
         if (currentMaxMembers >= currentMinMembers) setMaxMembersError("");
     }
-    
-    //Modal für Datum
-    // const datePicker = () => (
-    //     <ModalDatePicker
-    //       style={styles.datepicker}
-    //       renderDate={({ year, month, day, date }) => {
-    //         if (!date) {
-    //           return <Text style={[styles.text, styles.placeholderText]}>Datum eingeben</Text>
-    //         }
-
-    //         const dateStr = `${day}-${month}-${year}`
-    //         return <Text style={styles.text}>{dateStr}</Text>
-    //       }}
-    //     />
-    //   )
 
     const setDateHandler = (enteredDate) => {
         if (enteredDate) {
@@ -209,31 +190,8 @@ export default HomeScreen = ({navigation}) => {
                 }
                 setJoinedCourses(joined);
             });
-            // console.log("HEEEEY");
-            // var courseList = currentCourses;
-            // var removeIndex = courseList.map((course) => { return course.id; }).indexOf(id);
-            // courseList.splice(removeIndex, 1);
-            // setCurrentCourses(courseList);
         });
     };
-
-    // const joinCourseHandler = (courseId) => {
-    //     swipeListView.safeCloseOpenRow();
-    //     if (joinedCourses.indexOf(courseId) < 0) {
-    //         DB.joinCourse(courseId, () => {
-    //             const joinedList = joinedCourses;
-    //             joinedList.push(courseId);    
-    //             console.log(joinedList);
-    //             setJoinedCourses(joinedList);
-    //         }, () => {})
-    //     } else {
-    //         DB.exitCourse(courseId, () => {
-    //             const newJoinedList = joinedCourses.filter(course => course !== courseId);
-    //             setJoinedCourses(newJoinedList);
-    //             console.log("Ausgetreten" + newJoinedList);
-    //         })
-    //     }
-    // }
 
     return (
         <View style={{flex: 1}}>
@@ -265,42 +223,45 @@ export default HomeScreen = ({navigation}) => {
                                     <Text>
                                         { idError }
                                     </Text>
-                                    <View style= { styles.loginInput } >
-                                        <Text style= { [texts.buttonGrey, {paddingBottom: 5}] } >Minimale Mitgliederzahl</Text>
-                                        <NumericInput 
-                                            onChange={(text) => { setMinMaxMembersHandler(text, true) }} 
-                                            minValue = { 0 }
-                                            maxValue= { 20 }
-                                            rounded
-                                            totalHeight={45} 
-                                            containerStyle={{borderWidth: 0, backgroundColor: white}}
-                                            separatorWidth={0}
-                                            rightButtonBackgroundColor={darkGrey}
-                                            leftButtonBackgroundColor={darkGrey}
-                                            inputStyle={{fontWeight: "bold"}}
-                                        />
-                                        <Text>
-                                            { minMembersError }
-                                        </Text>
+                                    <View style={styles.row}>
+                                        <View >
+                                            <Text style= { [texts.buttonGrey, {paddingBottom: 5}] } >Mitglieder min.</Text>
+                                            <NumericInput 
+                                                onChange={(text) => { setMinMaxMembersHandler(text, true) }} 
+                                                minValue = { 0 }
+                                                maxValue= { 20 }
+                                                rounded
+                                                totalHeight={45} 
+                                                containerStyle={{borderWidth: 0, backgroundColor: white}}
+                                                separatorWidth={0}
+                                                rightButtonBackgroundColor={lightBlue}
+                                                leftButtonBackgroundColor={lightBlue}
+                                                inputStyle={{fontWeight: "bold"}}
+                                            />
+                                            <Text>
+                                                { minMembersError }
+                                            </Text>
+                                        </View>
+                                        <View style= { styles.loginInput } >
+                                            <Text style= { [texts.buttonGrey, {paddingBottom: 5}] }  >Mitglieder max.</Text>
+                                            <NumericInput 
+                                                onChange={(text) => { setMinMaxMembersHandler(text, false) }} 
+                                                minValue = { 0 }
+                                                maxValue= { 20 }
+                                                rounded
+                                                totalHeight={45} 
+                                                containerStyle={{borderWidth: 0, backgroundColor: white}}
+                                                separatorWidth={0}
+                                                rightButtonBackgroundColor={lightBlue}
+                                                leftButtonBackgroundColor={lightBlue}
+                                                inputStyle={{fontWeight: "bold"}}
+                                            />
+                                            <Text>
+                                                { maxMembersError }
+                                            </Text>
+                                        </View>
                                     </View>
-                                    <View style= { styles.loginInput } >
-                                        <Text style= { [texts.buttonGrey, {paddingBottom: 5}] }  >Maximale Mitgliederzahl</Text>
-                                        <NumericInput 
-                                            onChange={(text) => { setMinMaxMembersHandler(text, false) }} 
-                                            minValue = { 0 }
-                                            maxValue= { 20 }
-                                            rounded
-                                            totalHeight={45} 
-                                            containerStyle={{borderWidth: 0, backgroundColor: white}}
-                                            separatorWidth={0}
-                                            rightButtonBackgroundColor={darkGrey}
-                                            leftButtonBackgroundColor={darkGrey}
-                                            inputStyle={{fontWeight: "bold"}}
-                                        />
-                                        <Text>
-                                            { maxMembersError }
-                                        </Text>
-                                    </View>
+
                                     <View style= { styles.loginInput } >
                                         <Text style= { texts.buttonGrey } >Enddatum (optional)</Text>
                                             <DatePicker
@@ -324,16 +285,6 @@ export default HomeScreen = ({navigation}) => {
                                                         fontWeight: "bold",
                                                         fontSize: 22
                                                     }
-                                                    
-                                                    // dateIcon: {
-                                                    //   position: 'absolute',
-                                                    //   left: 0,
-                                                    //   top: 4,
-                                                    //   marginLeft: 0
-                                                    // },
-                                                    // dateInput: {
-                                                    //   marginLeft: 36
-                                                    // }
                                                 }}
                                                 onDateChange={(date) => { setDateHandler(date)}}
                                             />
@@ -342,7 +293,7 @@ export default HomeScreen = ({navigation}) => {
                                         </Text>
                                     </View>
                                 </View>
-                                <View style= { styles.row } >
+                                <View style= { styles.paddedRow } >
                                     <Button 
                                         buttonStyle= { buttons.buttonRow }
                                         titleStyle= { texts.buttonBlueCenter }
@@ -452,7 +403,6 @@ export default HomeScreen = ({navigation}) => {
                 }}
                 leftOpenValue={75}
             />
-
         </View>
   );
 };

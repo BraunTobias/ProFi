@@ -1,12 +1,9 @@
-import React, {useState, useLayoutEffect, useCallback} from "react";
+import React, {useState} from "react";
 import { StyleSheet, Text, TouchableOpacity, Image} from "react-native";
-import {Ionicons} from '@expo/vector-icons';
-import checkfalse from '../assets/check-false.png';
-import checktrue from '../assets/check-true.png';
-import { black, darkGrey, icons } from "../Styles";
+import { darkGrey, lightBlue, icons } from "../Styles";
 
 export default SkillsTile = props => {
-  const [currentIcon, setCurrentIcon] = useState(props.state ? checktrue : checkfalse);
+  const [currentIcon, setCurrentIcon] = useState(props.state ? icons.checkTrue : icons.checkFalse);
   const [currentIconState, setCurrentIconState] = useState(props.state);
   const [currentIconSize, setCurrentIconSize] = useState(36);
 
@@ -14,12 +11,12 @@ export default SkillsTile = props => {
   const changeIconHandler = () => {
     
     if (currentIconState) {
-      setCurrentIcon(checkfalse)
+      setCurrentIcon(icons.checkFalse)
       setCurrentIconSize(30)
       setCurrentIconState(false)
     }
     else {
-      setCurrentIcon(checktrue)
+      setCurrentIcon(icons.checkTrue)
       setCurrentIconSize(36)
       setCurrentIconState(true)
     }
@@ -36,15 +33,8 @@ export default SkillsTile = props => {
             source={currentIcon}
             style={styles.checkmark}
           />
-        {/* <Ionicons
-            raised
-            name={currentIcon} 
-            size={currentIconSize} 
-            type="ionicon"
-            color={"tomato"}
-        /> */}
         <Text 
-          style = {[styles.tileText, {color: currentIconState ? black : darkGrey}]}
+          style = {[styles.tileText, {color: currentIconState ? darkGrey : lightBlue}]}
         > {props.text} </Text>
     </TouchableOpacity>
   );
@@ -66,7 +56,7 @@ const styles = StyleSheet.create({
       fontSize: 16,
       fontWeight: 'bold',
       textAlign: 'right',
-      color: black
+      color: darkGrey
   },
   checkmark: {
     width: 22,

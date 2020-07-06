@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import {FlatList, View, Text, RefreshControl} from "react-native";
-import {SKILLS} from'../data/dummy-data';
+import {FlatList, View, Text} from "react-native";
 import SkillsTile from './SkillsTile';
 import CategoryIcon from './CategoryIcon';
-import {Button} from 'react-native-elements';
-import {Ionicons} from '@expo/vector-icons';
-import { Icon } from 'react-native-elements';
-import { TouchableHighlight } from 'react-native-gesture-handler';
-import { styles, buttons, texts, white, lightGrey, grey, black, iconsize, iconsizeAdd } from '../Styles';
+import { styles, texts } from '../Styles';
 import DB from '../api/DB_API';
 
 export default AttributeSelect = props => {

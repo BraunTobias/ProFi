@@ -1,7 +1,6 @@
-import React, {useState} from "react";
-import { StyleSheet, Text, TouchableOpacity, View, Image } from "react-native";
+import React from "react";
+import { StyleSheet, TouchableOpacity, Image } from "react-native";
 import { icons } from '../Styles';
-import DB from "../api/DB_API";
 
 export default FavButton = props => {
   

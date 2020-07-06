@@ -1,7 +1,6 @@
-import React , {useState, useEffect} from "react";
-import { StyleSheet, Text, TouchableOpacity, View, Image } from "react-native";
+import React  from "react";
+import { StyleSheet, TouchableOpacity, Image } from "react-native";
 import { icons } from '../Styles';
-import DB from '../api/DB_API';
 
 export default ProfileImageTile = props => {
 
@@ -24,6 +23,7 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     aspectRatio: 1, 
     height: 70,
-    backgroundColor: "#aeb8c3"
+    backgroundColor: "#aeb8c3",
+    marginTop: 15, 
   },
 });
