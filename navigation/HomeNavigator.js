@@ -18,9 +18,9 @@ export default HomeNavigator = () => {
             headerBackImage: (()=>{return(<Ionicons style={styles.backIcon} name={'ios-arrow-back'} size={iconsize} color={white} />)})
         }}>
             <HomeStack.Screen name = "Home" component= {HomeScreen} options={{headerTitle: 'Meine Kurse', headerTitleStyle: texts.header}}/>
-            <HomeStack.Screen name = "Course" component = {CourseScreen} options={{headerTitle: 'Kurs', headerBackTitleVisible: false, headerLeftContainerStyle: {paddingHorizontal: 10}}}/>
-            <HomeStack.Screen name = "Project" component= {IdeaScreen} options={{headerTitle: 'Idee', headerBackTitleVisible: false, headerLeftContainerStyle: {paddingHorizontal: 10}}}/>
-            <HomeStack.Screen name = "IdeaSkills" component= {AttributeListScreen} options={{headerTitle: 'Passende Fähigkeiten', headerBackTitleVisible: false, headerLeftContainerStyle: {paddingHorizontal: 10}}}/>
+            <HomeStack.Screen name = "Course" component = {CourseScreen} options={{headerTitle: 'Kurs', headerBackTitleVisible: false, headerLeftContainerStyle: {marginHorizontal: 10}}}/>
+            <HomeStack.Screen name = "Project" component= {IdeaScreen} options={{headerTitle: 'Idee', headerBackTitleVisible: false, headerLeftContainerStyle: {marginHorizontal: 10}}}/>
+            <HomeStack.Screen name = "IdeaSkills" component= {AttributeListScreen} options={{headerTitle: 'Passende Fähigkeiten', headerBackTitleVisible: false, headerLeftContainerStyle: {paddingLeft: 10}}}/>
 
         </HomeStack.Navigator>
     );

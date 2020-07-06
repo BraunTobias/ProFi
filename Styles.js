@@ -285,9 +285,8 @@ const texts = StyleSheet.create({
         letterSpacing: 0.5,
         fontFamily: 'Inter_700Bold',
         color: white,
-        marginLeft: (Platform.OS === 'android') ? -30 : 0,
+        marginLeft: (Platform.OS === 'android') ? -15 : 0,
         alignSelf: (Platform.OS === 'android') ? 'flex-start' : 'center'
-
     },
 
     headline: {

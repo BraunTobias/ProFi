@@ -85,7 +85,6 @@ const DB = {
                 });
             }
         }
-        
     },
 
     // Einloggen

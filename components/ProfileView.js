@@ -33,7 +33,7 @@ export default ProfileView = props => {
     }, []);
 
     return ( 
-        <View style={{height: "100%", paddingBottom: "30%", backgroundColor: lightGrey}}>
+        <View style={{height: "100%", backgroundColor: lightGrey, flex: 1}}>
             {/* // "Header" mit Profildaten */}
             <View style={styles.subHeaderProfile}>
                 
@@ -64,7 +64,7 @@ export default ProfileView = props => {
                     
                 </View>
             </View>
-            <View style={{paddingBottom: 10, backgroundColor: lightGrey}}>
+            {/* <View style={{paddingBottom: 10, backgroundColor: lightGrey}}> */}
                 <FlatList style={{height: "100%"}}
                     data={skillsList}
                     keyExtractor={(item, index) => index.toString()}
@@ -78,7 +78,7 @@ export default ProfileView = props => {
                     }}
                 />
 
-            </View>
+            {/* </View> */}
         </View>
      );
 }
