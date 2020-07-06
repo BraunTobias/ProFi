@@ -5,9 +5,9 @@ import { icons } from '../Styles';
 export default ProfileImageTile = props => {
 
   const source = props.imageUrl ? {uri: props.imageUrl} : icons.profilePlaceholder;
-
+  console.log(props.isLast);
   return (
-      <TouchableOpacity style={styles.itemContainer} onPress={() => props.onClick()} >
+      <TouchableOpacity style={[styles.itemContainer, {paddingEnd: props.isLast ? 20 : 0}]} onPress={() => props.onClick()} >
         <Image style={styles.profileImage}
           source={source}
         />

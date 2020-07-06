@@ -441,6 +441,7 @@ export default CourseScreen = ({route, navigation}) => {
                                 <ProfileImageTile
                                     onClick={() => {clickProfileHandler(itemData.item.userId)}} 
                                     imageUrl={itemData.item.imageUrl}
+                                    isLast={itemData.index == members.length - 1 ? true : false}
                                 />
                             );
                         }}
