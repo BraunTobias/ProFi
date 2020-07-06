@@ -65,7 +65,7 @@ export default ProFiFunction = (courseId, onFinish) => {
             teams.push(ideaIMembers);
             leftoverIdeaSkills.push(ideaISkills);
           }
-          
+
           // Für alle Fähigkeiten, die in einer Idee noch nicht besetzt sind, wird ein User hinzugefügt
           for (var i = 0; i < ideasIds.length; i++) {
             if (ideaFavs[i].length > 0) {

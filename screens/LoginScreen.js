@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, Modal } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { BackHandler } from 'react-native';
 import DB from '../api/DB_API';
 import ButtonSimple from '../components/ButtonSimple';
 import InputTile from '../components/InputTile';
@@ -71,11 +70,6 @@ export default LoginScreen = ({navigation}) => {
                     <ButtonSimple 
                         title= "Registrieren"
                         onClick= { () => navigation.navigate("Registration") }
-                        style= { buttons.buttonSimple }
-                    />
-                    <ButtonSimple 
-                        title= "Beenden"
-                        onClick= { () => BackHandler.exitApp() }
                         style= { buttons.buttonSimple }
                     />
                 </View>

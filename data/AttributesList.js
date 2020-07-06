@@ -5,7 +5,7 @@ export const skillsList = {
         "Audio Editing": false, 
         "Musiker/in": false, 
         "Sänger/in": false, 
-        "Ambient Sound Desinger": false, 
+        "Ambient Sound Designer": false, 
         "Audio Foley": false, 
         "Produktion": false,
     },

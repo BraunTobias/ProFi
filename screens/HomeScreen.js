@@ -54,7 +54,7 @@ export default HomeScreen = ({navigation}) => {
         });
         // DB.createTestCourse();
         // DB.fillAttributesList();
-        // DB.updateAttributesList();
+        DB.updateAttributesList();
     }, []);
 
     // Button fürs Hinzufügen neuer Kurse

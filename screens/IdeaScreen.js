@@ -160,7 +160,7 @@ export default IdeaScreen = ({route, navigation}) => {
                 </View>
                 {/* Membericons */}
                 <View style= { styles.membersRow } >
-                    <FlatList style={{paddingLeft: 5}}
+                    <FlatList style={{paddingLeft: 5, paddingBottom: 15}}
                         data={team}
                         horizontal={true}
                         showsHorizontalScrollIndicator={false}
@@ -170,7 +170,7 @@ export default IdeaScreen = ({route, navigation}) => {
                                 <ProfileImageTile
                                     onClick={() => {clickProfileHandler(itemData.item.userId)}} 
                                     imageUrl={itemData.item.imageUrl}
-                                    isLast={itemData.index == members.length - 1 ? true : false}
+                                    isLast={itemData.index == team.length - 1 ? true : false}
                                 />
                             );
                         }}

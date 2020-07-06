@@ -819,11 +819,11 @@ const DB = {
     saveIdeaTeams: function(courseId, ideaIds, teams, onSuccess) {
         for (var i = 0; i < teams.length; i++) {
             if (teams[i].length > 0) {
-                if (ideaIds[i]) {
+                if (ideaIds[i] && ideaIds[i] != []) {
                     firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaIds[i]).set({
                         team: teams[i],
-                        favourites: null,
-                        nogos: null,
+                        favourites: [],
+                        nogos: [],
                     }, {merge: true}); 
                 } else {
                     firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc("Idee" + i).set({
