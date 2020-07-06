@@ -31,7 +31,7 @@ export default IdeaScreen = ({route, navigation}) => {
             setCurrentComments(commentsList);
         });
         DB.getIdeaData(courseId, itemId, (data) => {
-            console.log(data);
+            // console.log(data);
             setCurrentSkills(data.skills);
 
             if (data.team && data.team.length > 0) {
@@ -60,14 +60,14 @@ export default IdeaScreen = ({route, navigation}) => {
     }, [navigation]);
 
     const addCommentHandler = () => {
-        console.log("add");
+        // console.log("add");
         if (currentCommentText != "") {
             DB.addComment(courseId, itemId, currentCommentText, () => {
                 setCommentVisibility(false);
                 setCurrentCommentText("");
                 DB.getCommentsList(courseId, itemId, (commentsList) => {
                     setCurrentComments(commentsList);
-                    console.log(commentsList);
+                    // console.log(commentsList);
                 });
             });
         }

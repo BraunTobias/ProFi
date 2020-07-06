@@ -10,7 +10,6 @@ export default AttributeListScreen = props => {
     useEffect(() => {
         DB.getAllAttributes("skills", filterList, (attributesList) => {
             setAttList(attributesList);
-            console.log(attributesList);
         }, () => {});
     }, []);
     

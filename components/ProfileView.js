@@ -22,11 +22,11 @@ export default ProfileView = props => {
             if (imageUrl) setCurrentImage({uri: imageUrl});
         });
         DB.getAttributesFromUser(props.userId, (list) => {
-            console.log("LIST: " + list);
+            // console.log("LIST: " + list);
             if (list.length > 0) {
                 DB.getAllAttributes("skills", list, (attributesList) => {
                     setSkillsList(attributesList);
-                    console.log(attributesList);
+                    // console.log(attributesList);
                 }, () => {});
             }
         })

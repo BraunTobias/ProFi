@@ -16,7 +16,6 @@ export default CourseScreen = ({route, navigation}) => {
     const {itemId} = route.params;
     const {itemTitle} = route.params;
     const {isMember} = route.params;
-    console.log(isMember);
     const currentUserId = DB.getCurrentUserId();
     const [swipeListView, setSwipeListView] = useState();
 
@@ -70,7 +69,7 @@ export default CourseScreen = ({route, navigation}) => {
     const getIdeasData = () => {
         DB.getIdeasList(itemId, (ideasList) => {
             setCurrentIdeas(ideasList);
-            console.log(ideasList);
+            // console.log(ideasList);
             for (const idea in ideasList) {
                 if (ideasList[idea].favourites != null && ideasList[idea].favourites.indexOf(currentUserId) >= 0) {
                     setCurrentFav(ideasList[idea].id);
@@ -137,12 +136,12 @@ export default CourseScreen = ({route, navigation}) => {
     const clickProfileHandler = (userId) => {
         setProfileVisibility(true);
         setViewedUserId(userId);
-        console.log("User ID: " + viewedUserId);
+        // console.log("User ID: " + viewedUserId);
     };
 
     const addIdeaHandler = () => {
         if (currentIdeaName != "" && currentIdeaDescription != "" && selectedSkillsList.length > 1) {
-            console.log ('OK')
+            // console.log ('OK')
             DB.addIdea(itemId, currentIdeaName, currentIdeaDescription, selectedSkillsList, [], () => {
                 setAddIdeaVisibility(false);
                 setCurrentIdeaName("");
@@ -153,7 +152,7 @@ export default CourseScreen = ({route, navigation}) => {
                 });
             });
         } else {
-            console.log ('Error')
+            // console.log ('Error')
             setCurrentWarning("Eingabe nicht vollständig");
             setErrorVisibility(true);
         }
@@ -224,13 +223,13 @@ export default CourseScreen = ({route, navigation}) => {
     const joinCourseHandler = () => {
         if (!userIsMember) {
             DB.joinCourse(itemId, () => {
-                console.log("Joined");
+                // console.log("Joined");
                 setUserIsMember(true);
                 getCourseData();
             }, () => {console.log("error")})
         } else {
             DB.exitCourse(itemId, () => {
-                console.log("Ausgetreten");
+                // console.log("Ausgetreten");
                 setUserIsMember(false);
                 getCourseData();
             })

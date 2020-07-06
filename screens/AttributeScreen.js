@@ -14,11 +14,11 @@ export default AttributeScreen = ({route, navigation}) => {
 
     useEffect(() => {
         DB.getCategoriesFromAttribute(attributeType, (categoriesList) => {
-            console.log(categoriesList);
+            // console.log(categoriesList);
             setCategoriesList(categoriesList);
             setCurrentCategory(categoriesList[0]);
             DB.getUserAttributesFromCategory(attributeType, categoriesList[0], filter, (attributesList) => {
-                console.log(attributesList);
+                // console.log(attributesList);
                 setDisplayedSkills(attributesList);
             }, (error) => {console.log(error)});    
         });
@@ -26,13 +26,13 @@ export default AttributeScreen = ({route, navigation}) => {
     
     const clickSkillHandler = (text) => {
         DB.toggleAttributeState(attributeType, currentCategory, text, () => {
-            console.log("Toggled state of " + text);
+            // console.log("Toggled state of " + text);
         });
     }
     const clickCategoryHandler = (name) => {
         setCurrentCategory(name);
         DB.getUserAttributesFromCategory(attributeType, name, filter, (attributesList) => {
-            console.log(attributesList);
+            // console.log(attributesList);
             setDisplayedSkills(attributesList);
         }, (error) => {console.log(error)});
     }

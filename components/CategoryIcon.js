@@ -17,7 +17,6 @@ export default CategoryIcon = props => {
         case "Licht & Event": iconName = require("../assets/icons/licht.png"); break;
         default: iconName = require("../assets/icons/programmierung.png");
     }
-    console.log(props.title);
 
   return (
         <TouchableHighlight 

@@ -33,7 +33,7 @@ export default ProfileScreen =  ({navigation})  => {
 
     const loadData = () => {
         DB.getUserInfo((data) => {
-            console.log(data);
+            // console.log(data);
             setCurrentName(data.username);
             setCurrentBio(data.bio);
             setCurrentMail(data.email);
@@ -84,7 +84,7 @@ export default ProfileScreen =  ({navigation})  => {
             [{ resize: { height: 400 } }],
             { compress: 0.2, base64: true}
         );
-        console.log("------ URI: " + smallImage.uri);
+        // console.log("------ URI: " + smallImage.uri);
         DB.changeProfileImage(smallImage.uri);
     };
 

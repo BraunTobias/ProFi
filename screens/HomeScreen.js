@@ -78,7 +78,7 @@ export default HomeScreen = ({navigation}) => {
     const addCourseHandler = () => {
         if (currentCourseName != "" && currentMaxMembers > 1 && currentCourseId != "") {
             if (currentMinMembers <= currentMaxMembers) {
-                console.log("add");
+                // console.log("add");
                 DB.addCourse(currentCourseName, currentCourseId, currentDate, currentMinMembers, currentMaxMembers, () => {
                     setAddCourseVisibility(false);
                     setCurrentCourseName("");
@@ -92,7 +92,7 @@ export default HomeScreen = ({navigation}) => {
                     setMaxMembersError("");
                     setDateError("");
                     DB.getCourseList((courseList) => {
-                        console.log(courseList);
+                        // console.log(courseList);
                         setCurrentCourses(courseList);
                     });
                 }, (error) => {setCurrentWarning(error)});
@@ -175,7 +175,6 @@ export default HomeScreen = ({navigation}) => {
 
     const deleteCourseHandler = (id) => {
         swipeListView.safeCloseOpenRow();
-        console.log("HEEEEY" + id);
         
         DB.removeCourseFromList(id, () => {
             DB.getCourseList((courseList) => {
@@ -241,7 +240,7 @@ export default HomeScreen = ({navigation}) => {
                                                 { minMembersError }
                                             </Text>
                                         </View>
-                                        <View style= { styles.loginInput } >
+                                        <View>
                                             <Text style= { [texts.buttonGrey, {paddingBottom: 5}] }  >Mitglieder max.</Text>
                                             <NumericInput 
                                                 onChange={(text) => { setMinMaxMembersHandler(text, false) }} 
@@ -261,7 +260,7 @@ export default HomeScreen = ({navigation}) => {
                                         </View>
                                     </View>
 
-                                    <View style= { styles.loginInput } >
+                                    <View >
                                         <Text style= { texts.buttonGrey } >Enddatum (optional)</Text>
                                             <DatePicker
                                                 style={{width: "100%"}}

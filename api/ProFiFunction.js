@@ -6,7 +6,6 @@ export default ProFiFunction = (courseId, onFinish) => {
     // Kursdaten
     DB.collectCourseData(courseId, (courseData) =>
     {
-        console.log(courseData);
         mainFunction(courseData);
     }, (error) => {console.log(error); onFinish()});
 
@@ -24,7 +23,7 @@ export default ProFiFunction = (courseId, onFinish) => {
         const memberSkills = courseData.memberSkills;
         var freeTeamPositions = 0;
         var teams = [];
-        var leftoverMembers = [];
+        var leftoverMembers = courseData.memberIds;
         
         for (var i = 0; i < ideasIds.length; i++) {
           const ideaIFavs = shuffle(ideaFavs[i]);
@@ -48,6 +47,7 @@ export default ProFiFunction = (courseId, onFinish) => {
                             if (ideaIMembers.length < maxMembers) {
                                 if (ideaIMembers.indexOf(favMemberJ) < 0) {
                                     ideaIMembers.push(favMemberJ);
+                                    leftoverMembers = leftoverMembers.filter(member => member != favMemberJ);
                                 } 
                             } else {
                               ideaISkills = [];
@@ -56,19 +56,16 @@ export default ProFiFunction = (courseId, onFinish) => {
                             break;
                         }
                 }
-                    
-                if (leftoverMembers.indexOf(favMemberJ) < 0 && ideaIMembers.indexOf(favMemberJ) < 0) {
-                  leftoverMembers.push(favMemberJ);
-                }
+                // if (leftoverMembers.indexOf(favMemberJ) < 0 && ideaIMembers.indexOf(favMemberJ) < 0) {
+                //   leftoverMembers.push(favMemberJ);
+                // }
               }
             }
             teams.push(ideaIMembers);
             leftoverIdeaSkills.push(ideaISkills);
           }
-
           // Für alle Fähigkeiten, die in einer Idee noch nicht besetzt sind, wird ein User hinzugefügt
           for (var i = 0; i < ideasIds.length; i++) {
-            if (ideaFavs[i].length > 0) {
               var leftoverIdeaISkills = leftoverIdeaSkills[i];
               const ideaIMembers = teams[i];
               
@@ -95,7 +92,6 @@ export default ProFiFunction = (courseId, onFinish) => {
                 leftoverIdeaISkills = leftoverIdeaISkills.filter(id => id != "");
                 leftoverMembers = leftoverMembers.filter(id => id != "");
                 teams[i] = ideaIMembers;
-            }
         }
 
         // Wenn Ideen noch nicht ausgelastet sind, werden alle die sie favorisiert haben hinzugefügt
@@ -182,8 +178,6 @@ export default ProFiFunction = (courseId, onFinish) => {
                 }    
             }
         }
-        console.log("------------- ERGEBNIS -------------");
-        console.log(teams);
         DB.saveIdeaTeams(courseId, ideasIds, teams, () => {
           onFinish();
         });

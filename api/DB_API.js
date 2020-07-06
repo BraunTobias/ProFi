@@ -16,7 +16,7 @@ const DB = {
     signUp: function(name, email, password, onSuccess, onError) {
         firebase.auth().createUserWithEmailAndPassword(email, password)
         .then((userInfo) => {
-            console.log("User angelegt");
+            // console.log("User angelegt");
             this.fillAttributesList(userInfo.user.uid);
             firebase.firestore().collection("users").doc(userInfo.user.uid).set({
                 username: name,
@@ -25,8 +25,8 @@ const DB = {
                 password: password
             })        
             .then(() => {
-                console.log("User account created & signed in!");
-                console.log("skills eingesetzt");
+                // console.log("User account created & signed in!");
+                // console.log("skills eingesetzt");
     
                 onSuccess();
             })
@@ -41,7 +41,7 @@ const DB = {
     // Listen fürs Profil ausfüllen 
     fillAttributesList: function(uid) {
         for (var category in skillsList) {
-            console.log("SKILLS: " + category + skillsList[category]);
+            // console.log("SKILLS: " + category + skillsList[category]);
             firebase.firestore().collection("users").doc(uid).collection("skills").doc(category).set(skillsList[category], {merge: true});        
         }
 
@@ -61,12 +61,12 @@ const DB = {
 
         // Prüfen ob das Attribut aus der neuen Liste beim User schon existiert; wenn nicht, dann hinzufügen
         for (var category in skillsList) {
-            console.log("---" + category + "---");
+            // console.log("---" + category + "---");
             for (var att in skillsList[category]) {
-                console.log(att);
+                // console.log(att);
                 const index = oldAttributesArray.indexOf(att);
                 if (index < 0) {
-                    console.log("Gibts noch nich");
+                    // console.log("Gibts noch nich");
                     firebase.firestore().collection("users").doc(currentUserID).collection("skills").doc(category).set({
                         [att]: false
                     }, {merge: true});
@@ -78,7 +78,7 @@ const DB = {
         }
         // Skills vom User löschen, die nicht mehr in der SkillsList sind
         for (var oldAtt in oldAttributesArray) {
-            console.log("Wird gelöscht: " + oldAttributesArray);
+            // console.log("Wird gelöscht: " + oldAttributesArray);
             for (var category in skillsList) {
                 firebase.firestore().collection("users").doc(currentUserID).collection("skills").doc(category).update({
                     [oldAttributesArray[oldAtt]]: firebase.firestore.FieldValue.delete()
@@ -98,7 +98,7 @@ const DB = {
     signOut: function(onSignedOut) {
         firebase.auth().signOut()
         .then(() => {
-            console.log("Signed Out");
+            // console.log("Signed Out");
             onSignedOut();
         });
     },
@@ -172,7 +172,7 @@ const DB = {
     },
     testProfileImage: async function(uri) {
         const response = await fetch(uri);
-        console.log("Success");
+        // console.log("Success");
     },
     
     changeProfileImage: async function(newImageUri) {
@@ -190,14 +190,14 @@ const DB = {
         const uploadTask = firebase.storage().ref().child("images/" + imageName).put(blob);
         uploadTask.on("state_changed", (snapshot) => {
             var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            console.log("snapshot: " + snapshot.state + " " + progress + "% done");
+            // console.log("snapshot: " + snapshot.state + " " + progress + "% done");
         }, (error) => {
             // Fehler beim Hochladen
-            console.log(error);
+            // console.log(error);
         }, () => {
             uploadTask.snapshot.ref.getDownloadURL()
             .then((downloadURL) => {
-                console.log('File available at', downloadURL);
+                // console.log('File available at', downloadURL);
                 firebase.firestore().collection("users").doc(currentUserId).set({
                     image: downloadURL,
                     imageName: imageName
@@ -207,10 +207,10 @@ const DB = {
                 if (oldImageName) {
                     firebase.storage().ref().child("images/" + oldImageName).delete()
                     .then(() => {
-                        console.log("Deleted old image");
+                        // console.log("Deleted old image");
                     })
                     .catch((error) => {
-                        console.log(error);
+                        // console.log(error);
                     })
                 }
             })
@@ -328,7 +328,6 @@ const DB = {
             const comment = doc.data();
             comment["id"] = doc.id;
             commentsList.push(comment);
-            console.log("He")
         });            
         commentsListRetrieved(commentsList);
     },
@@ -378,7 +377,7 @@ const DB = {
                         prospects: prospectsArray
                     }, {merge: true}); 
         
-                    console.log(prospectsArray);
+                    // console.log(prospectsArray);
 
                     // Der neue Kurs wird zurückgegeben um sofort angezeigt zu werden
                     const addedCourse = docSnapshot.data();
@@ -512,7 +511,7 @@ const DB = {
             const tempAtt = [];
             for (const title in categoryDoc.data()) {
                 if (filterList.length == 0 || filterList.indexOf(title) >= 0) {
-                    console.log("title: " + title);
+                    // console.log("title: " + title);
                     tempAtt.push(title);
                 }
             }
@@ -551,7 +550,7 @@ const DB = {
         if (snapshotData) {            
             // Gibt Liste als (alphabetisch geordnetes) Array zurück
             for (var title in snapshotData) {
-                console.log("title: " + title);
+                // console.log("title: " + title);
                 if (filterList.length == 0 || filterList.indexOf(title) >= 0) {
                     attributesList.push(title);
                 }
@@ -593,7 +592,7 @@ const DB = {
             }
             skillArray.sort();
             skillString = skillArray.join(", ");
-            console.log(skillString);
+            // console.log(skillString);
         });            
         const snapshotPrefs = await firebase.firestore().collection("users").doc(currentUserID).collection("prefs").get();
         snapshotPrefs.forEach((doc) => {
@@ -609,7 +608,7 @@ const DB = {
             }
             prefArray.sort();
             prefString = prefArray.join(", ") + " …";
-            console.log(prefString);
+            // console.log(prefString);
         });            
 
         
@@ -629,8 +628,6 @@ const DB = {
                 [attributeName]: newState
             }, {merge: true});
     
-        } else {
-            console.log("nee")
         }
     },
 
@@ -669,7 +666,7 @@ const DB = {
                 [prefType]: prefArray
             }, {merge: true}); 
     
-            console.log(prefArray);
+            // console.log(prefArray);
             onSuccess();            
         } else {
             console.log("Kein gültiger Pref-Typ");
@@ -685,7 +682,7 @@ const DB = {
                 if (doc.data()[prefType]) {
                     const newPrefArray = doc.data()[prefType].filter(item => item !== currentUserID);
                     const ideaId = doc.id;
-                    console.log("idea id: " + ideaId);
+                    // console.log("idea id: " + ideaId);
                     firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaId).set({
                         [prefType]: newPrefArray,
                     }, {merge: true}); 
@@ -717,7 +714,7 @@ const DB = {
             // idea["id"] = userDoc.id;
             allUserIds.push(userDoc.id);
         });    
-        console.log(allUserIds);
+        // console.log(allUserIds);
 
         const randomCreatorId = Math.floor((Math.random() * (allUserIds.length - 1)));
         firebase.firestore().collection("courses").doc("TEST").set({
@@ -822,8 +819,8 @@ const DB = {
                 if (ideaIds[i] && ideaIds[i] != []) {
                     firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaIds[i]).set({
                         team: teams[i],
-                        favourites: [],
-                        nogos: [],
+                        // favourites: [],
+                        // nogos: [],
                     }, {merge: true}); 
                 } else {
                     firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc("Idee" + i).set({
@@ -832,8 +829,6 @@ const DB = {
                         description: "Noch keine Idee vorhanden",
                     }, {merge: true}); 
                 }
-
-
             }
         }
         firebase.firestore().collection("courses").doc(courseId).set({

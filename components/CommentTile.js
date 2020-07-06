@@ -18,7 +18,6 @@ export default CommentTile = props => {
     DB.getUserInfoById(userId, (name, imageUrl) => {
       setCurrentUserName(name);
       if (imageUrl) setCurrentUserImage({ uri: imageUrl});
-      console.log(name, imageUrl);
     });
   }, []);
 

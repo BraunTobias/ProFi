@@ -149,7 +149,6 @@ const styles = StyleSheet.create({
         width: '100%', 
         height: '100%',
         paddingVertical: "10%",
-        // flexGrow: 1
     },
 
     center: {
@@ -160,7 +159,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start', 
         alignItems: 'flex-start',
         marginBottom: 10,
-        // minWidth: 250,
+        minWidth: 250,
         maxWidth: "100%",
     },
 
