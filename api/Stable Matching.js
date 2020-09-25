@@ -1,34 +1,82 @@
-// Daten
+// import {members, ideas} from './testData'; // Node cannot use import statement outside a module
 
+// Daten
 const skillValue = 1;
 const favValue = 5.5;
 
 var members = {
-        "uid1": {
-            skills : ["skill1", "skill2", "skill3"],
-        },
-        "uid2": {
-            skills : ["skill4", "skill5", "skill6"]
-        },
-        "uid3": {
-            skills : ["skill1", "skill3", "skill5"]
-        },
-        "uid4": {
-            skills : ["skill2", "skill4", "skill6"]
-        },
+    "Anna": {
+        skills : ["skill3", "skill6", "skill8"],
+    },
+    "Niklas": {
+        skills : ["skill1", "skill5", "skill8"]
+    },
+    "Klaus": {
+        skills : ["skill2", "skill4"]
+    },
+    "Bo": {
+        skills : ["skill6"]
+    },
+    "Paul": {
+        skills : ["skill7", "skill10"]
+    },
+    "Nina": {
+        skills : ["skill4", "skill9"]
+    },
+    "Johannes": {
+        skills : ["skill2", "skill3", "skill5", "skill9"]
+    },
+    "Clara": {
+        skills : ["skill1", "skill7", "skill10"]
+    },
+    "Lena": {
+        skills : ["skill3", "skill5"]
+    },
+    "Miriam": {
+        skills : ["skill6", "skill10"]
+    },
+    "Melanie": {
+        skills : ["skill2", "skill4", "skill15"]
+    },
+    "Tom": {
+        skills : ["skill6", "skill9"]
+    },
+    "Ali": {
+        skills : ["skill1", "skill8"]
+    },
+    "Oliver": {
+        skills : ["skill2", "skill4", "skill7"]
+    },
+    "Theo": {
+        skills : ["skill1", "skill3", "skill8", "skill10"]
+    }
 }
-
 var ideas = {
-        "ideaId1": { 
-            skills: ["skill1", "skill2", "skill4"],
-            favs: ["uid1"],
-            nogos: ["uid2"]
-        },
-        "ideaId2": {
-            skills: ["skill3", "skill4", "skill6"],
-            favs: ["uid3"],
-            nogos: ["uid4"]
-        },
+    "ideaA": { 
+        skills: ["skill1", "skill4", "skill7"],
+        favs: ["Paul", "Miriam"],
+        nogos: ["Klaus", "Oliver"]
+    },
+    "ideaB": {
+        skills: ["skill4", "skill8", "skill10"],
+        favs: ["uid3"],
+        nogos: ["Nina", "Miriam", "Theo"]
+    },
+    "ideaC": {
+        skills: ["skill1", "skill4", "skill7"],
+        favs: ["Klaus", "Bo", "Nina", "Johannes", "Oliver", "Theo"],
+        nogos: []
+    },
+    "ideaD": {
+        skills: ["skill2", "skill6", "skill9"],
+        favs: ["Niklas", "Lena"],
+        nogos: ["Clara", "Tom"]
+    },
+    "ideaE": {
+        skills: ["skill1", "skill5", "skill7", "skill9"],
+        favs: ["Anna", "Clara", "Melanie", "Tom", "Ali"],
+        nogos: ["Bo", "Paul", "Lena"]
+    }
 }
 
 // ___________________________________________________________________________________________________________________________________________________
@@ -80,8 +128,12 @@ createScoreLists();
 // ___________________________________________________________________________________________________________________________________________________
 
 // Ausgabe der Daten
+var consoleLog = "----------- Score List -----------\n";
 for (const memId in members) {
-    console.log(memId);
-    console.log(members[memId].scoreList[0] + " | " + members[memId].scoreList[1]);
-    console.log("-----------");
+    outputMemId = "" + memId;
+    while (outputMemId.length < 8) outputMemId = outputMemId + " ";
+    consoleLog = consoleLog + outputMemId + ": ";
+    for(const score in members[memId].scoreList) consoleLog = consoleLog + members[memId].scoreList[score] + " | "
+    consoleLog = consoleLog + "\n";
 }
+console.log(consoleLog);
