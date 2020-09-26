@@ -36,7 +36,7 @@ var members = {
         skills : ["skill6", "skill10"]
     },
     "Melanie": {
-        skills : ["skill2", "skill4", "skill15"]
+        skills : ["skill2", "skill4", "skill5"]
     },
     "Tom": {
         skills : ["skill6", "skill9"]
@@ -59,11 +59,11 @@ var ideas = {
     },
     "ideaB": {
         skills: ["skill4", "skill8", "skill10"],
-        favs: ["uid3"],
+        favs: [],
         nogos: ["Nina", "Miriam", "Theo"]
     },
     "ideaC": {
-        skills: ["skill1", "skill4", "skill7"],
+        skills: ["skill3", "skill6", "skill7"],
         favs: ["Klaus", "Bo", "Nina", "Johannes", "Oliver", "Theo"],
         nogos: []
     },
