@@ -114,21 +114,33 @@ function calculateSkillValues() {
             
             if(memberSkills[i][0]== ideaSkills[j][0]){
 
+                // Prozent von vorhandenen Member Skills, zu benötigten Idea Skills
+                // Genau Abdeckung = 1; Selter Skill (häufiger benötigt, als vorhanden) > 1; Häufiger Skill < 1; 
                 let percent = ideaSkills[j][1] / memberSkills[i][1];
 
-                //TO DO Weter irgenwie Mitteln auf ganze Werte
+                // Prozent * 10 für ganze Werte / 2, damit werte nicht übermäßig goß werden, abgerundet 
+                let value = Math.floor((percent * 10) /2);
 
+                // Falls Skill so häufig vorkommt, dass er null wird, passiert bei weniger als 20%
+                if(value <= 0){
+                    value =1;
+                }
 
-                values.push([memberSkills[i][0], percent]);
-                console.log(memberSkills[i][0] +": "+ideaSkills[j][1]+" / "+memberSkills[i][1]);
+                // Skill Values:
+                // 0%-39% = 1
+                // 40%-59% = 2
+                // 60%-79% = 3
+                // 80%-99% = 4
+                // 100%-119% = 5
+                // usw.
+
+                values.push([memberSkills[i][0], value]);
 
             }
         }
        
         
     }
-    
-    console.log(values);
 
 }
 
