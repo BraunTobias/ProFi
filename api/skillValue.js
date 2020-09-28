@@ -73,6 +73,8 @@ var ideas = {
     }
 }
 
+let values = new Array(); 
+
 function countSkills(obj) {
 
     let allSkills = new Array(); 
@@ -102,8 +104,6 @@ function countSkills(obj) {
 }
 
 function calculateSkillValues() {
-
-    let values = new Array(); 
 
     let memberSkills =countSkills(members);
     let ideaSkills =countSkills(ideas);
@@ -145,3 +145,22 @@ function calculateSkillValues() {
 }
 
 calculateSkillValues();
+
+
+module.exports = {
+    getSkillValue(skill) {
+
+        let value;
+    
+        values.forEach(skillValuePair => {
+      
+            if(skillValuePair[0] == skill){
+                value =skillValuePair[1];
+            }
+            
+        });
+
+        return value;
+    }
+}
+  

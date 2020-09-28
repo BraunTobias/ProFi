@@ -1,7 +1,7 @@
 // import {members, ideas} from './testData'; // Node cannot use import statement outside a module
 
 // Daten
-const skillValue = 1;
+const skillValue = require('./skillValue');
 const favValue = 5.5;
 
 var members = {
@@ -101,7 +101,7 @@ const createScoreLists = () => {
 
                     if (members[memId].skills.indexOf(skill) >= 0) {
                         // Wenn Skillüberschneidung vorhanden, Score erhöhen
-                        score += skillValue;
+                        score += skillValue.getSkillValue(skill);
                     }
                 });
 
