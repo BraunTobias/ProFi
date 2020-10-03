@@ -79,6 +79,8 @@ var ideas = {
     }
 }
 
+var onlySkillScores = [];
+
 // ___________________________________________________________________________________________________________________________________________________
 
 const createScoreLists = () => {
@@ -88,6 +90,7 @@ const createScoreLists = () => {
 
         // Score-Liste erstellen
         var scoreList = [];
+        var onlySkills = [];
         // Alle Ideen durchgehen
         for (const ideaId in ideas) {
 
@@ -103,7 +106,10 @@ const createScoreLists = () => {
                         // Wenn Skillüberschneidung vorhanden, Score erhöhen
                         score += skillValue.getSkillValue(skill);
                     }
+
                 });
+
+                onlySkills.push([ideaId, score]);
 
                 // Wenn die Idee favorisiert wurde, Score erhöhen
                 if (ideas[ideaId].favs.indexOf(memId) >= 0) {
@@ -117,13 +123,50 @@ const createScoreLists = () => {
         // scoreList nach Scores sortieren
         scoreList.sort((a,b) => b[1] - a[1]);
 
+        onlySkillScores.push([memId,onlySkills]);
+
         // fertige Score-Liste anhängen
         members[memId].scoreList = scoreList;
 
     }
+
 }
 
+const createIdeaLists = () =>{
+
+    for (const ideaId in ideas) {
+        
+        var scoreList = [];
+
+        onlySkillScores.forEach(member => {
+
+            member[1].forEach(scorePair => {
+
+                if(scorePair[0]==ideaId){
+                    scoreList.push([member[0],scorePair[1]]);
+                }
+            });
+
+        });
+
+        // scoreList nach Scores sortieren
+        scoreList.sort((a,b) => b[1] - a[1]);
+        
+        // fertige Score-Liste anhängen
+        ideas[ideaId].scoreList = scoreList;
+        console.log(ideaId + " : " +ideas[ideaId].scoreList);
+    }
+    
+}
+
+function stableMatching() {
+    
+}
+
+
+
 createScoreLists();
+createIdeaLists();
 
 // ___________________________________________________________________________________________________________________________________________________
 
