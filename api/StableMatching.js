@@ -3,6 +3,8 @@
 // Daten
 const skillValue = require('./skillValue');
 const favValue = 5.5;
+const maxMembers= 4;
+const minMembers = 2;
 
 var members = {
     "Anna": {
@@ -160,6 +162,83 @@ const createIdeaLists = () =>{
 }
 
 function stableMatching() {
+
+    var matches = [];
+    var unmatchedMembers = [];
+
+    //Mathces Array mit Ideen füllen
+    for (const ideaId in ideas) {
+        matches.push([ideaId]);
+    }
+
+    for (const memId in members) {
+       unmatchedMembers.push(memId);
+    }
+
+    var currentMember = 0;
+    
+
+  while(unmatchedMembers.length > 0){
+
+
+        //Erste Person
+        for (let i = 0; i < members[unmatchedMembers[currentMember]].scoreList.length; i++) {
+   
+            //Ersten Eintrag in Liste abfragen 
+            var currentProposal =members[unmatchedMembers[currentMember]].scoreList[i][0];
+            var memberMatched = false;
+
+            for (let scorePair= 0; scorePair < ideas[currentProposal].scoreList.length; scorePair++) {
+                //In Liste der Idee nach Member suchen, ob Score = 0
+                if(ideas[currentProposal].scoreList[scorePair][0]==unmatchedMembers[currentMember] && ideas[currentProposal].scoreList[scorePair][1]!=0){
+                    
+                    //In Matches zufügen wenn nicht schon voll
+                    matches.forEach(idea => {
+
+                        if (idea[0] ==currentProposal && idea.length < (maxMembers+1)) {
+                            idea.push(unmatchedMembers[currentMember]);
+
+                            
+                            console.log(unmatchedMembers[currentMember]+ " wird "+currentProposal+ "zugeordnet");
+                        
+                            unmatchedMembers.splice(currentMember,1);
+                            memberMatched= true;    
+                          
+                        }
+                        else if(idea[0] == currentProposal && idea.length == (maxMembers+1)){
+                            console.log(unmatchedMembers[currentMember]+ " "+currentProposal+ " ist schon voll");
+
+                            // ToDO wenn man besser ist als jeman in der schon vollen Gruppe
+                        }
+                        
+                    });
+
+                }
+                else if(ideas[currentProposal].scoreList[scorePair][0]==unmatchedMembers[currentMember] && ideas[currentProposal].scoreList[scorePair][1]==0){
+
+                    console.log(unmatchedMembers[currentMember]+ " hat keine Skills für "+currentProposal);
+                }
+
+                if(memberMatched){
+                    break;
+                }
+            }
+
+            
+            if(unmatchedMembers.length ==0 || memberMatched){
+
+                break;
+            }
+            
+
+        }
+           
+    }
+
+    
+
+
+    console.log(matches);
     
 }
 
@@ -167,6 +246,7 @@ function stableMatching() {
 
 createScoreLists();
 createIdeaLists();
+stableMatching();
 
 // ___________________________________________________________________________________________________________________________________________________
 
