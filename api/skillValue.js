@@ -119,20 +119,31 @@ function calculateSkillValues() {
                 let percent = ideaSkills[j][1] / memberSkills[i][1];
 
                 // Prozent * 10 für ganze Werte / 2, damit werte nicht übermäßig goß werden, abgerundet 
-                let value = Math.floor((percent * 10) /2);
+                //let value = Math.floor((percent * 10) /2);
+                //aufgerundet
+                let value = Math.ceil((percent * 10) /2);
 
                 // Falls Skill so häufig vorkommt, dass er null wird, passiert bei weniger als 20%
-                if(value <= 0){
+                /*if(value <= 0){
                     value =1;
-                }
+                }*/
 
-                // Skill Values:
+                // Skill Values bei abrunden:
                 // 0%-39% = 1
                 // 40%-59% = 2
                 // 60%-79% = 3
                 // 80%-99% = 4
                 // 100%-119% = 5
                 // usw.
+
+                // Skill Values bei aufrunden:
+                // 0%-20% = 1
+                // 21%-40% = 2
+                // 41%-60% = 3
+                // 61%-80% = 4
+                // 81%-100% = 5
+                // usw.
+
 
                 values.push([memberSkills[i][0], value]);
 
