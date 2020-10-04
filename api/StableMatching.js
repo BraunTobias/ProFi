@@ -176,6 +176,7 @@ function stableMatching() {
     }
 
     var currentMember = 0;
+    var unmatchable =[];
     
 
   while(unmatchedMembers.length > 0){
@@ -187,10 +188,12 @@ function stableMatching() {
             //Ersten Eintrag in Liste abfragen 
             var currentProposal =members[unmatchedMembers[currentMember]].scoreList[i][0];
             var memberMatched = false;
+            var ideaPreferenceList = ideas[currentProposal].scoreList;
 
-            for (let scorePair= 0; scorePair < ideas[currentProposal].scoreList.length; scorePair++) {
+            for (let scorePair= 0; scorePair < ideaPreferenceList.length; scorePair++) {
+                var currentMemberScore =ideaPreferenceList[scorePair][1];
                 //In Liste der Idee nach Member suchen, ob Score = 0
-                if(ideas[currentProposal].scoreList[scorePair][0]==unmatchedMembers[currentMember] && ideas[currentProposal].scoreList[scorePair][1]!=0){
+                if(ideaPreferenceList[scorePair][0]==unmatchedMembers[currentMember] && currentMemberScore!=0){
                     
                     //In Matches zufügen wenn nicht schon voll
                     matches.forEach(idea => {
@@ -208,20 +211,52 @@ function stableMatching() {
                         else if(idea[0] == currentProposal && idea.length == (maxMembers+1)){
                             console.log(unmatchedMembers[currentMember]+ " "+currentProposal+ " ist schon voll");
 
-                            // ToDO wenn man besser ist als jeman in der schon vollen Gruppe
+                            //wenn man besser ist als jeman in der schon vollen Gruppe
+                            for (let j = 1; j < idea.length; j++) {
+                                
+                                for (let k= 0; k < ideaPreferenceList.length; k++) {
+                                    
+                                    if (ideaPreferenceList[k][0]== idea[j] && ideaPreferenceList[k][1]<currentMemberScore) {
+
+                                        console.log(idea[j]+ " hat "+ideaPreferenceList[k][1]+"Punkte");
+                                        console.log(unmatchedMembers[currentMember]+ " ist besser als "+idea[j]);
+                                        unmatchedMembers.push(idea[j]);
+                                        idea.splice(j,1,unmatchedMembers[currentMember]);
+                                        
+                                        unmatchedMembers.splice(currentMember,1);
+                                        
+                                        memberMatched= true;  
+                                        
+                                    }
+                                    
+                                }
+                                if(memberMatched){
+                                    break;
+                                }
+
+                            }
+
                         }
                         
                     });
 
                 }
-                else if(ideas[currentProposal].scoreList[scorePair][0]==unmatchedMembers[currentMember] && ideas[currentProposal].scoreList[scorePair][1]==0){
+                else if(ideaPreferenceList[scorePair][0]==unmatchedMembers[currentMember] && ideaPreferenceList[scorePair][1]==0){
 
                     console.log(unmatchedMembers[currentMember]+ " hat keine Skills für "+currentProposal);
+                }
+                
+                if(i == members[unmatchedMembers[currentMember]].scoreList.length -1){
+                    unmatchable.push(unmatchedMembers[currentMember]);
+                    unmatchedMembers.splice(currentMember,1);
+                    break;
                 }
 
                 if(memberMatched){
                     break;
                 }
+
+                
             }
 
             
@@ -233,6 +268,47 @@ function stableMatching() {
 
         }
            
+    }
+
+    //Jemand konnte nicht zugeordnet werden
+
+    if (unmatchable.length > 0) {
+
+        unmatchable.forEach(unmatchedPerson => {
+            var smallestGroup= 0;
+
+            //kleinste Gruppe finden
+            for (let i = 0; i < matches.length; i++) {
+                
+                if(matches[smallestGroup].length > matches[i].length){
+                    smallestGroup = i;
+                }
+                
+            }
+
+            // wenn nicht Nogo, zu kleinster gruppe zuordenen
+            if (ideas[matches[smallestGroup][0]].nogos.indexOf(unmatchedPerson) < 0){
+                matches[smallestGroup].push(unmatchedPerson);
+            }
+            else{
+
+                // wenn das nicht geht gucken ob favorit schon voll ist, sonst da zuordnen
+                for (let i = 0; i < matches.length; i++) {
+
+                //TO Do was tun wenn Favorit voll?
+                    if(matches[i][0] == members[unmatchedPerson].scoreList[0][0] && matches[i].length < (maxMembers+1)){
+                        matches[i].push(unmatchedPerson);
+                    }
+                    
+                }
+
+            }
+            
+
+        });
+
+
+        
     }
 
     
