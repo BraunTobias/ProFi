@@ -246,16 +246,18 @@ function stableMatching() {
                     console.log(unmatchedMembers[currentMember]+ " hat keine Skills für "+currentProposal);
                 }
                 
-                if(i == members[unmatchedMembers[currentMember]].scoreList.length -1){
-                    unmatchable.push(unmatchedMembers[currentMember]);
-                    unmatchedMembers.splice(currentMember,1);
-                    break;
-                }
+                
 
                 if(memberMatched){
                     break;
                 }
 
+                
+            }
+            if(i == members[unmatchedMembers[currentMember]].scoreList.length-1 && !memberMatched){
+                    unmatchable.push(unmatchedMembers[currentMember]);
+                    unmatchedMembers.splice(currentMember,1);
+                    break;
                 
             }
 
