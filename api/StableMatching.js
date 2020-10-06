@@ -1,3 +1,4 @@
+
 // import {members, ideas} from './testData'; // Node cannot use import statement outside a module
 
 // Daten
@@ -161,25 +162,98 @@ const createIdeaLists = () =>{
     
 }
 
+function matching(unmatchedMembers, matches) {
+
+
+    var stillNotMatched = unmatchedMembers;
+
+    for (let i = 0; i < unmatchedMembers.length; i++) {
+        const unmatchedMember = unmatchedMembers[i];
+        var memberMatched= false;
+
+        for (let j = 0; j < members[unmatchedMember].scoreList.length; j++) {
+            const scorePair = members[unmatchedMember].scoreList[j];
+            
+
+            var currentProposalPreferences = ideas[scorePair[0]].scoreList;
+
+            currentProposalPreferences.forEach(preference => {
+
+
+                if(preference[0]==unmatchedMember && preference[1]!=0){
+
+                    if(matches[scorePair[0]].length < maxMembers){
+                        memberMatched =true;
+                        //var del = stillNotMatched.indexOf(unmatchedMember);
+                        //stillNotMatched.splice(del,1);
+                        console.log(unmatchedMember +" "+scorePair[0]);
+                        matches[scorePair[0]].push([unmatchedMember,preference[1]]);
+                    
+                    }
+                    else{
+                        var smallestScoreIndex=0;
+                        var smallestScore =500;
+
+                        for (let k = 0; k < matches[scorePair[0]].length; k++) {
+                            const compareMember = matches[scorePair[0]][k];
+
+                            console.log(compareMember);
+                            console.log(preference);
+
+                            
+
+                            if(compareMember[1]< smallestScore){
+                                smallestScore =compareMember[1];
+                                smallestScoreIndex=k;
+                            }
+                            
+                        }
+
+                        if(preference[1]> smallestScore){
+                            matches[scorePair[0]].splice(smallestScoreIndex,1, preference);
+                            memberMatched= true;
+                        }
+
+                    }
+        
+                    
+                }
+                
+                
+            });
+            
+            if(memberMatched){
+                break;
+            }
+        }
+        
+    }
+
+    return matches; 
+    
+}
+
 function stableMatching() {
 
-    var matches = [];
+    var matches = {};
     var unmatchedMembers = [];
 
     //Mathces Array mit Ideen füllen
     for (const ideaId in ideas) {
-        matches.push([ideaId]);
+        matches[ideaId]=[];
     }
 
     for (const memId in members) {
        unmatchedMembers.push(memId);
     }
 
+    var matches= matching(unmatchedMembers, matches);
+
     var currentMember = 0;
     var unmatchable =[];
     
 
-  while(unmatchedMembers.length > 0){
+ /* while(unmatchedMembers.length > 0){
 
 
         //Erste Person
@@ -311,7 +385,7 @@ function stableMatching() {
 
 
         
-    }
+    }*/
 
     
 
