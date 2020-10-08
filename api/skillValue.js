@@ -73,6 +73,8 @@ var ideas = {
     }
 }
 
+let values = new Array(); 
+
 function countSkills(obj) {
 
     let allSkills = new Array(); 
@@ -103,8 +105,6 @@ function countSkills(obj) {
 
 function calculateSkillValues() {
 
-    let values = new Array(); 
-
     let memberSkills =countSkills(members);
     let ideaSkills =countSkills(ideas);
 
@@ -114,22 +114,64 @@ function calculateSkillValues() {
             
             if(memberSkills[i][0]== ideaSkills[j][0]){
 
+                // Prozent von vorhandenen Member Skills, zu benötigten Idea Skills
+                // Genau Abdeckung = 1; Selter Skill (häufiger benötigt, als vorhanden) > 1; Häufiger Skill < 1; 
                 let percent = ideaSkills[j][1] / memberSkills[i][1];
 
-                //TO DO Weter irgenwie Mitteln auf ganze Werte
+                // Prozent * 10 für ganze Werte / 2, damit werte nicht übermäßig goß werden, abgerundet 
+                //let value = Math.floor((percent * 10) /2);
+                //aufgerundet
+                let value = Math.ceil((percent * 10) /2);
+
+                // Falls Skill so häufig vorkommt, dass er null wird, passiert bei weniger als 20%
+                /*if(value <= 0){
+                    value =1;
+                }*/
+
+                // Skill Values bei abrunden:
+                // 0%-39% = 1
+                // 40%-59% = 2
+                // 60%-79% = 3
+                // 80%-99% = 4
+                // 100%-119% = 5
+                // usw.
+
+                // Skill Values bei aufrunden:
+                // 0%-20% = 1
+                // 21%-40% = 2
+                // 41%-60% = 3
+                // 61%-80% = 4
+                // 81%-100% = 5
+                // usw.
 
 
-                values.push([memberSkills[i][0], percent]);
-                console.log(memberSkills[i][0] +": "+ideaSkills[j][1]+" / "+memberSkills[i][1]);
+                values.push([memberSkills[i][0], value]);
 
             }
         }
        
         
     }
-    
-    console.log(values);
 
 }
 
 calculateSkillValues();
+
+
+module.exports = {
+    getSkillValue(skill) {
+
+        let value;
+    
+        values.forEach(skillValuePair => {
+      
+            if(skillValuePair[0] == skill){
+                value =skillValuePair[1];
+            }
+            
+        });
+
+        return value;
+    }
+}
+  
