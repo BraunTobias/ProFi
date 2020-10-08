@@ -1,10 +1,10 @@
 {
-  "expoServerPort": 19000,
-  "expoServerNgrokUrl": "https://q3-zuf.anonymous.mosy.exp.direct",
-  "packagerNgrokUrl": "https://packager.q3-zuf.anonymous.mosy.exp.direct",
-  "ngrokPid": 17866,
-  "packagerPort": 19001,
-  "packagerPid": 16393,
+  "expoServerPort": null,
+  "expoServerNgrokUrl": null,
+  "packagerNgrokUrl": null,
+  "ngrokPid": null,
+  "packagerPort": null,
+  "packagerPid": null,
   "webpackServerPort": null,
   "devToolsPort": 19002
 }
