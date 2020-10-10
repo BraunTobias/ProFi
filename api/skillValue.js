@@ -1,4 +1,4 @@
-var members = {
+/*var members = {
     "Anna": {
         skills : ["skill3", "skill6", "skill8"],
     },
@@ -71,9 +71,66 @@ var ideas = {
         favs: ["Anna", "Clara", "Melanie", "Tom", "Ali"],
         nogos: ["Bo", "Paul", "Lena"]
     }
+}*/
+
+var members = {
+    "Anton": {
+        skills : ["skill1", "skill5", "skill8", "skill10"],
+    },
+    "Berta": {
+        skills : ["skill1", "skill4", "skill7"],
+    },
+    "Charlotte": {
+        skills : ["skill1", "skill2", "skill3", "skill4"],
+    },
+    "Dora": {
+        skills : ["skill5", "skill6", "skill9"],
+    },
+    "Emil": {
+        skills : ["skill6", "skill8", "skill9", "skill10"],
+    },
+    "Friedrich": {
+        skills : ["skill1", "skill3", "skill5"],
+    },
+    "Gustav": {
+        skills : ["skill1", "skill8", "skill9"],
+    },
+    "Heinrich": {
+        skills : ["skill3", "skill4", "skill6"],
+    },
+    "Ida": {
+        skills : ["skill1", "skill5", "skill9"],
+    },
+    "Julia": {
+        skills : ["skill3", "skill7", "skill8", "skill10"],
+    }
+}
+var ideas = {
+    "ideaA": { 
+        skills: ["skill1", "skill2", "skill5", "skill9"],
+        missingSkills: ["skill1", "skill2", "skill5", "skill9"],
+        favs: ["Anton", "Berta", "Heinrich"],
+        nogos: ["Dora", "Friedrich", "Ida"],
+        members: []
+    },
+    "ideaB": {
+        skills: ["skill3", "skill4", "skill6", "skill7"],
+        missingSkills: ["skill3", "skill4", "skill6", "skill7"],
+        favs: ["Dora", "Friedrich", "Ida"],
+        nogos: [],
+        members: []
+    },
+    "ideaC": {
+        skills: ["skill1", "skill5", "skill8", "skill10"],
+        missingSkills: ["skill1", "skill5", "skill8", "skill10"],
+        favs: ["Charlotte"],
+        nogos: ["Berta"],
+        members: []
+    },
 }
 
-let values = new Array(); 
+
+let values = {}; 
 
 function countSkills(obj) {
 
@@ -145,7 +202,7 @@ function calculateSkillValues() {
                 // usw.
 
 
-                values.push([memberSkills[i][0], value]);
+                values[memberSkills[i][0]] = value;
 
             }
         }
@@ -161,17 +218,7 @@ calculateSkillValues();
 module.exports = {
     getSkillValue(skill) {
 
-        let value;
-    
-        values.forEach(skillValuePair => {
-      
-            if(skillValuePair[0] == skill){
-                value =skillValuePair[1];
-            }
-            
-        });
-
-        return value;
+        return values[skill];
     }
 }
   
