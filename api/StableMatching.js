@@ -3,196 +3,274 @@
 // Daten
 // const skillValue = 1;
 const favValue = 6.5;
-const minMembers = 3;
-const maxMembers = 100 ;
+const minMembers = 2;
+const maxMembers = 4 ;
 
-// var members = {
-//    "Anna": {
-//         skills : ["skill3", "skill6", "skill8"],
-//         sorted : false
-//     },
-//     "Niklas": {
-//         skills : ["skill1", "skill5", "skill8"],
-//         sorted : false
-//     },
-//     "Klaus": {
-//         skills : ["skill2", "skill4"],
-//         sorted : false
-//     },
-//     "Bo": {
-//         skills : ["skill6"],
-//         sorted : false
-//     },
-//     "Paul": {
-//         skills : ["skill7", "skill10"],
-//         sorted : false
-//     },
-//     "Nina": {
-//         skills : ["skill4", "skill9"],
-//         sorted : false
-//     },
-//     "Johannes": {
-//         skills : ["skill2", "skill3", "skill5", "skill9"],
-//         sorted : false
-//     },
-//     "Clara": {
-//         skills : ["skill1", "skill7", "skill10"],
-//         sorted : false
-//     },
-//     "Lena": {
-//         skills : ["skill3", "skill5"],
-//         sorted : false
-//     },
-//     "Miriam": {
-//         skills : ["skill6", "skill10"],
-//         sorted : false
-//     },
-//     "Melanie": {
-//         skills : ["skill2", "skill4", "skill5"],
-//         sorted : false
-//     },
-//     "Tom": {
-//         skills : ["skill6", "skill9"],
-//         sorted : false
-//     },
-//     "Ali": {
-//         skills : ["skill1", "skill8"],
-//         sorted : false
-//     },
-//     "Oliver": {
-//         skills : ["skill2", "skill4", "skill7"],
-//         sorted : false
-//     },
-//     "Theo": {
-//         skills : ["skill1", "skill3", "skill8", "skill10"],
-//         sorted : false
-//     }
-// }
-// var ideas = {
-//     "ideaA": { 
-//         skills: ["skill1", "skill4", "skill7"],
-//         missingSkills: ["skill1", "skill4", "skill7"],
-//         favs: ["Paul", "Miriam"],
-//         nogos: ["Klaus", "Oliver"],
-//         members: []
-//     },
-//     "ideaB": {
-//         skills: ["skill4", "skill8", "skill10"],
-//         missingSkills: ["skill4", "skill8", "skill10"],
-//         favs: [],
-//         nogos: ["Nina", "Miriam", "Theo"],
-//         members: []
-//     },
-//     "ideaC": {
-//         skills: ["skill3", "skill6", "skill7"],
-//         missingSkills: ["skill3", "skill6", "skill7"],
-//         favs: ["Klaus", "Bo", "Nina", "Johannes", "Oliver", "Theo"],
-//         nogos: [],
-//         members: []
-//     },
-//     "ideaD": {
-//         skills: ["skill2", "skill6", "skill9"],
-//         missingSkills: ["skill2", "skill6", "skill9"],
-//         favs: ["Niklas", "Lena"],
-//         nogos: ["Clara", "Tom"],
-//         members: []
-//     },
-//     "ideaE": {
-//         skills: ["skill1", "skill5", "skill7", "skill9"],
-//         missingSkills: ["skill1", "skill5", "skill7", "skill9"],
-//         favs: ["Anna", "Clara", "Melanie", "Tom", "Ali"],
-//         nogos: ["Bo", "Paul", "Lena"],
-//         members: []
-//     }
-// }
 var members = {
-    "Anton": {
-        skills : ["skill1", "skill5", "skill8", "skill10"],
+   "Anna": {
+        skills : ["skill3", "skill6", "skill8"],
+        sorted : false
     },
-    "Berta": {
-        skills : ["skill1", "skill4", "skill7"],
+    "Niklas": {
+        skills : ["skill1", "skill5", "skill8"],
+        sorted : false
     },
-    "Charlotte": {
-        skills : ["skill1", "skill2", "skill3", "skill4"],
+    "Klaus": {
+        skills : ["skill2", "skill4"],
+        sorted : false
     },
-    "Dora": {
-        skills : ["skill5", "skill6", "skill9"],
+    "Bo": {
+        skills : ["skill6"],
+        sorted : false
     },
-    "Emil": {
-        skills : ["skill6", "skill8", "skill9", "skill10"],
+    "Paul": {
+        skills : ["skill7", "skill10"],
+        sorted : false
     },
-    "Friedrich": {
-        skills : ["skill1", "skill3", "skill5"],
+    "Nina": {
+        skills : ["skill4", "skill9"],
+        sorted : false
     },
-    "Gustav": {
-        skills : ["skill1", "skill8", "skill9"],
+    "Johannes": {
+        skills : ["skill2", "skill3", "skill5", "skill9"],
+        sorted : false
     },
-    "Heinrich": {
-        skills : ["skill3", "skill4", "skill6"],
+    "Clara": {
+        skills : ["skill1", "skill7", "skill10"],
+        sorted : false
     },
-    "Ida": {
-        skills : ["skill1", "skill5", "skill9"],
+    "Lena": {
+        skills : ["skill3", "skill5"],
+        sorted : false
     },
-    "Julia": {
-        skills : ["skill3", "skill7", "skill8", "skill10"],
+    "Miriam": {
+        skills : ["skill6", "skill10"],
+        sorted : false
+    },
+    "Melanie": {
+        skills : ["skill2", "skill4", "skill5"],
+        sorted : false
+    },
+    "Tom": {
+        skills : ["skill6", "skill9"],
+        sorted : false
+    },
+    "Ali": {
+        skills : ["skill1", "skill8"],
+        sorted : false
+    },
+    "Oliver": {
+        skills : ["skill2", "skill4", "skill7"],
+        sorted : false
+    },
+    "Theo": {
+        skills : ["skill1", "skill3", "skill8", "skill10"],
+        sorted : false
     }
 }
 var ideas = {
     "ideaA": { 
-        skills: ["skill1", "skill2", "skill5", "skill9"],
-        missingSkills: ["skill1", "skill2", "skill5", "skill9"],
-        favs: ["Anton", "Berta", "Heinrich"],
-        nogos: ["Dora", "Friedrich", "Ida"],
+        skills: ["skill1", "skill4", "skill7"],
+        missingSkills: ["skill1", "skill4", "skill7"],
+        favs: ["Paul", "Miriam"],
+        nogos: ["Klaus", "Oliver"],
         members: []
     },
     "ideaB": {
-        skills: ["skill3", "skill4", "skill6", "skill7"],
-        missingSkills: ["skill3", "skill4", "skill6", "skill7"],
-        favs: ["Dora", "Friedrich", "Ida"],
-        nogos: [],
+        skills: ["skill4", "skill8", "skill10"],
+        missingSkills: ["skill4", "skill8", "skill10"],
+        favs: [],
+        nogos: ["Nina", "Miriam", "Theo"],
         members: []
     },
     "ideaC": {
-        skills: ["skill1", "skill5", "skill8", "skill10"],
-        missingSkills: ["skill1", "skill5", "skill8", "skill10"],
-        favs: ["Charlotte"],
-        nogos: ["Berta"],
+        skills: ["skill3", "skill6", "skill7"],
+        missingSkills: ["skill3", "skill6", "skill7"],
+        favs: ["Klaus", "Bo", "Nina", "Johannes", "Oliver", "Theo"],
+        nogos: [],
         members: []
     },
+    "ideaD": {
+        skills: ["skill2", "skill6", "skill9"],
+        missingSkills: ["skill2", "skill6", "skill9"],
+        favs: ["Niklas", "Lena"],
+        nogos: ["Clara", "Tom"],
+        members: []
+    },
+    "ideaE": {
+        skills: ["skill1", "skill5", "skill7", "skill9"],
+        missingSkills: ["skill1", "skill5", "skill7", "skill9"],
+        favs: ["Anna", "Clara", "Melanie", "Tom", "Ali"],
+        nogos: ["Bo", "Paul", "Lena"],
+        members: []
+    }
 }
+// var members = {
+//     "Anton": {
+//         skills : ["skill1", "skill5", "skill8", "skill10"],
+//     },
+//     "Berta": {
+//         skills : ["skill1", "skill4", "skill7"],
+//     },
+//     "Charlotte": {
+//         skills : ["skill1", "skill2", "skill3", "skill4"],
+//     },
+//     "Dora": {
+//         skills : ["skill5", "skill6", "skill9"],
+//     },
+//     "Emil": {
+//         skills : ["skill6", "skill8", "skill9", "skill10"],
+//     },
+//     "Friedrich": {
+//         skills : ["skill1", "skill3", "skill5"],
+//     },
+//     "Gustav": {
+//         skills : ["skill1", "skill8", "skill9"],
+//     },
+//     "Heinrich": {
+//         skills : ["skill3", "skill4", "skill6"],
+//     },
+//     "Ida": {
+//         skills : ["skill1", "skill5", "skill9"],
+//     },
+//     "Julia": {
+//         skills : ["skill3", "skill7", "skill8", "skill10"],
+//     }
+// }
+// var ideas = {
+//     "ideaA": { 
+//         skills: ["skill1", "skill2", "skill5", "skill9"],
+//         missingSkills: ["skill1", "skill2", "skill5", "skill9"],
+//         favs: ["Anton", "Berta", "Heinrich"],
+//         nogos: ["Dora", "Friedrich", "Ida"],
+//         members: []
+//     },
+//     "ideaB": {
+//         skills: ["skill3", "skill4", "skill6", "skill7"],
+//         missingSkills: ["skill3", "skill4", "skill6", "skill7"],
+//         favs: ["Dora", "Friedrich", "Ida"],
+//         nogos: [],
+//         members: []
+//     },
+//     "ideaC": {
+//         skills: ["skill1", "skill5", "skill8", "skill10"],
+//         missingSkills: ["skill1", "skill5", "skill8", "skill10"],
+//         favs: ["Charlotte"],
+//         nogos: ["Berta"],
+//         members: []
+//     },
+// }
 // ___________________________________________________________________________________________________________________________________________________
 
-const skillValue = require('./skillValue');
-var skillValues = [];
+var skillValues = {};
 
-const calculateSkillValues = () => {
-    
-    var skillCounts = [];
-    
-    var membersCount = 0;
+function calculateSkillValues() {
 
-    // Skill-Vorkommen zählen
-    for (const memId in members) {
-        if (!members[memId].sorted) {
-            members[memId].skills.forEach((skill) => {
-                if (skillCounts[skill]) skillCounts[skill] += 1;
-                else skillCounts[skill] = 1;
+    skillValues=[];
+
+    let memberSkills =[];
+    let ideaSkills=[];
+
+    let allMemberSkills = new Array(); 
+    let allIdeaSkills = new Array(); 
+
+    //Skills zählen
+
+    for (const ID in members) {
+
+        if (!members[ID].sorted) {
+
+            members[ID].skills.forEach(skill => {
+
+                var index =allMemberSkills.indexOf(skill); 
+
+                if (index >= 0) {
+
+                    memberSkills[index][1]++;   
+                }
+                else{
+
+                    allMemberSkills.push(skill);
+                    memberSkills.push([skill,1]);
+                }            
             });
-            membersCount ++;
         }
+            
     }
 
-    // Skill-Werte zuweisen
-    for (const skill in skillCounts) {
-        var value = Math.round(membersCount / skillCounts[skill]);
-        if (membersCount == skillCounts[skill]) value = 0;
-        skillValues[skill] = value;
+    for (const ID in ideas) {    
+
+        ideas[ID].missingSkills.forEach(skill => {
+
+            var index =allIdeaSkills.indexOf(skill); 
+
+            if (index >= 0) {
+
+                ideaSkills[index][1]++;   
+            }
+            else{
+
+                allIdeaSkills.push(skill);
+                ideaSkills.push([skill,1]);
+            }            
+        });
+      
+    }
+
+    for (let i = 0; i < memberSkills.length; i++) {
+
+        for (let j = 0; j < ideaSkills.length; j++) {
+            
+            if(memberSkills[i][0]== ideaSkills[j][0]){
+
+                // Prozent von vorhandenen Member Skills, zu benötigten Idea Skills
+                // Genau Abdeckung = 1; Selter Skill (häufiger benötigt, als vorhanden) > 1; Häufiger Skill < 1; 
+                let percent = ideaSkills[j][1] / memberSkills[i][1];
+
+                // Prozent * 10 für ganze Werte / 2, damit werte nicht übermäßig goß werden, abgerundet 
+                //let value = Math.floor((percent * 10) /2);
+                //aufgerundet
+                let value = Math.ceil((percent * 10) /2);
+
+                // Falls Skill so häufig vorkommt, dass er null wird, passiert bei weniger als 20%
+                /*if(value <= 0){
+                    value =1;
+                }*/
+
+                // Skill Values bei abrunden:
+                // 0%-39% = 1
+                // 40%-59% = 2
+                // 60%-79% = 3
+                // 80%-99% = 4
+                // 100%-119% = 5
+                // usw.
+
+                // Skill Values bei aufrunden:
+                // 0%-20% = 1
+                // 21%-40% = 2
+                // 41%-60% = 3
+                // 61%-80% = 4
+                // 81%-100% = 5
+                // usw.
+
+
+                skillValues[memberSkills[i][0]] = value;
+
+            }
+        }
+       
+        
     }
 
     // Werte ausgeben
     for (var i = 1; i<= 10; i++) {
-        console.log("skill" + i + " – Wert:  " + skillValues["skill" + i]);
+
+        if(skillValues["skill"+i]>0){
+         console.log("skill" + i + " – Wert:  " + skillValues["skill" + i]);   
+        }
+        
     }
+
 }
 
 calculateSkillValues();
@@ -219,7 +297,7 @@ const createUserScoreLists = () => {
 
                     if (members[memId].skills.indexOf(skill) >= 0) {
                         // Wenn Skillüberschneidung vorhanden, Score erhöhen
-                        score += skillValue.getSkillValue(skill);
+                        score += skillValues[skill];
                     }
                 });
 
@@ -355,6 +433,7 @@ const bestRemainingMatch = () => {
 
         // Ideen bestimmen, deren Skills noch nicht abgedeckt sind
         updateMissingSkills();
+        calculateSkillValues();
 
         // Alle Scores von übrigen Usern zu nicht vollen Ideen abspeichern
         var missingScoreList = [];
@@ -450,6 +529,8 @@ const bestRemainingMatchFinal = () => {
         } 
     }
     console.log("");
+
+    updateMissingSkills();
 }
 
 const resolveIncompleteIdeas = () => {
@@ -524,7 +605,7 @@ const proFiFunction = () => {
     printList();
     
     // Scorelisten neu erstellen: nur unsortierte User werden mit einbezogen
-    calculateSkillValues();
+    //calculateSkillValues();
     
     // Alle optimal zueinanderpassenden übrigen User und Ideen zuordnen
     bestRemainingMatch();
