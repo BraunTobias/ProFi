@@ -162,6 +162,7 @@ var ideas = {
 }
 // ___________________________________________________________________________________________________________________________________________________
 
+const skillValue = require('./skillValue');
 var skillValues = [];
 
 const calculateSkillValues = () => {
@@ -218,7 +219,7 @@ const createUserScoreLists = () => {
 
                     if (members[memId].skills.indexOf(skill) >= 0) {
                         // Wenn Skillüberschneidung vorhanden, Score erhöhen
-                        score += skillValues[skill];
+                        score += skillValue.getSkillValue(skill);
                     }
                 });
 
