@@ -14,6 +14,7 @@ const AnimatedImplementation = require('../../Animated/src/AnimatedImplementatio
 const Platform = require('../../Utilities/Platform');
 const React = require('react');
 const ReactNative = require('../../Renderer/shims/ReactNative');
+require('../../Renderer/shims/ReactNative'); // Force side effects to prevent T55744311
 const ScrollResponder = require('../ScrollResponder');
 const ScrollViewStickyHeader = require('./ScrollViewStickyHeader');
 const StyleSheet = require('../../StyleSheet/StyleSheet');
@@ -23,11 +24,10 @@ const dismissKeyboard = require('../../Utilities/dismissKeyboard');
 const flattenStyle = require('../../StyleSheet/flattenStyle');
 const invariant = require('invariant');
 const processDecelerationRate = require('./processDecelerationRate');
-const requireNativeComponent = require('../../ReactNative/requireNativeComponent');
 const resolveAssetSource = require('../../Image/resolveAssetSource');
 const splitLayoutProps = require('../../StyleSheet/splitLayoutProps');
+const setAndForwardRef = require('../../Utilities/setAndForwardRef');
 
-import type {NativeMethodsMixinType} from '../../Renderer/shims/ReactNativeTypes';
 import type {EdgeInsetsProp} from '../../StyleSheet/EdgeInsetsPropType';
 import type {PointProp} from '../../StyleSheet/PointPropType';
 import type {ViewStyleProp} from '../../StyleSheet/StyleSheet';
@@ -37,9 +37,15 @@ import type {
   ScrollEvent,
   LayoutEvent,
 } from '../../Types/CoreEventTypes';
+import type {HostComponent} from '../../Renderer/shims/ReactNativeTypes';
 import type {State as ScrollResponderState} from '../ScrollResponder';
 import type {ViewProps} from '../View/ViewPropTypes';
 import type {Props as ScrollViewStickyHeaderProps} from './ScrollViewStickyHeader';
+
+import ScrollViewNativeComponent from './ScrollViewNativeComponent';
+import ScrollContentViewNativeComponent from './ScrollContentViewNativeComponent';
+import AndroidHorizontalScrollViewNativeComponent from './AndroidHorizontalScrollViewNativeComponent';
+import AndroidHorizontalScrollContentViewNativeComponent from './AndroidHorizontalScrollContentViewNativeComponent';
 
 let AndroidScrollView;
 let AndroidHorizontalScrollContentView;
@@ -48,33 +54,37 @@ let RCTScrollView;
 let RCTScrollContentView;
 
 if (Platform.OS === 'android') {
-  AndroidScrollView = requireNativeComponent('RCTScrollView');
-  AndroidHorizontalScrollView = requireNativeComponent(
-    'AndroidHorizontalScrollView',
-  );
-  AndroidHorizontalScrollContentView = requireNativeComponent(
-    'AndroidHorizontalScrollContentView',
-  );
-} else if (Platform.OS === 'ios') {
-  RCTScrollView = requireNativeComponent('RCTScrollView');
-  RCTScrollContentView = requireNativeComponent('RCTScrollContentView');
+  AndroidScrollView = ScrollViewNativeComponent;
+  AndroidHorizontalScrollView = AndroidHorizontalScrollViewNativeComponent;
+  AndroidHorizontalScrollContentView = AndroidHorizontalScrollContentViewNativeComponent;
 } else {
-  RCTScrollView = requireNativeComponent('RCTScrollView');
-  RCTScrollContentView = requireNativeComponent('RCTScrollContentView');
+  RCTScrollView = ScrollViewNativeComponent;
+  RCTScrollContentView = ScrollContentViewNativeComponent;
 }
 
-export type ScrollResponderType = {
-  ...ScrollView,
-  ...typeof ScrollResponder.Mixin,
-};
+// Public methods for ScrollView
+export type ScrollViewImperativeMethods = $ReadOnly<{|
+  getScrollResponder: $PropertyType<ScrollView, 'getScrollResponder'>,
+  getScrollableNode: $PropertyType<ScrollView, 'getScrollableNode'>,
+  getInnerViewNode: $PropertyType<ScrollView, 'getInnerViewNode'>,
+  getInnerViewRef: $PropertyType<ScrollView, 'getInnerViewRef'>,
+  getNativeScrollRef: $PropertyType<ScrollView, 'getNativeScrollRef'>,
+  scrollTo: $PropertyType<ScrollView, 'scrollTo'>,
+  scrollToEnd: $PropertyType<ScrollView, 'scrollToEnd'>,
+  flashScrollIndicators: $PropertyType<ScrollView, 'flashScrollIndicators'>,
 
-type TouchableProps = $ReadOnly<{|
-  onTouchStart?: (event: PressEvent) => void,
-  onTouchMove?: (event: PressEvent) => void,
-  onTouchEnd?: (event: PressEvent) => void,
-  onTouchCancel?: (event: PressEvent) => void,
-  onTouchEndCapture?: (event: PressEvent) => void,
+  // ScrollResponder.Mixin public methods
+  scrollResponderZoomTo: $PropertyType<
+    typeof ScrollResponder.Mixin,
+    'scrollResponderZoomTo',
+  >,
+  scrollResponderScrollNativeHandleToKeyboard: $PropertyType<
+    typeof ScrollResponder.Mixin,
+    'scrollResponderScrollNativeHandleToKeyboard',
+  >,
 |}>;
+
+export type ScrollResponderType = ScrollViewImperativeMethods;
 
 type IOSProps = $ReadOnly<{|
   /**
@@ -335,6 +345,18 @@ type AndroidProps = $ReadOnly<{|
    * @platform android
    */
   persistentScrollbar?: ?boolean,
+  /**
+   * Fades out the edges of the the scroll content.
+   *
+   * If the value is greater than 0, the fading edges will be set accordingly
+   * to the current scroll direction and position,
+   * indicating if there is more content to show.
+   *
+   * The default value is 0.
+   *
+   * @platform android
+   */
+  fadingEdgeLength?: ?number,
 |}>;
 
 type VRProps = $ReadOnly<{|
@@ -353,13 +375,13 @@ type VRProps = $ReadOnly<{|
   scrollBarThumbImage?: ?($ReadOnly<{||}> | number), // Opaque type returned by import IMAGE from './image.jpg'
 |}>;
 
-type StickyHeaderComponentType = React.ComponentType<ScrollViewStickyHeaderProps> & {
-  setNextHeaderY: number => void,
-};
+type StickyHeaderComponentType = React.AbstractComponent<
+  ScrollViewStickyHeaderProps,
+  $ReadOnly<{setNextHeaderY: number => void, ...}>,
+>;
 
 export type Props = $ReadOnly<{|
   ...ViewProps,
-  ...TouchableProps,
   ...IOSProps,
   ...AndroidProps,
   ...VRProps,
@@ -385,8 +407,8 @@ export type Props = $ReadOnly<{|
   /**
    * When true, the scroll view stops on the next index (in relation to scroll
    * position at release) regardless of how fast the gesture is. This can be
-   * used for horizontal pagination when the page is less than the width of
-   * the ScrollView. The default value is false.
+   * used for pagination when the page is less than the width of the
+   * horizontal ScrollView or the height of the vertical ScrollView. The default value is false.
    */
   disableIntervalMomentum?: ?boolean,
   /**
@@ -424,9 +446,9 @@ export type Props = $ReadOnly<{|
    *     synchrony with the touch; dragging upwards cancels the dismissal.
    *     On android this is not supported and it will have the same behavior as 'none'.
    */
-  keyboardDismissMode?: ?(
-    | 'none' // default
-    | 'on-drag' // cross-platform
+  keyboardDismissMode?: ?// default
+  (| 'none' // cross-platform
+    | 'on-drag'
     | 'interactive'
   ), // ios only
   /**
@@ -445,26 +467,26 @@ export type Props = $ReadOnly<{|
   /**
    * Called when the momentum scroll starts (scroll which occurs as the ScrollView glides to a stop).
    */
-  onMomentumScrollBegin?: (event: ScrollEvent) => void,
+  onMomentumScrollBegin?: ?(event: ScrollEvent) => void,
   /**
    * Called when the momentum scroll ends (scroll which occurs as the ScrollView glides to a stop).
    */
-  onMomentumScrollEnd?: (event: ScrollEvent) => void,
+  onMomentumScrollEnd?: ?(event: ScrollEvent) => void,
 
   /**
    * Fires at most once per frame during scrolling. The frequency of the
    * events can be controlled using the `scrollEventThrottle` prop.
    */
-  onScroll?: (event: ScrollEvent) => void,
+  onScroll?: ?(event: ScrollEvent) => void,
   /**
    * Called when the user begins to drag the scroll view.
    */
-  onScrollBeginDrag?: (event: ScrollEvent) => void,
+  onScrollBeginDrag?: ?(event: ScrollEvent) => void,
   /**
    * Called when the user stops dragging the scroll view and it either stops
    * or begins to glide.
    */
-  onScrollEndDrag?: (event: ScrollEvent) => void,
+  onScrollEndDrag?: ?(event: ScrollEvent) => void,
   /**
    * Called when scrollable content view of the ScrollView changes.
    *
@@ -563,6 +585,19 @@ export type Props = $ReadOnly<{|
   // $FlowFixMe - how to handle generic type without existential operator?
   refreshControl?: ?React.Element<any>,
   children?: React.Node,
+  /**
+   * A ref to the inner View element of the ScrollView. This should be used
+   * instead of calling `getInnerViewRef`.
+   */
+  innerViewRef?: React.Ref<typeof View>,
+  /**
+   * A ref to the Native ScrollView component. This ref can be used to call
+   * all of ScrollView's public methods, in addition to native methods like
+   * measure, measureLayout, etc.
+   */
+  scrollViewRef?: React.Ref<
+    typeof ScrollViewNativeComponent & ScrollViewImperativeMethods,
+  >,
 |}>;
 
 type State = {|
@@ -585,11 +620,14 @@ function createScrollResponder(
 }
 
 type ContextType = {|horizontal: boolean|} | null;
-const Context = React.createContext<ContextType>(null);
+const Context: React.Context<ContextType> = React.createContext(null);
 const standardHorizontalContext: ContextType = Object.freeze({
   horizontal: true,
 });
 const standardVerticalContext: ContextType = Object.freeze({horizontal: false});
+type ScrollViewComponentStatics = $ReadOnly<{|
+  Context: typeof Context,
+|}>;
 
 /**
  * Component that wraps platform ScrollView while providing
@@ -607,7 +645,7 @@ const standardVerticalContext: ContextType = Object.freeze({horizontal: false});
  * view from becoming the responder.
  *
  *
- * `<ScrollView>` vs [`<FlatList>`](/react-native/docs/flatlist.html) - which one to use?
+ * `<ScrollView>` vs [`<FlatList>`](https://reactnative.dev/docs/flatlist.html) - which one to use?
  *
  * `ScrollView` simply renders all its react child components at once. That
  * makes it very easy to understand and use.
@@ -683,8 +721,11 @@ class ScrollView extends React.Component<Props, State> {
   _scrollAnimatedValue: AnimatedImplementation.Value = new AnimatedImplementation.Value(
     0,
   );
-  _scrollAnimatedValueAttachment: ?{detach: () => void} = null;
-  _stickyHeaderRefs: Map<string, StickyHeaderComponentType> = new Map();
+  _scrollAnimatedValueAttachment: ?{detach: () => void, ...} = null;
+  _stickyHeaderRefs: Map<
+    string,
+    React.ElementRef<StickyHeaderComponentType>,
+  > = new Map();
   _headerLayoutYs: Map<string, number> = new Map();
 
   state: State = {
@@ -695,11 +736,9 @@ class ScrollView extends React.Component<Props, State> {
   UNSAFE_componentWillMount() {
     this._scrollResponder.UNSAFE_componentWillMount();
     this._scrollAnimatedValue = new AnimatedImplementation.Value(
-      this.props.contentOffset ? this.props.contentOffset.y : 0,
+      this.props.contentOffset?.y ?? 0,
     );
-    this._scrollAnimatedValue.setOffset(
-      this.props.contentInset ? this.props.contentInset.top || 0 : 0,
-    );
+    this._scrollAnimatedValue.setOffset(this.props.contentInset?.top ?? 0);
     this._stickyHeaderRefs = new Map();
     this._headerLayoutYs = new Map();
   }
@@ -731,9 +770,37 @@ class ScrollView extends React.Component<Props, State> {
     }
   }
 
-  setNativeProps(props: {[key: string]: mixed}) {
-    this._scrollViewRef && this._scrollViewRef.setNativeProps(props);
-  }
+  _setNativeRef = setAndForwardRef({
+    getForwardedRef: () => this.props.scrollViewRef,
+    setLocalRef: ref => {
+      this._scrollViewRef = ref;
+
+      /*
+        This is a hack. Ideally we would forwardRef to the underlying
+        host component. However, since ScrollView has it's own methods that can be
+        called as well, if we used the standard forwardRef then these
+        methods wouldn't be accessible and thus be a breaking change.
+
+        Therefore we edit ref to include ScrollView's public methods so that
+        they are callable from the ref.
+      */
+      if (ref) {
+        ref.getScrollResponder = this.getScrollResponder;
+        ref.getScrollableNode = this.getScrollableNode;
+        ref.getInnerViewNode = this.getInnerViewNode;
+        ref.getInnerViewRef = this.getInnerViewRef;
+        ref.getNativeScrollRef = this.getNativeScrollRef;
+        ref.scrollTo = this.scrollTo;
+        ref.scrollToEnd = this.scrollToEnd;
+        ref.flashScrollIndicators = this.flashScrollIndicators;
+
+        // $FlowFixMe - This method was manually bound from ScrollResponder.mixin
+        ref.scrollResponderZoomTo = this.scrollResponderZoomTo;
+        // $FlowFixMe - This method was manually bound from ScrollResponder.mixin
+        ref.scrollResponderScrollNativeHandleToKeyboard = this.scrollResponderScrollNativeHandleToKeyboard;
+      }
+    },
+  });
 
   /**
    * Returns a reference to the underlying scroll responder, which supports
@@ -741,22 +808,26 @@ class ScrollView extends React.Component<Props, State> {
    * implement this method so that they can be composed while providing access
    * to the underlying scroll responder's methods.
    */
-  getScrollResponder(): ScrollResponderType {
+  getScrollResponder: () => ScrollResponderType = () => {
     // $FlowFixMe - overriding type to include ScrollResponder.Mixin
     return ((this: any): ScrollResponderType);
-  }
+  };
 
-  getScrollableNode(): ?number {
+  getScrollableNode: () => ?number = () => {
     return ReactNative.findNodeHandle(this._scrollViewRef);
-  }
+  };
 
   getInnerViewNode(): ?number {
     return ReactNative.findNodeHandle(this._innerViewRef);
   }
 
-  getNativeScrollRef(): ?ScrollView {
-    return this._scrollViewRef;
+  getInnerViewRef(): ?React.ElementRef<typeof View> {
+    return this._innerViewRef;
   }
+
+  getNativeScrollRef: () => ?React.ElementRef<HostComponent<mixed>> = () => {
+    return this._scrollViewRef;
+  };
 
   /**
    * Scrolls to a given x, y offset, either immediately or with a smooth animation.
@@ -769,11 +840,29 @@ class ScrollView extends React.Component<Props, State> {
    * the function also accepts separate arguments as an alternative to the options object.
    * This is deprecated due to ambiguity (y before x), and SHOULD NOT BE USED.
    */
-  scrollTo(
-    options?: {x?: number, y?: number, animated?: boolean} | number,
+  scrollTo: (
+    options?:
+      | {
+          x?: number,
+          y?: number,
+          animated?: boolean,
+          ...
+        }
+      | number,
     deprecatedX?: number,
     deprecatedAnimated?: boolean,
-  ) {
+  ) => void = (
+    options?:
+      | {
+          x?: number,
+          y?: number,
+          animated?: boolean,
+          ...
+        }
+      | number,
+    deprecatedX?: number,
+    deprecatedAnimated?: boolean,
+  ) => {
     let x, y, animated;
     if (typeof options === 'number') {
       console.warn(
@@ -793,7 +882,7 @@ class ScrollView extends React.Component<Props, State> {
       y: y || 0,
       animated: animated !== false,
     });
-  }
+  };
 
   /**
    * If this is a vertical ScrollView scrolls to the bottom.
@@ -803,32 +892,24 @@ class ScrollView extends React.Component<Props, State> {
    * `scrollToEnd({animated: false})` for immediate scrolling.
    * If no options are passed, `animated` defaults to true.
    */
-  scrollToEnd(options?: ?{animated?: boolean}) {
+  scrollToEnd: (options?: ?{animated?: boolean, ...}) => void = (
+    options?: ?{animated?: boolean, ...},
+  ) => {
     // Default to true
     const animated = (options && options.animated) !== false;
     this._scrollResponder.scrollResponderScrollToEnd({
       animated: animated,
     });
-  }
-
-  /**
-   * Deprecated, use `scrollTo` instead.
-   */
-  scrollWithoutAnimationTo(y: number = 0, x: number = 0) {
-    console.warn(
-      '`scrollWithoutAnimationTo` is deprecated. Use `scrollTo` instead',
-    );
-    this.scrollTo({x, y, animated: false});
-  }
+  };
 
   /**
    * Displays the scroll indicators momentarily.
    *
    * @platform ios
    */
-  flashScrollIndicators() {
+  flashScrollIndicators: () => void = () => {
     this._scrollResponder.scrollResponderFlashScrollIndicators();
-  }
+  };
 
   _getKeyForIndex(index, childArray) {
     const child = childArray[index];
@@ -851,7 +932,10 @@ class ScrollView extends React.Component<Props, State> {
     }
   }
 
-  _setStickyHeaderRef(key: string, ref: ?StickyHeaderComponentType) {
+  _setStickyHeaderRef(
+    key: string,
+    ref: ?React.ElementRef<StickyHeaderComponentType>,
+  ) {
     if (ref) {
       this._stickyHeaderRefs.set(key, ref);
     } else {
@@ -927,15 +1011,15 @@ class ScrollView extends React.Component<Props, State> {
       this.props.onContentSizeChange(width, height);
   };
 
-  _scrollViewRef: ?ScrollView = null;
-  _setScrollViewRef = (ref: ?ScrollView) => {
-    this._scrollViewRef = ref;
-  };
+  _scrollViewRef: ?React.ElementRef<HostComponent<mixed>> = null;
 
-  _innerViewRef: ?NativeMethodsMixinType = null;
-  _setInnerViewRef = (ref: ?NativeMethodsMixinType) => {
-    this._innerViewRef = ref;
-  };
+  _innerViewRef: ?React.ElementRef<typeof View> = null;
+  _setInnerViewRef = setAndForwardRef({
+    getForwardedRef: () => this.props.innerViewRef,
+    setLocalRef: ref => {
+      this._innerViewRef = ref;
+    },
+  });
 
   render(): React.Node | React.Element<string> {
     let ScrollViewClass;
@@ -1003,7 +1087,6 @@ class ScrollView extends React.Component<Props, State> {
           return (
             <StickyHeaderComponent
               key={key}
-              // $FlowFixMe - inexact mixed is incompatible with exact React.Element
               ref={ref => this._setStickyHeaderRef(key, ref)}
               nextHeaderLayoutY={this._headerLayoutYs.get(
                 this._getKeyForIndex(nextIndex, childArray),
@@ -1035,9 +1118,11 @@ class ScrollView extends React.Component<Props, State> {
       Array.isArray(stickyHeaderIndices) && stickyHeaderIndices.length > 0;
 
     const contentContainer = (
+      /* $FlowFixMe(>=0.112.0 site=react_native_fb) This comment suppresses an
+       * error found when Flow v0.112 was deployed. To see the error, delete
+       * this comment and run Flow. */
       <ScrollContentContainerViewClass
         {...contentSizeChangeProps}
-        // $FlowFixMe Invalid prop usage
         ref={this._setInnerViewRef}
         style={contentContainerStyle}
         removeClippedSubviews={
@@ -1088,9 +1173,6 @@ class ScrollView extends React.Component<Props, State> {
         .scrollResponderHandleResponderReject,
       onResponderRelease: this._scrollResponder
         .scrollResponderHandleResponderRelease,
-      // $FlowFixMe
-      onResponderTerminate: this._scrollResponder
-        .scrollResponderHandleTerminate,
       onResponderTerminationRequest: this._scrollResponder
         .scrollResponderHandleTerminationRequest,
       onScrollBeginDrag: this._scrollResponder
@@ -1147,8 +1229,10 @@ class ScrollView extends React.Component<Props, State> {
         // On iOS the RefreshControl is a child of the ScrollView.
         // tvOS lacks native support for RefreshControl, so don't include it in that case
         return (
-          // $FlowFixMe
-          <ScrollViewClass {...props} ref={this._setScrollViewRef}>
+          /* $FlowFixMe(>=0.117.0 site=react_native_fb) This comment suppresses
+           * an error found when Flow v0.117 was deployed. To see the error,
+           * delete this comment and run Flow. */
+          <ScrollViewClass {...props} ref={this._setNativeRef}>
             {Platform.isTV ? null : refreshControl}
             {contentContainer}
           </ScrollViewClass>
@@ -1166,16 +1250,14 @@ class ScrollView extends React.Component<Props, State> {
           <ScrollViewClass
             {...props}
             style={[baseStyle, inner]}
-            // $FlowFixMe
-            ref={this._setScrollViewRef}>
+            ref={this._setNativeRef}>
             {contentContainer}
           </ScrollViewClass>,
         );
       }
     }
     return (
-      // $FlowFixMe
-      <ScrollViewClass {...props} ref={this._setScrollViewRef}>
+      <ScrollViewClass {...props} ref={this._setNativeRef}>
         {contentContainer}
       </ScrollViewClass>
     );
@@ -1200,4 +1282,22 @@ const styles = StyleSheet.create({
   },
 });
 
-module.exports = ScrollView;
+function Wrapper(props, ref) {
+  return <ScrollView {...props} scrollViewRef={ref} />;
+}
+Wrapper.displayName = 'ScrollView';
+const ForwardedScrollView = React.forwardRef(Wrapper);
+
+// $FlowFixMe Add static context to ForwardedScrollView
+ForwardedScrollView.Context = Context;
+
+ForwardedScrollView.displayName = 'ScrollView';
+
+module.exports = ((ForwardedScrollView: $FlowFixMe): React.AbstractComponent<
+  React.ElementConfig<typeof ScrollView>,
+  $ReadOnly<{|
+    ...$Exact<React.ElementRef<HostComponent<mixed>>>,
+    ...ScrollViewImperativeMethods,
+  |}>,
+> &
+  ScrollViewComponentStatics);

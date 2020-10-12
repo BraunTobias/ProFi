@@ -7,6 +7,7 @@
  * @flow
  * @format
  */
+
 'use strict';
 
 const NativeAnimatedHelper = require('../NativeAnimatedHelper');
@@ -14,14 +15,14 @@ const NativeAnimatedHelper = require('../NativeAnimatedHelper');
 const NativeAnimatedAPI = NativeAnimatedHelper.API;
 const invariant = require('invariant');
 
-type ValueListenerCallback = (state: {value: number}) => mixed;
+type ValueListenerCallback = (state: {value: number, ...}) => mixed;
 
 let _uniqueId = 1;
 
 // Note(vjeux): this would be better as an interface but flow doesn't
 // support them yet
 class AnimatedNode {
-  _listeners: {[key: string]: ValueListenerCallback};
+  _listeners: {[key: string]: ValueListenerCallback, ...};
   __nativeAnimatedValueListener: ?any;
   __attach(): void {}
   __detach(): void {
@@ -64,7 +65,7 @@ class AnimatedNode {
    * animations.  This is useful because there is no way to
    * synchronously read the value because it might be driven natively.
    *
-   * See http://facebook.github.io/react-native/docs/animatedvalue.html#addlistener
+   * See https://reactnative.dev/docs/animatedvalue.html#addlistener
    */
   addListener(callback: (value: any) => mixed): string {
     const id = String(_uniqueId++);
@@ -79,7 +80,7 @@ class AnimatedNode {
    * Unregister a listener. The `id` param shall match the identifier
    * previously returned by `addListener()`.
    *
-   * See http://facebook.github.io/react-native/docs/animatedvalue.html#removelistener
+   * See https://reactnative.dev/docs/animatedvalue.html#removelistener
    */
   removeListener(id: string): void {
     delete this._listeners[id];
@@ -91,7 +92,7 @@ class AnimatedNode {
   /**
    * Remove all registered listeners.
    *
-   * See http://facebook.github.io/react-native/docs/animatedvalue.html#removealllisteners
+   * See https://reactnative.dev/docs/animatedvalue.html#removealllisteners
    */
   removeAllListeners(): void {
     this._listeners = {};
@@ -149,14 +150,17 @@ class AnimatedNode {
     NativeAnimatedAPI.stopListeningToAnimatedNodeValue(this.__getNativeTag());
   }
 
-  __getNativeTag(): ?number {
+  __getNativeTag(): number {
     NativeAnimatedHelper.assertNativeAnimatedModule();
     invariant(
       this.__isNative,
       'Attempt to get native tag from node not marked as "native"',
     );
+
+    const nativeTag =
+      this.__nativeTag ?? NativeAnimatedHelper.generateNewNodeTag();
+
     if (this.__nativeTag == null) {
-      const nativeTag: ?number = NativeAnimatedHelper.generateNewNodeTag();
       this.__nativeTag = nativeTag;
       NativeAnimatedHelper.API.createAnimatedNode(
         nativeTag,
@@ -164,7 +168,8 @@ class AnimatedNode {
       );
       this.__shouldUpdateListenersForNewNativeTag = true;
     }
-    return this.__nativeTag;
+
+    return nativeTag;
   }
   __getNativeConfig(): Object {
     throw new Error(

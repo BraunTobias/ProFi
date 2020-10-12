@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
  * This source code is licensed under the MIT license found in the
@@ -13,12 +13,11 @@
 @protocol RCTBridgeModule;
 @class RCTBridge;
 
-typedef id<RCTBridgeModule>(^RCTBridgeModuleProvider)(void);
+typedef id<RCTBridgeModule> (^RCTBridgeModuleProvider)(void);
 
 @interface RCTModuleData : NSObject <RCTInvalidating>
 
-- (instancetype)initWithModuleClass:(Class)moduleClass
-                             bridge:(RCTBridge *)bridge;
+- (instancetype)initWithModuleClass:(Class)moduleClass bridge:(RCTBridge *)bridge;
 
 - (instancetype)initWithModuleClass:(Class)moduleClass
                      moduleProvider:(RCTBridgeModuleProvider)moduleProvider

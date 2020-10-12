@@ -163,8 +163,10 @@ const generateData = (count) => {
     }
 
     const data = {"members": members, "ideas": ideas};
+    const dataString = JSON.stringify(data);
+    
 
-    fs.writeFile("Datensatz-" + count + ".tx t", JSON.stringify(data), (err) => {  
+    fs.writeFile("Datensatz-" + count + ".txt", JSON.stringify(data), (err) => {  
         // In case of a error throw err. 
         if (err) throw err; 
     }) 

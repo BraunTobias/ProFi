@@ -11,11 +11,15 @@
 'use strict';
 
 import Platform from '../../Utilities/Platform';
+const View = require('../../Components/View/View');
+const React = require('react');
+import type {AnimatedComponentType} from './createAnimatedComponent';
 
 const AnimatedMock = require('./AnimatedMock');
 const AnimatedImplementation = require('./AnimatedImplementation');
 
-const Animated = ((Platform.isTesting
+//TODO(T57411659): Remove the bridgeless check when Animated perf regressions are fixed.
+const Animated = ((Platform.isTesting || global.RN$Bridgeless
   ? AnimatedMock
   : AnimatedImplementation): typeof AnimatedMock);
 
@@ -35,7 +39,10 @@ module.exports = {
   get Text(): any {
     return require('./components/AnimatedText');
   },
-  get View(): any {
+  get View(): AnimatedComponentType<
+    React.ElementConfig<typeof View>,
+    React.ElementRef<typeof View>,
+  > {
     return require('./components/AnimatedView');
   },
   ...Animated,

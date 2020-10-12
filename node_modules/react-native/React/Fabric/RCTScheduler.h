@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
  * This source code is licensed under the MIT license found in the
@@ -59,7 +59,10 @@ NS_ASSUME_NONNULL_BEGIN
                                        layoutContext:(facebook::react::LayoutContext)layoutContext
                                            surfaceId:(facebook::react::SurfaceId)surfaceId;
 
-- (const facebook::react::ComponentDescriptor &)getComponentDescriptor:(facebook::react::ComponentHandle)handle;
+- (facebook::react::ComponentDescriptor const *)findComponentDescriptorByHandle_DO_NOT_USE_THIS_IS_BROKEN:
+    (facebook::react::ComponentHandle)handle;
+
+- (facebook::react::MountingCoordinator::Shared)mountingCoordinatorWithSurfaceId:(facebook::react::SurfaceId)surfaceId;
 
 @end
 

@@ -12,11 +12,20 @@
 
 const AnimatedNode = require('../Animated/src/nodes/AnimatedNode');
 
-export type ColorValue = null | string;
+import type {NativeColorValue} from './PlatformColorValueTypes';
+
+export type ColorValue = null | string | NativeColorValue;
+
 export type ColorArrayValue = null | $ReadOnlyArray<ColorValue>;
 export type PointValue = {|
   x: number,
   y: number,
+|};
+export type EdgeInsetsValue = {|
+  top: number,
+  left: number,
+  right: number,
+  bottom: number,
 |};
 export type DimensionValue = null | number | string | AnimatedNode;
 
@@ -458,7 +467,7 @@ type ____LayoutStyle_Internal = $ReadOnly<{|
   /** `direction` specifies the directional flow of the user interface.
    *  The default is `inherit`, except for root node which will have
    *  value based on the current locale.
-   *  See https://facebook.github.io/yoga/docs/rtl/
+   *  See https://yogalayout.com/docs/layout-direction
    *  for more details.
    *  @platform ios
    */
@@ -576,24 +585,26 @@ export type ____ViewStyle_Internal = $ReadOnly<{|
   elevation?: number,
 |}>;
 
+export type ____FontWeight_Internal =
+  | 'normal'
+  | 'bold'
+  | '100'
+  | '200'
+  | '300'
+  | '400'
+  | '500'
+  | '600'
+  | '700'
+  | '800'
+  | '900';
+
 export type ____TextStyle_Internal = $ReadOnly<{|
   ...$Exact<____ViewStyle_Internal>,
   color?: ColorValue,
   fontFamily?: string,
   fontSize?: number,
   fontStyle?: 'normal' | 'italic',
-  fontWeight?:
-    | 'normal'
-    | 'bold'
-    | '100'
-    | '200'
-    | '300'
-    | '400'
-    | '500'
-    | '600'
-    | '700'
-    | '800'
-    | '900',
+  fontWeight?: ____FontWeight_Internal,
   fontVariant?: $ReadOnlyArray<
     | 'small-caps'
     | 'oldstyle-nums'
@@ -635,6 +646,7 @@ export type ____DangerouslyImpreciseStyle_Internal = {
   +resizeMode?: 'contain' | 'cover' | 'stretch' | 'center' | 'repeat',
   +tintColor?: ColorValue,
   +overlayColor?: string,
+  ...
 };
 
 type GenericStyleProp<+T> =
@@ -660,4 +672,5 @@ export type ____ImageStyleProp_Internal = GenericStyleProp<
 
 export type ____Styles_Internal = {
   +[key: string]: $Shape<____DangerouslyImpreciseStyle_Internal>,
+  ...,
 };

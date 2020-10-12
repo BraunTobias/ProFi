@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
  * This source code is licensed under the MIT license found in the
@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
  * RCTBubblingEventBlock, for other use cases prefer using a class that implements
  * RCTEvent to have a type safe way to initialize it.
  */
-@interface RCTComponentEvent : NSObject<RCTEvent>
+@interface RCTComponentEvent : NSObject <RCTEvent>
 
 - (instancetype)initWithName:(NSString *)name viewTag:(NSNumber *)viewTag body:(NSDictionary *)body;
 

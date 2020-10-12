@@ -1,84 +1,81 @@
 import React, { useState, useContext, useEffect } from 'react';
-import {FlatList } from "react-native";
-import { styles, texts, profileImage, lightGrey } from '../Styles'
+import {FlatList, Modal, StatusBar } from "react-native";
+
+import { boxes, colors, styles, texts } from '../Styles';
 import { View, Text, Image } from 'react-native';
 import { icons } from '../Styles';
 import DB from '../api/DB_API';
-
+import ModalContent from './ModalContent';
+import AttributeList from './AttributeList';
+import ProfileImage from './ProfileImage';
+import Padding from './Padding';
 
 export default ProfileView = props => {
+
     const [currentName, setCurrentName] = useState("");
     const [currentBio, setCurrentBio] = useState("");
     const [currentEmail, setCurrentEmail] = useState("");
     const [currentImage, setCurrentImage] = useState(icons.profilePlaceholder);
+    const [imageUrl, setImageUrl] = useState("");
     const [skillsList, setSkillsList] = useState([]);
-
-    // Wird nur beim Laden der Seite einmalig ausgeführt
+   
     useEffect(() => {
         DB.getUserInfoById(props.userId, (name, imageUrl, bio, email) => {
             setCurrentName(name);
             setCurrentBio(bio);
             setCurrentEmail(email);
-            if (imageUrl) setCurrentImage({uri: imageUrl});
+            if (imageUrl) setImageUrl(imageUrl);
         });
         DB.getAttributesFromUser(props.userId, (list) => {
-            // console.log("LIST: " + list);
-            if (list.length > 0) {
-                DB.getAllAttributes("skills", list, (attributesList) => {
-                    setSkillsList(attributesList);
-                    // console.log(attributesList);
-                }, () => {});
-            }
+            // if (list.length > 0) {
+            //     DB.getAllAttributes("skills", list, (attributesList) => {
+            //         setSkillsList(attributesList);
+            //         console.log(attributesList.join(", "))
+            //     }, () => {});
+            // }
+            setSkillsList(list);
         })
     }, []);
 
-    return ( 
-        <View style={{height: "100%", backgroundColor: lightGrey, flex: 1}}>
-            {/* // "Header" mit Profildaten */}
-            <View style={styles.subHeaderProfile}>
-                
-                {/* Linke Spalte: Profilbild */}
-                <View style={styles.contentProfile}>
-                    <Image 
-                        style={[profileImage.imageTile, profileImage.cameraPreview]} 
-                        source={currentImage} 
-                        />
-                        {/* source={{ uri: selectedImage.localUri}}  */}
+    return(
+        <Modal visible={props.visible} animationType='slide'>
+            <View style={{flex: 1}}>
+                <StatusBar barStyle="dark-content"/>
+
+                <View style={boxes.subHeader}>
+                    <Padding height={50}/>
+                    <View style={boxes.profileViewImage}>
+                        <ProfileImage
+                            imageUrl={imageUrl}
+                            onPress={() => {}}
+                            />
+                    </View>
+                    <Padding height={15}/>
+                    <View style={boxes.centeredRow}>
+                        <Text style={texts.listTileHeader}>{currentName}</Text>
+                    </View>
+                    <View style={boxes.centeredRow}>
+                        <Text style={texts.copy}>{currentBio}</Text>
+                    </View>
+                    <View style={boxes.centeredRow}>
+                        <Text style={texts.copy}>{currentEmail}</Text>
+                    </View>
+                    <Padding height={10}/>
                 </View>
 
-                {/* // Rechte Spalte */}
-                <View style={{flex:2, flexDirection: "column", justifyContent: 'center', alignItems: 'center'}}>
-                    <View style={{width: "90%"}} >
-                        <Text style= { texts.inputTextProfile }>{currentName}</Text>
-                    </View>
-                    <View style={{width: "90%"}} >
-                        <Text style={texts.textProfile}>Kurzbeschreibung:</Text>
-                        <Text style={texts.textBold}>{currentBio}</Text>
-                    </View>
-
-                    
-                    <View style={{width: "90%"}}>
-                        <Text style={texts.textProfile}>E-Mail:</Text>
-                        <Text style={texts.textBold}>{currentEmail}</Text>
-                    </View>
-                    
-                </View>
-            </View>
-            {/* <View style={{paddingBottom: 10, backgroundColor: lightGrey}}> */}
-                <FlatList style={{height: "100%"}}
-                    data={skillsList}
-                    keyExtractor={(item, index) => index.toString()}
-                    renderItem={(itemData) => { 
-                        return (
-                            <View style={styles.contentAttribute}>
-                                <Text style={[texts.textBoldAttribute, ]}>{itemData.item[0]}</Text> 
-                                <Text style={[texts.textAttribute, {backgroundColor: "white"}]}>{itemData.item[1]}</Text>
-                            </View>
-                        );
-                    }}
+                <AttributeList style={{flexGrow: 1, backgroundColor: "red"}}
+                    filterList = {skillsList}
+                    attributeType = "skills"
                 />
+                <View style={boxes.modalButton}>
+                    <ButtonLarge
+                        title={"OK"}
+                        onPress={props.onDismiss}
+                    />
+                </View>
 
-            {/* </View> */}
-        </View>
-     );
+            </View>
+        </Modal>
+    )        
 }
+          

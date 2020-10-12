@@ -7,13 +7,14 @@
  * @flow
  * @format
  */
+
 'use strict';
 
 const NativeAnimatedHelper = require('../NativeAnimatedHelper');
 
 import type AnimatedValue from '../nodes/AnimatedValue';
 
-export type EndResult = {finished: boolean};
+export type EndResult = {finished: boolean, ...};
 export type EndCallback = (result: EndResult) => void;
 
 export type AnimationConfig = {

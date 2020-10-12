@@ -1,4 +1,3 @@
-# coding: utf-8
 # Copyright (c) Facebook, Inc. and its affiliates.
 #
 # This source code is licensed under the MIT license found in the
@@ -18,16 +17,16 @@ else
 end
 
 folly_compiler_flags = '-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -Wno-comma -Wno-shorten-64-to-32'
-folly_version = '2018.10.22.00'
+folly_version = '2020.01.13.00'
 
 Pod::Spec.new do |s|
   s.name                   = "React-CoreModules"
   s.version                = version
   s.summary                = "-"  # TODO
-  s.homepage               = "http://facebook.github.io/react-native/"
+  s.homepage               = "https://reactnative.dev/"
   s.license                = package["license"]
   s.author                 = "Facebook, Inc. and its affiliates"
-  s.platforms              = { :ios => "9.0", :tvos => "9.2" }
+  s.platforms              = { :ios => "10.0", :tvos => "10.0" }
   s.compiler_flags         = folly_compiler_flags + ' -Wno-nullability-completeness'
   s.source                 = source
   s.source_files           = "**/*.{c,m,mm,cpp}"
@@ -39,9 +38,10 @@ Pod::Spec.new do |s|
                              }
 
   s.dependency "FBReactNativeSpec", version
-  s.dependency "RCTTypeSafety", version
-  s.dependency "React-RCTImage", version
   s.dependency "Folly", folly_version
+  s.dependency "RCTTypeSafety", version
   s.dependency "React-Core/CoreModulesHeaders", version
+  s.dependency "React-RCTImage", version
   s.dependency "ReactCommon/turbomodule/core", version
+  s.dependency "React-jsi", version
 end

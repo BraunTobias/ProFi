@@ -12,30 +12,20 @@
 
 const AppContainer = require('../ReactNative/AppContainer');
 const I18nManager = require('../ReactNative/I18nManager');
-const NativeEventEmitter = require('../EventEmitter/NativeEventEmitter');
-import NativeModalManager from './NativeModalManager';
-const Platform = require('../Utilities/Platform');
-const React = require('react');
 const PropTypes = require('prop-types');
+const React = require('react');
 const ScrollView = require('../Components/ScrollView/ScrollView');
 const StyleSheet = require('../StyleSheet/StyleSheet');
 const View = require('../Components/View/View');
 
 import type {ViewProps} from '../Components/View/ViewPropTypes';
 import type {DirectEventHandler} from '../Types/CodegenTypes';
-import type {SyntheticEvent} from '../Types/CoreEventTypes';
 import type EmitterSubscription from '../vendor/emitter/EmitterSubscription';
 import RCTModalHostView from './RCTModalHostViewNativeComponent';
-
-const ModalEventEmitter =
-  Platform.OS === 'ios' && NativeModalManager != null
-    ? new NativeEventEmitter(NativeModalManager)
-    : null;
-
 /**
  * The Modal component is a simple way to present content above an enclosing view.
  *
- * See https://facebook.github.io/react-native/docs/modal.html
+ * See https://reactnative.dev/docs/modal.html
  */
 
 // In order to route onDismiss callbacks, we need to uniquely identifier each
@@ -54,14 +44,14 @@ export type Props = $ReadOnly<{|
   /**
    * The `animationType` prop controls how the modal animates.
    *
-   * See https://facebook.github.io/react-native/docs/modal.html#animationtype
+   * See https://reactnative.dev/docs/modal.html#animationtype
    */
   animationType?: ?('none' | 'slide' | 'fade'),
 
   /**
    * The `presentationStyle` prop controls how the modal appears.
    *
-   * See https://facebook.github.io/react-native/docs/modal.html#presentationstyle
+   * See https://reactnative.dev/docs/modal.html#presentationstyle
    */
   presentationStyle?: ?(
     | 'fullScreen'
@@ -74,22 +64,32 @@ export type Props = $ReadOnly<{|
    * The `transparent` prop determines whether your modal will fill the
    * entire view.
    *
-   * See https://facebook.github.io/react-native/docs/modal.html#transparent
+   * See https://reactnative.dev/docs/modal.html#transparent
    */
   transparent?: ?boolean,
+
+  /**
+   * The `statusBarTranslucent` prop determines whether your modal should go under
+   * the system statusbar.
+   *
+   * See https://reactnative.dev/docs/modal.html#transparent
+   */
+  statusBarTranslucent?: ?boolean,
 
   /**
    * The `hardwareAccelerated` prop controls whether to force hardware
    * acceleration for the underlying window.
    *
-   * See https://facebook.github.io/react-native/docs/modal.html#hardwareaccelerated
+   * This prop works only on Android.
+   *
+   * See https://reactnative.dev/docs/modal.html#hardwareaccelerated
    */
   hardwareAccelerated?: ?boolean,
 
   /**
    * The `visible` prop determines whether your modal is visible.
    *
-   * See https://facebook.github.io/react-native/docs/modal.html#visible
+   * See https://reactnative.dev/docs/modal.html#visible
    */
   visible?: ?boolean,
 
@@ -99,7 +99,7 @@ export type Props = $ReadOnly<{|
    *
    * This is required on Apple TV and Android.
    *
-   * See https://facebook.github.io/react-native/docs/modal.html#onrequestclose
+   * See https://reactnative.dev/docs/modal.html#onrequestclose
    */
   onRequestClose?: ?DirectEventHandler<null>,
 
@@ -107,7 +107,7 @@ export type Props = $ReadOnly<{|
    * The `onShow` prop allows passing a function that will be called once the
    * modal has been shown.
    *
-   * See https://facebook.github.io/react-native/docs/modal.html#onshow
+   * See https://reactnative.dev/docs/modal.html#onshow
    */
   onShow?: ?DirectEventHandler<null>,
 
@@ -115,19 +115,14 @@ export type Props = $ReadOnly<{|
    * The `onDismiss` prop allows passing a function that will be called once
    * the modal has been dismissed.
    *
-   * See https://facebook.github.io/react-native/docs/modal.html#ondismiss
+   * See https://reactnative.dev/docs/modal.html#ondismiss
    */
   onDismiss?: ?() => mixed,
 
   /**
-   * Deprecated. Use the `animationType` prop instead.
-   */
-  animated?: ?boolean,
-
-  /**
    * The `supportedOrientations` prop allows the modal to be rotated to any of the specified orientations.
    *
-   * See https://facebook.github.io/react-native/docs/modal.html#supportedorientations
+   * See https://reactnative.dev/docs/modal.html#supportedorientations
    */
   supportedOrientations?: ?$ReadOnlyArray<
     | 'portrait'
@@ -140,23 +135,18 @@ export type Props = $ReadOnly<{|
   /**
    * The `onOrientationChange` callback is called when the orientation changes while the modal is being displayed.
    *
-   * See https://facebook.github.io/react-native/docs/modal.html#onorientationchange
+   * See https://reactnative.dev/docs/modal.html#onorientationchange
    */
   onOrientationChange?: ?DirectEventHandler<OrientationChangeEvent>,
 |}>;
 
 class Modal extends React.Component<Props> {
-  static defaultProps: $TEMPORARY$object<{|
-    hardwareAccelerated: boolean,
-    visible: boolean,
-  |}> = {
+  static defaultProps: {|hardwareAccelerated: boolean, visible: boolean|} = {
     visible: true,
     hardwareAccelerated: false,
   };
 
-  static contextTypes:
-    | any
-    | $TEMPORARY$object<{|rootTag: React$PropType$Primitive<number>|}> = {
+  static contextTypes: any | {|rootTag: React$PropType$Primitive<number>|} = {
     rootTag: PropTypes.number,
   };
 
@@ -171,11 +161,11 @@ class Modal extends React.Component<Props> {
 
   static childContextTypes:
     | any
-    | $TEMPORARY$object<{|virtualizedList: React$PropType$Primitive<any>|}> = {
+    | {|virtualizedList: React$PropType$Primitive<any>|} = {
     virtualizedList: PropTypes.object,
   };
 
-  getChildContext(): $TEMPORARY$object<{|virtualizedList: null|}> {
+  getChildContext(): {|virtualizedList: null|} {
     // Reset the context so VirtualizedList doesn't get confused by nesting
     // in the React tree that doesn't reflect the native component hierarchy.
     return {
@@ -183,22 +173,9 @@ class Modal extends React.Component<Props> {
     };
   }
 
-  componentDidMount() {
-    if (ModalEventEmitter) {
-      this._eventSubscription = ModalEventEmitter.addListener(
-        'modalDismissed',
-        event => {
-          if (event.modalID === this._identifier && this.props.onDismiss) {
-            this.props.onDismiss();
-          }
-        },
-      );
-    }
-  }
-
   componentWillUnmount() {
-    if (this._eventSubscription) {
-      this._eventSubscription.remove();
+    if (this.props.onDismiss != null) {
+      this.props.onDismiss();
     }
   }
 
@@ -229,14 +206,7 @@ class Modal extends React.Component<Props> {
       backgroundColor: this.props.transparent ? 'transparent' : 'white',
     };
 
-    let animationType = this.props.animationType;
-    if (!animationType) {
-      // manually setting default prop here to keep support for the deprecated 'animated' prop
-      animationType = 'none';
-      if (this.props.animated) {
-        animationType = 'slide';
-      }
-    }
+    let animationType = this.props.animationType || 'none';
 
     let presentationStyle = this.props.presentationStyle;
     if (!presentationStyle) {
@@ -262,6 +232,7 @@ class Modal extends React.Component<Props> {
         hardwareAccelerated={this.props.hardwareAccelerated}
         onRequestClose={this.props.onRequestClose}
         onShow={this.props.onShow}
+        statusBarTranslucent={this.props.statusBarTranslucent}
         identifier={this._identifier}
         style={styles.modal}
         onStartShouldSetResponder={this._shouldSetResponder}
@@ -288,6 +259,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   container: {
+    /* $FlowFixMe(>=0.111.0 site=react_native_fb) This comment suppresses an
+     * error found when Flow v0.111 was deployed. To see the error, delete this
+     * comment and run Flow. */
     [side]: 0,
     top: 0,
     flex: 1,

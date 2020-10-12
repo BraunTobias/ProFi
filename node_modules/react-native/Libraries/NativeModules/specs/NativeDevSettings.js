@@ -15,11 +15,17 @@ import * as TurboModuleRegistry from '../../TurboModule/TurboModuleRegistry';
 
 export interface Spec extends TurboModule {
   +reload: () => void;
+  +reloadWithReason?: (reason: string) => void;
+  +onFastRefresh?: () => void;
   +setHotLoadingEnabled: (isHotLoadingEnabled: boolean) => void;
   +setIsDebuggingRemotely: (isDebuggingRemotelyEnabled: boolean) => void;
-  +setLiveReloadEnabled: (isLiveReloadEnabled: boolean) => void;
   +setProfilingEnabled: (isProfilingEnabled: boolean) => void;
   +toggleElementInspector: () => void;
+  +addMenuItem: (title: string) => void;
+
+  // Events
+  +addListener: (eventName: string) => void;
+  +removeListeners: (count: number) => void;
 
   // iOS only.
   +setIsShakeToShowDevMenuEnabled: (enabled: boolean) => void;

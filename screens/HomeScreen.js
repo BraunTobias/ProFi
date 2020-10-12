@@ -1,176 +1,107 @@
-import React, {useState, useLayoutEffect, useEffect}from "react";
-import { Modal, View, Text } from "react-native";
+import React, {useState, useEffect} from 'react';
+import { View, Text, Modal, Keyboard } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
-import NumericInput from 'react-native-numeric-input'
-import { Ionicons } from '@expo/vector-icons';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { compareAsc, format } from 'date-fns';
+
+import { icons, colors, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
-import ModalComponent from "../components/ModalComponent";
-import InputTile from "../components/InputTile";
+import InputField from '../components/InputField';
+import NumberInput from '../components/NumberInput';
+import ButtonSmall from '../components/ButtonSmall';
+import SwipeButton from '../components/SwipeButton';
 import ListTile from "../components/ListTile";
-import Button from '../components/Button';
-import DeleteCourseButton from "../components/DeleteCourseButton";
-import { styles, buttons, texts, white, lightGrey, darkBlue, iconsizeAdd, lightBlue } from "../Styles"
-import DatePicker from "react-native-datepicker";
+import ModalContent from "../components/ModalContent";
 
 export default HomeScreen = ({navigation}) => {
+
     const currentUserId = DB.getCurrentUserId();
 
+    // State Hooks
     const [currentCourses, setCurrentCourses] = useState([]);
     const [joinedCourses, setJoinedCourses] = useState([]);
     const [swipeListView, setSwipeListView] = useState();
 
-    const [findVisibility, setFindVisibility] = useState(false);
-    const [currentFindName, setCurrentFindName] = useState("");
-    const [addCourseVisibility, setAddCourseVisibility] = useState(false);
-    const [currentCourseName, setCurrentCourseName] = useState("");
-    const [currentCourseId, setCurrentCourseId] = useState("");
-    const [currentMinMembers, setCurrentMinMembers] = useState();
-    const [currentMaxMembers, setCurrentMaxMembers] = useState();
-    const [currentDate, setCurrentDate] = useState("");
-    // Warnungsfelder
-    const [findCourseWarning, setFindCurseWarning] = useState("");
-    const [currentWarning, setCurrentWarning] = useState("");
-    const [nameError, setNameError] = useState("");
-    const [idError, setIdError] = useState("");
-    const [minMembersError, setMinMemebersError] = useState("");
-    const [maxMembersError, setMaxMembersError] = useState("");
-    const [dateError, setDateError] = useState("");
-  
-    // Wird nur beim Laden der Seite einmalig ausgeführt
+    // State Hooks für Modals
+    const [findCourseVisible, setFindCourseVisible] = useState(false);
+    const [currentFindCourseId, setCurrentFindCourseId] = useState("");
+    const [newCourseVisible, setNewCourseVisible] = useState(false);
+    const [newCourseDateVisible, setNewCourseDateVisible] = useState(false);
+    const [currentNewCourseName, setCurrentNewCourseName] = useState("");
+    const [currentNewCourseId, setCurrentNewCourseId] = useState("");
+    const [currentNewCourseDate, setCurrentNewCourseDate] = useState(new Date());
+    const [currentNewCourseMinMembers, setCurrentNewCourseMinMembers] = useState(2);
+    const [currentNewCourseMaxMembers, setCurrentNewCourseMaxMembers] = useState(2);
+
+    // Wird nach dem Rendern ausgeführt
     useEffect(() => {
-        console.ignoredYellowBox = ['Setting a timer'];
         const unsubscribe = navigation.addListener('focus', () => {
             DB.getCourseList((courseList) => {
-                // console.log(courseList);
                 setCurrentCourses(courseList);
-                var joined = [];
-                for (const course in courseList) {
-                    if (courseList[course].members.indexOf(currentUserId) >= 0) {
-                        joined.push(courseList[course].id);
-                    }
-                }
-                setJoinedCourses(joined);
+                // var joined = [];
+                // for (const course in courseList) {
+                //     if (courseList[course].members.indexOf(currentUserId) >= 0) {
+                //         joined.push(courseList[course].id);
+                //     }
+                // }
+                // setJoinedCourses(joined);
             });
         });
-        // DB.createTestCourse();
-        // DB.fillAttributesList();
-        DB.updateAttributesList();
     }, []);
 
-    // Button fürs Hinzufügen neuer Kurse
-    useLayoutEffect(() => {
-        navigation.setOptions({
-            headerRight : () => (
-                <Button 
-                    type ='clear'
-                    icon={<Ionicons name='ios-add' size={iconsizeAdd} color={white}/>}
-                    onPress={() => {setAddCourseVisibility(true)}}
-                />)
-        });
-    }, [navigation]);
-    
-    const clickHandler = (id, title) => {
-        swipeListView.safeCloseOpenRow();
-        const isMember = joinedCourses.indexOf(id) >= 0
-        navigation.navigate("Course", {itemId: id, itemTitle: title, isMember: isMember});
-    };
-
-    const addCourseHandler = () => {
-        if (currentCourseName != "" && currentMaxMembers > 1 && currentCourseId != "") {
-            if (currentMinMembers <= currentMaxMembers) {
-                // console.log("add");
-                DB.addCourse(currentCourseName, currentCourseId, currentDate, currentMinMembers, currentMaxMembers, () => {
-                    setAddCourseVisibility(false);
-                    setCurrentCourseName("");
-                    setCurrentCourseId("");
-                    setCurrentMinMembers("");
-                    setCurrentMaxMembers("");
-                    setCurrentDate("");
-                    setNameError("");
-                    setIdError("");
-                    setMinMemebersError("");
-                    setMaxMembersError("");
-                    setDateError("");
-                    DB.getCourseList((courseList) => {
-                        // console.log(courseList);
-                        setCurrentCourses(courseList);
-                    });
-                }, (error) => {setCurrentWarning(error)});
-            } else {
-                setMaxMembersError("Maximum muss größer sein als das Minimum");
-            }
-        } else {
-            setCurrentWarning("Eingabe nicht vollständig");
-        }
-    };
-
-    const setCourseNameHandler = (enteredText) => {
-        if (enteredText) {
-            setCurrentCourseName(enteredText);
-            setNameError("");
-        } else {
-            setCurrentCourseName("");
-            setNameError("Bitte einen Kursnamen eingeben");
-        }
-    };
-
-    const setCourseIdHandler = (enteredText) => {
-        if (enteredText) {
-            if (true) {
-                // CHECK name-scheme
-                setCurrentCourseId(enteredText);
-                setIdError("")
-            } else {
-                setIdError("Bitte ans Kürzel-Schema halten");
-            }
-        } else {
-            setCurrentCourseId("");
-            setIdError("Bitte ein Kürzel eingeben");
-        }
-    };
-
-    const setMinMaxMembersHandler = (enteredNumber, isMin) => {
-        setCurrentWarning("");
-
-        if (enteredNumber < 1) {
-            if (isMin) setCurrentMinMembers(1);
-            else setCurrentMaxMembers(1);
-        } else if (enteredNumber > 20) {
-            if (isMin) setCurrentMinMembers(20);
-            else setCurrentMaxMembers(20);
-        } else {
-            if (isMin) setCurrentMinMembers(enteredNumber);
-            else setCurrentMaxMembers(enteredNumber);
-        }
-        if (currentMaxMembers >= currentMinMembers) setMaxMembersError("");
-    }
-
-    const setDateHandler = (enteredDate) => {
-        if (enteredDate) {
-            setCurrentDate(enteredDate);
-            setDateError("");
-            // parse enteredDate
-        } else {
-            setDateError("Offenes Projekt ohne Datumsangabe");
-        }
-    }
-
-    const setFindCourseHandler = (enteredId) => {
-        setCurrentFindName(enteredId);
-    }
-    
-    const findCourseHandler = () => {
-        if (currentFindName != "") {
-            DB.addCourseToList(currentFindName, (addedCourse) => {
-                setCurrentFindName("");
+    // Handler für Modals
+    const pressFindCourseHandler = (committed) => {
+        if (committed && currentFindCourseId != "") {
+            DB.addCourseToList(currentFindCourseId, (addedCourse) => {
+                setCurrentFindCourseId("");
                 var courseList = currentCourses;
                 courseList.push(addedCourse);
                 setCurrentCourses(courseList);
-                setFindVisibility(false);
+                setFindCourseVisible(false);
             }, (error) => {
                 console.log(error);
             })
+        } else {
+            setFindCourseVisible(false);
         }
+    }
+    const changeFindCourseIdHandler = (enteredText) => {
+        setCurrentFindCourseId(enteredText.toUpperCase());
+    }
+    const pressNewCourseHandler = (committed) => {
+        if (committed) {
+            DB.addCourse(currentNewCourseName, currentNewCourseId, currentNewCourseDate, currentNewCourseMinMembers, currentNewCourseMaxMembers, () => {
+                setNewCourseVisible(false);
+                setCurrentNewCourseName("");
+                setCurrentNewCourseId("");    
+                setCurrentNewCourseMinMembers("");
+                setCurrentNewCourseMaxMembers("");
+                setCurrentNewCourseDate(new Date());
+                DB.getCourseList((courseList) => {
+                    setCurrentCourses(courseList);
+                });
+            }, (error) => {setCurrentWarning(error)});
+        } else {
+            setNewCourseVisible(false);
+        }
+    }
+    const changeNewCourseNameHandler = (enteredText) => {
+        setCurrentNewCourseName(enteredText);
+    }
+    const changeNewCourseIdHandler = (enteredText) => {
+        setCurrentNewCourseId(enteredText.toUpperCase());
+    }
+    const changeNewCourseMinMembersHandler = (number) => {
+        setCurrentNewCourseMinMembers(number);
+        if (number > currentNewCourseMaxMembers) setCurrentNewCourseMaxMembers(number);
+    }
+    const changeNewCourseMaxMembersHandler = (number) => {
+        setCurrentNewCourseMaxMembers(number);
+        if (number < currentNewCourseMinMembers) setCurrentNewCourseMinMembers(number);
+    }
+    const changeNewCourseDateHandler = (date) => {
+        setCurrentNewCourseDate(date);
+        setNewCourseDateVisible(false);
     }
 
     const deleteCourseHandler = (id) => {
@@ -191,218 +122,145 @@ export default HomeScreen = ({navigation}) => {
         });
     };
 
-    return (
-        <View style={{flex: 1}}>
-            {/* Kurs erstellen */}
-            <Modal visible= { addCourseVisibility } animationType= 'slide'>
-                <ModalComponent
-                    title= 'Kurs erstellen'
-                    subheader= { () => {}}
-                    content= { () => {
-                        return(
-                            <View>
-                                <Text></Text>{/* Text-Absatz */}
-                                <View style= { [styles.center, {width: "90%"}] }>
-                                    <InputTile 
-                                        title= "Kursname"
-                                        placeholderText= "Kursname"
-                                        value= { currentCourseName }
-                                        onChangeText= { setCourseNameHandler }
-                                    />
-                                    <Text>
-                                        { nameError }
-                                    </Text>
-                                    <InputTile 
-                                        title= "Kurs-ID"
-                                        placeholderText= "KürzelSemesterJahr"
-                                        value= { currentCourseId }
-                                        onChangeText= { setCourseIdHandler }
-                                    />
-                                    <Text>
-                                        { idError }
-                                    </Text>
-                                    <View style={styles.row}>
-                                        <View >
-                                            <Text style= { [texts.buttonGrey, {paddingBottom: 5}] } >Mitglieder min.</Text>
-                                            <NumericInput 
-                                                onChange={(text) => { setMinMaxMembersHandler(text, true) }} 
-                                                minValue = { 0 }
-                                                maxValue= { 20 }
-                                                rounded
-                                                totalHeight={45} 
-                                                containerStyle={{borderWidth: 0, backgroundColor: white}}
-                                                separatorWidth={0}
-                                                rightButtonBackgroundColor={lightBlue}
-                                                leftButtonBackgroundColor={lightBlue}
-                                                inputStyle={{fontWeight: "bold"}}
-                                            />
-                                            <Text>
-                                                { minMembersError }
-                                            </Text>
-                                        </View>
-                                        <View>
-                                            <Text style= { [texts.buttonGrey, {paddingBottom: 5}] }  >Mitglieder max.</Text>
-                                            <NumericInput 
-                                                onChange={(text) => { setMinMaxMembersHandler(text, false) }} 
-                                                minValue = { 0 }
-                                                maxValue= { 20 }
-                                                rounded
-                                                totalHeight={45} 
-                                                containerStyle={{borderWidth: 0, backgroundColor: white}}
-                                                separatorWidth={0}
-                                                rightButtonBackgroundColor={lightBlue}
-                                                leftButtonBackgroundColor={lightBlue}
-                                                inputStyle={{fontWeight: "bold"}}
-                                            />
-                                            <Text>
-                                                { maxMembersError }
-                                            </Text>
-                                        </View>
-                                    </View>
+    const selectCourseHandler = (id, title, date) => {
+        swipeListView.safeCloseOpenRow();
+        const isMember = joinedCourses.indexOf(id) >= 0
+        navigation.navigate("Course", {itemId: id, itemTitle: title, isMember: isMember, itemDate: date});
+    }
 
-                                    <View >
-                                        <Text style= { texts.buttonGrey } >Enddatum (optional)</Text>
-                                            <DatePicker
-                                                style={{width: "100%"}}
-                                                date={currentDate}
-                                                format="DD.MM.YYYY"
-                                                minDate="07.07.2020"
-                                                maxDate="07.07.2021"
-                                                confirmBtnText="OK"
-                                                cancelBtnText="Abbrechen"
-                                                showIcon={false}
-                                                customStyles={{
-                                                    dateInput: {
-                                                        borderRadius: 10,
-                                                        borderWidth: 0,
-                                                        backgroundColor: white,
-                                                        height: 45,
-                                                        marginTop:15,
-                                                    },
-                                                    dateText : {
-                                                        fontFamily: 'Inter_700Bold',
-                                                        fontSize: 22
-                                                    }
-                                                }}
-                                                onDateChange={(date) => { setDateHandler(date)}}
-                                            />
-                                        <Text>
-                                            { dateError }
-                                        </Text>
-                                    </View>
-                                </View>
-                                <View style= { styles.paddedRow } >
-                                    <Button 
-                                        buttonStyle= { buttons.buttonRow }
-                                        titleStyle= { texts.buttonBlueCenter }
-                                        title= 'OK' 
-                                        onClick= {addCourseHandler}
-                                    />
-                                    <Button 
-                                        buttonStyle= { buttons.buttonRow }
-                                        titleStyle= { texts.buttonBlueCenter }
-                                        title= 'Abbrechen'
-                                        onClick= { () => { setAddCourseVisibility(false); setCurrentWarning(""); } }
-                                    />
-                                </View>
-                            </View>
-                        )
-                    }}
-                />
-            </Modal>
-
+    return(
+        <View style={{flex:1}}>
+            
             {/* Kurs finden */}
-            <Modal visible= { findVisibility } animationType= 'slide'>
-                <ModalComponent
-                    title= 'Kurs finden'
+            <Modal visible= { findCourseVisible } animationType= 'slide'>
+                <ModalContent
                     subheader= { () => {}}
                     content= { () => {
                         return(
-                            <View >
-                                <Text></Text>{/* Text-Absatz */}
-                                <View style= { [styles.center, {width: "90%"}] }>
-                                    <InputTile 
-                                        title= "Kurs-ID"
-                                        placeholderText= "KürzelSemesterJahr"
-                                        value= { currentFindName }
-                                        onChangeText= { setFindCourseHandler }
-                                    />
-                                    <Text>
-                                        { findCourseWarning }
-                                    </Text>
-                                </View>
-                                <View style= { styles.paddedRow } >
-                                    <Button 
-                                        buttonStyle= { buttons.buttonRow }
-                                        titleStyle= { texts.buttonBlueCenter }
-                                        title= 'OK' 
-                                        onClick= {findCourseHandler}
-                                    />
-                                    <Button 
-                                        buttonStyle= { buttons.buttonRow }
-                                        titleStyle= { texts.buttonBlueCenter }
-                                        title= 'Abbrechen'
-                                        onClick= { () => { setFindVisibility(false) } }
-                                    />
-                                </View>
+                            <View style={boxes.mainContainer}>
+                                <Text style={texts.titleCentered}>{"Kurs finden"}</Text>
+                                <InputField
+                                    placeholderText= "Kurs-ID eingeben"
+                                    value={currentFindCourseId}
+                                    onChangeText={changeFindCourseIdHandler}
+                                />
                             </View>
                         )
                     }}
+                    onDismiss= {pressFindCourseHandler}
                 />
             </Modal>
 
-            {/* Meine Kurse */}
-            <View style= {styles.subHeader} >
-                <View style= { styles.paddedRow } >
-                    <Button 
-                        buttonStyle= { buttons.buttonRowGrey }
-                        titleStyle= { texts.buttonGrey }
-                        title= 'Kurs finden' 
-                        icon= "find"
-                        onClick= { () => { setFindVisibility(true) } }
+            {/* Kurs erstellen */}
+            <Modal visible= { newCourseVisible } animationType= 'slide'>
+                <ModalContent
+                    subheader= { () => {}}
+                    content= { () => {
+                        return(
+                            <View style={boxes.mainContainer}>
+                                <Text style={texts.titleCentered}>{"Kurs erstellen"}</Text>
+                                <InputField
+                                    title= "Kursname"
+                                    placeholderText= "Kursname"
+                                    value={currentNewCourseName}
+                                    onChangeText={changeNewCourseNameHandler}
+                                />
+                                <InputField
+                                    title= "Kurs-ID"
+                                    placeholderText= "KürzelSemesterJahr"
+                                    value={currentNewCourseId}
+                                    onChangeText={changeNewCourseIdHandler}
+                                />
+                                <InputField
+                                    title= "End-Datum"
+                                    isDate= {true}
+                                    placeholderText= "Datum auswählen …"
+                                    value={format(currentNewCourseDate, "dd.MM.yyyy")}
+                                    onPress={() => {setNewCourseDateVisible(true); Keyboard.dismiss()}}
+                                />
+                                <DateTimePickerModal
+                                    isVisible={newCourseDateVisible}
+                                    mode="date"
+                                    headerTextIOS="Datum auswählen"
+                                    cancelTextIOS="Abbrechen"
+                                    confirmTextIOS="OK"
+                                    onConfirm={changeNewCourseDateHandler}
+                                    onCancel={() => {setNewCourseDateVisible(false)}}
+                                />
+                                <View style={boxes.unPaddedRow}>
+                                    <NumberInput
+                                        title= {"Mitglieder min."}
+                                        value= {currentNewCourseMinMembers}
+                                        onChange={changeNewCourseMinMembersHandler}
+                                        />
+                                    <NumberInput
+                                        title= {"Mitglieder max."}
+                                        value= {currentNewCourseMaxMembers}
+                                        onChange={changeNewCourseMaxMembersHandler}
+                                    />
+                                </View>
+                            </View> 
+                        )
+                    }}
+                    onDismiss= {(committed) => {pressNewCourseHandler(committed)}}
+                />
+            </Modal>
+
+
+
+            <View style={ boxes.subHeader }>
+                <View style={ boxes.paddedRow }>
+                    <ButtonSmall
+                        title={"Kurs finden"}
+                        icon={"find"}
+                        onPress={() => {setFindCourseVisible(true)}}
                     />
-                    <Button 
-                        buttonStyle= { buttons.buttonRow }
-                        titleStyle= { texts.buttonBlue }
-                        title= 'Neuer Kurs'
-                        icon= "plus"
-                        onClick= { () => { setAddCourseVisibility(true) } }
+                    <ButtonSmall
+                        title={"Neuer Kurs"}
+                        icon={"plus"}
+                        onPress={() => {setNewCourseVisible(true)}}
                     />
                 </View>
             </View>
 
             <SwipeListView
-                style={{flexGrow: 1}}
+                style={{backgroundColor: "white"}}
                 ref = {ref => setSwipeListView(ref)}
-                data={currentCourses}
+                sections={currentCourses}
                 disableLeftSwipe = {true}
                 keyExtractor={(item, index) => index.toString()}
-
-                renderItem={(itemData) => { 
+                useSectionList
+                renderSectionHeader={({ section }) => (
+                        <View style={boxes.separator}>
+                            <Text style={texts.separatorText}>{section.key}</Text>
+                        </View>
+                )}
+                renderItem={({ item, index, section }) => { 
                     return (
                         <ListTile
-                            onClick={() => {clickHandler(itemData.item.id, itemData.item.title)}} 
-                            id={itemData.item.id}
-                            title={itemData.item.title}
-                            subtitle={"Gruppengröße: " + itemData.item.minMembers + " – " + itemData.item.maxMembers + " Personen\n"+ itemData.item.date}
-                            backgroundColor = {itemData.index % 2 === 0 ? white : lightGrey}
-                            isMember = {joinedCourses.indexOf(itemData.item.id) >= 0}
+                            onPress={() => {selectCourseHandler(item.id, item.title, item.date)}} 
+                            id={item.id}
+                            title={item.title}
+                            subtitle={item.members.length + " Mitglieder, Gruppengröße " + item.minMembers + "-" + item.maxMembers + "\n" + item.date}
+                            index = {index}
+                            isMember = {joinedCourses.indexOf(item.id) >= 0}
                         />
                     )
                 }}
                 renderHiddenItem={ (itemData) => {
                     return (
-                        <View style={{height: "100%", width: 500}}>
-                                <DeleteCourseButton
-                                    onClick={(ref) => {deleteCourseHandler(itemData.item.id)}}
-                                />
+                        <View style={boxes.swipeRowOne}>
+                            <SwipeButton
+                                backgroundColor={colors.red}
+                                onPress={(ref) => {deleteCourseHandler(itemData.item.id)}}
+                            />
                         </View>
                     )
                 }}
-                leftOpenValue={75}
+                leftOpenValue={60}
             />
+
         </View>
-  );
-};
 
-
+    )
+}

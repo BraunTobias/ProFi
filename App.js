@@ -1,43 +1,40 @@
-import React, { useState } from "react";
-import AuthenticationNavigator from './navigation/AuthenticationNavigator';
-import MainNavigator from './navigation/MainNavigator';
-import { LogInContext } from './data/LogInContext';
-import { useFonts, Inter_400Regular, Inter_700Bold } from '@expo-google-fonts/inter';
+import React, {useState, useEffect} from 'react';
+import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { AppLoading } from 'expo';
 import * as firebase from 'firebase';
-import 'firebase/firestore';
-import {decode, encode} from 'base-64';
-console.disableYellowBox = true;
-
-if (!global.btoa) { global.btoa = encode }
-if (!global.atob) { global.atob = decode }
+import MainNavigator from './navigation/MainTab';
+import AuthScreen from './screens/AuthScreen';
 
 export default App => {
 
+  // Schriften laden
   let [fontsLoaded] = useFonts({
     Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
     Inter_700Bold,
   });
 
-  const [user, setUser] = useState(null);
-  const [authentication, setAuthentication] = useState(false);
-
-  // Initialize Firebase
+  // Firebase-Initialisierung
   const firebaseConfig = {
-      apiKey: "AIzaSyDbvERxsJQae79DoUlieAvImJ8MyYg_6bg",
-      authDomain: "teamfinder-be2e3.firebaseapp.com",
-      databaseURL: "https://teamfinder-be2e3.firebaseio.com",
-      projectId: "teamfinder-be2e3",
-      storageBucket: "teamfinder-be2e3.appspot.com",
-      messagingSenderId: "773821416512",
-      appId: "1:773821416512:web:0a6f083afd99313a20cba5"
-  };
+    apiKey: "AIzaSyDbvERxsJQae79DoUlieAvImJ8MyYg_6bg",
+    authDomain: "teamfinder-be2e3.firebaseapp.com",
+    databaseURL: "https://teamfinder-be2e3.firebaseio.com",
+    projectId: "teamfinder-be2e3",
+    storageBucket: "teamfinder-be2e3.appspot.com",
+    messagingSenderId: "773821416512",
+    appId: "1:773821416512:web:0a6f083afd99313a20cba5"
+  };  
   try {
       firebase.initializeApp(firebaseConfig);
   } catch(err) {
     console.log(err);
   }
 
+  // State Hooks
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Bestimmt, welcher Navigator geladen wird
   const authHandler = (auth) => {
     if (!fontsLoaded) {
       return <AppLoading />;
@@ -45,23 +42,25 @@ export default App => {
     if (auth) {
       return ( <MainNavigator /> )
     } else {
-      return ( <AuthenticationNavigator /> )
+      return ( <AuthScreen/> )
     }
   }
 
+  // Wird aufgerufen wenn der User ein- oder ausgeloggt wird
   firebase.auth().onAuthStateChanged((user) => {
     if (user) {
+        // Wenn der User soeben eingeloggt wurde
         console.log("Navigation zur App");
-        setAuthentication(true);
-      } else {
+        setIsLoggedIn(true);
+    } else {
+        // Wenn der User soeben ausgeloggt wurde
         console.log("Bitte einloggen");
-        setAuthentication(false);
+        setIsLoggedIn(false);
     }
   })
 
   return (
-    <LogInContext.Provider value={[authentication, setAuthentication, user, setUser]}>
-        {authHandler(authentication)}
-    </LogInContext.Provider>
+    authHandler(isLoggedIn)
   )
-};
+
+}

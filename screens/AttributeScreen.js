@@ -1,88 +1,82 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import {FlatList, View, Text} from "react-native";
-import SkillsTile from '../components/SkillsTile';
-import CategoryIcon from '../components/CategoryIcon';
-import { styles, texts } from '../Styles';
+
+import { boxes, colors, styles, texts } from '../Styles';
+import AttributeTile from '../components/AttributeTile';
+import ScrollRow from '../components/ScrollRow';
 import DB from '../api/DB_API';
 
 export default AttributeScreen = ({route, navigation}) => {
-    const {filter} = route.params;
+
     const {attributeType} = route.params;
+    
+    // State Hooks
     const [currentCategory, setCurrentCategory] = useState("");
     const [categoriesList, setCategoriesList] = useState([]);
     const [displayedSkills, setDisplayedSkills] = useState([]);
 
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerTitle: attributeType == "skills" ? "Fähigkeiten" : "Interessen",
+        });
+    }, [navigation]);
+
     useEffect(() => {
         DB.getCategoriesFromAttribute(attributeType, (categoriesList) => {
-            // console.log(categoriesList);
             setCategoriesList(categoriesList);
             setCurrentCategory(categoriesList[0]);
-            DB.getUserAttributesFromCategory(attributeType, categoriesList[0], filter, (attributesList) => {
-                // console.log(attributesList);
+            DB.getUserAttributesFromCategory(attributeType, categoriesList[0], (attributesList) => {
                 setDisplayedSkills(attributesList);
             }, (error) => {console.log(error)});    
         });
     }, []);
-    
-    const clickSkillHandler = (text) => {
-        DB.toggleAttributeState(attributeType, currentCategory, text, () => {
-            // console.log("Toggled state of " + text);
-        });
-    }
-    const clickCategoryHandler = (name) => {
-        setCurrentCategory(name);
-        DB.getUserAttributesFromCategory(attributeType, name, filter, (attributesList) => {
-            // console.log(attributesList);
+
+    const selectCategoryHandler = (category) => {
+        setCurrentCategory(category);
+        DB.getUserAttributesFromCategory(attributeType, category, (attributesList) => {
             setDisplayedSkills(attributesList);
         }, (error) => {console.log(error)});
     }
 
-        return(
-            <View style={{height: "100%"}}>
+    const clickAttributeHandler = (text) => {
+        DB.toggleAttributeState(attributeType, currentCategory, text, () => {
+        });
+    }
 
-                <View style= { styles.subHeader } >
-
-                    <View style= {styles.membersRow} >
-                            {/* Fähigkeiten-Header: Icons */}
-                            <FlatList
-                                style ={{paddingLeft: 15, paddingRight: 15}}
-                                data={categoriesList}
-                                horizontal={true}
-                                showsHorizontalScrollIndicator={false}
-                                keyExtractor={(item, index) => index.toString()}
-                                renderItem={(itemData) => { 
-                                    return (
-                                        <CategoryIcon
-                                            onClick={() => {clickCategoryHandler(itemData.item)}} 
-                                            title={itemData.item}
-                                            isActive={currentCategory == itemData.item}
-                                            isLast={itemData.index == categoriesList.length - 1 ? true : false}
-                                        />
-                                    );
-                                }}
-                            />
-
-                    </View>
+    return(
+        <View style={{flex: 1}}>
+            <View style={boxes.subHeader}>
+                <View style={boxes.paddedRow}>
+                    <Text style={texts.copy}>Durch Auswählen einer Fähigkeit erklärst du dich bereit, diese ggf. in einem Projekt zu übernehmen. 
+                        Du musst sie noch nicht beherrschen.</Text>
                 </View>
-                
-                <Text style={[texts.headline, {paddingLeft: 20, padding: 10}]}>{currentCategory}</Text>
-
-                <FlatList style={{height: "90%"}}
-                    data={displayedSkills}
-                    keyExtractor={(item, index) => item[0] }
-                    renderItem={(itemData) => { 
-                        return (
-                            <SkillsTile
-                                text={itemData.item[0]}  
-                                state={itemData.item[1]}
-                                index = {itemData.index}
-                                backgroundColor = {itemData.index % 2 === 0 ? "#ffffff" : "#f5f7f7"}
-                                onClick={clickSkillHandler}
-                            />
-                        );
-                    }}
+                <ScrollRow
+                    type="attributes"
+                    data= {categoriesList}
+                    currentCategory={currentCategory}
+                    onPress={selectCategoryHandler}
                 />
             </View>
-        );
-  
+            <View style={boxes.separator}>
+                <Text style={texts.separatorText}>{currentCategory}</Text>
+            </View>
+            <FlatList 
+                style= {{backgroundColor: colors.white, flexGrow: 1}}
+                data={displayedSkills}
+                keyExtractor={(item, index) => item[0] }
+                renderItem={(itemData) => { 
+                    return (
+                        <AttributeTile
+                            text={itemData.item[0]}  
+                            state={itemData.item[1]}
+                            index = {itemData.index}
+                            backgroundColor = {itemData.index % 2 === 0 ? "#ffffff" : "#f5f7f7"}
+                            onPress={clickAttributeHandler}
+                        />
+                    );
+                }}
+            />
+
+        </View>
+    )
 }

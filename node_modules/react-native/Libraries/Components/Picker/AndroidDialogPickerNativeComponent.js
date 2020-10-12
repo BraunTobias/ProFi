@@ -5,26 +5,30 @@
  * LICENSE file in the root directory of this source tree.
  *
  * @format
- * @flow
+ * @flow strict-local
  */
 
 'use strict';
 
-import {requireNativeComponent} from 'react-native';
+import * as React from 'react';
+
+import codegenNativeCommands from '../../Utilities/codegenNativeCommands';
+import requireNativeComponent from '../../ReactNative/requireNativeComponent';
 
 import type {
   DirectEventHandler,
   Int32,
   WithDefault,
 } from '../../Types/CodegenTypes';
+import type {HostComponent} from '../../Renderer/shims/ReactNativeTypes';
 import type {TextStyleProp} from '../../StyleSheet/StyleSheet';
 import type {ColorValue} from '../../StyleSheet/StyleSheetTypes';
-import type {NativeComponent} from '../../Renderer/shims/ReactNative';
+import type {ProcessedColorValue} from '../../StyleSheet/processColor';
 import type {ViewProps} from '../../Components/View/ViewPropTypes';
 
 type PickerItem = $ReadOnly<{|
   label: string,
-  color?: ?Int32,
+  color?: ?ProcessedColorValue,
 |}>;
 
 type PickerItemSelectEvent = $ReadOnly<{|
@@ -37,6 +41,7 @@ type NativeProps = $ReadOnly<{|
 
   // Props
   color?: ?ColorValue,
+  backgroundColor?: ?ColorValue,
   enabled?: WithDefault<boolean, true>,
   items: $ReadOnlyArray<PickerItem>,
   prompt?: WithDefault<string, ''>,
@@ -46,8 +51,19 @@ type NativeProps = $ReadOnly<{|
   onSelect?: DirectEventHandler<PickerItemSelectEvent>,
 |}>;
 
-type ReactPicker = Class<NativeComponent<NativeProps>>;
+type NativeType = HostComponent<NativeProps>;
 
-module.exports = ((requireNativeComponent(
+interface NativeCommands {
+  +setNativeSelectedPosition: (
+    viewRef: React.ElementRef<NativeType>,
+    index: number,
+  ) => void;
+}
+
+export const Commands: NativeCommands = codegenNativeCommands<NativeCommands>({
+  supportedCommands: ['setNativeSelectedPosition'],
+});
+
+export default (requireNativeComponent<NativeProps>(
   'AndroidDialogPicker',
-): any): ReactPicker);
+): NativeType);

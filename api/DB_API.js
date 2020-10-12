@@ -2,6 +2,7 @@ import * as firebase from 'firebase';
 import 'firebase/firestore';
 import "firebase/storage";
 import {skillsList} from '../data/AttributesList';
+import { compareAsc, format } from 'date-fns';
 
 const DB = {
     // Kopiert von https://stackoverflow.com/questions/48006903/react-unique-id-generation
@@ -193,7 +194,7 @@ const DB = {
             // console.log("snapshot: " + snapshot.state + " " + progress + "% done");
         }, (error) => {
             // Fehler beim Hochladen
-            // console.log(error);
+            console.log(error);
         }, () => {
             uploadTask.snapshot.ref.getDownloadURL()
             .then((downloadURL) => {
@@ -288,18 +289,41 @@ const DB = {
     
     // Gibt Liste mit allen Kursen des aktuellen Users für Home-Seite zurück
     getCourseList: async function(courseListRetrieved) {
-        const courseList = [];
+        const courseList = {};
         const currentUserID = firebase.auth().currentUser.uid;
         
         // Liste aller Kurse nach User-ID filtern und abspeichern
+        // const query = await firebase.firestore().collection("courses").where("prospects", "array-contains", currentUserID).get();
+        // query.forEach((doc) => {
+        //     const course = doc.data();
+        //     course["id"] = doc.id;
+        //     courseList.push(course);
+        // });
+        // Neue Version für SectionList
         const query = await firebase.firestore().collection("courses").where("prospects", "array-contains", currentUserID).get();
         query.forEach((doc) => {
             const course = doc.data();
             course["id"] = doc.id;
-            courseList.push(course);
-            // console.log(doc.id);
-        });
-        courseListRetrieved(courseList);
+            if (course.date) course.date = format(course.date.toDate(), "dd.MM.yyyy");
+            else course.date = "Kein Datum";
+            if (courseList[course.semester]) courseList[course.semester].push(course);
+            else courseList[course.semester] = [course];
+        }); 
+        var courseListSections = [];
+        // Die Keys sind die Semester
+        var keys = Object.keys(courseList);
+        // Erst umgekehrt alphabetisch sortieren (W > S)
+        keys.sort();
+        keys.reverse();
+        // Dann nach Zahlen sortieren
+        keys.sort((a,b) => (b[2]+b[3]) - (a[2]+a[3]));
+        for (var i = 0; i < keys.length; i++) {
+            courseListSections.push({
+                data: courseList[keys[i]],
+                key: keys[i],
+            });
+        }
+        courseListRetrieved(courseListSections);
     },
     // Gibt Liste mit allen Ideen für Kurs-Seite zurück
     getIdeasList: async function(courseId, ideasListRetrieved) {
@@ -479,7 +503,7 @@ const DB = {
     },
 
     // Liste aller Skills bzw. Präferenzen einer Kategorie ausgeben (zweidimensionales Array mit Info, ob der User diese hat oder nicht)
-    getUserAttributesFromCategory: async function(attributeType, categoryName, filterList, onSuccess, onError) {
+    getUserAttributesFromCategory: async function(attributeType, categoryName, onSuccess, onError) {
         const attributesList = [];
         const currentUserID = firebase.auth().currentUser.uid;
         const snapshot = await firebase.firestore().collection("users").doc(currentUserID).collection(attributeType).doc(categoryName).get();
@@ -488,9 +512,7 @@ const DB = {
         if (snapshotData) {            
             // Gibt Liste als (alphabetisch geordnetes) Array zurück
             for (var title in snapshotData) {
-                if (filterList.length == 0 || filterList.indexOf(title) >= 0) {
-                    attributesList.push([title, snapshotData[title]]);
-                }
+                attributesList.push([title, snapshotData[title]]);
             }
             attributesList.sort();
             onSuccess(attributesList);
@@ -506,21 +528,38 @@ const DB = {
 
         const snapshot = await firebase.firestore().collection("users").doc(currentUserID).collection(attributeType).get();
 
+        // snapshot.forEach((categoryDoc) => {
+        //     const tempArray = [categoryDoc.id];
+        //     const tempAtt = [];
+        //     for (const title in categoryDoc.data()) {
+        //         if (filterList[0] || filterList.indexOf(title) >= 0) {
+        //             tempAtt.push(title);
+        //         }
+        //     }
+        //     if (tempAtt.length > 0) {
+        //         const tempAttString = tempAtt.join("\n");
+        //         tempArray.push(tempAttString);
+        //         attributesList.push(tempArray);
+        //     }
+        // });    
+        
+        // Neue Version für SectionList
         snapshot.forEach((categoryDoc) => {
-            const tempArray = [categoryDoc.id];
-            const tempAtt = [];
+            const categoryName = categoryDoc.id;
+            var categoryAttributes = [];
             for (const title in categoryDoc.data()) {
-                if (filterList.length == 0 || filterList.indexOf(title) >= 0) {
-                    // console.log("title: " + title);
-                    tempAtt.push(title);
+                if (filterList[0] && filterList.indexOf(title) >= 0) {
+                    categoryAttributes.push(title);
                 }
             }
-            if (tempAtt.length > 0) {
-                const tempAttString = tempAtt.join("\n");
-                tempArray.push(tempAttString);
-                attributesList.push(tempArray);
+            if (categoryAttributes.length > 0) {
+                attributesList.push({
+                    data: categoryAttributes,
+                    key: categoryName,
+                });
             }
-        });    
+        });  
+        
         onSuccess(attributesList);
     },
 
@@ -529,8 +568,6 @@ const DB = {
         const snapshot = await firebase.firestore().collection("users").doc(userId).collection("skills").get();
 
         snapshot.forEach((categoryDoc) => {
-            const tempArray = [categoryDoc.id];
-            const tempAtt = [];
             for (const title in categoryDoc.data()) {
                 if (categoryDoc.data()[title] == true) {
                     attributesList.push(title);
@@ -541,7 +578,7 @@ const DB = {
     },
 
     // Liste aller Skills bzw. Präferenzen einer Kategorie ausgeben (OHNE Info, ob der User diese hat oder nicht)
-    getNeutralAttributesFromCategory: async function(attributeType, categoryName, filterList, onSuccess, onError) {
+    getNeutralAttributesFromCategory: async function(attributeType, categoryName, onSuccess, onError) {
         const attributesList = [];
         const currentUserID = firebase.auth().currentUser.uid;
         const snapshot = await firebase.firestore().collection("users").doc(currentUserID).collection(attributeType).doc(categoryName).get();
@@ -551,9 +588,7 @@ const DB = {
             // Gibt Liste als (alphabetisch geordnetes) Array zurück
             for (var title in snapshotData) {
                 // console.log("title: " + title);
-                if (filterList.length == 0 || filterList.indexOf(title) >= 0) {
-                    attributesList.push(title);
-                }
+                attributesList.push(title);
             }
             attributesList.sort();
             onSuccess(attributesList);

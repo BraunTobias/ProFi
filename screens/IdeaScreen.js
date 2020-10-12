@@ -1,39 +1,51 @@
-import React, {useState, useLayoutEffect, useEffect} from 'react';
-import {FlatList , View, Text, Modal, TextInput} from 'react-native';
-import Button from '../components/Button';
-import ListTile from '../components/ListTile';
-import CommentTile from '../components/CommentTile';
-import ProfileView from '../components/ProfileView';
+import React, {useState, useEffect, useLayoutEffect} from 'react';
+import { View, Text, Modal, Keyboard } from 'react-native';
+import { SwipeListView } from 'react-native-swipe-list-view';
+import { compareAsc, format } from 'date-fns';
+
+import { icons, colors, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
-import { styles, texts, buttons, lightGrey } from '../Styles';
+import InputField from '../components/InputField';
+import ButtonSmall from '../components/ButtonSmall';
+import SwipeButton from '../components/SwipeButton';
+import CommentTile from '../components/CommentTile';
+import ModalContent from "../components/ModalContent";
+import ProfileImage from "../components/ProfileImage";
+import ButtonLarge from '../components/ButtonLarge';
+import ScrollRow from '../components/ScrollRow';
+import { FlatList } from 'react-native-gesture-handler';
 
 export default IdeaScreen = ({route, navigation}) => {
+
     const {itemId} = route.params;
-    const {courseId} = route.params;
     const {itemTitle} = route.params;
-    const {itemSubtitle} = route.params;
+    const {itemDescription} = route.params;
+    const {skillsList} = route.params;
+    const {courseId} = route.params;
+    const currentUserId = DB.getCurrentUserId();
 
-    // States für Profil-Ansicht
-    const [team, setTeam] = useState([]);
-    const [viewedUserId, setViewedUserId] = useState(false);
-    const [profileVisibility, setProfileVisibility] = useState(false);
-
-    // States für Kommentar-Eingabe
-    const [commentVisibility, setCommentVisibility] = useState(false);
-    const [currentCommentText, setCurrentCommentText] = useState("");
-    
-    // States für Ideen-Info
+    // State Hooks
     const [currentSkills, setCurrentSkills] = useState([]);
     const [currentComments, setCurrentComments] = useState([]);
+    const [swipeListView, setSwipeListView] = useState();
+
+
+    // State Hooks für Modal
+    const [newCommentVisible, setNewCommentVisible] = useState(false);
+    const [currentNewCommentText, setCurrentNewCommentText] = useState("");
+
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerTitle: courseId,
+        });
+    }, [navigation]);
 
     useEffect(() => {
         DB.getCommentsList(courseId, itemId, (commentsList) => {
             setCurrentComments(commentsList);
         });
         DB.getIdeaData(courseId, itemId, (data) => {
-            // console.log(data);
             setCurrentSkills(data.skills);
-
             if (data.team && data.team.length > 0) {
                 const teamUidList = data.team;
                 var newTeamList = [];
@@ -52,164 +64,103 @@ export default IdeaScreen = ({route, navigation}) => {
 
         });
     }, []);
-    
-    useLayoutEffect(() => {
-        navigation.setOptions({
-            headerTitle: itemTitle
-        });
-    }, [navigation]);
 
-    const addCommentHandler = () => {
-        // console.log("add");
-        if (currentCommentText != "") {
-            DB.addComment(courseId, itemId, currentCommentText, () => {
-                setCommentVisibility(false);
-                setCurrentCommentText("");
-                DB.getCommentsList(courseId, itemId, (commentsList) => {
-                    setCurrentComments(commentsList);
-                    // console.log(commentsList);
-                });
-            });
-        }
+    const likeHandler = (id) => {
+        
+    }
+    const replyHandler = (id) => {
+
     }
 
-    const setCommentHandler = (text) => {
-        setCurrentCommentText(text);
+    // Handler für Modal
+    const changeNewCommentTextHandler = (enteredText) => {
+        setCurrentNewCommentText(enteredText);
     }
-
-    const clickProfileHandler = (userId) => {
-        setProfileVisibility(true);
-        setViewedUserId(userId);
+    const pressNewCommentHandler = (committed) => {
+        setNewCommentVisible(false);
     }
 
     return(
-        <View style={{flex: 1}}>
+        <View style={{flex:1}}>
 
-            {/* // Kommentar schreiben */}
-            <Modal visible={commentVisibility} animationType='slide'>
-            <ModalComponent
-                    title= 'Kommentar hinzufügen'
-                    subheader= { () => {} }
+            {/* Idee erstellen */}
+            <Modal visible= { newCommentVisible } animationType= 'slide'>
+                <ModalContent
+                    subheader= { () => {}}
                     content= { () => {
                         return(
-                            <View styles= {{backgroundColor: lightGrey }}>
-                                <View style= { styles.contentFake } >
-                                    <Text></Text>{/* Text-Absatz */}
-                                    <Text style= { texts.headline } >Kommentar (max. 200 Zeichen)</Text>
-                                </View>
-                                <View style= { styles.commentField } >
-                                    <TextInput 
-                                        textAlign= { 'left' }
-                                        textAlignVertical= { 'top' }
-                                        style= { texts.inputText }
-                                        placeholder= { "Schreibe einen Kommentar" } 
-                                        onChangeText= { setCommentHandler }
-                                        value= { currentCommentText }
-                                        multiline
-                                        numberOfLines= { 10 }
-                                        maxLength= { 200 }
-                                    />
-                                </View>
-                                <View style= { styles.paddedRow } >
-                                    <Button 
-                                        buttonStyle= { buttons.buttonRow }
-                                        titleStyle= { texts.buttonBlueCenter }
-                                        title= 'OK' 
-                                        onClick= { () => { addCommentHandler() } }
-                                    />
-                                    <Button 
-                                        buttonStyle= { buttons.buttonRow }
-                                        titleStyle= { texts.buttonBlueCenter }
-                                        title= 'Abbrechen'
-                                        onClick= { () => { setCommentVisibility(false) } }
-                                    />
-                                </View>
-                            </View>
+                            <View style={boxes.mainContainer}>
+                                <Text style={texts.titleCentered}>{"Kommentar schreiben"}</Text>
+                                <InputField
+                                    placeholderText= "max. 300 Zeichen"
+                                    value={currentNewCommentText}
+                                    onChangeText={changeNewCommentTextHandler}
+                                    multiline={true}
+                                />
+                            </View> 
                         )
                     }}
+                    onDismiss= {(committed) => {pressNewCommentHandler(committed)}}
                 />
             </Modal>
 
-            {/* // User-Profil ansehen */}
-            <Modal visible={profileVisibility} animationType='slide'>
-                <View style={{flex: 1}}>
-                    <View style= { styles.headerFake }>
-                        <Text style= { texts.header }>Profil</Text>
-                    </View>
-
-                    <View style={{flex: 1}}>
-                        <View style={{height: "85%"}}>
-                            <ProfileView userId={viewedUserId}/>
-                        </View>
-                        <View style={{height: "15%", justifyContent:"center", alignItems: "center", backgroundColor: lightGrey}}>
-                            <Button 
-                                buttonStyle= { buttons.buttonRow }
-                                titleStyle= { texts.buttonBlueCenter }
-                                title='OK' 
-                                onClick={() => {setProfileVisibility(false)}}
-                            />
-                        </View>
-                    </View>
+            <View style={ boxes.subHeader }>
+                <View style={ boxes.paddedRow }>
+                    <Text style={texts.subHeader}>{itemTitle}</Text>
                 </View>
-            </Modal>
-
-            {/* // Idee & Kommentar-Liste */}
-            <View style= { styles.subHeader}>
-                <View style= {[styles.headerRow, {paddingBottom: 10}]}>
-                    <Text style={texts.text}>{itemSubtitle}</Text>
-                </View>
-                {/* Membericons */}
-                <View style= { styles.membersRow } >
-                    <FlatList style={{paddingLeft: 5, paddingBottom: 15}}
-                        data={team}
-                        horizontal={true}
-                        showsHorizontalScrollIndicator={false}
-                        keyExtractor={(item, index) => index.toString()}
-                        renderItem={(itemData) => { 
-                            return (
-                                <ProfileImageTile
-                                    onClick={() => {clickProfileHandler(itemData.item.userId)}} 
-                                    imageUrl={itemData.item.imageUrl}
-                                    isLast={itemData.index == team.length - 1 ? true : false}
-                                />
-                            );
-                        }}
-                    >
-                    </FlatList>
+                <View style={ boxes.paddedRow }>
+                    <Text style={texts.copy}>{itemDescription}</Text>
                 </View>
                 <ListTile
-                    title={"Passende Fähigkeiten"}
+                    title="Passende Fähigkeiten"
                     subtitle={currentSkills.join(", ")}
-                    onClick={() => navigation.navigate('IdeaSkills', {attributeType: "skills", filter: currentSkills})} 
+                    index={0}
+                    onPress={() => navigation.navigate('IdeaAttributes', {attributeType: "skills", filter: currentSkills, title: "Passende Fähigkeiten"})}
                 />
+            </View>
 
-            </View>
-            <View style={ styles.commentRow }>
-                <Text style={texts.headline}>Kommentare:</Text>
-                <Button 
-                    buttonStyle= { buttons.buttonRow }
-                    titleStyle= { texts.buttonBlue }
-                    title= 'Kommentar'
-                    icon= "plus"
-                    onClick= { () => { setCommentVisibility(true) } }
-                />
-            </View>
-            <FlatList
-            data={currentComments}
-            renderItem={(itemData) => { 
-                return (
-                    <CommentTile
-                        id={itemData.item.id}
-                        userId={itemData.item.user}
-                        subtitle={itemData.item.text}
-                        timestamp={itemData.item.time}
-                        onClick={clickProfileHandler}
-                        backgroundColor = {itemData.index % 2 === 0 ? "#ffffff" : "#f5f7f7"}
-                    />
-                );
-            }}
+            <SwipeListView
+                style={{backgroundColor: "white"}}
+                ref = {ref => setSwipeListView(ref)}
+                data={currentComments}
+                disableLeftSwipe = {true}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={(itemData) => { 
+                    return (
+                        <CommentTile
+                            id={itemData.item.id}
+                            userId={itemData.item.user}
+                            comment={itemData.item.text}
+                            timestamp={itemData.item.time}
+                            isLiked={false}
+                            index = {itemData.index}
+                        />
+                    )
+                }}
+                renderHiddenItem={ (itemData) => {
+                    return (
+                        <View style={[boxes.swipeRowTwo, {backgroundColor: colors.lightBlue}]}>
+                            <SwipeButton
+                                backgroundColor={colors.darkBlue}
+                                onPress={(ref) => {replyHandler(itemData.item.id)}}
+                            />
+                            <SwipeButton
+                                backgroundColor={colors.lightBlue}
+                                onPress={(ref) => {likeHandler(itemData.item.id)}}
+                            />
+                        </View>
+                    )
+                }}
+                leftOpenValue={120}
             />
-        </View>
-  );
 
+            <View style={[boxes.paddedRow, {backgroundColor: colors.white, paddingBottom: 10}]}>
+                <ButtonLarge
+                    title="Kommentar schreiben"
+                    onPress={() => {setNewCommentVisible(true)}}
+                />
+            </View>
+
+        </View>
+    )
 }

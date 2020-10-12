@@ -8,6 +8,12 @@
  */
 function emptyFunction() {}
 
+function isScreenReaderEnabled() {
+  return new Promise(function (resolve, reject) {
+    resolve(true);
+  });
+}
+
 var AccessibilityInfo = {
   /**
    * Query whether a screen reader is currently enabled.
@@ -15,11 +21,12 @@ var AccessibilityInfo = {
    * Returns a promise which resolves to a boolean.
    * The result is `true` when a screen reader is enabled and `false` otherwise.
    */
-  fetch: function fetch() {
-    return new Promise(function (resolve, reject) {
-      resolve(true);
-    });
-  },
+  isScreenReaderEnabled: isScreenReaderEnabled,
+
+  /**
+   * Deprecated
+   */
+  fetch: isScreenReaderEnabled,
 
   /**
    * Add an event handler. Supported events:

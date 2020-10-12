@@ -12,16 +12,17 @@
 
 const EventEmitter = require('../vendor/emitter/EventEmitter');
 const NativeEventEmitter = require('../EventEmitter/NativeEventEmitter');
-import NativeAppState from './NativeAppState';
 
-const logError = require('../Utilities/logError');
 const invariant = require('invariant');
+const logError = require('../Utilities/logError');
+
+import NativeAppState from './NativeAppState';
 
 /**
  * `AppState` can tell you if the app is in the foreground or background,
  * and notify you when the state changes.
  *
- * See http://facebook.github.io/react-native/docs/appstate.html
+ * See https://reactnative.dev/docs/appstate.html
  */
 class AppState extends NativeEventEmitter {
   _eventHandlers: Object;
@@ -72,7 +73,7 @@ class AppState extends NativeEventEmitter {
    * Add a handler to AppState changes by listening to the `change` event type
    * and providing the handler.
    *
-   * See http://facebook.github.io/react-native/docs/appstate.html#addeventlistener
+   * See https://reactnative.dev/docs/appstate.html#addeventlistener
    */
   addEventListener(type: string, handler: Function) {
     invariant(
@@ -119,7 +120,7 @@ class AppState extends NativeEventEmitter {
   /**
    * Remove a handler by passing the `change` event type and the handler.
    *
-   * See http://facebook.github.io/react-native/docs/appstate.html#removeeventlistener
+   * See https://reactnative.dev/docs/appstate.html#removeeventlistener
    */
   removeEventListener(type: string, handler: Function) {
     invariant(
@@ -148,11 +149,11 @@ class MissingNativeAppStateShim extends EventEmitter {
   isAvailable: boolean = false;
   currentState: ?string = null;
 
-  addEventListener() {
+  addEventListener(type: string, handler: Function) {
     throwMissingNativeModule();
   }
 
-  removeEventListener() {
+  removeEventListener(type: string, handler: Function) {
     throwMissingNativeModule();
   }
 
@@ -173,10 +174,8 @@ class MissingNativeAppStateShim extends EventEmitter {
 // This module depends on the native `RCTAppState` module. If you don't include it,
 // `AppState.isAvailable` will return `false`, and any method calls will throw.
 // We reassign the class variable to keep the autodoc generator happy.
-if (NativeAppState) {
-  AppState = new AppState();
-} else {
-  AppState = new MissingNativeAppStateShim();
-}
+const AppStateInstance: AppState | MissingNativeAppStateShim = NativeAppState
+  ? new AppState()
+  : new MissingNativeAppStateShim();
 
-module.exports = AppState;
+module.exports = AppStateInstance;

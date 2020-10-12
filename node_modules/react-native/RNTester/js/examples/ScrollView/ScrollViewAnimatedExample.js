@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  *
  * @format
- * @flow
+ * @flow strict-local
  */
 
 'use strict';
@@ -23,7 +23,7 @@ const {
   Dimensions,
 } = ReactNative;
 
-class ScrollViewAnimatedExample extends Component<{}> {
+class ScrollViewAnimatedExample extends Component<{...}> {
   _scrollViewPos = new Animated.Value(0);
 
   startAnimation: () => void = () => {
@@ -39,10 +39,14 @@ class ScrollViewAnimatedExample extends Component<{}> {
   render(): React.Node {
     const interpolated = this._scrollViewPos.interpolate({
       inputRange: [0, 1],
+      /* $FlowFixMe(>=0.38.0) - Flow error detected during the deployment of
+       * v0.38.0. To see the error, remove this comment and run flow */
       outputRange: [0, 0.1],
     });
     const interpolated2 = this._scrollViewPos.interpolate({
       inputRange: [0, 1],
+      /* $FlowFixMe(>=0.38.0) - Flow error detected during the deployment of
+       * v0.38.0. To see the error, remove this comment and run flow */
       outputRange: ['0deg', '1deg'],
     });
     return (
