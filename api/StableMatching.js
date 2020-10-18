@@ -6,160 +6,160 @@ const favValue = 5.5;
 const minMembers = 2;
 const maxMembers = 4 ;
 
-var members = {
-   "Anna": {
-        skills : ["skill3", "skill6", "skill8"],
-        sorted : false
-    },
-    "Niklas": {
-        skills : ["skill1", "skill5", "skill8"],
-        sorted : false
-    },
-    "Klaus": {
-        skills : ["skill2", "skill4"],
-        sorted : false
-    },
-    "Bo": {
-        skills : ["skill6"],
-        sorted : false
-    },
-    "Paul": {
-        skills : ["skill7", "skill10"],
-        sorted : false
-    },
-    "Nina": {
-        skills : ["skill4", "skill9"],
-        sorted : false
-    },
-    "Johannes": {
-        skills : ["skill2", "skill3", "skill5", "skill9"],
-        sorted : false
-    },
-    "Clara": {
-        skills : ["skill1", "skill7", "skill10"],
-        sorted : false
-    },
-    "Lena": {
-        skills : ["skill3", "skill5"],
-        sorted : false
-    },
-    "Miriam": {
-        skills : ["skill6", "skill10"],
-        sorted : false
-    },
-    "Melanie": {
-        skills : ["skill2", "skill4", "skill5"],
-        sorted : false
-    },
-    "Tom": {
-        skills : ["skill6", "skill9"],
-        sorted : false
-    },
-    "Ali": {
-        skills : ["skill1", "skill8"],
-        sorted : false
-    },
-    "Oliver": {
-        skills : ["skill2", "skill4", "skill7"],
-        sorted : false
-    },
-    "Theo": {
-        skills : ["skill1", "skill3", "skill8", "skill10"],
-        sorted : false
-    }
-}
-var ideas = {
-    "ideaA": { 
-        skills: ["skill1", "skill4", "skill7"],
-        missingSkills: ["skill1", "skill4", "skill7"],
-        favs: ["Paul", "Miriam"],
-        nogos: ["Klaus", "Oliver"],
-        members: []
-    },
-    "ideaB": {
-        skills: ["skill4", "skill8", "skill10"],
-        missingSkills: ["skill4", "skill8", "skill10"],
-        favs: [],
-        nogos: ["Nina", "Miriam", "Theo"],
-        members: []
-    },
-    "ideaC": {
-        skills: ["skill3", "skill6", "skill7"],
-        missingSkills: ["skill3", "skill6", "skill7"],
-        favs: ["Klaus", "Bo", "Nina", "Johannes", "Oliver", "Theo"],
-        nogos: [],
-        members: []
-    },
-    "ideaD": {
-        skills: ["skill2", "skill6", "skill9"],
-        missingSkills: ["skill2", "skill6", "skill9"],
-        favs: ["Niklas", "Lena"],
-        nogos: ["Clara", "Tom"],
-        members: []
-    },
-    "ideaE": {
-        skills: ["skill1", "skill5", "skill7", "skill9"],
-        missingSkills: ["skill1", "skill5", "skill7", "skill9"],
-        favs: ["Anna", "Clara", "Melanie", "Tom", "Ali"],
-        nogos: ["Bo", "Paul", "Lena"],
-        members: []
-    }
-}
 // var members = {
-//     "Anton": {
-//         skills : ["skill1", "skill5", "skill8", "skill10"],
+//    "Anna": {
+//         skills : ["skill3", "skill6", "skill8"],
+//         sorted : false
 //     },
-//     "Berta": {
-//         skills : ["skill1", "skill4", "skill7"],
+//     "Niklas": {
+//         skills : ["skill1", "skill5", "skill8"],
+//         sorted : false
 //     },
-//     "Charlotte": {
-//         skills : ["skill1", "skill2", "skill3", "skill4"],
+//     "Klaus": {
+//         skills : ["skill2", "skill4"],
+//         sorted : false
 //     },
-//     "Dora": {
-//         skills : ["skill5", "skill6", "skill9"],
+//     "Bo": {
+//         skills : ["skill6"],
+//         sorted : false
 //     },
-//     "Emil": {
-//         skills : ["skill6", "skill8", "skill9", "skill10"],
+//     "Paul": {
+//         skills : ["skill7", "skill10"],
+//         sorted : false
 //     },
-//     "Friedrich": {
-//         skills : ["skill1", "skill3", "skill5"],
+//     "Nina": {
+//         skills : ["skill4", "skill9"],
+//         sorted : false
 //     },
-//     "Gustav": {
-//         skills : ["skill1", "skill8", "skill9"],
+//     "Johannes": {
+//         skills : ["skill2", "skill3", "skill5", "skill9"],
+//         sorted : false
 //     },
-//     "Heinrich": {
-//         skills : ["skill3", "skill4", "skill6"],
+//     "Clara": {
+//         skills : ["skill1", "skill7", "skill10"],
+//         sorted : false
 //     },
-//     "Ida": {
-//         skills : ["skill1", "skill5", "skill9"],
+//     "Lena": {
+//         skills : ["skill3", "skill5"],
+//         sorted : false
 //     },
-//     "Julia": {
-//         skills : ["skill3", "skill7", "skill8", "skill10"],
+//     "Miriam": {
+//         skills : ["skill6", "skill10"],
+//         sorted : false
+//     },
+//     "Melanie": {
+//         skills : ["skill2", "skill4", "skill5"],
+//         sorted : false
+//     },
+//     "Tom": {
+//         skills : ["skill6", "skill9"],
+//         sorted : false
+//     },
+//     "Ali": {
+//         skills : ["skill1", "skill8"],
+//         sorted : false
+//     },
+//     "Oliver": {
+//         skills : ["skill2", "skill4", "skill7"],
+//         sorted : false
+//     },
+//     "Theo": {
+//         skills : ["skill1", "skill3", "skill8", "skill10"],
+//         sorted : false
 //     }
 // }
 // var ideas = {
 //     "ideaA": { 
-//         skills: ["skill1", "skill2", "skill5", "skill9"],
-//         missingSkills: ["skill1", "skill2", "skill5", "skill9"],
-//         favs: ["Anton", "Berta", "Heinrich"],
-//         nogos: ["Dora", "Friedrich", "Ida"],
+//         skills: ["skill1", "skill4", "skill7"],
+//         missingSkills: ["skill1", "skill4", "skill7"],
+//         favs: ["Paul", "Miriam"],
+//         nogos: ["Klaus", "Oliver"],
 //         members: []
 //     },
 //     "ideaB": {
-//         skills: ["skill3", "skill4", "skill6", "skill7"],
-//         missingSkills: ["skill3", "skill4", "skill6", "skill7"],
-//         favs: ["Dora", "Friedrich", "Ida"],
-//         nogos: [],
+//         skills: ["skill4", "skill8", "skill10"],
+//         missingSkills: ["skill4", "skill8", "skill10"],
+//         favs: [],
+//         nogos: ["Nina", "Miriam", "Theo"],
 //         members: []
 //     },
 //     "ideaC": {
-//         skills: ["skill1", "skill5", "skill8", "skill10"],
-//         missingSkills: ["skill1", "skill5", "skill8", "skill10"],
-//         favs: ["Charlotte"],
-//         nogos: ["Berta"],
+//         skills: ["skill3", "skill6", "skill7"],
+//         missingSkills: ["skill3", "skill6", "skill7"],
+//         favs: ["Klaus", "Bo", "Nina", "Johannes", "Oliver", "Theo"],
+//         nogos: [],
 //         members: []
 //     },
+//     "ideaD": {
+//         skills: ["skill2", "skill6", "skill9"],
+//         missingSkills: ["skill2", "skill6", "skill9"],
+//         favs: ["Niklas", "Lena"],
+//         nogos: ["Clara", "Tom"],
+//         members: []
+//     },
+//     "ideaE": {
+//         skills: ["skill1", "skill5", "skill7", "skill9"],
+//         missingSkills: ["skill1", "skill5", "skill7", "skill9"],
+//         favs: ["Anna", "Clara", "Melanie", "Tom", "Ali"],
+//         nogos: ["Bo", "Paul", "Lena"],
+//         members: []
+//     }
 // }
+var members = {
+    "Anton": {
+        skills : ["skill1", "skill5", "skill8", "skill10"],
+    },
+    "Berta": {
+        skills : ["skill1", "skill4", "skill7"],
+    },
+    "Charlotte": {
+        skills : ["skill1", "skill2", "skill3", "skill4"],
+    },
+    "Dora": {
+        skills : ["skill5", "skill6", "skill9"],
+    },
+    "Emil": {
+        skills : ["skill6", "skill8", "skill9", "skill10"],
+    },
+    "Friedrich": {
+        skills : ["skill1", "skill3", "skill5"],
+    },
+    "Gustav": {
+        skills : ["skill1", "skill8", "skill9"],
+    },
+    "Heinrich": {
+        skills : ["skill3", "skill4", "skill6"],
+    },
+    "Ida": {
+        skills : ["skill1", "skill5", "skill9"],
+    },
+    "Julia": {
+        skills : ["skill3", "skill7", "skill8", "skill10"],
+    }
+}
+var ideas = {
+    "ideaA": { 
+        skills: ["skill1", "skill2", "skill5", "skill9"],
+        missingSkills: ["skill1", "skill2", "skill5", "skill9"],
+        favs: ["Anton", "Berta", "Heinrich"],
+        nogos: ["Dora", "Friedrich", "Ida"],
+        members: []
+    },
+    "ideaB": {
+        skills: ["skill3", "skill4", "skill6", "skill7"],
+        missingSkills: ["skill3", "skill4", "skill6", "skill7"],
+        favs: ["Dora", "Friedrich", "Ida"],
+        nogos: [],
+        members: []
+    },
+    "ideaC": {
+        skills: ["skill1", "skill5", "skill8", "skill10"],
+        missingSkills: ["skill1", "skill5", "skill8", "skill10"],
+        favs: ["Charlotte"],
+        nogos: ["Berta"],
+        members: []
+    },
+}
 // ___________________________________________________________________________________________________________________________________________________
 
 var skillValues = {};
@@ -369,14 +369,14 @@ const stableMatching = () => {
     var sortedMembers = 0;
     var i =0;
     // DAS ALLES MACHEN SOLANGE ES NOCH UNSORTIERTE MEMBERS GIBT
-    while ((unmatchableMembers+sortedMembers)<= Object.keys(members).length) {
+    while ((unmatchableMembers+sortedMembers)< Object.keys(members).length) {
         console.log("---- Step " + i + " ----");
         i++;
         // Alle Mitglieder durchgehen
         for (const memId in members) {
 
             // Prüfen ob das Mitglied schon vergeben ist
-            if (!members[memId].sorted) {
+            if (!members[memId].sorted && !members[memId].unmatchable) {
 
                 if (members[memId].scoreList.length > 0) {
 
@@ -401,13 +401,15 @@ const stableMatching = () => {
                         members[overflowUserId].sorted = false;
                         var oldScoreList = members[overflowUserId].scoreList;
                         var newScoreList = oldScoreList.filter(idea => idea[0] != prefIdeaId);
+                        if(newScoreList.length == 0){
+                            unmatchableMembers+=1;
+                            members[memId].unmatchable  = true;
+                        }
                         members[overflowUserId].scoreList = newScoreList;
                     
                     }
                 }
-                else{
-                    unmatchableMembers+=1;
-                }
+        
             }
            
         }
