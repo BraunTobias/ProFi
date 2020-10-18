@@ -2,7 +2,7 @@
 
 // Daten
 // const skillValue = 1;
-const favValue = 6.5;
+const favValue = 5.5;
 const minMembers = 2;
 const maxMembers = 4 ;
 
@@ -365,9 +365,13 @@ const createSingleIdeaScoreList = (ideaId) => {
 createUserScoreLists();
 
 const stableMatching = () => {
+    var unmatchableMembers = 0;
+    var sortedMembers = 0;
+    var i =0;
     // DAS ALLES MACHEN SOLANGE ES NOCH UNSORTIERTE MEMBERS GIBT
-    for (var i = 0; i < 10; i++) {
+    while ((unmatchableMembers+sortedMembers)<= Object.keys(members).length) {
         console.log("---- Step " + i + " ----");
+        i++;
         // Alle Mitglieder durchgehen
         for (const memId in members) {
 
@@ -386,6 +390,7 @@ const stableMatching = () => {
                     if (ideas[prefIdeaId].members.length <= minMembers) {
                         // Wenn die Idee noch nicht überfüllt ist, den User als sortiert markieren 
                         members[memId].sorted  = true;
+                        sortedMembers +=1;
                     } else {
                         // Bei Überfüllung den User in der Idee anhand der Score-Liste vergleichen und den schlechtesten User löschen
                         overflowUserId = createSingleIdeaScoreList(prefIdeaId);
@@ -400,8 +405,14 @@ const stableMatching = () => {
                     
                     }
                 }
+                else{
+                    unmatchableMembers+=1;
+                }
             }
+           
         }
+
+        console.log(unmatchableMembers+sortedMembers);
     }
 
 }
