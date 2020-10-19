@@ -1,6 +1,5 @@
 import React from "react";
 import { StyleSheet, Text, Image, TouchableHighlight, View } from "react-native";
-import {Ionicons} from '@expo/vector-icons';
 import { icons, colors, boxes, texts } from '../Styles';
 
 export default ListTile = props => {
@@ -53,7 +52,7 @@ export default ListTile = props => {
                 <Text numberOfLines={2} ellipsizeMode="tail" style = {[texts.copy, {color: props.myTeam ? white : colors.darkGrey}]}>{props.subtitle}</Text>
             </View>
 
-            <Image style={boxes.listTileArrow} source={require("../assets/icons/arrow-right.png")} resizeMode="contain"/>
+            <Image style={boxes.listTileArrow} source={require("../assets/ui-icons/arrow-right.png")} resizeMode="contain"/>
 
         </View>
     </TouchableHighlight>

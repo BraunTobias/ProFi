@@ -5,6 +5,7 @@ import { boxes, colors, styles, texts } from '../Styles';
 import AttributeTile from '../components/AttributeTile';
 import ScrollRow from '../components/ScrollRow';
 import DB from '../api/DB_API';
+import Padding from './Padding';
 
 export default AttributeScreen = (props) => {
 
@@ -35,6 +36,12 @@ export default AttributeScreen = (props) => {
     return(
         <View style={{flex: 1}}>
             <View style={boxes.subHeader}>
+                <Padding
+                    height={50}
+                />
+                <View style={boxes.paddedRow}>
+                    <Text style={texts.separatorText}>Fähigkeiten auswählen</Text>
+                </View>
                 <ScrollRow
                     type="attributes"
                     data= {categoriesList}

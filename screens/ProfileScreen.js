@@ -6,7 +6,7 @@ import DB from '../api/DB_API';
 import ButtonLarge from '../components/ButtonLarge';
 import ProfileImage from '../components/ProfileImage';
 import InputField from '../components/InputField';
-import ListTile from '../components/ListTile';
+import AttributePreviewTile from '../components/AttributePreviewTile';
 
 export default ProfileScreen = ({navigation}) => {
 
@@ -90,12 +90,14 @@ export default ProfileScreen = ({navigation}) => {
                     onChangeText={() => {}}
                 />
             </View>
-            <ListTile
-                title="Meine Fähigkeiten"
-                subtitle={skillString}
-                index={0}
-                onPress={() => navigation.navigate('Attributes', {attributeType: "skills"})}
-            />
+            <View style={boxes.paddedRow}>
+                <AttributePreviewTile
+                    title="Meine Fähigkeiten"
+                    subtitle={skillString}
+                    index={0}
+                    onPress={() => navigation.navigate('Attributes', {attributeType: "skills"})}
+                />
+            </View>
         </View>
         </TouchableWithoutFeedback>
     )

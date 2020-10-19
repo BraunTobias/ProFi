@@ -29,7 +29,17 @@ export default CommentTile = props => {
             <ProfileImage
                 userId={userId}
                 imageUrl={currentUserImage}
+                onPress={props.onPress}
             />
+            <View style={boxes.likesRow}>
+                <Image
+                    style={boxes.likesImage}
+                    height={17}
+                    width={17}
+                    source={icons.like}
+                />
+                <Text style={texts.copy}>{props.likes}</Text>
+            </View>
         </View>
         <View style={boxes.commentTileContent}>
             <View style={boxes.commentTileHeader}>            

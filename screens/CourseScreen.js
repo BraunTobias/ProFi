@@ -13,6 +13,7 @@ import ButtonLarge from '../components/ButtonLarge';
 import ScrollRow from '../components/ScrollRow';
 import AttributeSelect from '../components/AttributeSelect';
 import ProfileView from '../components/ProfileView';
+import AttributePreviewTile from '../components/AttributePreviewTile';
 
 export default CourseScreen = ({route, navigation}) => {
 
@@ -205,9 +206,9 @@ export default CourseScreen = ({route, navigation}) => {
         <View style={{flex:1}}>
             {profileVisible &&
                 <ProfileView
-                userId={viewedUserId}
-                visible={profileVisible}
-                onDismiss={() => {setProfileVisible(false)}}
+                    userId={viewedUserId}
+                    visible={profileVisible}
+                    onDismiss={() => {setProfileVisible(false)}}
                 />
             }
 
@@ -230,9 +231,11 @@ export default CourseScreen = ({route, navigation}) => {
                                     onChangeText={changeNewIdeaTextHandler}
                                     multiline={true}
                                 />
-                                <ButtonLarge
-                                    title= "Fähigkeiten hinzufügen"
-                                    onPress= {() => {setAddSkillsVisible(true)}}
+                                <AttributePreviewTile
+                                    title="Passende Fähigkeiten"
+                                    subtitle={selectedSkillsList.join(", ")}
+                                    index={0}
+                                    onPress={() => {setAddSkillsVisible(true)}}
                                 />
                             </View> 
                         )
@@ -276,8 +279,7 @@ export default CourseScreen = ({route, navigation}) => {
                 data={currentIdeas}
                 disableLeftSwipe = {true}
                 keyExtractor={(item, index) => index.toString()}
-                renderItem={(itemData) => { 
-                    return (
+                renderItem={(itemData) => 
                         <ListTile
                             onPress={() => {selectIdeaHandler(itemData.item.id, itemData.item.title, itemData.item.description, itemData.item.skills)}} 
                             id={itemData.item.id}
@@ -288,22 +290,21 @@ export default CourseScreen = ({route, navigation}) => {
                             isNogo={itemData.item.id == currentNogo}
                             index = {itemData.index}
                         />
-                    )
-                }}
-                renderHiddenItem={ (itemData) => {
-                    return (
+                }
+                renderHiddenItem={ (itemData) => 
                         <View style={boxes.swipeRowTwo}>
                             <SwipeButton
+                                icon={icons.fav}
                                 backgroundColor={colors.darkBlue}
                                 onPress={(ref) => {addFavHandler(itemData.item.id)}}
                             />
                             <SwipeButton
+                                icon={icons.nogo}
                                 backgroundColor={colors.red}
                                 onPress={(ref) => {addNogoHandler(itemData.item.id)}}
                             />
                         </View>
-                    )
-                }}
+                }
                 leftOpenValue={120}
             />
 

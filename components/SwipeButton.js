@@ -4,6 +4,7 @@ import { StyleSheet, TouchableOpacity, View, Image } from "react-native";
 import { icons, colors, boxes, texts } from '../Styles';
 
 export default SwipeButton = props => {
+
   return (
     <TouchableOpacity
       style={[boxes.swipeButton, {backgroundColor: props.backgroundColor}]}
@@ -11,7 +12,7 @@ export default SwipeButton = props => {
     >
         <Image 
             style= {boxes.swipeIcon}
-            source= { icons.nogo }
+            source= { props.icon }
             resizeMode= { "contain" }
         />
     </TouchableOpacity>

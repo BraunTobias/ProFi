@@ -13,16 +13,19 @@ const colors = {
 }
 
 const icons = {
-    profilePlaceholder: require("./assets/icons/user.png"),
-    checkTrue: require("./assets/icons/check-true.png"),
-    checkFalse: require("./assets/icons/check-false.png"),
-    home: require("./assets/icons/home.png"),
-    profile: require("./assets/icons/profile.png"),
-    plus: require("./assets/icons/plus.png"),
-    find: require("./assets/icons/find.png"),
-    exit: require("./assets/icons/exit.png"),
-    fav: require("./assets/icons/favourite.png"),
-    nogo: require("./assets/icons/nogo.png"),
+    profilePlaceholder: require("./assets/ui-icons/user.png"),
+    checkTrue: require("./assets/ui-icons/check-true.png"),
+    checkFalse: require("./assets/ui-icons/check-false.png"),
+    home: require("./assets/ui-icons/home.png"),
+    profile: require("./assets/ui-icons/profile.png"),
+    plus: require("./assets/ui-icons/plus.png"),
+    find: require("./assets/ui-icons/find.png"),
+    exit: require("./assets/ui-icons/exit.png"),
+    fav: require("./assets/ui-icons/favourite.png"),
+    nogo: require("./assets/ui-icons/nogo.png"),
+    delete: require("./assets/ui-icons/delete.png"),
+    like: require("./assets/ui-icons/like.png"),
+    reply: require("./assets/ui-icons/reply.png"),
 }
 
 const boxes = {
@@ -59,7 +62,6 @@ const boxes = {
     },
     inputField: {
         minHeight: 45,
-        width: "100%",
         paddingHorizontal: 10,
         marginVertical: 5,
         backgroundColor: "white",
@@ -79,7 +81,11 @@ const boxes = {
         borderRadius: 7,
         flexDirection: "row",
         justifyContent: "space-between",
-        alignItems: "center"
+        alignItems: "center",
+        shadowColor: "white",
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 1,
+        shadowRadius: 0,
     },
     buttonSmallInactive: {
         height: 45,
@@ -114,8 +120,9 @@ const boxes = {
         justifyContent: "center",
     },
     buttonIcon: {
-        width: 35,
-        height: 35,
+        width: 25,
+        height: 25,
+        marginEnd: 5,
         tintColor: "white"
     },
     numberInput: {
@@ -128,6 +135,25 @@ const boxes = {
         width: 40, 
         height: 40,
         borderRadius: 7
+    },
+    attributePreviewTile: {
+        height: 90,
+        width: "100%",
+        paddingLeft: 15,
+        paddingRight: 35,
+        paddingVertical: 10,
+        marginTop: 10,
+        marginBottom: 5,
+        alignItems: "left",
+        justifyContent: "center",
+        backgroundColor: "white", 
+        // borderBottomWidth: 1,
+        // borderColor: colors.darkBlue,
+        borderRadius: 7,
+        shadowColor: colors.darkBlue,
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.5,
+        shadowRadius: 0,
     },
     listTile: {
         paddingLeft: 15,
@@ -159,15 +185,18 @@ const boxes = {
         paddingLeft: 15,
         paddingRight: 35,
         paddingVertical: 10,
-        minHeight: 90,
+        minHeight: 100,
         width: "100%",
         flexDirection: "row",
         alignItems: "left",
         justifyContent: "top",
+        backgroundColor: "red"
     },
     commentTileImage: {
         height: 60,
-        width: 60
+        width: 60,
+        alignItems: "left",
+        justifyContent: "flex-start"
     },
     commentTileHeader: {
         flexDirection: "row", 
@@ -177,7 +206,19 @@ const boxes = {
     commentTileContent: {
         width: width - 90, 
         justifyContent: "center", 
-        paddingStart: 15    ,
+        paddingStart: 15,
+    },
+    likesRow: {
+        width: "100%",
+        marginTop: 5, 
+        flexDirection: "row", 
+        justifyContent: "center", 
+        alignItems: "center"
+    },
+    likesImage: {
+        resizeMode: "contain", 
+        tintColor: colors.darkBlue, 
+        marginRight: 5    
     },
     swipeButton: {
         flex: 1,
@@ -264,11 +305,11 @@ const boxes = {
     },
     separator: {
         paddingHorizontal: 15,
-        paddingVertical: 5,
+        paddingVertical: 7,
         borderBottomWidth: 1,
         borderColor: colors.darkBlue,
-        backgroundColor: "rgba(255,255,255,0.8)"
-    }
+        backgroundColor: "rgba(255,255,255,0.9)"
+    },
 
 
 }
@@ -295,7 +336,7 @@ const texts = {
         fontFamily: 'Inter_500Medium',
         fontSize: 16,
         color: "white",
-        textAlign: "left"
+        textAlign: "left",
     },
     buttonLargeSolid: {
         fontFamily: 'Inter_500Medium',
@@ -326,6 +367,13 @@ const texts = {
         lineHeight: 20,
         fontFamily: 'Inter_400Regular',
         color: colors.darkGrey,
+    },
+    sectionListCopy: {
+        fontSize: 16,
+        lineHeight: 26,
+        fontFamily: 'Inter_400Regular',
+        color: colors.darkGrey,
+        paddingStart: 15,
     },
     commentTileTime: {
         fontSize: 16,

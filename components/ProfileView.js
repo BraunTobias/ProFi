@@ -26,15 +26,11 @@ export default ProfileView = props => {
             setCurrentEmail(email);
             if (imageUrl) setImageUrl(imageUrl);
         });
-        DB.getAttributesFromUser(props.userId, (list) => {
-            // if (list.length > 0) {
-            //     DB.getAllAttributes("skills", list, (attributesList) => {
-            //         setSkillsList(attributesList);
-            //         console.log(attributesList.join(", "))
-            //     }, () => {});
-            // }
-            setSkillsList(list);
-        })
+        DB.getAttributesFromUser(props.userId, (filterList) => {
+            DB.getAllAttributes("skills", filterList, (attributesList) => {
+                setSkillsList(attributesList);
+            }, () => {});
+        });    
     }, []);
 
     return(
@@ -64,8 +60,7 @@ export default ProfileView = props => {
                 </View>
 
                 <AttributeList style={{flexGrow: 1, backgroundColor: "red"}}
-                    filterList = {skillsList}
-                    attributeType = "skills"
+                    attList={skillsList}
                 />
                 <View style={boxes.modalButton}>
                     <ButtonLarge

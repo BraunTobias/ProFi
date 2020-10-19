@@ -155,8 +155,7 @@ export default HomeScreen = ({navigation}) => {
             <Modal visible= { newCourseVisible } animationType= 'slide'>
                 <ModalContent
                     subheader= { () => {}}
-                    content= { () => {
-                        return(
+                    content= { () => 
                             <View style={boxes.mainContainer}>
                                 <Text style={texts.titleCentered}>{"Kurs erstellen"}</Text>
                                 <InputField
@@ -200,8 +199,7 @@ export default HomeScreen = ({navigation}) => {
                                     />
                                 </View>
                             </View> 
-                        )
-                    }}
+                    }
                     onDismiss= {(committed) => {pressNewCourseHandler(committed)}}
                 />
             </Modal>
@@ -252,6 +250,7 @@ export default HomeScreen = ({navigation}) => {
                         <View style={boxes.swipeRowOne}>
                             <SwipeButton
                                 backgroundColor={colors.red}
+                                icon={icons.delete}
                                 onPress={(ref) => {deleteCourseHandler(itemData.item.id)}}
                             />
                         </View>

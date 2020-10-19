@@ -281,6 +281,7 @@ const DB = {
             user: currentUserID,
             text: commentText,
             time: firebase.firestore.Timestamp.fromDate(new Date()),
+            likes: []
         })
         .then(() => {
             onSuccess();
@@ -345,7 +346,7 @@ const DB = {
     },
     // Gibt Liste mit allen Kommentaren für Idee-Seite zurück
     getCommentsList: async function(courseId, ideaId, commentsListRetrieved) {
-        const commentsList = [];
+        var commentsList = [];
 
         const snapshot = await firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaId).collection("comments").orderBy("time", "desc").get();
         snapshot.forEach((doc) => {
@@ -354,6 +355,25 @@ const DB = {
             commentsList.push(comment);
         });            
         commentsListRetrieved(commentsList);
+    },
+    likeComment: async function(courseId, ideaId, commentId, onSuccess) {
+        const currentUserID = firebase.auth().currentUser.uid;
+        var newLikes = [];
+
+        const snapshotDoc = await firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaId).collection("comments").doc(commentId).get();
+        if (snapshotDoc.data().likes)               newLikes = snapshotDoc.data().likes;
+        if (newLikes.indexOf(currentUserID) < 0)    newLikes.push(currentUserID);
+        else                                        newLikes = newLikes.filter(item => item !== currentUserID);
+
+        firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaId).collection("comments").doc(commentId).set({
+            likes: newLikes
+        }, {merge: true}); 
+        onSuccess();
+    },
+    deleteComment: function(courseId, ideaId, commentId) {
+        const currentUserID = firebase.auth().currentUser.uid;
+        console.log("DELETED")
+        firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaId).collection("comments").doc(commentId).delete();
     },
     
     // Gibt Eigenschaften eines Kurses zurück
@@ -528,21 +548,6 @@ const DB = {
 
         const snapshot = await firebase.firestore().collection("users").doc(currentUserID).collection(attributeType).get();
 
-        // snapshot.forEach((categoryDoc) => {
-        //     const tempArray = [categoryDoc.id];
-        //     const tempAtt = [];
-        //     for (const title in categoryDoc.data()) {
-        //         if (filterList[0] || filterList.indexOf(title) >= 0) {
-        //             tempAtt.push(title);
-        //         }
-        //     }
-        //     if (tempAtt.length > 0) {
-        //         const tempAttString = tempAtt.join("\n");
-        //         tempArray.push(tempAttString);
-        //         attributesList.push(tempArray);
-        //     }
-        // });    
-        
         // Neue Version für SectionList
         snapshot.forEach((categoryDoc) => {
             const categoryName = categoryDoc.id;
@@ -559,10 +564,9 @@ const DB = {
                 });
             }
         });  
-        
         onSuccess(attributesList);
     },
-
+    
     getAttributesFromUser: async function(userId, onSuccess) {
         const attributesList = [];
         const snapshot = await firebase.firestore().collection("users").doc(userId).collection("skills").get();

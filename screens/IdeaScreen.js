@@ -1,19 +1,18 @@
 import React, {useState, useEffect, useLayoutEffect} from 'react';
 import { View, Text, Modal, Keyboard } from 'react-native';
-import { SwipeListView } from 'react-native-swipe-list-view';
+import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view';
 import { compareAsc, format } from 'date-fns';
 
 import { icons, colors, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
 import InputField from '../components/InputField';
-import ButtonSmall from '../components/ButtonSmall';
 import SwipeButton from '../components/SwipeButton';
 import CommentTile from '../components/CommentTile';
 import ModalContent from "../components/ModalContent";
-import ProfileImage from "../components/ProfileImage";
 import ButtonLarge from '../components/ButtonLarge';
 import ScrollRow from '../components/ScrollRow';
-import { FlatList } from 'react-native-gesture-handler';
+import AttributePreviewTile from '../components/AttributePreviewTile';
+import ProfileView from '../components/ProfileView';
 
 export default IdeaScreen = ({route, navigation}) => {
 
@@ -29,10 +28,13 @@ export default IdeaScreen = ({route, navigation}) => {
     const [currentComments, setCurrentComments] = useState([]);
     const [swipeListView, setSwipeListView] = useState();
 
-
     // State Hooks für Modal
     const [newCommentVisible, setNewCommentVisible] = useState(false);
     const [currentNewCommentText, setCurrentNewCommentText] = useState("");
+
+    // State Hooks für Profilansicht
+    const [viewedUserId, setViewedUserId] = useState(currentUserId);
+    const [profileVisible, setProfileVisible] = useState(false);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -57,7 +59,7 @@ export default IdeaScreen = ({route, navigation}) => {
                             "username": name,
                             "imageUrl": url
                         });
-                        setTeam(newTeamList);
+                        // setTeam(newTeamList);
                     });
                 }
             }
@@ -65,11 +67,25 @@ export default IdeaScreen = ({route, navigation}) => {
         });
     }, []);
 
-    const likeHandler = (id) => {
-        
+    const likeCommentHandler = (commentId) => {
+        DB.likeComment(courseId, itemId, commentId, () => {
+            DB.getCommentsList(courseId, itemId, (commentsList) => {
+                setCurrentComments(commentsList);
+                swipeListView.safeCloseOpenRow();
+            });
+        });
     }
-    const replyHandler = (id) => {
+    const deleteCommentHandler = (commentId) => {
+        DB.deleteComment(courseId, itemId, commentId);
+        DB.getCommentsList(courseId, itemId, (commentsList) => {
+            setCurrentComments(commentsList);
+            swipeListView.safeCloseOpenRow();
+        });
+    }
 
+    const viewProfileHandler = (id) => {
+        setViewedUserId(id);
+        setProfileVisible(true);
     }
 
     // Handler für Modal
@@ -77,11 +93,27 @@ export default IdeaScreen = ({route, navigation}) => {
         setCurrentNewCommentText(enteredText);
     }
     const pressNewCommentHandler = (committed) => {
-        setNewCommentVisible(false);
+        if (currentNewCommentText != "") {
+            DB.addComment(courseId, itemId, currentNewCommentText, () => {
+                setNewCommentVisible(false);
+                setCurrentNewCommentText("");
+                DB.getCommentsList(courseId, itemId, (commentsList) => {
+                    setCurrentComments(commentsList);
+                });
+            });
+        } 
     }
 
     return(
         <View style={{flex:1}}>
+
+            {profileVisible &&
+                <ProfileView
+                    userId={viewedUserId}
+                    visible={profileVisible}
+                    onDismiss={() => {setProfileVisible(false)}}
+                />
+            }
 
             {/* Idee erstellen */}
             <Modal visible= { newCommentVisible } animationType= 'slide'>
@@ -111,12 +143,15 @@ export default IdeaScreen = ({route, navigation}) => {
                 <View style={ boxes.paddedRow }>
                     <Text style={texts.copy}>{itemDescription}</Text>
                 </View>
-                <ListTile
-                    title="Passende Fähigkeiten"
-                    subtitle={currentSkills.join(", ")}
-                    index={0}
-                    onPress={() => navigation.navigate('IdeaAttributes', {attributeType: "skills", filter: currentSkills, title: "Passende Fähigkeiten"})}
-                />
+                <View style={ boxes.paddedRow }>
+                    <AttributePreviewTile
+                        title="Passende Fähigkeiten"
+                        subtitle={currentSkills.join(", ")}
+                        index={0}
+                        onPress={() => navigation.navigate('IdeaAttributes', {attributeType: "skills", filter: currentSkills, title: "Passende Fähigkeiten"})}
+                    />
+                </View>
+
             </View>
 
             <SwipeListView
@@ -125,33 +160,27 @@ export default IdeaScreen = ({route, navigation}) => {
                 data={currentComments}
                 disableLeftSwipe = {true}
                 keyExtractor={(item, index) => index.toString()}
-                renderItem={(itemData) => { 
-                    return (
-                        <CommentTile
-                            id={itemData.item.id}
-                            userId={itemData.item.user}
-                            comment={itemData.item.text}
-                            timestamp={itemData.item.time}
-                            isLiked={false}
-                            index = {itemData.index}
+                renderItem={(itemData) => 
+                    <CommentTile
+                        id={itemData.item.id}
+                        userId={itemData.item.user}
+                        comment={itemData.item.text}
+                        timestamp={itemData.item.time}
+                        likes={itemData.item.likes.length}
+                        index = {itemData.index}
+                        onPress = {() => {viewProfileHandler(itemData.item.user)}}
+                    />
+                }
+                renderHiddenItem={ (itemData) => 
+                    <View style={[boxes.swipeRowOne, {backgroundColor: itemData.item.user == currentUserId ? colors.red : itemData.item.likes.indexOf(currentUserId) < 0 ? colors.darkBlue : colors.lightBlue}]}>
+                        <SwipeButton
+                            icon={itemData.item.user == currentUserId ? icons.delete : icons.like}
+                            backgroundColor={itemData.item.user == currentUserId ? colors.red : itemData.item.likes.indexOf(currentUserId) < 0 ? colors.darkBlue : colors.lightBlue}
+                            onPress={() => {itemData.item.user == currentUserId ? deleteCommentHandler(itemData.item.id) : likeCommentHandler(itemData.item.id)}}
                         />
-                    )
-                }}
-                renderHiddenItem={ (itemData) => {
-                    return (
-                        <View style={[boxes.swipeRowTwo, {backgroundColor: colors.lightBlue}]}>
-                            <SwipeButton
-                                backgroundColor={colors.darkBlue}
-                                onPress={(ref) => {replyHandler(itemData.item.id)}}
-                            />
-                            <SwipeButton
-                                backgroundColor={colors.lightBlue}
-                                onPress={(ref) => {likeHandler(itemData.item.id)}}
-                            />
-                        </View>
-                    )
-                }}
-                leftOpenValue={120}
+                    </View>
+                }
+                leftOpenValue={60}
             />
 
             <View style={[boxes.paddedRow, {backgroundColor: colors.white, paddingBottom: 10}]}>
