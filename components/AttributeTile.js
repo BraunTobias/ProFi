@@ -32,6 +32,7 @@ export default AttributeTile = props => {
         >
             <Image
                 source={currentIcon}
+                tintColor={colors.darkBlue}
                 style={boxes.attributeCheckmark}
             />
             <Text 

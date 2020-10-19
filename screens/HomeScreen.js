@@ -38,13 +38,17 @@ export default HomeScreen = ({navigation}) => {
         const unsubscribe = navigation.addListener('focus', () => {
             DB.getCourseList((courseList) => {
                 setCurrentCourses(courseList);
-                // var joined = [];
-                // for (const course in courseList) {
-                //     if (courseList[course].members.indexOf(currentUserId) >= 0) {
-                //         joined.push(courseList[course].id);
-                //     }
-                // }
-                // setJoinedCourses(joined);
+                var joined = [];
+                for (const section of courseList) {
+                    for (const course of section.data) {
+                        if (course.members.indexOf(currentUserId) >= 0) {
+                            joined.push(course.id);
+                        }
+                        console.log(course.members);
+                    }
+                }
+                setJoinedCourses(joined);
+                console.log(joined);
             });
         });
     }, []);

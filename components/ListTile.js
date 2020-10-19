@@ -28,7 +28,7 @@ export default ListTile = props => {
       return (
         <Image 
         style= { boxes.listTileIcon }
-        source= { icons.fav }
+        source= { icons.checkTrue }
         resizeMode= { "contain" }
         />
     )

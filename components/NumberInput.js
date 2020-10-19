@@ -19,7 +19,6 @@ export default NumberInput = props => {
                 min= {2}
                 max= {20}
                 step= {1}
-                // buttonPressStyle ={{opacity: "0.2"}}
                 colorLeft ={props.value <= 2 ? colors.lightBlue : colors.darkBlue}
                 colorRight ={props.value >= 20 ? colors.lightBlue : colors.darkBlue}
                 onChange={props.onChange}

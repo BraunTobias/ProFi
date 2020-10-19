@@ -138,7 +138,7 @@ export default IdeaScreen = ({route, navigation}) => {
 
             <View style={ boxes.subHeader }>
                 <View style={ boxes.paddedRow }>
-                    <Text style={texts.subHeader}>{itemTitle}</Text>
+                    <Text style={texts.commentTileHeader}>{itemTitle}</Text>
                 </View>
                 <View style={ boxes.paddedRow }>
                     <Text style={texts.copy}>{itemDescription}</Text>

@@ -136,7 +136,7 @@ export default CourseScreen = ({route, navigation}) => {
             DB.joinCourse(itemId, () => {
                 setUserIsMember(true);
                 getCourseData();
-            }, () => {console.log("error")})
+            }, (e) => {console.log(e)})
         } else {
             DB.exitCourse(itemId, () => {
                 setUserIsMember(false);

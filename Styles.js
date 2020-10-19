@@ -86,6 +86,7 @@ const boxes = {
         shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 1,
         shadowRadius: 0,
+        elevation: 5,
     },
     buttonSmallInactive: {
         height: 45,
@@ -144,7 +145,7 @@ const boxes = {
         paddingVertical: 10,
         marginTop: 10,
         marginBottom: 5,
-        alignItems: "left",
+        alignItems: "flex-start",
         justifyContent: "center",
         backgroundColor: "white", 
         // borderBottomWidth: 1,
@@ -154,18 +155,19 @@ const boxes = {
         shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 0.5,
         shadowRadius: 0,
+        elevation: 5,
     },
     listTile: {
         paddingLeft: 15,
         paddingRight: 35,
         height: 90,
         width: "100%",
-        alignItems: "left",
+        alignItems: "flex-start",
         justifyContent: "center",
     },
     listTileHeader: {
         flexDirection: "row",
-        justifyContent: "left",
+        justifyContent: "flex-start",
     },
     listTileArrow: {
         position: "absolute",
@@ -188,14 +190,14 @@ const boxes = {
         minHeight: 100,
         width: "100%",
         flexDirection: "row",
-        alignItems: "left",
-        justifyContent: "top",
+        alignItems: "flex-start",
+        justifyContent: "flex-start",
         backgroundColor: "red"
     },
     commentTileImage: {
         height: 60,
         width: 60,
-        alignItems: "left",
+        alignItems: "flex-start",
         justifyContent: "flex-start"
     },
     commentTileHeader: {
@@ -216,6 +218,8 @@ const boxes = {
         alignItems: "center"
     },
     likesImage: {
+        height: 17,
+        width: 17,
         resizeMode: "contain", 
         tintColor: colors.darkBlue, 
         marginRight: 5    
