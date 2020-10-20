@@ -22,8 +22,7 @@ const DB = {
             firebase.firestore().collection("users").doc(userInfo.user.uid).set({
                 username: name,
                 bio: "",
-                email: email,
-                password: password
+                email: email
             })        
             .then(() => {
                 // console.log("User account created & signed in!");
@@ -109,6 +108,7 @@ const DB = {
         const snapshotDoc = await firebase.firestore().collection("users").doc(currentUserID).get();
         if (snapshotDoc.data()) {
             userInfo = snapshotDoc.data();
+            userInfo.email = firebase.auth().currentUser.email;
         }
         onSuccess(userInfo, currentUserID);
     },
@@ -137,39 +137,30 @@ const DB = {
             bio: newBio
         }, {merge: true}); 
     },
-    changeEmail: function(newEmail, onError) {
-        var oldEmail = "";
-        const currentUser = firebase.auth().currentUser;
-        currentUser.updateEmail(newEmail)
-        .then(() => {
-            firebase.firestore().collection("users").doc(currentUser.uid).set({
-                email: newEmail
-            }, {merge: true}); 
+    changeEmail: async function(oldEmail, newEmail, password, onSuccess, onError) {
+        firebase.auth().signInWithEmailAndPassword(oldEmail, password)
+        .then(async () => {
+            firebase.auth().currentUser.updateEmail(newEmail)
+            .then(() => {
+                firebase.firestore().collection("users").doc(firebase.auth().currentUser.uid).set({
+                    email: newEmail
+                }, {merge: true}); 
+            })
+            .then(() => {onSuccess()});
         })
-        .catch(async (error) => {
-            const snapshotDoc = await firebase.firestore().collection("users").doc(currentUser.uid).get();
-            if (snapshotDoc.data()) {
-                oldEmail = snapshotDoc.data().email;
-            }
-            onError(error, oldEmail);
+        .catch(e => {
+            onError(e);
         });
     },
-    changePassword: function(newPassword, onError) {
-        var oldPassword = "";
-        const currentUser = firebase.auth().currentUser;
-        currentUser.updatePassword(newPassword)
-        .then(() => {
-            firebase.firestore().collection("users").doc(currentUser.uid).set({
-                password: newPassword
-            }, {merge: true}); 
+    changePassword: function(email, oldPassword, newPassword, onSuccess, onError) {
+        firebase.auth().signInWithEmailAndPassword(email, oldPassword)
+        .then(async () => {
+            firebase.auth().currentUser.updatePassword(newPassword)
+            .then(() => {onSuccess()});
         })
-        .catch(async (error) => {
-            const snapshotDoc = await firebase.firestore().collection("users").doc(currentUser.uid).get();
-            if (snapshotDoc.data()) {
-                oldPassword = snapshotDoc.data().password;
-            }
-            onError(error, oldPassword);
-        });
+        .catch(e => {
+            onError(e);
+        })
     },
     testProfileImage: async function(uri) {
         const response = await fetch(uri);
@@ -231,7 +222,7 @@ const DB = {
                 onError("Diese ID ist schon vergeben!");
             } else {
                 firebase.firestore().collection("courses").doc(id).set({
-                    founder: currentUserID,
+                    creator: currentUserID,
                     title: title,
                     date: date,
                     minMembers: minMembers,
@@ -266,7 +257,7 @@ const DB = {
         });
     },
     // Neuen Kommentar erstellen
-    addComment: async function(courseId, ideaId, commentText, onSuccess) {
+    addComment: async function(courseId, ideaId, commentText, replyTo, onSuccess) {
         var currentUserName = "Anonym";
         var currentUserImage  = "";
         const currentUserID = firebase.auth().currentUser.uid;
@@ -281,7 +272,8 @@ const DB = {
             user: currentUserID,
             text: commentText,
             time: firebase.firestore.Timestamp.fromDate(new Date()),
-            likes: []
+            likes: [],
+            replyTo: replyTo
         })
         .then(() => {
             onSuccess();
@@ -348,13 +340,22 @@ const DB = {
     getCommentsList: async function(courseId, ideaId, commentsListRetrieved) {
         var commentsList = [];
 
-        const snapshot = await firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaId).collection("comments").orderBy("time", "desc").get();
+        const snapshot = await firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaId).collection("comments").orderBy("time", "asc").get();
         snapshot.forEach((doc) => {
             const comment = doc.data();
             comment["id"] = doc.id;
-            commentsList.push(comment);
+            if (!comment.replyTo) {
+                commentsList.push(comment);
+            } else {
+                var index = 0;
+                //Index des ursprünglichen Kommentars finden und dort einsetzen
+                for (const normalComment of commentsList) {
+                    if (comment.replyTo == normalComment.id) index = commentsList.indexOf(normalComment);
+                }
+                commentsList.splice(index, 0, comment);
+            }
         });            
-        commentsListRetrieved(commentsList);
+        commentsListRetrieved(commentsList.reverse());
     },
     likeComment: async function(courseId, ideaId, commentId, onSuccess) {
         const currentUserID = firebase.auth().currentUser.uid;
@@ -761,7 +762,7 @@ const DB = {
             date: "31.12.2020",
             minMembers: 2,
             maxMembers: 4,
-            founder: "jO01nq0aMeMTAmTxgT7PY9lErqt1",
+            creator: "jO01nq0aMeMTAmTxgT7PY9lErqt1",
             prospects: [allUserIds[0], allUserIds[1], allUserIds[2], allUserIds[3], allUserIds[4], allUserIds[5]],
             members: [allUserIds[0], allUserIds[1], allUserIds[2], allUserIds[3], allUserIds[4], allUserIds[5]]
         })

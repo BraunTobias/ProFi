@@ -26,6 +26,7 @@ const icons = {
     delete: require("./assets/ui-icons/delete.png"),
     like: require("./assets/ui-icons/like.png"),
     reply: require("./assets/ui-icons/reply.png"),
+    edit: require("./assets/ui-icons/edit.png"),
 }
 
 const boxes = {
@@ -38,7 +39,6 @@ const boxes = {
         justifyContent: "center",
     },
     header: {
-        height: 100,
         backgroundColor: colors.darkBlue,
     },
     subHeader: {
@@ -64,12 +64,20 @@ const boxes = {
         minHeight: 45,
         paddingHorizontal: 10,
         marginVertical: 5,
-        backgroundColor: "white",
+        backgroundColor: colors.white,
         borderBottomWidth: 1,
         borderColor: colors.lightBlue,
         borderRadius: 7,
-        fontFamily: 'Inter_400Regular',
-        fontSize: 16,
+    },
+    inputFieldIcon: {
+        height: 45, 
+        width: 45,
+        position: "absolute", 
+        right: 0,
+        borderBottomRightRadius: 7,
+        borderTopRightRadius: 7,
+        backgroundColor: colors.darkBlue, 
+        tintColor: colors.white,
     },
     buttonSmall: {
         height: 45,
@@ -82,7 +90,7 @@ const boxes = {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        shadowColor: "white",
+        shadowColor: colors.white,
         shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 1,
         shadowRadius: 0,
@@ -124,7 +132,7 @@ const boxes = {
         width: 25,
         height: 25,
         marginEnd: 5,
-        tintColor: "white"
+        tintColor: colors.white
     },
     numberInput: {
         flex: 1,
@@ -147,7 +155,7 @@ const boxes = {
         marginBottom: 5,
         alignItems: "flex-start",
         justifyContent: "center",
-        backgroundColor: "white", 
+        backgroundColor: colors.white, 
         // borderBottomWidth: 1,
         // borderColor: colors.darkBlue,
         borderRadius: 7,
@@ -192,7 +200,18 @@ const boxes = {
         flexDirection: "row",
         alignItems: "flex-start",
         justifyContent: "flex-start",
-        backgroundColor: "red"
+    },
+    commentReplyTile: {
+        paddingLeft: 5,
+        paddingRight: 35,
+        paddingVertical: 10,
+        minHeight: 100,
+        width: width - 45,
+        flexDirection: "row",
+        alignItems: "flex-start",
+        justifyContent: "flex-start",
+        borderLeftWidth: 20,
+        borderLeftColor: colors.lightBlue
     },
     commentTileImage: {
         height: 60,
@@ -201,6 +220,7 @@ const boxes = {
         justifyContent: "flex-start"
     },
     commentTileHeader: {
+        width: "100%",
         flexDirection: "row", 
         justifyContent: "space-between", 
         alignItems: "baseline",
@@ -232,7 +252,8 @@ const boxes = {
         justifyContent: "center",
     },
     swipeIcon: {
-        width: "65%"
+        width: "65%",
+        tintColor: colors.white
     },
     swipeRowOne: {
         height: "100%", 
@@ -312,7 +333,7 @@ const boxes = {
         paddingVertical: 7,
         borderBottomWidth: 1,
         borderColor: colors.darkBlue,
-        backgroundColor: "rgba(255,255,255,0.9)"
+        backgroundColor: colors.white
     },
 
 
@@ -339,13 +360,13 @@ const texts = {
     buttonSmall: {
         fontFamily: 'Inter_500Medium',
         fontSize: 16,
-        color: "white",
+        color: colors.white,
         textAlign: "left",
     },
     buttonLargeSolid: {
         fontFamily: 'Inter_500Medium',
         fontSize: 16,
-        color: "white",
+        color: colors.white,
         textAlign: "center"
     },
     buttonLargeTransparent: {
@@ -394,6 +415,10 @@ const texts = {
         fontSize: 18,
         color: colors.darkBlue,
         fontFamily: 'Inter_600SemiBold',
+    },
+    inputField: {
+        fontFamily: 'Inter_400Regular',
+        fontSize: 16,
     }
 }
 

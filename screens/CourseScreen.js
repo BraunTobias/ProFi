@@ -26,8 +26,8 @@ export default CourseScreen = ({route, navigation}) => {
     // State Hooks
     const [currentIdeas, setCurrentIdeas] = useState([]);
     const [swipeListView, setSwipeListView] = useState();
-    const [founderId, setFounderId] = useState("");
-    const [founder, setFounder] = useState("");
+    const [creatorId, setCreatorId] = useState("");
+    const [creator, setCreator] = useState("");
     const [members, setMembers] = useState([]);
     const [minMembers, setMinMembers] = useState(0);
     const [maxMembers, setMaxMembers] = useState(0);
@@ -58,7 +58,7 @@ export default CourseScreen = ({route, navigation}) => {
 
     const getCourseData = () => {
         DB.getCourseData(itemId, (data) => {
-            setFounderId(data.founder);
+            setCreatorId(data.creator);
             setMinMembers(data.minMembers);
             setMaxMembers(data.maxMembers);
             if (data.members && data.members.length > 0) {
@@ -78,8 +78,8 @@ export default CourseScreen = ({route, navigation}) => {
             } else {
                 setMembers([]);
             }
-            DB.getUserInfoById (data.founder, (userName, userImage, bio, email) => {
-                setFounder(userName);
+            DB.getUserInfoById (data.creator, (userName, userImage, bio, email) => {
+                setCreator(userName);
             });
         });    
     }
@@ -263,7 +263,7 @@ export default CourseScreen = ({route, navigation}) => {
                 </View>
                 <View style={ boxes.paddedRow }>
                     <Text style={texts.subHeader}>{itemDate}</Text>
-                    <Text style={texts.subHeader}>{founder}</Text>
+                    <Text style={texts.subHeader}>{creator}</Text>
                 </View>
                 <ScrollRow
                     data= {members}

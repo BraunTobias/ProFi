@@ -30,7 +30,10 @@ export default IdeaScreen = ({route, navigation}) => {
 
     // State Hooks für Modal
     const [newCommentVisible, setNewCommentVisible] = useState(false);
+    const [newReplyVisible, setNewReplyVisible] = useState(false);
     const [currentNewCommentText, setCurrentNewCommentText] = useState("");
+    const [currentReplyText, setCurrentReplyText] = useState("");
+    const [currentReplyComment, setCurrentReplyComment] = useState({});
 
     // State Hooks für Profilansicht
     const [viewedUserId, setViewedUserId] = useState(currentUserId);
@@ -92,16 +95,35 @@ export default IdeaScreen = ({route, navigation}) => {
     const changeNewCommentTextHandler = (enteredText) => {
         setCurrentNewCommentText(enteredText);
     }
+    const changeReplyTextHandler = (enteredText) => {
+        setCurrentReplyText(enteredText);
+    }
     const pressNewCommentHandler = (committed) => {
-        if (currentNewCommentText != "") {
-            DB.addComment(courseId, itemId, currentNewCommentText, () => {
-                setNewCommentVisible(false);
+        if (committed) {
+            if (currentNewCommentText != "") {
+                DB.addComment(courseId, itemId, currentNewCommentText, "", () => {
+                    setNewCommentVisible(false);
+                    setCurrentNewCommentText("");
+                    DB.getCommentsList(courseId, itemId, (commentsList) => {
+                        setCurrentComments(commentsList);
+                    });
+                });
+            } 
+        } else {
+            setNewCommentVisible(false);
+        }
+    }
+    const pressReplyHandler = (committed) => {
+        if (currentReplyText != "") {
+            DB.addComment(courseId, itemId, currentReplyText, currentReplyComment.id, () => {
+                setNewReplyVisible(false);
                 setCurrentNewCommentText("");
                 DB.getCommentsList(courseId, itemId, (commentsList) => {
                     setCurrentComments(commentsList);
                 });
             });
         } 
+        swipeListView.safeCloseOpenRow();
     }
 
     return(
@@ -115,7 +137,7 @@ export default IdeaScreen = ({route, navigation}) => {
                 />
             }
 
-            {/* Idee erstellen */}
+            {/* Kommentar schreiben */}
             <Modal visible= { newCommentVisible } animationType= 'slide'>
                 <ModalContent
                     subheader= { () => {}}
@@ -133,6 +155,32 @@ export default IdeaScreen = ({route, navigation}) => {
                         )
                     }}
                     onDismiss= {(committed) => {pressNewCommentHandler(committed)}}
+                />
+            </Modal>
+            {/* Auf Kommentar antworten */}
+            <Modal visible= { newReplyVisible } animationType= 'slide'>
+                <ModalContent
+                    subheader= { () => {}}
+                    content= { () => {
+                        return(
+                            <View style={boxes.mainContainer}>
+                                <Text style={texts.titleCentered}>{"Antwort schreiben"}</Text>
+                                <CommentTile
+                                    userId={currentReplyComment.user}
+                                    comment={currentReplyComment.text}
+                                    timestamp={currentReplyComment.time}
+                                    likes={currentReplyComment.likes.length}
+                                />
+                                <InputField
+                                    placeholderText= "max. 300 Zeichen"
+                                    value={currentReplyText}
+                                    onChangeText={changeReplyTextHandler}
+                                    multiline={true}
+                                />
+                            </View> 
+                        )
+                    }}
+                    onDismiss= {pressReplyHandler}
                 />
             </Modal>
 
@@ -167,20 +215,26 @@ export default IdeaScreen = ({route, navigation}) => {
                         comment={itemData.item.text}
                         timestamp={itemData.item.time}
                         likes={itemData.item.likes.length}
+                        isReply={itemData.item.replyTo && itemData.item.replyTo.length > 0}
                         index = {itemData.index}
                         onPress = {() => {viewProfileHandler(itemData.item.user)}}
                     />
                 }
                 renderHiddenItem={ (itemData) => 
-                    <View style={[boxes.swipeRowOne, {backgroundColor: itemData.item.user == currentUserId ? colors.red : itemData.item.likes.indexOf(currentUserId) < 0 ? colors.darkBlue : colors.lightBlue}]}>
+                    <View style={[boxes.swipeRowTwo, {backgroundColor: colors.mediumBlue}]}>
                         <SwipeButton
                             icon={itemData.item.user == currentUserId ? icons.delete : icons.like}
                             backgroundColor={itemData.item.user == currentUserId ? colors.red : itemData.item.likes.indexOf(currentUserId) < 0 ? colors.darkBlue : colors.lightBlue}
                             onPress={() => {itemData.item.user == currentUserId ? deleteCommentHandler(itemData.item.id) : likeCommentHandler(itemData.item.id)}}
                         />
+                        <SwipeButton
+                            icon={icons.reply}
+                            backgroundColor={colors.mediumBlue}
+                            onPress={() => {setNewReplyVisible(true); setCurrentReplyComment(itemData.item)}}
+                        />
                     </View>
                 }
-                leftOpenValue={60}
+                leftOpenValue={120}
             />
 
             <View style={[boxes.paddedRow, {backgroundColor: colors.white, paddingBottom: 10}]}>

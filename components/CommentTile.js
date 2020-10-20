@@ -1,5 +1,6 @@
 import React , {useState, useEffect} from "react";
 import { StyleSheet, Text, TouchableOpacity, View, Image } from "react-native";
+import Autolink from 'react-native-autolink';
 
 import { icons, colors, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
@@ -24,7 +25,7 @@ export default CommentTile = props => {
     }, []);
 
     return (
-    <View style={[boxes.commentTile, colorStyle]}>
+    <View style={[props.isReply ? [boxes.commentReplyTile] : boxes.commentTile, colorStyle]}>
         <View style={boxes.commentTileImage}>
             <ProfileImage
                 userId={userId}
@@ -46,7 +47,11 @@ export default CommentTile = props => {
                 <Text style = {texts.commentTileHeader}>{currentUserName}</Text>
                 <Text style = {texts.commentTileTime}>{date}</Text>
             </View>
-            <Text style = {texts.copy}>{props.comment}</Text>
+            <Autolink 
+                style = {texts.copy}
+                text={props.comment}
+            />
+            {/* <Text style = {texts.copy}>{props.comment}</Text> */}
         </View>
     </View>
     );

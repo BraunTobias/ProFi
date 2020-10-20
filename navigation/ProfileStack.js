@@ -17,24 +17,24 @@ export default HomeNavigator = () => {
                 headerTintColor: colors.white,
             }}
         >
-                <HomeStack.Screen 
-                    name = "Home" 
-                    component= {ProfileScreen} 
-                    options={{
-                        headerTitle: 'Mein Profil', 
-                    }}
-                />
-                <HomeStack.Screen 
-                    name = "Attributes" 
-                    component = {AttributeScreen} 
-                    options={{
-                        headerTitle: 'Attribute', 
-                        headerBackTitleVisible: false, 
-                        headerLeftContainerStyle: {
-                            marginHorizontal: 10
-                        }
-                    }}
-                />
+            <HomeStack.Screen 
+                name = "Home" 
+                component= {ProfileScreen} 
+                options={{
+                    headerTitle: 'Mein Profil', 
+                }}
+            />
+            <HomeStack.Screen 
+                name = "Attributes" 
+                component = {AttributeScreen} 
+                options={{
+                    headerTitle: 'Attribute', 
+                    headerBackTitleVisible: false, 
+                    headerLeftContainerStyle: {
+                        marginHorizontal: 10
+                    }
+                }}
+            />
         </HomeStack.Navigator>
     );
 };

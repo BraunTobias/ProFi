@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, TextInput, Text } from 'react-native';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import { View, TextInput, Text, Image } from 'react-native';
+import { TouchableOpacity, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { icons, colors, boxes, texts } from '../Styles';
 
 export default InputField = props => {
@@ -15,20 +15,27 @@ export default InputField = props => {
   }
 
   const mainField = () => {
-    if (props.isDate) {
+    if (props.isButton) {
       return(
-        <TouchableWithoutFeedback onPress={props.onPress}>
-          <TextInput
-              style= {boxes.inputField}
-              autoCapitalize="none"
-              textAlign= "left"
-              placeholder= { props.placeholderText }
-              value= { props.value }
-              onChangeText= { text => props.onChangeText(text)}
-              secureTextEntry= { props.secureTextEntry }
-              pointerEvents={"none"}
-          />
-        </TouchableWithoutFeedback>
+        <TouchableOpacity onPress={props.onPress}>
+          <View style={[boxes.inputField, {flexDirection: "row", justifyContent: "space-between", alignItems:"center"}]}>
+            <TextInput
+                style= {texts.inputField}
+                autoCapitalize="none"
+                textAlign= "left"
+                placeholder= { props.placeholderText }
+                value= { props.value }
+                onChangeText= { text => props.onChangeText(text)}
+                secureTextEntry= { props.secureTextEntry }
+                pointerEvents={"none"}
+            />
+            <Image
+              style={boxes.inputFieldIcon}
+              source={props.icon}
+              resizeMode={"contain"}
+            />
+          </View>
+        </TouchableOpacity>
       )
     } else {
       return (
@@ -41,6 +48,7 @@ export default InputField = props => {
             onChangeText= { text => props.onChangeText(text)}
             secureTextEntry= { props.secureTextEntry }
             multiline={props.multiline}
+            dataDetectorTypes={"link"}
             maxLength={300}
         />
       )

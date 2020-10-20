@@ -44,11 +44,9 @@ export default HomeScreen = ({navigation}) => {
                         if (course.members.indexOf(currentUserId) >= 0) {
                             joined.push(course.id);
                         }
-                        console.log(course.members);
                     }
                 }
                 setJoinedCourses(joined);
-                console.log(joined);
             });
         });
     }, []);
@@ -176,7 +174,7 @@ export default HomeScreen = ({navigation}) => {
                                 />
                                 <InputField
                                     title= "End-Datum"
-                                    isDate= {true}
+                                    isButton= {true}
                                     placeholderText= "Datum auswählen …"
                                     value={format(currentNewCourseDate, "dd.MM.yyyy")}
                                     onPress={() => {setNewCourseDateVisible(true); Keyboard.dismiss()}}
@@ -226,7 +224,7 @@ export default HomeScreen = ({navigation}) => {
             </View>
 
             <SwipeListView
-                style={{backgroundColor: "white"}}
+                style={{backgroundColor: colors.white}}
                 ref = {ref => setSwipeListView(ref)}
                 sections={currentCourses}
                 disableLeftSwipe = {true}
