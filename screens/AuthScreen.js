@@ -38,7 +38,7 @@ export default AuthScreen = () => {
 
     // Login
     const logIn = () => {
-        DB.logIn("neuer@neuer.de", "1234567", ((error) => {console.log(error)}));
+        DB.logIn(currentMail, currentPW, ((error) => {console.log(error)}));
     }
 
     return (
