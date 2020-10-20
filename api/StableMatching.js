@@ -3,8 +3,8 @@
 // Daten
 // const skillValue = 1;
 const favValue = 5.5;
-const minMembers = 2;
-const maxMembers = 4 ;
+const minMembers = 3;
+const maxMembers = 6 ;
 
 // var members = {
 //    "Anna": {
