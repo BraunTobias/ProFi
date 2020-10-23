@@ -25,7 +25,7 @@ export default CommentTile = props => {
     }, []);
 
     return (
-    <View style={[props.isReply ? [boxes.commentReplyTile] : boxes.commentTile, colorStyle]}>
+    <View style={[props.isReply ? boxes.commentReplyTile : boxes.commentTile, colorStyle]}>
         <View style={boxes.commentTileImage}>
             <ProfileImage
                 userId={userId}
@@ -42,16 +42,16 @@ export default CommentTile = props => {
                 <Text style={texts.copy}>{props.likes}</Text>
             </View>
         </View>
-        <View style={boxes.commentTileContent}>
+        <View style={props.isReply ? boxes.commentReplyTileContent : boxes.commentTileContent}>
             <View style={boxes.commentTileHeader}>            
                 <Text style = {texts.commentTileHeader}>{currentUserName}</Text>
                 <Text style = {texts.commentTileTime}>{date}</Text>
             </View>
             <Autolink 
+                linkStyle={texts.link}
                 style = {texts.copy}
                 text={props.comment}
             />
-            {/* <Text style = {texts.copy}>{props.comment}</Text> */}
         </View>
     </View>
     );

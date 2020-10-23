@@ -1,9 +1,11 @@
-import React from 'react';
-import { View, TextInput, Text, Image } from 'react-native';
-import { TouchableOpacity, TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import React, { useState } from 'react';
+import { View, TextInput, Text, Image, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+// import { ,  } from 'react-native-gesture-handler';
 import { icons, colors, boxes, texts } from '../Styles';
 
 export default InputField = props => {
+
+  const [pwVisible, setPwVisible] = useState(false);
 
   // Wenn vorhanden, wird der Titel über dem Input-Feld angezeigt
   const titleText = () => {
@@ -26,7 +28,6 @@ export default InputField = props => {
                 placeholder= { props.placeholderText }
                 value= { props.value }
                 onChangeText= { text => props.onChangeText(text)}
-                secureTextEntry= { props.secureTextEntry }
                 pointerEvents={"none"}
             />
             <Image
@@ -39,18 +40,31 @@ export default InputField = props => {
       )
     } else {
       return (
-        <TextInput
-            style= {[boxes.inputField, {height: props.multiline ? "auto" : 45, paddingTop: props.multiline ? 12 : 0, paddingBottom: props.multiline ? 12 : 0}]}
-            autoCapitalize="none"
-            textAlign= "left"
-            placeholder= { props.placeholderText }
-            value= { props.value }
-            onChangeText= { text => props.onChangeText(text)}
-            secureTextEntry= { props.secureTextEntry }
-            multiline={props.multiline}
-            dataDetectorTypes={"link"}
-            maxLength={300}
-        />
+        <View style= {[boxes.inputField, {height: props.multiline ? "auto" : 40, paddingTop: props.multiline ? 6 : 0, paddingBottom: props.multiline ? 12 : 0}]}>
+          <TextInput
+              style= {texts.inputField}
+              autoCapitalize="none"
+              textAlign= "left"
+              placeholder= { props.placeholderText }
+              value= { props.value }
+              onChangeText= { text => props.onChangeText(text)}
+              secureTextEntry= { props.secureTextEntry && !pwVisible}
+              multiline={props.multiline}
+              maxLength={300}
+          />
+          {props.secureTextEntry && 
+              <TouchableOpacity 
+                  style={{position: "absolute", right: 0}}
+                  onPress={() => setPwVisible(!pwVisible)}
+              >
+                  <Image 
+                    style={{height: 40, aspectRatio: 1, marginRight: 5, tintColor: colors.mediumBlue}}
+                    source={pwVisible ? icons.passwordHide : icons.passwordShow}
+                    resizeMode={"contain"}
+                  />
+              </TouchableOpacity>
+          }
+        </View>
       )
     }
   }

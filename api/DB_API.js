@@ -146,7 +146,10 @@ const DB = {
                     email: newEmail
                 }, {merge: true}); 
             })
-            .then(() => {onSuccess()});
+            .then(() => {onSuccess()})
+            .catch(e => {
+                onError(e);
+            });    
         })
         .catch(e => {
             onError(e);
@@ -182,14 +185,14 @@ const DB = {
         const uploadTask = firebase.storage().ref().child("images/" + imageName).put(blob);
         uploadTask.on("state_changed", (snapshot) => {
             var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            // console.log("snapshot: " + snapshot.state + " " + progress + "% done");
+            console.log("snapshot: " + snapshot.state + " " + progress + "% done");
         }, (error) => {
             // Fehler beim Hochladen
             console.log(error);
         }, () => {
             uploadTask.snapshot.ref.getDownloadURL()
             .then((downloadURL) => {
-                // console.log('File available at', downloadURL);
+                console.log('File available at', downloadURL);
                 firebase.firestore().collection("users").doc(currentUserId).set({
                     image: downloadURL,
                     imageName: imageName
@@ -199,15 +202,14 @@ const DB = {
                 if (oldImageName) {
                     firebase.storage().ref().child("images/" + oldImageName).delete()
                     .then(() => {
-                        // console.log("Deleted old image");
+                        console.log("Deleted old image");
                     })
                     .catch((error) => {
-                        // console.log(error);
+                        console.log(error);
                     })
                 }
             })
         });
-
     },
 
     // Neuen Kurs erstellen (Objekt der Klasse course übergeben)
@@ -240,6 +242,7 @@ const DB = {
     // Neue Idee erstellen 
     addIdea: function(courseId, title, description, skills, interests, onSuccess) {
         const currentUserID = firebase.auth().currentUser.uid;
+
         firebase.firestore().collection("courses").doc(courseId).collection("ideas").add({
             title: title,
             description: description,
@@ -256,6 +259,19 @@ const DB = {
             })
         });
     },
+    // Idee bearbeiten
+    editIdea: function(courseId, ideaId, title, description, skills, interests, onSuccess) {
+        firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaId).set({
+            title: title,
+            description: description,
+            interests: interests,
+            skills: skills,
+        }, {merge: true})
+        .then(() => {
+            onSuccess();
+        });
+    },
+
     // Neuen Kommentar erstellen
     addComment: async function(courseId, ideaId, commentText, replyTo, onSuccess) {
         var currentUserName = "Anonym";
@@ -429,10 +445,10 @@ const DB = {
                     addedCourse["id"] = docSnapshot.id;
                     onSuccess(addedCourse);
                 } else {
-                    onError("User ist schon am Kurs interessiert");
+                    onError("Du hast diesen Kurs schon in deiner Liste.");
                 }         
             } else {
-                onError("Diese ID existiert nicht.");
+                onError("Diese Kurs-ID existiert nicht.");
             }
         });
     },

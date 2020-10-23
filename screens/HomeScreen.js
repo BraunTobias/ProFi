@@ -1,8 +1,9 @@
 import React, {useState, useEffect} from 'react';
-import { View, Text, Modal, Keyboard } from 'react-native';
+import { View, Text, Modal, Keyboard, Alert } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { compareAsc, format } from 'date-fns';
+import AsyncStorage from '@react-native-community/async-storage';
 
 import { icons, colors, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
@@ -30,9 +31,25 @@ export default HomeScreen = ({navigation}) => {
     const [currentNewCourseName, setCurrentNewCourseName] = useState("");
     const [currentNewCourseId, setCurrentNewCourseId] = useState("");
     const [currentNewCourseDate, setCurrentNewCourseDate] = useState(new Date());
+    const [newCourseDateErrorVisible, setNewCourseDateErrorVisible] = useState(false);
     const [currentNewCourseMinMembers, setCurrentNewCourseMinMembers] = useState(2);
     const [currentNewCourseMaxMembers, setCurrentNewCourseMaxMembers] = useState(2);
+    const [deleteInfoVisible, setDeleteInfoVisible] = useState(false);
+    const [deleteInfoReceived, setDeleteInfoReceived] = useState(false);
 
+    // Für Info-Modal
+    const storeInfoReceived = async (info) => {
+        try {
+          await AsyncStorage.setItem(info, currentUserId);
+        } catch(e) {console.log(e);}
+    }
+    const getInfoReceived = async () => {
+        try {
+          const deleteInfo = await AsyncStorage.getItem("deleteInfoReceived");
+          if (deleteInfo == currentUserId) setDeleteInfoReceived(true);
+        } catch(e) {console.log(e);}
+    }
+      
     // Wird nach dem Rendern ausgeführt
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
@@ -47,11 +64,15 @@ export default HomeScreen = ({navigation}) => {
                     }
                 }
                 setJoinedCourses(joined);
+                getInfoReceived();
             });
         });
     }, []);
 
     // Handler für Modals
+    const changeFindCourseIdHandler = (enteredText) => {
+        setCurrentFindCourseId(enteredText.toUpperCase());
+    }
     const pressFindCourseHandler = (committed) => {
         if (committed && currentFindCourseId != "") {
             DB.addCourseToList(currentFindCourseId, (addedCourse) => {
@@ -61,28 +82,32 @@ export default HomeScreen = ({navigation}) => {
                 setCurrentCourses(courseList);
                 setFindCourseVisible(false);
             }, (error) => {
-                console.log(error);
+                Alert.alert(
+                    "Ungültige Eingabe",
+                    error,
+                    [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+                );              
             })
         } else {
             setFindCourseVisible(false);
         }
     }
-    const changeFindCourseIdHandler = (enteredText) => {
-        setCurrentFindCourseId(enteredText.toUpperCase());
-    }
     const pressNewCourseHandler = (committed) => {
         if (committed) {
-            DB.addCourse(currentNewCourseName, currentNewCourseId, currentNewCourseDate, currentNewCourseMinMembers, currentNewCourseMaxMembers, () => {
-                setNewCourseVisible(false);
-                setCurrentNewCourseName("");
-                setCurrentNewCourseId("");    
-                setCurrentNewCourseMinMembers("");
-                setCurrentNewCourseMaxMembers("");
-                setCurrentNewCourseDate(new Date());
-                DB.getCourseList((courseList) => {
-                    setCurrentCourses(courseList);
-                });
-            }, (error) => {setCurrentWarning(error)});
+            if (currentNewCourseDate - (new Date()) >= 0) {
+                DB.addCourse(currentNewCourseName, currentNewCourseId, currentNewCourseDate, currentNewCourseMinMembers, currentNewCourseMaxMembers, () => {
+                    setNewCourseVisible(false);
+                    setCurrentNewCourseName("");
+                    setCurrentNewCourseId("");    
+                    setCurrentNewCourseMinMembers("");
+                    setCurrentNewCourseMaxMembers("");
+                    setCurrentNewCourseDate(new Date());
+                    DB.getCourseList((courseList) => {
+                        setCurrentCourses(courseList);
+                    });
+                }, (error) => {setCurrentWarning(error)});
+            }    
+            if (currentNewCourseDate - (new Date()) < 0) setNewCourseDateErrorVisible(true);
         } else {
             setNewCourseVisible(false);
         }
@@ -104,24 +129,29 @@ export default HomeScreen = ({navigation}) => {
     const changeNewCourseDateHandler = (date) => {
         setCurrentNewCourseDate(date);
         setNewCourseDateVisible(false);
+        console.log(date - (new Date()) > 0)
+        if (date - (new Date()) < 0) setNewCourseDateErrorVisible(true);
+        else  setNewCourseDateErrorVisible(false);
     }
 
     const deleteCourseHandler = (id) => {
-        swipeListView.safeCloseOpenRow();
-        
-        DB.removeCourseFromList(id, () => {
-            DB.getCourseList((courseList) => {
-                // console.log(courseList);
-                setCurrentCourses(courseList);
-                var joined = [];
-                for (const course in courseList) {
-                    if (courseList[course].members.indexOf(currentUserId) >= 0) {
-                        joined.push(courseList[course].id);
+        if (!deleteInfoReceived) {
+            setDeleteInfoVisible(true); 
+        } else {
+            swipeListView.safeCloseOpenRow();
+            DB.removeCourseFromList(id, () => {
+                DB.getCourseList((courseList) => {
+                    setCurrentCourses(courseList);
+                    var joined = [];
+                    for (const course in courseList) {
+                        if (courseList[course].members.indexOf(currentUserId) >= 0) {
+                            joined.push(courseList[course].id);
+                        }
                     }
-                }
-                setJoinedCourses(joined);
+                    setJoinedCourses(joined);
+                });
             });
-        });
+        }
     };
 
     const selectCourseHandler = (id, title, date) => {
@@ -133,6 +163,13 @@ export default HomeScreen = ({navigation}) => {
     return(
         <View style={{flex:1}}>
             
+            <InfoModal 
+                visible={deleteInfoVisible}
+                onPress={() => {setDeleteInfoVisible(false); storeInfoReceived("deleteInfoReceived"); setDeleteInfoReceived(true);}}
+                title="Kurs aus Liste löschen"
+                copy="Durch diese Aktion wird der Kurs aus deiner Liste entfernt. Möchtest du einen Kurs in der Liste behalten, aber kein Mitglied sein, tritt stattdessen auf der Kurs-Seite aus. Natürlich kannst du einen entfernten Kurs jederzeit über den Finden-Button wieder hinzufügen."
+            />
+
             {/* Kurs finden */}
             <Modal visible= { findCourseVisible } animationType= 'slide'>
                 <ModalContent
@@ -175,10 +212,16 @@ export default HomeScreen = ({navigation}) => {
                                 <InputField
                                     title= "End-Datum"
                                     isButton= {true}
+                                    icon={icons.date}
                                     placeholderText= "Datum auswählen …"
                                     value={format(currentNewCourseDate, "dd.MM.yyyy")}
                                     onPress={() => {setNewCourseDateVisible(true); Keyboard.dismiss()}}
                                 />
+                                {newCourseDateErrorVisible &&
+                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
+                                        Das Datum muss in der Zukunft liegen.
+                                    </Text>
+                                }
                                 <DateTimePickerModal
                                     isVisible={newCourseDateVisible}
                                     mode="date"

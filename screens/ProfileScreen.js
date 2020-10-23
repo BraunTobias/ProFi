@@ -25,16 +25,21 @@ export default ProfileScreen = ({navigation}) => {
     const [currentEditMail, setCurrentEditMail] = useState("");
     const [currentEnterPassword, setCurrentEnterPassword] = useState("");
     const [currentEditPassword, setCurrentEditPassword] = useState("");
-    // const [changesSaved, setChangesSaved] = useState(true);
+    const [currentConfirmPassword, setCurrentConfirmPassword] = useState("");
     const [skillString, setSkillString] = useState("");
     const [currentImage, setCurrentImage] = useState("");
+    const [imageLoading, setImageLoading] = useState(true);
 
     // State Hooks für Modals
-    const [editImageVisible, setEditImageVisible] = useState(false);
     const [editNameVisible, setEditNameVisible] = useState(false);
     const [editBioVisible, setEditBioVisible] = useState(false);
     const [editEmailVisible, setEditEmailVisible] = useState(false);
     const [editPasswordVisible, setEditPasswordVisible] = useState(false);
+    const [mailErrorVisible, setMailErrorVisible] = useState(false);
+    const [pwErrorVisible, setPwErrorVisible] = useState(false);
+    const [confirmPwErrorVisible, setConfirmPwErrorVisible] = useState(false);
+    const [editPwErrorVisible, setEditPwErrorVisible] = useState(false);
+    const [nameErrorVisible, setNameErrorVisible] = useState(false);
 
     const getUserData = () => {
         DB.getUserInfo((data) => {
@@ -44,6 +49,7 @@ export default ProfileScreen = ({navigation}) => {
             setCurrentEditBio(data.bio);
             setCurrentMail(data.email);
             if (data.image) setCurrentImage(data.image);
+            setImageLoading(false);
         });
         DB.userAttributesToString((skills, prefs) => {
             setSkillString(skills);
@@ -63,11 +69,17 @@ export default ProfileScreen = ({navigation}) => {
     // Handler für Modals
     const changeNameHandler = (enteredText) => {
         setCurrentEditName(enteredText);
+        if (enteredText != "") setNameErrorVisible(false);
     }
     const pressEditNameHandler = (committed) => {
         if (committed) {
-            DB.changeUsername(currentEditName, currentBio);
-            getUserData();
+            if (currentEditName != "") {
+                DB.changeUsername(currentEditName, currentBio);
+                getUserData();
+            } else {
+                setNameErrorVisible(true);
+                return;
+            }
         }
         else {
             setCurrentEditName(currentName);
@@ -89,18 +101,37 @@ export default ProfileScreen = ({navigation}) => {
     }
     const changeEmailHandler = (enteredText) => {
         setCurrentEditMail(enteredText);
+        if (enteredText != "") setMailErrorVisible(false);
     }
     const changeEnterPasswordHandler = (enteredText) => {
         setCurrentEnterPassword(enteredText);
+        if (enteredText != "") setPwErrorVisible(false);
     }
     const pressEditEmailHandler = (committed) => {
         if (committed) {
-            DB.changeEmail(currentMail, currentEditMail, currentEnterPassword, () => {
-                setCurrentMail(currentEditMail);
-                setEditEmailVisible(false);
-                setCurrentEnterPassword("");
-                setCurrentEditMail("");
-            }, (error) => {console.log(error)});            
+            if (currentEditMail != "" && currentEnterPassword != "") {
+                DB.changeEmail(currentMail, currentEditMail, currentEnterPassword, () => {
+                    setCurrentMail(currentEditMail);
+                    setEditEmailVisible(false);
+                    setCurrentEnterPassword("");
+                    setCurrentEditMail("");
+                }, (error) => {
+                    var errorText = error.message;
+                    switch (error.code) {
+                        case "auth/invalid-email": errorText = "Bitte eine gültige E-Mail-Adresse eingeben."; break;
+                        case "auth/email-already-in-use": errorText = "Diese E-Mail-Adresse ist schon vergeben."; break;
+                        case "auth/wrong-password": errorText = "Falsches Passwort eingegeben."; setCurrentEnterPassword(""); break;
+                    }
+                    Alert.alert(
+                        "Ungültige Eingabe",
+                        errorText,
+                        [{ text: "OK" }],
+                    );                  
+                });            
+            } else {
+                if (currentEditMail == "") setMailErrorVisible(true);
+                if (currentEnterPassword == "") setPwErrorVisible(true);
+            }
         } else {
             setEditEmailVisible(false);
             setCurrentEnterPassword("");
@@ -109,18 +140,40 @@ export default ProfileScreen = ({navigation}) => {
     }
     const changePasswordHandler = (enteredText) => {
         setCurrentEditPassword(enteredText);
+        if (enteredText.length >= 6) setEditPwErrorVisible(false);
+    }
+    const changeConfirmPasswordHandler = (enteredText) => {
+        setCurrentConfirmPassword(enteredText);
+        if (enteredText == currentEditPassword) setConfirmPwErrorVisible(false);
     }
     const pressEditPasswordHandler = (committed) => {
         if (committed) {
-            DB.changePassword(currentMail, currentEnterPassword, currentEditPassword, () => {
-                setEditPasswordVisible(false);
-                setCurrentEnterPassword("");
-                setCurrentEditPassword("");
-            }, (error) => {console.log(error)});            
+            if (currentEnterPassword != "" && currentEditPassword.length <= 6 && currentEditPassword == currentConfirmPassword) {
+                DB.changePassword(currentMail, currentEnterPassword, currentEditPassword, () => {
+                    setEditPasswordVisible(false);
+                    setCurrentEnterPassword("");
+                    setCurrentEditPassword("");
+                    setCurrentConfirmPassword("");
+                }, (error) => {
+                    var errorText = error.message;
+                    switch (error.code) {
+                        case "auth/wrong-password": errorText = "Falsches Passwort eingegeben."; setCurrentEnterPassword(""); break;
+                    }
+                    Alert.alert(
+                        "Ungültige Eingabe",
+                        errorText,
+                        [{ text: "OK" }],
+                    );                  
+                });            
+            }
+            if (currentEnterPassword == "") setPwErrorVisible(true);
+            if (currentEditPassword.length < 6) setEditPwErrorVisible(true);
+            else if (currentEditPassword != currentConfirmPassword) setConfirmPwErrorVisible(true);
         } else {
             setEditPasswordVisible(false);
             setCurrentEnterPassword("");
             setCurrentEditPassword("");
+            setCurrentConfirmPassword("");
         }
     }
 
@@ -141,16 +194,21 @@ export default ProfileScreen = ({navigation}) => {
     const selectImageHandler = async () => {
         const hasPermission = await verifyPermissions(Permissions.CAMERA_ROLL);
         if (!hasPermission) return;
-    
-        let pickerResult = await ImagePicker.launchImageLibraryAsync();
-        if (pickerResult.cancelled === true) return;
-        setCurrentImage({ uri: pickerResult.uri });
+        setImageLoading(true);
+        let pickerResult = await ImagePicker.launchImageLibraryAsync({
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 1,
+          });
+        if (pickerResult.cancelled) return;
         const smallImage = await ImageManipulator.manipulateAsync(
             pickerResult.uri,
             [{ resize: { height: 400 } }],
-            { compress: 0.2, base64: true}
+            { compress: 0.2, base64: true }
         );
         DB.changeProfileImage(smallImage.uri);
+        setCurrentImage(smallImage.uri);
+        setImageLoading(false);
     };
 
     return(
@@ -169,6 +227,11 @@ export default ProfileScreen = ({navigation}) => {
                                     value={currentEditName}
                                     onChangeText={changeNameHandler}
                                 />
+                                {nameErrorVisible &&
+                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
+                                        Bitte einen Namen eingeben.
+                                    </Text>
+                                }
                             </View>
                         )
                     }}
@@ -208,11 +271,21 @@ export default ProfileScreen = ({navigation}) => {
                                     onChangeText={changeEnterPasswordHandler}
                                     secureTextEntry={true}
                                 />
+                                {pwErrorVisible &&
+                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
+                                        Bitte ein Passwort eingeben.
+                                    </Text>
+                                }
                                 <InputField
                                     placeholderText= "Neue E-Mail-Adresse"
                                     value={currentEditMail}
                                     onChangeText={changeEmailHandler}
                                 />
+                                {mailErrorVisible &&
+                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
+                                        Bitte eine E-Mail-Adresse eingeben.
+                                    </Text>
+                                }
                             </View>
                         )
                     }}
@@ -228,16 +301,40 @@ export default ProfileScreen = ({navigation}) => {
                             <View style={boxes.mainContainer}>
                                 <Text style={texts.titleCentered}>{"Passwort ändern"}</Text>
                                 <InputField
+                                    title= "Altes Passwort"
                                     placeholderText= "Altes Passwort"
                                     value={currentEnterPassword}
                                     onChangeText={changeEnterPasswordHandler}
                                     secureTextEntry={true}
                                 />
+                                {pwErrorVisible &&
+                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
+                                        Bitte ein Passwort eingeben.
+                                    </Text>
+                                }
                                 <InputField
+                                    title= "Neues Passwort"
                                     placeholderText= "Neues Passwort"
                                     value={currentEditPassword}
                                     onChangeText={changePasswordHandler}
+                                    secureTextEntry={true}
                                 />
+                                {editPwErrorVisible &&
+                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
+                                        Bitte ein Passwort mit mindestens 6 Zeichen eingeben.
+                                    </Text>
+                                }
+                                <InputField
+                                    placeholderText= "Neues Passwort bestätigen"
+                                    value={currentConfirmPassword}
+                                    onChangeText={changeConfirmPasswordHandler}
+                                    secureTextEntry={true}
+                                />
+                                {confirmPwErrorVisible &&
+                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
+                                        Passwörter stimmen nicht überein.
+                                    </Text>
+                                }
                             </View>
                         )
                     }}
@@ -252,6 +349,7 @@ export default ProfileScreen = ({navigation}) => {
                             <ProfileImage
                                 imageUrl={currentImage}
                                 onPress={selectImageHandler}
+                                loading={imageLoading}
                             />
                         </View>
                     </View>

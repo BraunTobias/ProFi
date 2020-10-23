@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import { View } from 'react-native';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { AppLoading } from 'expo';
 import * as firebase from 'firebase';
@@ -37,7 +38,9 @@ export default App => {
   // Bestimmt, welcher Navigator geladen wird
   const authHandler = (auth) => {
     if (!fontsLoaded) {
-      return <AppLoading />;
+      return <View></View>;
+      // AppLoading gibt zurzeit Fehlermeldung aus
+      // return <AppLoading />;
     }  
     if (auth) {
       return ( <MainNavigator /> )

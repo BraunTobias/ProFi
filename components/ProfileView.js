@@ -15,7 +15,6 @@ export default ProfileView = props => {
     const [currentName, setCurrentName] = useState("");
     const [currentBio, setCurrentBio] = useState("");
     const [currentEmail, setCurrentEmail] = useState("");
-    const [currentImage, setCurrentImage] = useState(icons.profilePlaceholder);
     const [imageUrl, setImageUrl] = useState("");
     const [skillsList, setSkillsList] = useState([]);
    

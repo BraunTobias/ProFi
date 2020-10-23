@@ -27,7 +27,7 @@ export default ListTile = props => {
     } else if (props.isMember) {
       return (
         <Image 
-        style= { boxes.listTileIcon }
+        style= { [boxes.listTileIcon, {width: 22, height: 22, marginTop: 1}] }
         source= { icons.checkTrue }
         resizeMode= { "contain" }
         />

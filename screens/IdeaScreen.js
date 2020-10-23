@@ -13,6 +13,8 @@ import ButtonLarge from '../components/ButtonLarge';
 import ScrollRow from '../components/ScrollRow';
 import AttributePreviewTile from '../components/AttributePreviewTile';
 import ProfileView from '../components/ProfileView';
+import AttributeSelect from '../components/AttributeSelect';
+import Padding from '../components/Padding';
 
 export default IdeaScreen = ({route, navigation}) => {
 
@@ -27,13 +29,26 @@ export default IdeaScreen = ({route, navigation}) => {
     const [currentSkills, setCurrentSkills] = useState([]);
     const [currentComments, setCurrentComments] = useState([]);
     const [swipeListView, setSwipeListView] = useState();
+    const [currentUserIsCreator, setCurrentUserIsCreator] = useState(false);
+    const [ideaText, setIdeaText] = useState(itemDescription);
+    const [ideaName, setIdeaName] = useState(itemTitle);
+    const [ideaCreator, setIdeaCreator] = useState("");
 
     // State Hooks für Modal
+    const [editIdeaVisible, setEditIdeaVisible] = useState(false);
+    const [addSkillsVisible, setAddSkillsVisible] = useState(false);
+    const [editIdeaName, setEditIdeaName] = useState(itemTitle);
+    const [editIdeaText, setEditIdeaText] = useState(itemDescription);
+    const [selectedSkillsList, setSelectedSkillsList] = useState([]);
     const [newCommentVisible, setNewCommentVisible] = useState(false);
     const [newReplyVisible, setNewReplyVisible] = useState(false);
     const [currentNewCommentText, setCurrentNewCommentText] = useState("");
     const [currentReplyText, setCurrentReplyText] = useState("");
     const [currentReplyComment, setCurrentReplyComment] = useState({});
+    const [currentCommentErrorVisible, setCurrentCommentErrorVisible] = useState(false);
+    const [editIdeaNameErrorVisible, setEditIdeaNameErrorVisible] = useState(false);
+    const [editIdeaTextErrorVisible, setEditIdeaTextErrorVisible] = useState(false);
+    const [selectedSkillsListErrorVisible, setSelectedSkillsListErrorVisible] = useState(false);
 
     // State Hooks für Profilansicht
     const [viewedUserId, setViewedUserId] = useState(currentUserId);
@@ -51,6 +66,11 @@ export default IdeaScreen = ({route, navigation}) => {
         });
         DB.getIdeaData(courseId, itemId, (data) => {
             setCurrentSkills(data.skills);
+            setSelectedSkillsList(data.skills);
+            DB.getUserInfoById(data.creator, (userName) => {
+                setIdeaCreator(userName);
+            });
+            if (data.creator == currentUserId) setCurrentUserIsCreator(true);
             if (data.team && data.team.length > 0) {
                 const teamUidList = data.team;
                 var newTeamList = [];
@@ -66,7 +86,6 @@ export default IdeaScreen = ({route, navigation}) => {
                     });
                 }
             }
-
         });
     }, []);
 
@@ -94,9 +113,11 @@ export default IdeaScreen = ({route, navigation}) => {
     // Handler für Modal
     const changeNewCommentTextHandler = (enteredText) => {
         setCurrentNewCommentText(enteredText);
+        if (enteredText != "") setCurrentCommentErrorVisible(false);
     }
     const changeReplyTextHandler = (enteredText) => {
         setCurrentReplyText(enteredText);
+        if (enteredText != "") setCurrentCommentErrorVisible(false);
     }
     const pressNewCommentHandler = (committed) => {
         if (committed) {
@@ -108,22 +129,104 @@ export default IdeaScreen = ({route, navigation}) => {
                         setCurrentComments(commentsList);
                     });
                 });
-            } 
+            } else {
+                setCurrentCommentErrorVisible(true);
+            }
         } else {
             setNewCommentVisible(false);
+            setCurrentCommentErrorVisible(false);
         }
     }
     const pressReplyHandler = (committed) => {
-        if (currentReplyText != "") {
-            DB.addComment(courseId, itemId, currentReplyText, currentReplyComment.id, () => {
-                setNewReplyVisible(false);
-                setCurrentNewCommentText("");
-                DB.getCommentsList(courseId, itemId, (commentsList) => {
-                    setCurrentComments(commentsList);
+        if (committed) {
+            if (currentReplyText != "") {
+                DB.addComment(courseId, itemId, currentReplyText, currentReplyComment.id, () => {
+                    setNewReplyVisible(false);
+                    setCurrentNewCommentText("");
+                    DB.getCommentsList(courseId, itemId, (commentsList) => {
+                        setCurrentComments(commentsList);
+                    });
                 });
-            });
-        } 
+            } else {
+                setCurrentCommentErrorVisible(true);
+            }
+        } else {
+            setNewReplyVisible(false);
+            setCurrentCommentErrorVisible(false);
+        }
         swipeListView.safeCloseOpenRow();
+    }
+
+    const changeEditIdeaNameHandler = (enteredText) => {
+        setEditIdeaName(enteredText);
+        if (editIdeaName.length > 1) setEditIdeaNameErrorVisible(false);
+    }
+    const changeEditIdeaTextHandler = (enteredText) => {
+        setEditIdeaText(enteredText);
+        if (editIdeaText.length > 1) setEditIdeaTextErrorVisible(false);
+    }
+    const addSkillHandler = (skill) => {
+        var oldList = selectedSkillsList;
+        if (oldList.indexOf(skill) < 0) {
+            oldList.push(skill);
+        } else {
+            var newList = oldList.filter(item => item !== skill);
+            setSelectedSkillsList(newList);
+        }
+        if (selectedSkillsList.length > 0) setSelectedSkillsListErrorVisible(false);
+    }
+    const pressEditIdeaHandler = (committed) => {
+        if (committed) {
+            if (editIdeaName.length > 1 && editIdeaText.length > 1 && selectedSkillsList.length > 0) {
+                DB.editIdea(courseId, itemId, editIdeaName, editIdeaText, selectedSkillsList, [], () => {
+                    setEditIdeaVisible(false);
+                    setEditIdeaTextErrorVisible(false);
+                    setEditIdeaNameErrorVisible(false);
+                    setSelectedSkillsListErrorVisible(false);
+                    setCurrentSkills(selectedSkillsList);
+                    setSelectedSkillsList(selectedSkillsList);
+                    setIdeaName(editIdeaName);
+                    setIdeaText(editIdeaText);
+                }, (error) => {console.log(error)});
+            }
+            if (editIdeaName.length <= 1) setEditIdeaNameErrorVisible(true);
+            if (editIdeaText.length <= 1) setEditIdeaTextErrorVisible(true);
+            if (selectedSkillsList.length == 0) setSelectedSkillsListErrorVisible(true);
+        } else {
+            setEditIdeaVisible(false);
+            setEditIdeaTextErrorVisible(false);
+            setEditIdeaNameErrorVisible(false);
+            setSelectedSkillsListErrorVisible(false);
+        }
+    }
+
+    const swipeButtons = (item) => {
+        if (item.replyTo) {
+            return(
+                <View style={[boxes.swipeRowOne, {backgroundColor: colors.red}]}>
+                    <SwipeButton
+                        icon={item.user == currentUserId ? icons.delete : icons.like}
+                        backgroundColor={item.user == currentUserId ? colors.red : item.likes.indexOf(currentUserId) < 0 ? colors.darkBlue : colors.lightBlue}
+                        onPress={() => {item.user == currentUserId ? deleteCommentHandler(item.id) : likeCommentHandler(item.id)}}
+                    />
+                </View>
+            );
+        } else {
+            return(
+                <View style={[boxes.swipeRowTwo, {backgroundColor: colors.mediumBlue}]}>
+                    <SwipeButton
+                        icon={item.user == currentUserId ? icons.delete : icons.like}
+                        backgroundColor={item.user == currentUserId ? colors.red : item.likes.indexOf(currentUserId) < 0 ? colors.darkBlue : colors.lightBlue}
+                        onPress={() => {item.user == currentUserId ? deleteCommentHandler(item.id) : likeCommentHandler(item.id)}}
+                    />
+                    <SwipeButton
+                        icon={icons.reply}
+                        backgroundColor={colors.mediumBlue}
+                        onPress={() => {setNewReplyVisible(true); setCurrentReplyComment(item)}}
+                    />
+                </View>
+            );
+        }
     }
 
     return(
@@ -151,6 +254,11 @@ export default IdeaScreen = ({route, navigation}) => {
                                     onChangeText={changeNewCommentTextHandler}
                                     multiline={true}
                                 />
+                                {currentCommentErrorVisible &&
+                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
+                                        Bitte einen Kommentar eingeben.
+                                    </Text>
+                                }
                             </View> 
                         )
                     }}
@@ -177,19 +285,81 @@ export default IdeaScreen = ({route, navigation}) => {
                                     onChangeText={changeReplyTextHandler}
                                     multiline={true}
                                 />
+                                {currentCommentErrorVisible &&
+                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
+                                        Bitte eine Antwort eingeben.
+                                    </Text>
+                                }
                             </View> 
                         )
                     }}
                     onDismiss= {pressReplyHandler}
                 />
             </Modal>
+                
+            {/* // Idee bearbeiten */}
+            <Modal visible= { editIdeaVisible } animationType= 'slide'>
+                <ModalContent
+                    subheader= { () => {}}
+                    content= { () => {
+                        return(
+                            <View style={boxes.mainContainer}>
+                                <Text style={texts.titleCentered}>{"Idee bearbeiten"}</Text>
+                                <InputField
+                                    placeholderText= "Titel"
+                                    value={editIdeaName}
+                                    onChangeText={changeEditIdeaNameHandler}
+                                />
+                                {editIdeaNameErrorVisible &&
+                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
+                                        Bitte einen Namen angeben.
+                                    </Text>
+                                }
+                                <InputField
+                                    placeholderText= "Beschreibung"
+                                    value={editIdeaText}
+                                    onChangeText={changeEditIdeaTextHandler}
+                                    multiline={true}
+                                />
+                                {editIdeaTextErrorVisible &&
+                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
+                                        Bitte einen Beschreibungstext angeben.
+                                    </Text>
+                                }
+                                <AttributePreviewTile
+                                    title="Passende Fähigkeiten"
+                                    subtitle={selectedSkillsList.join(", ")}
+                                    index={0}
+                                    onPress={() => {setAddSkillsVisible(true)}}
+                                />
+                                {selectedSkillsListErrorVisible &&
+                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
+                                        Bitte mindestens eine Fähigkeit angeben.
+                                    </Text>
+                                }
+                            </View> 
+                        )
+                    }}
+                    onDismiss= {pressEditIdeaHandler}
+                />
+                {/* // Idee bearbeiten: Fähigkeiten auswählen */}
+                <Modal visible={addSkillsVisible} animationType='slide'>
+                    {/* <Text style={texts.titleCentered}>{"Fähigkeiten hinzufügen"}</Text> */}
+                    <AttributeSelect
+                        attributeType = "skills"
+                        selectedAttributesList={selectedSkillsList}
+                        addAttribute = {addSkillHandler}
+                        onDismiss = {() => {setAddSkillsVisible(false)}}
+                    />
+                </Modal>
+            </Modal>
 
             <View style={ boxes.subHeader }>
                 <View style={ boxes.paddedRow }>
-                    <Text style={texts.commentTileHeader}>{itemTitle}</Text>
+                    <Text style={texts.subHeaderLarge}>{ideaName}</Text>
                 </View>
                 <View style={ boxes.paddedRow }>
-                    <Text style={texts.copy}>{itemDescription}</Text>
+                    <Text style={texts.copy}>{ideaText}</Text>
                 </View>
                 <View style={ boxes.paddedRow }>
                     <AttributePreviewTile
@@ -197,9 +367,16 @@ export default IdeaScreen = ({route, navigation}) => {
                         subtitle={currentSkills.join(", ")}
                         index={0}
                         onPress={() => navigation.navigate('IdeaAttributes', {attributeType: "skills", filter: currentSkills, title: "Passende Fähigkeiten"})}
-                    />
+                        />
                 </View>
-
+                {currentUserIsCreator &&
+                    <View style={ boxes.paddedRow }>
+                        <ButtonLarge
+                            title="Idee bearbeiten"
+                            onPress={() => setEditIdeaVisible(true)}
+                        />
+                    </View>
+                }
             </View>
 
             <SwipeListView
@@ -209,32 +386,42 @@ export default IdeaScreen = ({route, navigation}) => {
                 disableLeftSwipe = {true}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={(itemData) => 
-                    <CommentTile
-                        id={itemData.item.id}
-                        userId={itemData.item.user}
-                        comment={itemData.item.text}
-                        timestamp={itemData.item.time}
-                        likes={itemData.item.likes.length}
-                        isReply={itemData.item.replyTo && itemData.item.replyTo.length > 0}
-                        index = {itemData.index}
-                        onPress = {() => {viewProfileHandler(itemData.item.user)}}
-                    />
+                    <SwipeRow leftOpenValue={itemData.item.replyTo ? 60 : 120}>
+                        {swipeButtons(itemData.item)}
+                        <CommentTile
+                            id={itemData.item.id}
+                            userId={itemData.item.user}
+                            comment={itemData.item.text}
+                            timestamp={itemData.item.time}
+                            likes={itemData.item.likes.length}
+                            isReply={itemData.item.replyTo && itemData.item.replyTo.length > 0}
+                            index = {itemData.index}
+                            onPress = {() => {viewProfileHandler(itemData.item.user)}}
+                        />
+                    </SwipeRow>
+
                 }
-                renderHiddenItem={ (itemData) => 
-                    <View style={[boxes.swipeRowTwo, {backgroundColor: colors.mediumBlue}]}>
-                        <SwipeButton
-                            icon={itemData.item.user == currentUserId ? icons.delete : icons.like}
-                            backgroundColor={itemData.item.user == currentUserId ? colors.red : itemData.item.likes.indexOf(currentUserId) < 0 ? colors.darkBlue : colors.lightBlue}
-                            onPress={() => {itemData.item.user == currentUserId ? deleteCommentHandler(itemData.item.id) : likeCommentHandler(itemData.item.id)}}
-                        />
-                        <SwipeButton
-                            icon={icons.reply}
-                            backgroundColor={colors.mediumBlue}
-                            onPress={() => {setNewReplyVisible(true); setCurrentReplyComment(itemData.item)}}
-                        />
+                ListFooterComponent={
+                    <View style={boxes.ideaFooter}>
+                        <Text style={texts.ideaFooter}>{"Idee von " + ideaCreator}</Text>
                     </View>
                 }
-                leftOpenValue={120}
+
+                // renderHiddenItem={ (itemData) => 
+                //     <View style={[boxes.swipeRowTwo, {backgroundColor: colors.mediumBlue}]}>
+                //         <SwipeButton
+                //             icon={itemData.item.user == currentUserId ? icons.delete : icons.like}
+                //             backgroundColor={itemData.item.user == currentUserId ? colors.red : itemData.item.likes.indexOf(currentUserId) < 0 ? colors.darkBlue : colors.lightBlue}
+                //             onPress={() => {itemData.item.user == currentUserId ? deleteCommentHandler(itemData.item.id) : likeCommentHandler(itemData.item.id)}}
+                //         />
+                //         <SwipeButton
+                //             icon={icons.reply}
+                //             backgroundColor={colors.mediumBlue}
+                //             onPress={() => {setNewReplyVisible(true); setCurrentReplyComment(itemData.item)}}
+                //         />
+                //     </View>
+                // }
+                // leftOpenValue={120}
             />
 
             <View style={[boxes.paddedRow, {backgroundColor: colors.white, paddingBottom: 10}]}>
