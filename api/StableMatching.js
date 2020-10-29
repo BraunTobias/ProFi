@@ -469,17 +469,25 @@ const bestRemainingMatchFinal = () => {
                             score += 1;
                         }
                     }
-                    missingScoreList.push([memId, ideaId, score]);
+                    missingScoreList.push([memId, ideaId, score, ideas[ideaId].members.length]);
                 }
             }
         }
     }
 
-    missingScoreList.sort((a,b) => b[2] - a[2]);
+    missingScoreList.sort((a,b) =>{
+        if(a[2] === b[2]){
+
+            return a[3] - b[3]  
+        }
+
+        return b[2] - a[2]  
+    }); 
+
+    console.log(missingScoreList);
     
     // User der Reihe nach ihrer passendsten Idee zuordnen, wenn diese noch nicht voll ist
     for (var i = 0; i < missingScoreList.length; i++) {
-        //if (missingScoreList[i][2] == 0) break;
         const topIdea = missingScoreList[i][1];
         const topMember = missingScoreList[i][0];
         if (ideas[topIdea].members.length < maxMembers && !members[topMember].sorted) {
