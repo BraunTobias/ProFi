@@ -3,112 +3,112 @@
 // Daten
 // const skillValue = 1;
 const favValue = 5.5;
-const minMembers = 2;
-const maxMembers = 4;
+const minMembers = 3;
+const maxMembers = 6;
 
-var members = {
-   "Anna": {
-        skills : ["skill3", "skill6", "skill8"],
-        sorted : false
-    },
-    "Niklas": {
-        skills : ["skill1", "skill5", "skill8"],
-        sorted : false
-    },
-    "Klaus": {
-        skills : ["skill2", "skill4"],
-        sorted : false
-    },
-    "Bo": {
-        skills : ["skill6"],
-        sorted : false
-    },
-    "Paul": {
-        skills : ["skill7", "skill10"],
-        sorted : false
-    },
-    "Nina": {
-        skills : ["skill4", "skill9"],
-        sorted : false
-    },
-    "Johannes": {
-        skills : ["skill2", "skill3", "skill5", "skill9"],
-        sorted : false
-    },
-    "Clara": {
-        skills : ["skill1", "skill7", "skill10"],
-        sorted : false
-    },
-    "Lena": {
-        skills : ["skill3", "skill5"],
-        sorted : false
-    },
-    "Miriam": {
-        skills : ["skill6", "skill10"],
-        sorted : false
-    },
-    "Melanie": {
-        skills : ["skill2", "skill4", "skill5"],
-        sorted : false
-    },
-    "Tom": {
-        skills : ["skill6", "skill9"],
-        sorted : false
-    },
-    "Ali": {
-        skills : ["skill1", "skill8"],
-        sorted : false
-    },
-    "Oliver": {
-        skills : ["skill2", "skill4", "skill7"],
-        sorted : false
-    },
-    "Theo": {
-        skills : ["skill1", "skill3", "skill8", "skill10"],
-        sorted : false
-    }
-}
-var ideas = {
-    "ideaA": { 
-        skills: ["skill1", "skill4", "skill7"],
-        missingSkills: ["skill1", "skill4", "skill7"],
-        favs: ["Paul", "Miriam"],
-        nogos: ["Klaus", "Oliver"],
-        members: []
-    },
-    "ideaB": {
-        skills: ["skill4", "skill8", "skill10"],
-        missingSkills: ["skill4", "skill8", "skill10"],
-        favs: [],
-        nogos: ["Nina", "Miriam", "Theo"],
-        members: []
-    },
-    "ideaC": {
-        skills: ["skill3", "skill6", "skill7"],
-        missingSkills: ["skill3", "skill6", "skill7"],
-        favs: ["Klaus", "Bo", "Nina", "Johannes", "Oliver", "Theo"],
-        nogos: [],
-        members: []
-    },
-    "ideaD": {
-        skills: ["skill2", "skill6", "skill9"],
-        missingSkills: ["skill2", "skill6", "skill9"],
-        favs: ["Niklas", "Lena"],
-        nogos: ["Clara", "Tom"],
-        members: []
-    },
-    "ideaE": {
-        skills: ["skill1", "skill5", "skill7", "skill9"],
-        missingSkills: ["skill1", "skill5", "skill7", "skill9"],
-        favs: ["Anna", "Clara", "Melanie", "Tom", "Ali"],
-        nogos: ["Bo", "Paul", "Lena"],
-        members: []
-    }
-}
+// var members = {
+//    "Anna": {
+//         skills : ["skill3", "skill6", "skill8"],
+//         sorted : false
+//     },
+//     "Niklas": {
+//         skills : ["skill1", "skill5", "skill8"],
+//         sorted : false
+//     },
+//     "Klaus": {
+//         skills : ["skill2", "skill4"],
+//         sorted : false
+//     },
+//     "Bo": {
+//         skills : ["skill6"],
+//         sorted : false
+//     },
+//     "Paul": {
+//         skills : ["skill7", "skill10"],
+//         sorted : false
+//     },
+//     "Nina": {
+//         skills : ["skill4", "skill9"],
+//         sorted : false
+//     },
+//     "Johannes": {
+//         skills : ["skill2", "skill3", "skill5", "skill9"],
+//         sorted : false
+//     },
+//     "Clara": {
+//         skills : ["skill1", "skill7", "skill10"],
+//         sorted : false
+//     },
+//     "Lena": {
+//         skills : ["skill3", "skill5"],
+//         sorted : false
+//     },
+//     "Miriam": {
+//         skills : ["skill6", "skill10"],
+//         sorted : false
+//     },
+//     "Melanie": {
+//         skills : ["skill2", "skill4", "skill5"],
+//         sorted : false
+//     },
+//     "Tom": {
+//         skills : ["skill6", "skill9"],
+//         sorted : false
+//     },
+//     "Ali": {
+//         skills : ["skill1", "skill8"],
+//         sorted : false
+//     },
+//     "Oliver": {
+//         skills : ["skill2", "skill4", "skill7"],
+//         sorted : false
+//     },
+//     "Theo": {
+//         skills : ["skill1", "skill3", "skill8", "skill10"],
+//         sorted : false
+//     }
+// }
+// var ideas = {
+//     "ideaA": { 
+//         skills: ["skill1", "skill4", "skill7"],
+//         missingSkills: ["skill1", "skill4", "skill7"],
+//         favs: ["Paul", "Miriam"],
+//         nogos: ["Klaus", "Oliver"],
+//         members: []
+//     },
+//     "ideaB": {
+//         skills: ["skill4", "skill8", "skill10"],
+//         missingSkills: ["skill4", "skill8", "skill10"],
+//         favs: [],
+//         nogos: ["Nina", "Miriam", "Theo"],
+//         members: []
+//     },
+//     "ideaC": {
+//         skills: ["skill3", "skill6", "skill7"],
+//         missingSkills: ["skill3", "skill6", "skill7"],
+//         favs: ["Klaus", "Bo", "Nina", "Johannes", "Oliver", "Theo"],
+//         nogos: [],
+//         members: []
+//     },
+//     "ideaD": {
+//         skills: ["skill2", "skill6", "skill9"],
+//         missingSkills: ["skill2", "skill6", "skill9"],
+//         favs: ["Niklas", "Lena"],
+//         nogos: ["Clara", "Tom"],
+//         members: []
+//     },
+//     "ideaE": {
+//         skills: ["skill1", "skill5", "skill7", "skill9"],
+//         missingSkills: ["skill1", "skill5", "skill7", "skill9"],
+//         favs: ["Anna", "Clara", "Melanie", "Tom", "Ali"],
+//         nogos: ["Bo", "Paul", "Lena"],
+//         members: []
+//     }
+// }
 // 
-//  var members ={"Anton":{"skills":["skill0","skill10","skill13","skill5"],"sorted":false},"Berta":{"skills":["skill11","skill12","skill5"],"sorted":false},"Charlotte":{"skills":["skill10","skill12","skill14","skill6","skill7"],"sorted":false},"Dora":{"skills":["skill1","skill11","skill3","skill5","skill8"],"sorted":false},"Emil":{"skills":["skill11","skill13","skill14","skill6","skill7"],"sorted":false},"Friedrich":{"skills":["skill0","skill10","skill11","skill5","skill9"],"sorted":false},"Gustav":{"skills":["skill11","skill12","skill14","skill5","skill6"],"sorted":false},"Heinrich":{"skills":["skill1","skill13","skill14","skill7"],"sorted":false},"Ida":{"skills":["skill1","skill11","skill3","skill8"],"sorted":false},"Julia":{"skills":["skill11","skill2","skill6"],"sorted":false},"Konrad":{"skills":["skill0","skill12","skill3"],"sorted":false},"Ludwig":{"skills":["skill1","skill3","skill4"],"sorted":false},"Martha":{"skills":["skill0","skill11","skill4","skill6"],"sorted":false},"Nina":{"skills":["skill0","skill10","skill11"],"sorted":false},"Otto":{"skills":["skill14","skill2","skill7","skill8","skill9"],"sorted":false},"Paula":{"skills":["skill13","skill4","skill7","skill9"],"sorted":false},"Quentin":{"skills":["skill11","skill14","skill3","skill6"],"sorted":false},"Richard":{"skills":["skill12","skill14","skill4","skill7","skill9"],"sorted":false},"Sophie":{"skills":["skill1","skill14","skill9"],"sorted":false},"Theo":{"skills":["skill0","skill1","skill11"],"sorted":false},"Ulrike":{"skills":["skill11","skill14","skill3"],"sorted":false},"Vincent":{"skills":["skill12","skill13","skill3"],"sorted":false},"Wilhelm":{"skills":["skill1","skill12","skill4","skill5","skill9"],"sorted":false}};
-//  var ideas ={"ideaA":{"skills":["skill0","skill1","skill13","skill14","skill7"],"missingSkills":["skill0","skill1","skill13","skill14","skill7"],"members":[],"favs":["Emil","Konrad","Ulrike","Wilhelm"],"nogos":["Berta","Gustav","Heinrich","Ludwig","Quentin","Sophie"]},"ideaB":{"skills":["skill0","skill10","skill2","skill5","skill6","skill8","skill9"],"missingSkills":["skill0","skill10","skill2","skill5","skill6","skill8","skill9"],"members":[],"favs":["Anton","Friedrich","Ludwig","Vincent"],"nogos":["Dora","Nina"]},"ideaC":{"skills":["skill0","skill13","skill2","skill5","skill8"],"missingSkills":["skill0","skill13","skill2","skill5","skill8"],"members":[],"favs":["Paula","Richard"],"nogos":["Emil"]},"ideaD":{"skills":["skill1","skill14","skill3","skill4","skill7","skill8","skill9"],"missingSkills":["skill1","skill14","skill3","skill4","skill7","skill8","skill9"],"members":[],"favs":["Berta","Ida","Julia","Sophie"],"nogos":["Richard"]},"ideaE":{"skills":["skill1","skill10","skill2","skill3","skill5"],"missingSkills":["skill1","skill10","skill2","skill3","skill5"],"members":[],"favs":[],"nogos":["Theo","Ulrike","Vincent"]},"ideaF":{"skills":["skill3","skill4","skill5","skill6","skill9"],"missingSkills":["skill3","skill4","skill5","skill6","skill9"],"members":[],"favs":["Gustav","Otto","Theo"],"nogos":["Anton","Konrad","Paula"]},"ideaG":{"skills":["skill10","skill12","skill3","skill4","skill6","skill7","skill8"],"missingSkills":["skill10","skill12","skill3","skill4","skill6","skill7","skill8"],"members":[],"favs":["Martha"],"nogos":["Charlotte","Wilhelm"]},"ideaH":{"skills":["skill1","skill14","skill2","skill5","skill7","skill8","skill9"],"missingSkills":["skill1","skill14","skill2","skill5","skill7","skill8","skill9"],"members":[],"favs":["Dora","Heinrich","Quentin"],"nogos":["Friedrich","Martha"]},"ideaI":{"skills":["skill0","skill11","skill12","skill6","skill8","skill9"],"missingSkills":["skill0","skill11","skill12","skill6","skill8","skill9"],"members":[],"favs":[],"nogos":["Ida","Otto"]}};
-// // ___________________________________________________________________________________________________________________________________________________
+ var members ={"Anton":{"skills":["skill0","skill10","skill13","skill5"],"sorted":false},"Berta":{"skills":["skill11","skill12","skill5"],"sorted":false},"Charlotte":{"skills":["skill10","skill12","skill14","skill6","skill7"],"sorted":false},"Dora":{"skills":["skill1","skill11","skill3","skill5","skill8"],"sorted":false},"Emil":{"skills":["skill11","skill13","skill14","skill6","skill7"],"sorted":false},"Friedrich":{"skills":["skill0","skill10","skill11","skill5","skill9"],"sorted":false},"Gustav":{"skills":["skill11","skill12","skill14","skill5","skill6"],"sorted":false},"Heinrich":{"skills":["skill1","skill13","skill14","skill7"],"sorted":false},"Ida":{"skills":["skill1","skill11","skill3","skill8"],"sorted":false},"Julia":{"skills":["skill11","skill2","skill6"],"sorted":false},"Konrad":{"skills":["skill0","skill12","skill3"],"sorted":false},"Ludwig":{"skills":["skill1","skill3","skill4"],"sorted":false},"Martha":{"skills":["skill0","skill11","skill4","skill6"],"sorted":false},"Nina":{"skills":["skill0","skill10","skill11"],"sorted":false},"Otto":{"skills":["skill14","skill2","skill7","skill8","skill9"],"sorted":false},"Paula":{"skills":["skill13","skill4","skill7","skill9"],"sorted":false},"Quentin":{"skills":["skill11","skill14","skill3","skill6"],"sorted":false},"Richard":{"skills":["skill12","skill14","skill4","skill7","skill9"],"sorted":false},"Sophie":{"skills":["skill1","skill14","skill9"],"sorted":false},"Theo":{"skills":["skill0","skill1","skill11"],"sorted":false},"Ulrike":{"skills":["skill11","skill14","skill3"],"sorted":false},"Vincent":{"skills":["skill12","skill13","skill3"],"sorted":false},"Wilhelm":{"skills":["skill1","skill12","skill4","skill5","skill9"],"sorted":false}};
+ var ideas ={"ideaA":{"skills":["skill0","skill1","skill13","skill14","skill7"],"missingSkills":["skill0","skill1","skill13","skill14","skill7"],"members":[],"favs":["Emil","Konrad","Ulrike","Wilhelm"],"nogos":["Berta","Gustav","Heinrich","Ludwig","Quentin","Sophie"]},"ideaB":{"skills":["skill0","skill10","skill2","skill5","skill6","skill8","skill9"],"missingSkills":["skill0","skill10","skill2","skill5","skill6","skill8","skill9"],"members":[],"favs":["Anton","Friedrich","Ludwig","Vincent"],"nogos":["Dora","Nina"]},"ideaC":{"skills":["skill0","skill13","skill2","skill5","skill8"],"missingSkills":["skill0","skill13","skill2","skill5","skill8"],"members":[],"favs":["Paula","Richard"],"nogos":["Emil"]},"ideaD":{"skills":["skill1","skill14","skill3","skill4","skill7","skill8","skill9"],"missingSkills":["skill1","skill14","skill3","skill4","skill7","skill8","skill9"],"members":[],"favs":["Berta","Ida","Julia","Sophie"],"nogos":["Richard"]},"ideaE":{"skills":["skill1","skill10","skill2","skill3","skill5"],"missingSkills":["skill1","skill10","skill2","skill3","skill5"],"members":[],"favs":[],"nogos":["Theo","Ulrike","Vincent"]},"ideaF":{"skills":["skill3","skill4","skill5","skill6","skill9"],"missingSkills":["skill3","skill4","skill5","skill6","skill9"],"members":[],"favs":["Gustav","Otto","Theo"],"nogos":["Anton","Konrad","Paula"]},"ideaG":{"skills":["skill10","skill12","skill3","skill4","skill6","skill7","skill8"],"missingSkills":["skill10","skill12","skill3","skill4","skill6","skill7","skill8"],"members":[],"favs":["Martha"],"nogos":["Charlotte","Wilhelm"]},"ideaH":{"skills":["skill1","skill14","skill2","skill5","skill7","skill8","skill9"],"missingSkills":["skill1","skill14","skill2","skill5","skill7","skill8","skill9"],"members":[],"favs":["Dora","Heinrich","Quentin"],"nogos":["Friedrich","Martha"]},"ideaI":{"skills":["skill0","skill11","skill12","skill6","skill8","skill9"],"missingSkills":["skill0","skill11","skill12","skill6","skill8","skill9"],"members":[],"favs":[],"nogos":["Ida","Otto"]}};
+// ___________________________________________________________________________________________________________________________________________________
 
 var skillValues = {};
 
@@ -521,15 +521,19 @@ function resolvePartiallyFilledIdeas() {
     var partialIdeas = [];
     for (const ideasId in ideas) {
         if (ideas[ideasId].members.length < minMembers) {
-            partialIdeas.push(ideasId);
+            partialIdeas.push([ideasId, ideas[ideasId].missingSkills.length]);
         }
     }
+
+    partialIdeas.sort((a,b) => b[1] - a[1]); 
+
+    console.log(partialIdeas);
 
     for (var i = 0; i < partialIdeas.length; i++) {
         console.log(partialIdeas[i] + " hat weniger als " + minMembers +" Teilnehmer");   
     
         // Prüfen, ob die unvollständigste Idee aufgelöst werden kann 
-        const ideaToResolve = partialIdeas[i];
+        const ideaToResolve = partialIdeas[i][0];
         resolve(ideaToResolve); 
     }
     
@@ -547,6 +551,7 @@ const resolveIncompleteIdeas = () => {
         }
     }
 
+    //Als erstes die Ideen mit den meisten Fehlenden skills löschen
     incompleteIdeas.sort((a,b) => b[1] - a[1]); 
 
     for (var i = 0; i < incompleteIdeas.length; i++) {
