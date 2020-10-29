@@ -3,8 +3,8 @@
 // Daten
 // const skillValue = 1;
 const favValue = 5.5;
-const minMembers = 2;
-const maxMembers = 3;
+const minMembers = 4;
+const maxMembers = 6;
 
 // var members = {
 //    "Anna": {
@@ -524,16 +524,25 @@ function resolvePartiallyFilledIdeas() {
     var partialIdeas = [];
     for (const ideasId in ideas) {
         if (ideas[ideasId].members.length < minMembers) {
-            partialIdeas.push([ideasId, ideas[ideasId].missingSkills.length]);
+            partialIdeas.push([ideasId, ideas[ideasId].missingSkills.length,ideas[ideasId].members.length]);
         }
     }
 
-    partialIdeas.sort((a,b) => b[1] - a[1]); 
+    //Sortiere ungefüllte Ideen erst nach Anzahl der fehlenden Skills, dann bei Gleichstand nach Anzahl der Mitglieder
+    partialIdeas.sort((a,b) =>{
+        if(a[1] === b[1]){
+
+            return a[2] - b[2]  
+        }
+
+        return b[1] - a[1]  
+    }); 
+
 
     console.log(partialIdeas);
 
     for (var i = 0; i < partialIdeas.length; i++) {
-        console.log(partialIdeas[i] + " hat weniger als " + minMembers +" Teilnehmer");   
+        console.log(partialIdeas[i][0] + " hat weniger als " + minMembers +" Teilnehmer");   
     
         // Prüfen, ob die unvollständigste Idee aufgelöst werden kann 
         const ideaToResolve = partialIdeas[i][0];
