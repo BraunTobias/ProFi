@@ -476,7 +476,7 @@ const bestRemainingMatchFinal = () => {
     
     // User der Reihe nach ihrer passendsten Idee zuordnen, wenn diese noch nicht voll ist
     for (var i = 0; i < missingScoreList.length; i++) {
-        if (missingScoreList[i][2] == 0) break;
+        //if (missingScoreList[i][2] == 0) break;
         const topIdea = missingScoreList[i][1];
         const topMember = missingScoreList[i][0];
         if (ideas[topIdea].members.length < maxMembers && !members[topMember].sorted) {
@@ -545,7 +545,7 @@ const resolveIncompleteIdeas = () => {
     var incompleteIdeas = [];
     for (const ideasId in ideas) {
         //Toleranz von 20% bei nicht abgedeckten Skills
-        var tolerance = 0.2
+        var tolerance = 0.2;
         if (ideas[ideasId].missingSkills.length > 0 && ideas[ideasId].missingSkills.length/ideas[ideasId].skills.length >= tolerance) {
             incompleteIdeas.push([ideasId, ideas[ideasId].missingSkills.length]);
         }
