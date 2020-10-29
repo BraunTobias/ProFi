@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useLayoutEffect} from 'react';
-import { View, Text, Modal, Keyboard } from 'react-native';
+import { View, Text, Modal, Keyboard, ActivityIndicator } from 'react-native';
 import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view';
 import { compareAsc, format } from 'date-fns';
 
@@ -21,7 +21,6 @@ export default IdeaScreen = ({route, navigation}) => {
     const {itemId} = route.params;
     const {itemTitle} = route.params;
     const {itemDescription} = route.params;
-    const {skillsList} = route.params;
     const {courseId} = route.params;
     const currentUserId = DB.getCurrentUserId();
 
@@ -33,6 +32,7 @@ export default IdeaScreen = ({route, navigation}) => {
     const [ideaText, setIdeaText] = useState(itemDescription);
     const [ideaName, setIdeaName] = useState(itemTitle);
     const [ideaCreator, setIdeaCreator] = useState("");
+    const [commentsLoading, setCommentsLoading] = useState(true);
 
     // State Hooks für Modal
     const [editIdeaVisible, setEditIdeaVisible] = useState(false);
@@ -63,6 +63,7 @@ export default IdeaScreen = ({route, navigation}) => {
     useEffect(() => {
         DB.getCommentsList(courseId, itemId, (commentsList) => {
             setCurrentComments(commentsList);
+            setCommentsLoading(false);
         });
         DB.getIdeaData(courseId, itemId, (data) => {
             setCurrentSkills(data.skills);
@@ -187,15 +188,24 @@ export default IdeaScreen = ({route, navigation}) => {
                     setSelectedSkillsList(selectedSkillsList);
                     setIdeaName(editIdeaName);
                     setIdeaText(editIdeaText);
-                }, (error) => {console.log(error)});
+                }, () => {
+                    Alert.alert(
+                        "Fehler",
+                        "Idee konnte nicht bearbeitet werden",
+                        [{ text: "OK", onPress: () => {}}],
+                    );              
+                });
             }
             if (editIdeaName.length <= 1) setEditIdeaNameErrorVisible(true);
             if (editIdeaText.length <= 1) setEditIdeaTextErrorVisible(true);
             if (selectedSkillsList.length == 0) setSelectedSkillsListErrorVisible(true);
         } else {
             setEditIdeaVisible(false);
-            setEditIdeaTextErrorVisible(false);
+            setEditIdeaName(ideaName);
+            setEditIdeaText(ideaText);
+            setSelectedSkillsList(currentSkills);
             setEditIdeaNameErrorVisible(false);
+            setEditIdeaTextErrorVisible(false);
             setSelectedSkillsListErrorVisible(false);
         }
     }
@@ -273,12 +283,16 @@ export default IdeaScreen = ({route, navigation}) => {
                         return(
                             <View style={boxes.mainContainer}>
                                 <Text style={texts.titleCentered}>{"Antwort schreiben"}</Text>
-                                <CommentTile
-                                    userId={currentReplyComment.user}
-                                    comment={currentReplyComment.text}
-                                    timestamp={currentReplyComment.time}
-                                    likes={currentReplyComment.likes.length}
-                                />
+                                <View style={{marginLeft: 20}}>
+                                    <CommentTile
+                                        userId={currentReplyComment.user}
+                                        userName={currentReplyComment.name}
+                                        userUrl={currentReplyComment.url}
+                                        comment={currentReplyComment.text}
+                                        timestamp={currentReplyComment.time}
+                                        likes={currentReplyComment.likes.length}
+                                    />
+                                </View>
                                 <InputField
                                     placeholderText= "max. 300 Zeichen"
                                     value={currentReplyText}
@@ -369,28 +383,27 @@ export default IdeaScreen = ({route, navigation}) => {
                         onPress={() => navigation.navigate('IdeaAttributes', {attributeType: "skills", filter: currentSkills, title: "Passende Fähigkeiten"})}
                         />
                 </View>
-                {currentUserIsCreator &&
-                    <View style={ boxes.paddedRow }>
-                        <ButtonLarge
-                            title="Idee bearbeiten"
-                            onPress={() => setEditIdeaVisible(true)}
-                        />
-                    </View>
-                }
             </View>
+
+            {commentsLoading && 
+                <View style={{backgroundColor: "white", paddingVertical: 30}}>
+                    <ActivityIndicator/>
+                </View>
+            }
 
             <SwipeListView
                 style={{backgroundColor: "white"}}
                 ref = {ref => setSwipeListView(ref)}
                 data={currentComments}
-                disableLeftSwipe = {true}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={(itemData) => 
-                    <SwipeRow leftOpenValue={itemData.item.replyTo ? 60 : 120}>
+                    <SwipeRow leftOpenValue={itemData.item.replyTo ? 60 : 120} disableLeftSwipe = {true}>
                         {swipeButtons(itemData.item)}
                         <CommentTile
                             id={itemData.item.id}
                             userId={itemData.item.user}
+                            userName={itemData.item.name}
+                            userUrl={itemData.item.url}
                             comment={itemData.item.text}
                             timestamp={itemData.item.time}
                             likes={itemData.item.likes.length}
@@ -399,32 +412,25 @@ export default IdeaScreen = ({route, navigation}) => {
                             onPress = {() => {viewProfileHandler(itemData.item.user)}}
                         />
                     </SwipeRow>
-
+                }
+                ListHeaderComponent={
+                    currentUserIsCreator &&
+                    <View style={ boxes.paddedRow }>
+                        <ButtonLarge
+                            title="Idee bearbeiten"
+                            onPress={() => setEditIdeaVisible(true)}
+                        />
+                    </View>
                 }
                 ListFooterComponent={
+                    !commentsLoading && !currentUserIsCreator &&
                     <View style={boxes.ideaFooter}>
                         <Text style={texts.ideaFooter}>{"Idee von " + ideaCreator}</Text>
                     </View>
                 }
-
-                // renderHiddenItem={ (itemData) => 
-                //     <View style={[boxes.swipeRowTwo, {backgroundColor: colors.mediumBlue}]}>
-                //         <SwipeButton
-                //             icon={itemData.item.user == currentUserId ? icons.delete : icons.like}
-                //             backgroundColor={itemData.item.user == currentUserId ? colors.red : itemData.item.likes.indexOf(currentUserId) < 0 ? colors.darkBlue : colors.lightBlue}
-                //             onPress={() => {itemData.item.user == currentUserId ? deleteCommentHandler(itemData.item.id) : likeCommentHandler(itemData.item.id)}}
-                //         />
-                //         <SwipeButton
-                //             icon={icons.reply}
-                //             backgroundColor={colors.mediumBlue}
-                //             onPress={() => {setNewReplyVisible(true); setCurrentReplyComment(itemData.item)}}
-                //         />
-                //     </View>
-                // }
-                // leftOpenValue={120}
             />
 
-            <View style={[boxes.paddedRow, {backgroundColor: colors.white, paddingBottom: 10}]}>
+            <View style={[boxes.paddedRow, {backgroundColor: colors.white, paddingVertical: 5}]}>
                 <ButtonLarge
                     title="Kommentar schreiben"
                     onPress={() => {setNewCommentVisible(true)}}

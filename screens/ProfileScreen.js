@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useLayoutEffect} from 'react';
-import { View, Text, TouchableWithoutFeedback, Keyboard, Modal, Alert } from 'react-native';
+import { View, Text, TouchableWithoutFeedback, Keyboard, Modal, Alert, Switch } from 'react-native';
 import * as ImageManipulator from "expo-image-manipulator";
 import * as Permissions from "expo-permissions";
 import * as ImagePicker from "expo-image-picker"
@@ -29,6 +29,7 @@ export default ProfileScreen = ({navigation}) => {
     const [skillString, setSkillString] = useState("");
     const [currentImage, setCurrentImage] = useState("");
     const [imageLoading, setImageLoading] = useState(true);
+    const [pushEnabled, setPushEnabled] = useState(false);
 
     // State Hooks für Modals
     const [editNameVisible, setEditNameVisible] = useState(false);
@@ -48,6 +49,7 @@ export default ProfileScreen = ({navigation}) => {
             setCurrentBio(data.bio);
             setCurrentEditBio(data.bio);
             setCurrentMail(data.email);
+            if (data.pushNotificationsAllowed) setPushEnabled(data.pushNotificationsAllowed);
             if (data.image) setCurrentImage(data.image);
             setImageLoading(false);
         });
@@ -177,6 +179,18 @@ export default ProfileScreen = ({navigation}) => {
         }
     }
 
+    const togglePushNotficationSwitch = () => {
+        DB.registerPushNotifications(!pushEnabled, () => {
+            setPushEnabled(!pushEnabled);
+        }, () => {
+            Alert.alert(
+                "Fehler",
+                "Push-Mitteilungen konnten nicht aktiviert werden",
+                [{ text: "OK" }],
+            );                  
+        });
+    }
+
     // Profilbild
     const verifyPermissions = async (permission) => {
         const result = await Permissions.askAsync(permission);
@@ -200,7 +214,10 @@ export default ProfileScreen = ({navigation}) => {
             aspect: [1, 1],
             quality: 1,
           });
-        if (pickerResult.cancelled) return;
+        if (pickerResult.cancelled) {
+            setImageLoading(false); 
+            return;
+        }
         const smallImage = await ImageManipulator.manipulateAsync(
             pickerResult.uri,
             [{ resize: { height: 400 } }],
@@ -399,6 +416,16 @@ export default ProfileScreen = ({navigation}) => {
                         />
                     </View>
                     <Padding height={10}/>
+                    <View style={[boxes.paddedRow, {alignItems: "center", paddingLeft: 25}]}>
+                        <Text style={texts.copy}>Push-Mitteilungen erhalten</Text>
+                        <Switch
+                            onValueChange={togglePushNotficationSwitch}
+                            value={pushEnabled}
+                            trackColor={{ false: colors.lightBlue, true: colors.darkBlue }}
+                            ios_backgroundColor={colors.lightBlue}
+                        />
+                    </View>
+                    <Padding height={10}/>
                     <View style={boxes.paddedRow}>
                         <ButtonLarge 
                             title="Abmelden" 
@@ -407,6 +434,7 @@ export default ProfileScreen = ({navigation}) => {
                         />
 
                     </View>
+                    <Padding height={15}/>
 
             </ScrollView>
         </View>

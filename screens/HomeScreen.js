@@ -31,6 +31,8 @@ export default HomeScreen = ({navigation}) => {
     const [currentNewCourseName, setCurrentNewCourseName] = useState("");
     const [currentNewCourseId, setCurrentNewCourseId] = useState("");
     const [currentNewCourseDate, setCurrentNewCourseDate] = useState(new Date());
+    const [newCourseNameErrorVisible, setNewCourseNameErrorVisible] = useState(false);
+    const [newCourseIdErrorVisible, setNewCourseIdErrorVisible] = useState(false);
     const [newCourseDateErrorVisible, setNewCourseDateErrorVisible] = useState(false);
     const [currentNewCourseMinMembers, setCurrentNewCourseMinMembers] = useState(2);
     const [currentNewCourseMaxMembers, setCurrentNewCourseMaxMembers] = useState(2);
@@ -50,22 +52,26 @@ export default HomeScreen = ({navigation}) => {
         } catch(e) {console.log(e);}
     }
       
+    const loadData = () => {
+        DB.getCourseList((courseList) => {
+            setCurrentCourses(courseList);
+            var joined = [];
+            for (const section of courseList) {
+                for (const course of section.data) {
+                    if (course.members.indexOf(currentUserId) >= 0) {
+                        joined.push(course.id);
+                    }
+                }
+            }
+            setJoinedCourses(joined);
+            getInfoReceived();
+        });
+    }
+
     // Wird nach dem Rendern ausgeführt
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            DB.getCourseList((courseList) => {
-                setCurrentCourses(courseList);
-                var joined = [];
-                for (const section of courseList) {
-                    for (const course of section.data) {
-                        if (course.members.indexOf(currentUserId) >= 0) {
-                            joined.push(course.id);
-                        }
-                    }
-                }
-                setJoinedCourses(joined);
-                getInfoReceived();
-            });
+            loadData();
         });
     }, []);
 
@@ -77,15 +83,26 @@ export default HomeScreen = ({navigation}) => {
         if (committed && currentFindCourseId != "") {
             DB.addCourseToList(currentFindCourseId, (addedCourse) => {
                 setCurrentFindCourseId("");
-                var courseList = currentCourses;
-                courseList.push(addedCourse);
-                setCurrentCourses(courseList);
+                var newCourses = currentCourses;
+                var found = false;
+                for (const section in newCourses) {
+                    if (newCourses[section].key == addedCourse.semester) {
+                        newCourses[section].data.push(addedCourse);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    const newSection = {"key": addedCourse.semester, "data": [addedCourse]}
+                    newCourses.splice(0, 0, newSection);
+                }
+                setCurrentCourses(newCourses);
                 setFindCourseVisible(false);
             }, (error) => {
                 Alert.alert(
                     "Ungültige Eingabe",
                     error,
-                    [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+                    [{ text: "OK", onPress: () => {}}],
                 );              
             })
         } else {
@@ -94,19 +111,25 @@ export default HomeScreen = ({navigation}) => {
     }
     const pressNewCourseHandler = (committed) => {
         if (committed) {
-            if (currentNewCourseDate - (new Date()) >= 0) {
+            if (currentNewCourseName != "" && currentNewCourseId != "" && currentNewCourseDate - (new Date()) >= 0) {
                 DB.addCourse(currentNewCourseName, currentNewCourseId, currentNewCourseDate, currentNewCourseMinMembers, currentNewCourseMaxMembers, () => {
                     setNewCourseVisible(false);
                     setCurrentNewCourseName("");
                     setCurrentNewCourseId("");    
-                    setCurrentNewCourseMinMembers("");
-                    setCurrentNewCourseMaxMembers("");
+                    setCurrentNewCourseMinMembers(2);
+                    setCurrentNewCourseMaxMembers(2);
                     setCurrentNewCourseDate(new Date());
-                    DB.getCourseList((courseList) => {
-                        setCurrentCourses(courseList);
-                    });
-                }, (error) => {setCurrentWarning(error)});
+                    loadData();
+                }, (error) => {
+                    Alert.alert(
+                        "Ungültige Eingabe",
+                        error,
+                        [{ text: "OK", onPress: () => {}}],
+                    );              
+                });
             }    
+            if (currentNewCourseName == "") setNewCourseNameErrorVisible(true);
+            if (currentNewCourseId == "") setNewCourseIdErrorVisible(true);
             if (currentNewCourseDate - (new Date()) < 0) setNewCourseDateErrorVisible(true);
         } else {
             setNewCourseVisible(false);
@@ -114,9 +137,11 @@ export default HomeScreen = ({navigation}) => {
     }
     const changeNewCourseNameHandler = (enteredText) => {
         setCurrentNewCourseName(enteredText);
+        if (enteredText != "") setNewCourseNameErrorVisible(false);
     }
     const changeNewCourseIdHandler = (enteredText) => {
         setCurrentNewCourseId(enteredText.toUpperCase());
+        if (enteredText != "") setNewCourseIdErrorVisible(false);
     }
     const changeNewCourseMinMembersHandler = (number) => {
         setCurrentNewCourseMinMembers(number);
@@ -140,16 +165,13 @@ export default HomeScreen = ({navigation}) => {
         } else {
             swipeListView.safeCloseOpenRow();
             DB.removeCourseFromList(id, () => {
-                DB.getCourseList((courseList) => {
-                    setCurrentCourses(courseList);
-                    var joined = [];
-                    for (const course in courseList) {
-                        if (courseList[course].members.indexOf(currentUserId) >= 0) {
-                            joined.push(courseList[course].id);
-                        }
-                    }
-                    setJoinedCourses(joined);
-                });
+                // DB.getCourseList((courseList) => {
+                //     setCurrentCourses(courseList);
+                //     var joined = joinedCourses;
+                //     joined = joined.filter((item) => {item != id});
+                //     setJoinedCourses(joined);
+                // });
+                loadData();
             });
         }
     };
@@ -203,12 +225,22 @@ export default HomeScreen = ({navigation}) => {
                                     value={currentNewCourseName}
                                     onChangeText={changeNewCourseNameHandler}
                                 />
+                                {newCourseNameErrorVisible &&
+                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
+                                        Bitte einen Namen eingeben.
+                                    </Text>
+                                }
                                 <InputField
                                     title= "Kurs-ID"
                                     placeholderText= "KürzelSemesterJahr"
                                     value={currentNewCourseId}
                                     onChangeText={changeNewCourseIdHandler}
                                 />
+                                {newCourseIdErrorVisible &&
+                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
+                                        Bitte eine ID eingeben.
+                                    </Text>
+                                }
                                 <InputField
                                     title= "End-Datum"
                                     isButton= {true}

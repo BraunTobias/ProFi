@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import { View } from 'react-native';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
-import { AppLoading } from 'expo';
+import { AppLoading, Permissions, Notifications } from 'expo';
 import * as firebase from 'firebase';
 import MainNavigator from './navigation/MainTab';
 import AuthScreen from './screens/AuthScreen';
@@ -27,7 +27,9 @@ export default App => {
     appId: "1:773821416512:web:0a6f083afd99313a20cba5"
   };  
   try {
+    if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
+    }
   } catch(err) {
     console.log(err);
   }
@@ -53,11 +55,9 @@ export default App => {
   firebase.auth().onAuthStateChanged((user) => {
     if (user) {
         // Wenn der User soeben eingeloggt wurde
-        console.log("Navigation zur App");
         setIsLoggedIn(true);
     } else {
         // Wenn der User soeben ausgeloggt wurde
-        console.log("Bitte einloggen");
         setIsLoggedIn(false);
     }
   })

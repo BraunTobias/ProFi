@@ -31,6 +31,7 @@ const icons = {
     info: require("./assets/ui-icons/info.png"),
     passwordShow: require("./assets/ui-icons/passwordShow.png"),
     passwordHide: require("./assets/ui-icons/passwordHide.png"),
+    replyComment: require("./assets/ui-icons/replyComment.png"),
 }
 
 const boxes = {
@@ -125,6 +126,10 @@ const boxes = {
         backgroundColor: colors.darkBlue,
         borderRadius: 7,
         justifyContent: "center",
+        shadowColor: colors.white,
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 1,
+        shadowRadius: 0,
     },
     buttonLargeTransparent: {
         height: 40,
@@ -202,22 +207,17 @@ const boxes = {
         paddingRight: 35,
         paddingVertical: 10,
         minHeight: 100,
-        width: width,
+        // width: width,
         flexDirection: "row",
         alignItems: "flex-start",
         justifyContent: "flex-start",
     },
     commentReplyTile: {
-        paddingLeft: 35,
-        paddingRight: 35,
-        paddingVertical: 10,
-        minHeight: 100,
-        // width: width - 45,
-        flexDirection: "row",
-        alignItems: "flex-start",
-        justifyContent: "flex-start",
-        // borderLeftWidth: 20,
-        // borderLeftColor: colors.lightBlue
+        width: 20, 
+        height: 60, 
+        marginRight: 5, 
+        marginLeft: -5, 
+        tintColor: colors.lightBlue
     },
     commentTileImage: {
         height: 60,

@@ -9,9 +9,9 @@ export default ProfileImage = props => {
 
     return (
         <TouchableWithoutFeedback onPress={props.onPress}>
-            <View style={boxes.profileImage}>
+            <View style={[boxes.profileImage, {marginRight: props.isLast ? 30 : 7}]}>
                 <Image 
-                    style={[boxes.profileImage, {marginEnd: props.isLast ? 30 : 7}]}
+                    style={boxes.profileImage}
                     source={source}
                 />
                 {props.loading && 

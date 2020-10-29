@@ -8,7 +8,6 @@ import AttributeImage from "./AttributeImage";
 export default ScrollRow = props => {
 
     const data = props.data;
-
     return(
         <View style= { boxes.scrollRow }>
             <FlatList 
