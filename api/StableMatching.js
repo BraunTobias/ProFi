@@ -475,13 +475,14 @@ const bestRemainingMatchFinal = () => {
         }
     }
 
+    //Priorisiert das Ideen füllen vor dem Höchsten Score -> führt zu ausgeglicheneren Gruppengrößen
     missingScoreList.sort((a,b) =>{
-        if(a[2] === b[2]){
+        if(a[3] === b[3]){
 
-            return a[3] - b[3]  
+            return b[2] - a[2]  
         }
 
-        return b[2] - a[2]  
+        return a[3] - b[3]  
     }); 
 
     console.log(missingScoreList);
