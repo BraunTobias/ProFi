@@ -1,12 +1,12 @@
 const fs = require('fs');
 
 var numberOfSkills = 15;
-var numberOfMembers = 15;
-var numberOfIdeas = 15;
+var numberOfMembers = 27;
+var numberOfIdeas = 4;
 var minMemberSkills = 3;
 var maxMemberSkills = 5;
 var minIdeaSkills = 5;
-var maxIdeaSkills = 7;
+var maxIdeaSkills = 8;
 
 var memberNames = [
     "Anton",
