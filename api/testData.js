@@ -1,8 +1,11 @@
 const fs = require('fs');
 
 var numberOfSkills = 15;
-var numberOfMembers = 27;
-var numberOfIdeas = 4;
+var numberOfMembers = 15;
+var numberOfIdeas = 6;
+var numberOfInterests = 10;
+var minMemberInterests =4;
+var maxMemberInterests =5;
 var minMemberSkills = 3;
 var maxMemberSkills = 5;
 var minIdeaSkills = 5;
@@ -96,6 +99,31 @@ const setMemberSkills = () => {
     }
 }
 
+const setMemberInterests = () => {
+    for (const memberName in members) {
+
+        // Zufällige Skillzahlen generieren
+        var interestAmount = 100000;
+        while (interestAmount > numberOfInterests) {
+            var interestAmount = Math.floor(Math.random() * (maxMemberInterests - minMemberInterests + 1)) + minMemberInterests; 
+        }
+        var interestNumbers = [];
+        while(interestNumbers.length < interestAmount){
+            var random = Math.floor(Math.random() * (numberOfInterests));
+            if(interestNumbers.indexOf(random) === -1) interestNumbers.push(random);
+        }
+
+        var memberInterests = [];
+        
+        for (const interestNumber of interestNumbers) {
+            memberInterests.push("interest" + interestNumber);
+        }
+        memberInterests.sort();
+
+        members[memberName].interests = memberInterests;
+    }
+}
+
 const setIdeaSkills = () => {
     for (const ideaName of ideaNames.slice(0, numberOfIdeas - 1)) {
         ideas[ideaName] = {};
@@ -123,6 +151,7 @@ const setIdeaSkills = () => {
         ideas[ideaName].members = [];
         ideas[ideaName].favs = [];
         ideas[ideaName].nogos = [];
+        ideas[ideaName].commonInterests =[];
     }    
 }    
 
@@ -145,6 +174,7 @@ setIdeaPrefs = () => {
 const generateData = (count) => {
 
     setMemberSkills();
+    setMemberInterests();
     setIdeaSkills();
     setIdeaPrefs();
     
@@ -152,6 +182,7 @@ const generateData = (count) => {
     for (const mem in members) {
         console.log(mem);
         console.log(" Skills: " + members[mem].skills.join(", "));
+        console.log(" Interests: " + members[mem].interests.join(", "));
     }
     console.log("------ Ideas ------");
     for (const idea in ideas) {
