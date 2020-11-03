@@ -444,6 +444,15 @@ const bestRemainingMatchFinal = () => {
                             score += 1;
                         }
                     }
+                    //Score erhöhen wenn User ein gemeinsames Interesse hat 
+                    for (const interest of ideas[ideaId].commonInterests) {
+                            
+                        if (members[memId].interests.indexOf(interest) >= 0) {
+                            score += 1;
+                            
+                            console.log(memId + " hat "+ interest +" von "+ ideaId);
+                        }
+                    }
                     missingScoreList.push([memId, ideaId, score, ideas[ideaId].members.length]);
                 }
             }
@@ -466,7 +475,7 @@ const bestRemainingMatchFinal = () => {
     for (var i = 0; i < missingScoreList.length; i++) {
         const topIdea = missingScoreList[i][1];
         const topMember = missingScoreList[i][0];
-        if (ideas[topIdea].members.length < maxMembers && !members[topMember].sorted) {
+        if (missingScoreList[i][3] < maxMembers && !members[topMember].sorted) {
             ideas[topIdea].members.push(topMember);
             members[topMember].sorted = true;
             console.log(topMember + " wird " + topIdea + " zugeordnet mit Score " + missingScoreList[i][2]);
@@ -608,11 +617,7 @@ const printList = () => {
 const proFiFunction = () => {
 
     stableMatching();
-    // HIER MÜSSEN IDEEN, DIE NICHT VOLL GEWORDEN SIND, NOCH ENTFERNT WERDEN
     printList();
-    
-    // Scorelisten neu erstellen: nur unsortierte User werden mit einbezogen
-    //calculateSkillValues();
     
     // Alle optimal zueinanderpassenden übrigen User und Ideen zuordnen
     bestRemainingMatch();
