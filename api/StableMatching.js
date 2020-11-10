@@ -327,7 +327,6 @@ const updateCommonInterests = () => {
            
             
         }
-        console.log(commonInterestsList);
         //Interessenliste in Idee fest speichern
         ideas[ideaId].commonInterests = commonInterestsList;
     }
@@ -550,9 +549,11 @@ const bestRemainingMatchFinal = () => {
                     for (const interest of ideas[ideaId].commonInterests) {
                             
                         if (members[memId].interests.indexOf(interest[0]) >= 0) {
-                            score += 1;
-                            
-                            // console.log(memId + " hat "+ interest +" von "+ ideaId);
+
+                            if(interest[1] > 1){
+                               score += interest[1]-1; 
+                               
+                            }
                         }
                     }
                     missingScoreList.push([memId, ideaId, score, ideas[ideaId].members.length]);
@@ -601,6 +602,7 @@ const bestRemainingMatchFinal = () => {
     }
 
     updateMissingSkills();
+    updateCommonInterests();
 }
 
 function resolve(ideaToResolve){
