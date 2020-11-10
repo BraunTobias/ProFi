@@ -263,8 +263,6 @@ const stableMatching = () => {
         console.log(unmatchableMembers+sortedMembers);
     }
 
-    //Nach erster fester Zuordung gemeinsame Interessen speichern
-    updateCommonInterests();
 
 }
 
@@ -299,28 +297,37 @@ const updateCommonInterests = () => {
 
         //Jeden Zugeorneten Teilnehmer durchgehen
         for (const memberId of ideas[ideaId].members) {
-           
-            //Alle Interessen des Teilnehmers durchegen
-            members[memberId].interests.forEach(memberInterest => {
 
-                let isAlreadyInList = false
-                for (let i = 0; i < commonInterestsList.length; i++) {
-                    const commonInterest = commonInterestsList[i];
+            //Wurde der Teilnehmer schon gezählt?
+            if(!members[memberId].interestsCounted){
 
-                    if(commonInterest[0]== memberInterest){
-                        commonInterestsList[i][1]+=1;
-                        isAlreadyInList= true;
+                //Alle Interessen des Teilnehmers durchegen
+                members[memberId].interests.forEach(memberInterest => {
+
+                    let isAlreadyInList = false
+                    //Wenn schon vorhanden zählen wie oft
+                    for (let i = 0; i < commonInterestsList.length; i++) {
+                        const commonInterest = commonInterestsList[i];
+
+                        if(commonInterest[0]== memberInterest){
+                            commonInterestsList[i][1]+=1;
+                            isAlreadyInList= true;
+                        }
+                
                     }
-            
-                }
+                    //Wenn nicht vorhanden hinzufügen
+                    if(!isAlreadyInList){
+                        commonInterestsList.push([memberInterest, 1]);
+                    }
+                
+                });
 
-                if(!isAlreadyInList){
-                    commonInterestsList.push([memberInterest, 1]);
-                }
-            
-            });
+                members[memberId].interestsCounted = true;
+            }
+           
             
         }
+        console.log(commonInterestsList);
         //Interessenliste in Idee fest speichern
         ideas[ideaId].commonInterests = commonInterestsList;
     }
@@ -439,6 +446,7 @@ const bestRemainingMatch = () => {
 
         // Ideen bestimmen, deren Skills noch nicht abgedeckt sind
         updateMissingSkills();
+        updateCommonInterests();
         calculateSkillValues();
 
         // Alle Scores von übrigen Usern zu nicht vollen Ideen abspeichern
@@ -466,10 +474,11 @@ const bestRemainingMatch = () => {
                         for (const interest of ideas[ideaId].commonInterests) {
                             
                             if (members[memId].interests.indexOf(interest[0]) >= 0) {
-                                interestScore += 1;
-                                //HIER SCOREBERECHNUNG ERGÄNZEN!
-                                
-                                //console.log(memId + " hat "+ interest +" von "+ ideaId);
+
+                                if(interest[1] > 1){
+                                   interestScore += interest[1]-1; 
+                                   
+                                }
                             }
                         }
                         if (skillScore+interestScore > 0) {
