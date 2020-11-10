@@ -43,8 +43,7 @@ function calculateSkillValues() {
                     memberSkills.push([skill,1]);
                 }            
             });
-        }
-            
+        }      
     }
 
     for (const ID in ideas) {    
@@ -62,8 +61,7 @@ function calculateSkillValues() {
                 allIdeaSkills.push(skill);
                 ideaSkills.push([skill,1]);
             }            
-        });
-      
+        }); 
     }
 
     for (let i = 0; i < memberSkills.length; i++) {
@@ -76,23 +74,8 @@ function calculateSkillValues() {
                 // Genau Abdeckung = 1; Selter Skill (häufiger benötigt, als vorhanden) > 1; Häufiger Skill < 1; 
                 let percent = ideaSkills[j][1] / memberSkills[i][1];
 
-                // Prozent * 10 für ganze Werte / 2, damit werte nicht übermäßig goß werden, abgerundet 
-                //let value = Math.floor((percent * 10) /2);
-                //aufgerundet
+                // Prozent * 10 für ganze Werte / 2, damit werte nicht übermäßig goß werden, aufgerundet
                 let value = Math.ceil((percent * 10) /2);
-
-                // Falls Skill so häufig vorkommt, dass er null wird, passiert bei weniger als 20%
-                /*if(value <= 0){
-                    value =1;
-                }*/
-
-                // Skill Values bei abrunden:
-                // 0%-39% = 1
-                // 40%-59% = 2
-                // 60%-79% = 3
-                // 80%-99% = 4
-                // 100%-119% = 5
-                // usw.
 
                 // Skill Values bei aufrunden:
                 // 0%-20% = 1
@@ -102,20 +85,15 @@ function calculateSkillValues() {
                 // 81%-100% = 5
                 // usw.
 
-
                 skillValues[memberSkills[i][0]] = value;
-
             }
-        }
-       
-        
+        }        
     }
 
     // Werte ausgeben
     for (const skill in skillValues) {
         console.log(skill+" – Wert:  "+ skillValues[skill]);
-    }
- 
+    } 
 }
 
 calculateSkillValues();
@@ -220,7 +198,6 @@ const stableMatching = () => {
         i++;
         // Alle Mitglieder durchgehen
         for (const memId in members) {
-
             // Prüfen ob das Mitglied schon vergeben ist
             if (!members[memId].sorted && !members[memId].unmatchable) {
 
@@ -252,18 +229,12 @@ const stableMatching = () => {
                             members[memId].unmatchable  = true;
                         }
                         members[overflowUserId].scoreList = newScoreList;
-                    
                     }
                 }
-        
-            }
-           
+            }  
         }
-    
         console.log(unmatchableMembers+sortedMembers);
     }
-
-
 }
 
 const updateMissingSkills = () => {
@@ -319,18 +290,14 @@ const updateCommonInterests = () => {
                     if(!isAlreadyInList){
                         commonInterestsList.push([memberInterest, 1]);
                     }
-                
                 });
 
                 members[memberId].interestsCounted = true;
-            }
-           
-            
+            }     
         }
         //Interessenliste in Idee fest speichern
         ideas[ideaId].commonInterests = commonInterestsList;
-    }
-    
+    } 
 }
 
 function addEmptyIdeas(unsorted) {
@@ -385,10 +352,8 @@ function addEmptyIdeas(unsorted) {
                         score += 1;
                     }
                 }
-
                 scoreList.push([memId, score]);
-            }
-            
+            }   
         });
 
         //ScoreListe sortieren, höchste Punkte zuerst
@@ -411,9 +376,7 @@ function addEmptyIdeas(unsorted) {
             unsorted = unsorted.filter(memId => memId != memId2);
             
         });
-    
     }
-
     //Letzte Idee Anzahl der Member prüfen, sonst auflösen
     if(ideas["empty"+newIdea].members.length < minMembers){
 
@@ -429,15 +392,10 @@ function addEmptyIdeas(unsorted) {
                 if(ideas[ideaId].members.length < maxMembers && !members[member].sorted){
                     ideas[ideaId].members.push(member); 
                     members[member].sorted = true;
-                }
-                
+                } 
             });
-
-        }
-        
-    }
-
-    
+        }  
+    } 
 }
 
 const bestRemainingMatch = () => {
@@ -474,10 +432,8 @@ const bestRemainingMatch = () => {
                             
                             if (members[memId].interests.indexOf(interest[0]) >= 0) {
 
-                                if(interest[1] > 1){
-                                   interestScore += interest[1]-1; 
-                                   
-                                }
+                                if(interest[1] > 1) interestScore += interest[1]-1; 
+                     
                             }
                         }
                         if (skillScore+interestScore > 0) {
@@ -523,6 +479,7 @@ const bestRemainingMatch = () => {
 
     }
 }
+
 const bestRemainingMatchFinal = () => {
 
     // Alle Scores von übrigen Usern zu allen Ideen abspeichern
@@ -550,10 +507,8 @@ const bestRemainingMatchFinal = () => {
                             
                         if (members[memId].interests.indexOf(interest[0]) >= 0) {
 
-                            if(interest[1] > 1){
-                               score += interest[1]-1; 
-                               
-                            }
+                            if(interest[1] > 1) score += interest[1]-1; 
+      
                         }
                     }
                     missingScoreList.push([memId, ideaId, score, ideas[ideaId].members.length]);
@@ -616,8 +571,7 @@ function resolve(ideaToResolve){
 
                 if(!members[member].sorted || ideas[ideaToResolve].members.indexOf(member) > 0){
                     console.log(member + " hat "+ ideaId + " als NOGO");
-                }
-                
+                }    
             });
         }
     }
@@ -636,7 +590,6 @@ function resolve(ideaToResolve){
         delete ideas[ideaToResolve];
         // MUSS DIE IDEE NOCH AUS ALLEN SCORELISTEN ENTFERNT WERDEN?
     }
-
 }
 
 function resolvePartiallyFilledIdeas() {
@@ -658,7 +611,6 @@ function resolvePartiallyFilledIdeas() {
         return b[1] - a[1]  
     }); 
 
-
     console.log(partialIdeas);
 
     for (var i = 0; i < partialIdeas.length; i++) {
@@ -667,8 +619,7 @@ function resolvePartiallyFilledIdeas() {
         // Prüfen, ob die unvollständigste Idee aufgelöst werden kann 
         const ideaToResolve = partialIdeas[i][0];
         resolve(ideaToResolve); 
-    }
-    
+    }   
 }
 
 const resolveIncompleteIdeas = () => {
@@ -695,8 +646,6 @@ const resolveIncompleteIdeas = () => {
 
         resolve(ideaToResolve); 
     }
-
-    
 }
 
 const printList = () => {
