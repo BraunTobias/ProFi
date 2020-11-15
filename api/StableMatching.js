@@ -359,10 +359,14 @@ function addEmptyIdeas(unsorted) {
         //ScoreListe sortieren, höchste Punkte zuerst
         scoreList.sort((a,b) => b[1] - a[1] ); 
         
-        //Bis midest Anzahl -1 aus Liste in Idee sortieren
+        //Bis Maximal Anzahl -1 aus Liste in Idee sortieren
+        //wenn min = max dann mindest Anzahl
+        let emptyIdeaMemberCount =  maxMembers-1;
+        if(minMembers == maxMembers) emptyIdeaMemberCount = minMembers;
+
         scoreList.forEach(member => {
 
-            if(ideas["empty"+newIdea].members.length < maxMembers-1){
+            if(ideas["empty"+newIdea].members.length < emptyIdeaMemberCount){
                 ideas["empty"+newIdea].members.push(member[0]);
                 sorted.push(member[0]);
                 members[member[0]].sorted = true;
@@ -550,10 +554,31 @@ const bestRemainingMatchFinal = () => {
         }
     }
 
+    // Wenn es noch nicht zugeordnete Leute gibt
     if(unsorted.length > 0){
-        console.log("Wir brauchen eine neue Idee!");
-        //To Do min max Anzahl nur eine Person? Lohnt sich leere Idee?
-        addEmptyIdeas(unsorted);
+        //Bei unter 20% fehlenden Leuten zur MindestAnzahl = neue Idee < minMembers
+        //Bei über 20% fehlenden Leuten zur mindest Anzahl = auf alte Ideen aufteilen > maxMembers
+        let missingForMinMembers=  1-(unsorted.length / minMembers);
+
+        if(missingForMinMembers <= 0.2){
+            console.log("Wir brauchen eine neue Idee!");
+            addEmptyIdeas(unsorted);
+        }
+        else{
+
+            missingScoreList.sort((a,b) => b[2] - a[2]); 
+            console.log(missingScoreList);
+            //Hier über maximal anzahl gehen
+            for (var i = 0; i < missingScoreList.length; i++) {
+                const topIdea = missingScoreList[i][1];
+                const topMember = missingScoreList[i][0];
+                if (!members[topMember].sorted) {
+                    ideas[topIdea].members.push(topMember);
+                    members[topMember].sorted = true;
+                    console.log(topMember + " wird " + topIdea + " zugeordnet mit Score " + missingScoreList[i][2]);
+                } 
+            }
+        }
     }
 
     updateMissingSkills();
