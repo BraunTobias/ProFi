@@ -382,23 +382,48 @@ function addEmptyIdeas(unsorted) {
         });
     }
     //Letzte Idee Anzahl der Member prüfen, sonst auflösen
+    
     if(ideas["empty"+newIdea].members.length < minMembers){
 
+        let missingForMinMembers=  1-(ideas["empty"+newIdea].members.length / minMembers);
         var lastMembers = ideas["empty"+newIdea].members;
-        resolve("empty"+newIdea);
-        // Was wenn es nicht genug Plätze gibt?
 
-        console.log(lastMembers);
-        for (const ideaId in ideas) {
+        // bei über 20% fehlenden Leuten zur MindestAnzahl = auflösen
+        //Sonst beibehalten
+        if(missingForMinMembers > 0.2){
+            delete ideas["empty"+newIdea];
+            let missingSkillsList=[];
+
+            lastMembers.forEach(member =>{
+                members[member].sorted = false;
+            })
+
+            console.log(lastMembers);
+            //Auf Ideen mit freien Plätzen aufteilen
+            for (const ideaId in ideas) {
+
+                lastMembers.forEach(member => {
+
+                    if(ideas[ideaId].members.length < maxMembers && !members[member].sorted){
+                        ideas[ideaId].members.push(member); 
+                        members[member].sorted = true;
+                    } 
+                });
+
+                missingSkillsList.push([ideaId, ideas[ideaId]. missingSkills.length]);
+            } 
+            // Wenn keine freien Plätze, auf die mit dem meisten Missing skills aufteilen
+            missingSkillsList.sort((a,b) => b[1] - a[1]);   
+            let i =0;
 
             lastMembers.forEach(member => {
-
-                if(ideas[ideaId].members.length < maxMembers && !members[member].sorted){
-                    ideas[ideaId].members.push(member); 
+                if(!members[member].sorted && ideas[missingSkillsList[i][0]].nogos.indexOf(member) < 0){
+                    ideas[missingSkillsList[i][0]].members.push(member); 
                     members[member].sorted = true;
-                } 
+                    i+=1;
+                }    
             });
-        }  
+        } 
     } 
 }
 
