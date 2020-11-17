@@ -300,13 +300,14 @@ const updateCommonInterests = () => {
 }
 
 function addEmptyIdeas(unsorted) {
-    var newIdea =0;
+    var newIdeaNumber =0;
 
     while (unsorted.length > 0) {
         var sorted =[];
-        newIdea +=1;
+        newIdeaNumber +=1;
+        var newIdea ="empty"+newIdeaNumber;
 
-        ideas["empty"+newIdea]={
+        ideas[newIdea]={
         skills: [],// Skills der neuen member abspeichern?
         missingSkills: [],
         favs: [],
@@ -320,24 +321,24 @@ function addEmptyIdeas(unsorted) {
         unsorted.forEach(memId => {
 
             //erster Teilnehmer in Idee speichern
-            if(ideas["empty"+newIdea].members.length == 0){
-                ideas["empty"+newIdea].members.push(memId);
+            if(ideas[newIdea].members.length == 0){
+                ideas[newIdea].members.push(memId);
                 //Erste skills speichern
                 members[memId].skills.forEach(skill => {
-                    ideas["empty"+newIdea].skills.push(skill);    
+                    ideas[newIdea].skills.push(skill);    
                 });
                 //Erste Interessen speichern
                 members[memId].interests.forEach(interest => {
-                    ideas["empty"+newIdea].commonInterests.push(interest);    
+                    ideas[newIdea].commonInterests.push(interest);    
                 });
                 sorted.push(memId);
                 members[memId].sorted = true;
             }
-            else if(ideas["empty"+newIdea].members.length < maxMembers){
+            else if(ideas[newIdea].members.length < maxMembers){
                 var score = 0;
 
                 //Score erhöhen wenn User ein gemeinsames Interesse hat 
-                for (const interest of ideas["empty"+newIdea].commonInterests) {
+                for (const interest of ideas[newIdea].commonInterests) {
                         
                     if (members[memId].interests.indexOf(interest) >= 0) {
                         score += 1;
@@ -357,10 +358,10 @@ function addEmptyIdeas(unsorted) {
 
         scoreList.forEach(member => {
 
-            if(ideas["empty"+newIdea].members.length < emptyIdeaMemberCount){
-                ideas["empty"+newIdea].members.push(member[0]);
+            if(ideas[newIdea].members.length < emptyIdeaMemberCount){
+                ideas[newIdea].members.push(member[0]);
                 members[member[0]].skills.forEach(skill => {
-                    if(ideas["empty"+newIdea].skills.indexOf(skill) < 0) ideas["empty"+newIdea].skills.push(skill);    
+                    if(ideas[newIdea].skills.indexOf(skill) < 0) ideas[newIdea].skills.push(skill);    
                 });
                 sorted.push(member[0]);
                 members[member[0]].sorted = true;
@@ -373,16 +374,16 @@ function addEmptyIdeas(unsorted) {
     }
     //Letzte Idee Anzahl der Member prüfen, sonst auflösen
     
-    if(ideas["empty"+newIdea].members.length < minMembers){
+    if(ideas[newIdea].members.length < minMembers){
 
-        let missingForMinMembers=  1-(ideas["empty"+newIdea].members.length / minMembers);
-        var lastMembers = ideas["empty"+newIdea].members;
+        let missingForMinMembers=  1-(ideas[newIdea].members.length / minMembers);
+        var lastMembers = ideas[newIdea].members;
 
         // bei über 20% fehlenden Leuten zur MindestAnzahl = auflösen
         //Sonst beibehalten
         if(missingForMinMembers > 0.25){
             let missingSkillsList=[];
-            resolve("empty"+newIdea);
+            resolve(newIdea);
 
             console.log(lastMembers);
             //Auf Ideen mit freien Plätzen aufteilen
