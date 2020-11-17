@@ -10,7 +10,7 @@ export default AttributePreviewTile = props => {
     >
         <View style={boxes.attributePreviewTile}>
             <View>
-                <Text numberOfLines={1} style = {[texts.commentTileHeader, {color: props.myTeam ? colors.white : colors.darkBlue}]}>{props.title}</Text>
+                <Text numberOfLines={1} style = {texts.subHeaderLarge}>{props.title}</Text>
                 <Text numberOfLines={2} ellipsizeMode="tail" style = {[texts.copy, {color: props.myTeam ? white : colors.darkGrey}]}>{props.subtitle}</Text>
             </View>
             <Image style={boxes.listTileArrow} source={require("../assets/ui-icons/arrow-right.png")} resizeMode="contain"/>

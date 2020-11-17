@@ -1,19 +1,40 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import {FlatList, View, Text} from "react-native";
+import {FlatList, View, Text, Modal} from "react-native";
+import AsyncStorage from '@react-native-community/async-storage';
 
 import { boxes, colors, styles, texts } from '../Styles';
 import AttributeTile from '../components/AttributeTile';
 import ScrollRow from '../components/ScrollRow';
 import DB from '../api/DB_API';
+import ButtonLarge from '../components/ButtonLarge';
+import InfoModal from '../components/InfoModal';
+import Padding from '../components/Padding';
 
 export default AttributeScreen = ({route, navigation}) => {
 
     const {attributeType} = route.params;
+    const currentUserId = DB.getCurrentUserId();
     
     // State Hooks
     const [currentCategory, setCurrentCategory] = useState("");
     const [categoriesList, setCategoriesList] = useState([]);
     const [displayedSkills, setDisplayedSkills] = useState([]);
+    const [skillsInfoVisible, setSkillsInfoVisible] = useState(false);
+
+    // Für Info-Modal
+    const storeInfoReceived = async (info) => {
+        try {
+          await AsyncStorage.setItem(info, currentUserId);
+          console.log(currentUserId)
+        } catch(e) {console.log(e);}
+    }
+    const getInfoReceived = async () => {
+        try {
+          const skillsInfo = await AsyncStorage.getItem("skillsInfoReceived");
+          console.log(skillsInfo);
+          if (skillsInfo != currentUserId) setSkillsInfoVisible(true);
+        } catch(e) {console.log(e);}
+    }
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -22,12 +43,15 @@ export default AttributeScreen = ({route, navigation}) => {
     }, [navigation]);
 
     useEffect(() => {
-        DB.getCategoriesFromAttribute(attributeType, (categoriesList) => {
-            setCategoriesList(categoriesList);
-            setCurrentCategory(categoriesList[0]);
-            DB.getUserAttributesFromCategory(attributeType, categoriesList[0], (attributesList) => {
-                setDisplayedSkills(attributesList);
-            }, (error) => {console.log(error)});    
+        const unsubscribe = navigation.addListener('focus', () => {
+            DB.getCategoriesFromAttribute(attributeType, (categoriesList) => {
+                setCategoriesList(categoriesList);
+                setCurrentCategory(categoriesList[0]);
+                getInfoReceived();
+                DB.getUserAttributesFromCategory(attributeType, categoriesList[0], (attributesList) => {
+                    setDisplayedSkills(attributesList);
+                }, (error) => {console.log(error)});    
+            });
         });
     }, []);
 
@@ -45,11 +69,18 @@ export default AttributeScreen = ({route, navigation}) => {
 
     return(
         <View style={{flex: 1}}>
+            <InfoModal 
+                visible={skillsInfoVisible}
+                onPress={() => {setSkillsInfoVisible(false); storeInfoReceived("skillsInfoReceived");}}
+                title="Fähigkeiten-Auswahl"
+                copy="Durch das Auswählen einer Fähigkeit erklärst du dich bereit, diese bei Bedarf in einem Projekt zu übernehmen. 
+                    Du musst sie noch nicht beherrschen, sondern nur bereit sein, dich damit auseinanderzusetzen."
+            />
             <View style={boxes.subHeader}>
-                <View style={boxes.paddedRow}>
+                {/* <View style={boxes.paddedRow}>
                     <Text style={texts.copy}>Durch Auswählen einer Fähigkeit erklärst du dich bereit, diese ggf. in einem Projekt zu übernehmen. 
                         Du musst sie noch nicht beherrschen.</Text>
-                </View>
+                </View> */}
                 <ScrollRow
                     type="attributes"
                     data= {categoriesList}

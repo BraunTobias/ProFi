@@ -1,6 +1,9 @@
 import React, {useState, useEffect, useLayoutEffect} from 'react';
-import { View, Text, Modal, Keyboard } from 'react-native';
+import { View, Text, Modal, Keyboard, ActivityIndicator, Alert } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import AsyncStorage from '@react-native-community/async-storage';
+import { compareAsc, format } from 'date-fns';
 
 import { icons, colors, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
@@ -26,29 +29,66 @@ export default CourseScreen = ({route, navigation}) => {
     // State Hooks
     const [currentIdeas, setCurrentIdeas] = useState([]);
     const [swipeListView, setSwipeListView] = useState();
-    const [creatorId, setCreatorId] = useState("");
+    const [courseName, setCourseName] = useState(itemTitle);
+    const [courseDate, setCourseDate] = useState(new Date());
     const [creator, setCreator] = useState("");
     const [members, setMembers] = useState([]);
     const [minMembers, setMinMembers] = useState(0);
     const [maxMembers, setMaxMembers] = useState(0);
     const [userIsMember, setUserIsMember] = useState(isMember);
+    const [userIsCreator, setUserIsCreator] = useState(false);
     const [currentFav, setCurrentFav] = useState();
     const [currentNogo, setCurrentNogo] = useState();
+    const [courseDataLoading, setCourseDataLoading] = useState(true);
 
     // States für Auswertungs-Ansicht
     const [evaluating, setEvaluating] = useState(false);
     const [evaluated, setEvaluated] = useState(false);
 
     // State Hooks für Modals
+    const [editCourseVisible, setEditCourseVisible] = useState(false);
+    const [editCourseDateVisible, setEditCourseDateVisible] = useState(false);
+    const [editCourseNameErrorVisible, setEditCourseNameErrorVisible] = useState(false);
+    const [editCourseDateErrorVisible, setEditCourseDateErrorVisible] = useState(false);
+    const [editCourseName, setEditCourseName] = useState(itemTitle);
+    const [editCourseDate, setEditCourseDate] = useState(new Date());
+    const [editCourseMinMembers, setEditCourseMinMembers] = useState(0);
+    const [editCourseMaxMembers, setEditCourseMaxMembers] = useState(0);
     const [newIdeaVisible, setNewIdeaVisible] = useState(false);
     const [addSkillsVisible, setAddSkillsVisible] = useState(false);
     const [selectedSkillsList, setSelectedSkillsList] = useState([]);
     const [currentNewIdeaName, setCurrentNewIdeaName] = useState("");
     const [currentNewIdeaText, setCurrentNewIdeaText] = useState("");
+    const [favInfoVisible, setFavInfoVisible] = useState(false);
+    const [nogoInfoVisible, setNogoInfoVisible] = useState(false);
+    const [joinInfoVisible, setJoinInfoVisible] = useState(false);
+    const [favInfoReceived, setFavInfoReceived] = useState(false);
+    const [nogoInfoReceived, setNogoInfoReceived] = useState(false);
+    const [joinInfoReceived, setJoinInfoReceived] = useState(false);
+    const [newIdeaNameErrorVisible, setNewIdeaNameErrorVisible] = useState(false);
+    const [newIdeaTextErrorVisible, setNewIdeaTextErrorVisible] = useState(false);
+    const [selectedSkillsListErrorVisible, setSelectedSkillsListErrorVisible] = useState(false);
 
     // State Hooks für Profilansicht
     const [viewedUserId, setViewedUserId] = useState(currentUserId);
     const [profileVisible, setProfileVisible] = useState(false);
+
+    // Für Info-Modal
+    const storeInfoReceived = async (info) => {
+        try {
+          await AsyncStorage.setItem(info, currentUserId);
+        } catch(e) {console.log(e);}
+    }
+    const getInfoReceived = async () => {
+        try {
+          const favInfo = await AsyncStorage.getItem("favInfoReceived");
+          if(favInfo == currentUserId) setFavInfoReceived(true); 
+          const nogoInfo = await AsyncStorage.getItem("nogoInfoReceived");
+          if(nogoInfo == currentUserId) setNogoInfoReceived(true);
+          const joinInfo = await AsyncStorage.getItem("joinInfoReceived");
+          if(joinInfo == currentUserId) setJoinInfoReceived(true);
+        } catch(e) {console.log(e);}
+      }
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -58,29 +98,16 @@ export default CourseScreen = ({route, navigation}) => {
 
     const getCourseData = () => {
         DB.getCourseData(itemId, (data) => {
-            setCreatorId(data.creator);
+            setCreator(data.creatorName);
             setMinMembers(data.minMembers);
             setMaxMembers(data.maxMembers);
-            if (data.members && data.members.length > 0) {
-                const memberUidList = data.members;
-                var newMembersList = [];
-                for (const member in memberUidList) {
-                    const uid = memberUidList[member];
-                    DB.getUserInfoById(uid, (name, url) => {
-                        newMembersList.push({
-                            "userId": uid,
-                            "username": name,
-                            "imageUrl": url
-                        });
-                        setMembers(newMembersList);
-                    });
-                }
-            } else {
-                setMembers([]);
-            }
-            DB.getUserInfoById (data.creator, (userName, userImage, bio, email) => {
-                setCreator(userName);
-            });
+            setEditCourseMinMembers(data.minMembers);
+            setEditCourseMaxMembers(data.maxMembers);
+            setMembers(data.members);
+            setCourseDate(data.date.toDate());
+            setEditCourseDate(data.date.toDate());
+            setCourseDataLoading(false);
+            setUserIsCreator(data.creator == currentUserId);
         });    
     }
 
@@ -91,57 +118,68 @@ export default CourseScreen = ({route, navigation}) => {
             DB.getIdeasList(itemId, (ideasList) => {
                 setCurrentIdeas(ideasList);
                 for (const idea in ideasList) {
-                    if (ideasList[idea].favourites != null && ideasList[idea].favourites.indexOf(currentUserId) >= 0) {
+                    if (ideasList[idea].favourites && ideasList[idea].favourites.indexOf(currentUserId) >= 0) {
                         setCurrentFav(ideasList[idea].id);
-                    } else if (ideasList[idea].nogos != null && ideasList[idea].nogos.indexOf(currentUserId) >= 0) {
+                    } else if (ideasList[idea].nogos && ideasList[idea].nogos.indexOf(currentUserId) >= 0) {
                         setCurrentNogo(ideasList[idea].id);
                     }
                 }
             });
+            getInfoReceived();
         });
     }, []);
 
     const addFavHandler = (ideaId) => {
-        swipeListView.safeCloseOpenRow();
-        if (currentFav == ideaId) {
-            DB.deletePref("favourites", itemId, () => {
-                setCurrentFav("");
-            });
+        if (!favInfoReceived) {
+            setFavInfoVisible(true); 
         } else {
-            DB.addPref("favourites", itemId, ideaId, () => {
-                setCurrentFav(ideaId);
-                if (currentNogo == ideaId) {
-                    setCurrentNogo("");
-                }
-            });
+            swipeListView.safeCloseOpenRow();
+            if (currentFav == ideaId) {
+                DB.deletePref("favourites", itemId, () => {
+                    setCurrentFav("");
+                });
+            } else {
+                DB.addPref("favourites", itemId, ideaId, () => {
+                    setCurrentFav(ideaId);
+                    if (currentNogo == ideaId) setCurrentNogo("");
+                });
+            }
         }
     }
     const addNogoHandler = (ideaId) => {
-        swipeListView.safeCloseOpenRow();
-        if (currentNogo == ideaId) {
-            DB.deletePref("nogos", itemId, () => {
-                setCurrentNogo("");
-            });
+        if (!nogoInfoReceived) {
+            setNogoInfoVisible(true); 
         } else {
-            DB.addPref("nogos", itemId, ideaId, () => {
-                setCurrentNogo(ideaId);
-                if (currentFav == ideaId) {
-                    setCurrentFav("");
-                }
-            });
+            swipeListView.safeCloseOpenRow();
+            if (currentNogo == ideaId) {
+                DB.deletePref("nogos", itemId, () => {
+                    setCurrentNogo("");
+                });
+            } else {
+                DB.addPref("nogos", itemId, ideaId, () => {
+                    setCurrentNogo(ideaId);
+                    if (currentFav == ideaId) {
+                        setCurrentFav("");
+                    }
+                });
+            }
         }
     }
     const joinCourseHandler = () => {
-        if (!userIsMember) {
-            DB.joinCourse(itemId, () => {
-                setUserIsMember(true);
-                getCourseData();
-            }, (e) => {console.log(e)})
+        if (!joinInfoReceived) {
+            setJoinInfoVisible(true); 
         } else {
-            DB.exitCourse(itemId, () => {
-                setUserIsMember(false);
-                getCourseData();
-            })
+            if (!userIsMember) {
+                DB.joinCourse(itemId, () => {
+                    setUserIsMember(true);
+                    getCourseData();
+                }, (e) => {console.log(e)})
+            } else {
+                DB.exitCourse(itemId, () => {
+                    setUserIsMember(false);
+                    getCourseData();
+                })
+            }
         }
     }
 
@@ -151,22 +189,36 @@ export default CourseScreen = ({route, navigation}) => {
     }
 
     // Handler für Modals
-    const pressNewIdeaHandler = () => {
-        DB.addIdea(itemId, currentNewIdeaName, currentNewIdeaText, selectedSkillsList, [], () => {
+    const pressNewIdeaHandler = (committed) => {
+        if (committed) {
+            if (currentNewIdeaName.length > 1 && currentNewIdeaText.length > 1 && selectedSkillsList.length > 0) {
+                DB.addIdea(itemId, currentNewIdeaName, currentNewIdeaText, selectedSkillsList, [], () => {
+                    setNewIdeaVisible(false);
+                    setCurrentNewIdeaName("");
+                    setCurrentNewIdeaText("");    
+                    setSelectedSkillsList("");
+                    DB.getIdeasList(itemId, (ideasList) => {
+                        setCurrentIdeas(ideasList);
+                    });
+                }, (error) => {setCurrentWarning(error)});
+            }
+            if (currentNewIdeaName.length <= 1) setNewIdeaNameErrorVisible(true);
+            if (currentNewIdeaText.length <= 1) setNewIdeaTextErrorVisible(true);
+            if (selectedSkillsList.length == 0) setSelectedSkillsListErrorVisible(true);
+        } else {
             setNewIdeaVisible(false);
             setCurrentNewIdeaName("");
             setCurrentNewIdeaText("");    
             setSelectedSkillsList("");
-            DB.getIdeasList(itemId, (ideasList) => {
-                setCurrentIdeas(ideasList);
-            });
-    }, (error) => {setCurrentWarning(error)});
+        }
     }
     const changeNewIdeaNameHandler = (enteredText) => {
         setCurrentNewIdeaName(enteredText);
+        if (enteredText.length > 1) setNewIdeaNameErrorVisible(false);
     }
     const changeNewIdeaTextHandler = (enteredText) => {
         setCurrentNewIdeaText(enteredText);
+        if (enteredText.length > 1) setNewIdeaTextErrorVisible(false);
     }
 
     const addSkillHandler = (skill) => {
@@ -177,6 +229,57 @@ export default CourseScreen = ({route, navigation}) => {
             var newList = oldList.filter(item => item !== skill);
             setSelectedSkillsList(newList);
         }
+        if (selectedSkillsList.length > 0) setSelectedSkillsListErrorVisible(false);
+    }
+
+    const pressEditCourseHandler = (committed) => {
+        if (committed) {
+            if (editCourseName.length > 1) {
+                DB.editCourse(itemId, editCourseName, editCourseDate, editCourseMinMembers, editCourseMaxMembers, () => {
+                    setEditCourseVisible(false);
+                    setEditCourseNameErrorVisible(false);
+                    setEditCourseDateErrorVisible(false);
+                    setCourseName(editCourseName);
+                    setCourseDate(editCourseDate);
+                    setMinMembers(editCourseMinMembers);
+                    setMaxMembers(editCourseMaxMembers);
+                }, () => {
+                    Alert.alert(
+                        "Fehler",
+                        "Kurs konnte nicht bearbeitet werden",
+                        [{ text: "OK", onPress: () => {}}],
+                    );              
+                });
+            }
+            if (editCourseName.length == "") setEditCourseNameErrorVisible(true);
+            if (editCourseDate - (new Date()) < 0) setEditCourseDateErrorVisible(true);
+        } else {
+            setEditCourseVisible(false);
+            setEditCourseNameErrorVisible(false);
+            setEditCourseDateErrorVisible(false);
+            setEditCourseName(courseName);
+            setEditCourseDate(courseDate);
+            setEditCourseMinMembers(minMembers);
+            setEditCourseMaxMembers(maxMembers);
+        }
+    }
+    const changeEditCourseNameHandler = (enteredText) => {
+        setEditCourseName(enteredText);
+        if (enteredText != "") setEditCourseNameErrorVisible(false);
+    }
+    const changeEditCourseDateHandler = (date) => {
+        setEditCourseDate(date);
+        setEditCourseDateVisible(false);
+        if (date - (new Date()) < 0) setEditCourseDateErrorVisible(true);
+        else setEditCourseDateErrorVisible(false);
+    }
+    const changeEditCourseMinMembersHandler = (number) => {
+        setEditCourseMinMembers(number);
+        if (number > editCourseMaxMembers) setEditCourseMaxMembers(number);
+    }
+    const changeEditCourseMaxMembersHandler = (number) => {
+        setEditCourseMaxMembers(number);
+        if (number < editCourseMinMembers) setEditCourseMinMembers(number);
     }
 
     const selectIdeaHandler = (id, title, description, skills) => {
@@ -184,26 +287,27 @@ export default CourseScreen = ({route, navigation}) => {
         navigation.navigate("Idea", {itemId: id, itemTitle: title, itemDescription: description, skillsList: skills, courseId: itemId});
     }
 
-    const buttonRow = () => {
-        if (!evaluated) {
-            return(
-                <View style={ boxes.paddedRow }>
-                    <ButtonSmall
-                        title={userIsMember ? "Mitglied" : "Beitreten"}
-                        icon={userIsMember ? "checkTrue" : "checkFalse"}
-                        onPress={joinCourseHandler}
-                    />
-                    <ButtonSmall
-                        title={"Neue Idee"}
-                        icon={"plus"}
-                        onPress={() => {setNewIdeaVisible(true)}}
-                    />
-                </View>
-        )} else { return null }
-    }
-
     return(
         <View style={{flex:1}}>
+            <InfoModal 
+                visible={joinInfoVisible}
+                onPress={() => {setJoinInfoVisible(false); storeInfoReceived("joinInfoReceived"); setJoinInfoReceived(true);}}
+                title="Einem Kurs beitreten"
+                copy="Wenn du diesem Kurs beitrittst, wirst du bei der Ideenverteilung berücksichtigt. Du kannst jederzeit wieder austreten und dir den Kurs weiter angucken. Aber achte darauf, dass du am oben angegebenen Datum dem Kurs beigetreten bist, um zugeteilt zu werden."
+            />
+            <InfoModal 
+                visible={favInfoVisible}
+                onPress={() => {setFavInfoVisible(false); storeInfoReceived("favInfoReceived"); setFavInfoReceived(true);}}
+                title="Favoriten setzen"
+                copy="Wenn du eine Idee als Favorit markierst, erhöht sich die Chance, dass du dieser zugeteilt wirst. Du kannst einen Favoriten pro Kurs setzen. Sobald du eine andere Idee favorisierst, wird dein alter Favorit entfernt."
+            />
+            <InfoModal 
+                visible={nogoInfoVisible}
+                onPress={() => {setNogoInfoVisible(false); storeInfoReceived("nogoInfoReceived"); setNogoInfoReceived(true);}}
+                title="No-Go setzen"
+                copy="Wenn du eine Idee als No-Go markierst, wirst du dieser auf keinen Fall zugeteilt. Du kannst ein No-Go pro Kurs setzen. Sobald du eine andere Idee als No-Go markierst, wird dein altes No-Go entfernt."
+            />
+
             {profileVisible &&
                 <ProfileView
                     userId={viewedUserId}
@@ -211,6 +315,67 @@ export default CourseScreen = ({route, navigation}) => {
                     onDismiss={() => {setProfileVisible(false)}}
                 />
             }
+            {/* Kurs bearbeiten */}
+            <Modal visible= { editCourseVisible } animationType= 'slide'>
+                <ModalContent
+                    subheader= { () => {}}
+                    content= { () => {
+                        return(
+                            <View style={boxes.mainContainer}>
+                                <Text style={texts.titleCentered}>{"Kurs bearbeiten"}</Text>
+                                <InputField
+                                    title="Kursname"
+                                    placeholderText= "Kursname"
+                                    value={editCourseName}
+                                    onChangeText={changeEditCourseNameHandler}
+                                />
+                                {editCourseNameErrorVisible &&
+                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
+                                        Bitte einen Kursnamen angeben.
+                                    </Text>
+                                }
+                                <InputField
+                                    title= "End-Datum"
+                                    isButton= {true}
+                                    icon={icons.date}
+                                    placeholderText= "Datum auswählen …"
+                                    value={format(editCourseDate, "dd.MM.yyyy")}
+                                    onPress={() => {setEditCourseDateVisible(true); Keyboard.dismiss()}}
+                                />
+                                {editCourseDateErrorVisible &&
+                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
+                                        Das Datum muss in der Zukunft liegen.
+                                    </Text>
+                                }
+                                <DateTimePickerModal
+                                    isVisible={editCourseDateVisible}
+                                    mode="date"
+                                    date = {editCourseDate}
+                                    headerTextIOS="Datum auswählen"
+                                    cancelTextIOS="Abbrechen"
+                                    confirmTextIOS="OK"
+                                    onConfirm={changeEditCourseDateHandler}
+                                    onCancel={() => {setEditCourseDateVisible(false)}}
+                                />
+                                <View style={boxes.unPaddedRow}>
+                                    <NumberInput
+                                        title= {"Mitglieder min."}
+                                        value= {editCourseMinMembers}
+                                        onChange={changeEditCourseMinMembersHandler}
+                                        />
+                                    <NumberInput
+                                        title= {"Mitglieder max."}
+                                        value= {editCourseMaxMembers}
+                                        onChange={changeEditCourseMaxMembersHandler}
+                                    />
+                                </View>
+                            </View> 
+                        )
+                    }}
+                    onDismiss= {pressEditCourseHandler}
+                />
+            </Modal>
+
 
             {/* Idee erstellen */}
             <Modal visible= { newIdeaVisible } animationType= 'slide'>
@@ -225,22 +390,37 @@ export default CourseScreen = ({route, navigation}) => {
                                     value={currentNewIdeaName}
                                     onChangeText={changeNewIdeaNameHandler}
                                 />
+                                {newIdeaNameErrorVisible &&
+                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
+                                        Bitte einen Namen angeben.
+                                    </Text>
+                                }
                                 <InputField
                                     placeholderText= "Beschreibung"
                                     value={currentNewIdeaText}
                                     onChangeText={changeNewIdeaTextHandler}
                                     multiline={true}
                                 />
+                                {newIdeaTextErrorVisible &&
+                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
+                                        Bitte einen Beschreibungstext angeben.
+                                    </Text>
+                                }
                                 <AttributePreviewTile
                                     title="Passende Fähigkeiten"
-                                    subtitle={selectedSkillsList.join(", ")}
+                                    subtitle={selectedSkillsList.length > 0 ? selectedSkillsList.join(", ") : ""}
                                     index={0}
                                     onPress={() => {setAddSkillsVisible(true)}}
                                 />
+                                {selectedSkillsListErrorVisible &&
+                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
+                                        Bitte mindestens eine Fähigkeit angeben.
+                                    </Text>
+                                }
                             </View> 
                         )
                     }}
-                    onDismiss= {(committed) => {pressNewIdeaHandler(committed)}}
+                    onDismiss= {pressNewIdeaHandler}
                 />
 
                 {/* // Idee hinzufügen: Fähigkeiten auswählen */}
@@ -257,20 +437,57 @@ export default CourseScreen = ({route, navigation}) => {
 
 
             <View style={ boxes.subHeader }>
-                <View style={ boxes.paddedRow }>
-                    <Text style={texts.subHeader}>{itemTitle}</Text>
-                    <Text style={texts.subHeader}>{minMembers + "-" + maxMembers + " Personen"}</Text>
+                {!courseDataLoading && 
+                <View>
+                    <View style={ boxes.paddedRow }>
+                        <Text style={texts.subHeader}>{courseName}</Text>
+                        <Text style={texts.subHeader}>{minMembers + "-" + maxMembers + " Personen"}</Text>
+                    </View>
+                    <View style={ boxes.paddedRow }>
+                        <Text style={texts.subHeader}>{format(courseDate, "dd.MM.yyyy")}</Text>
+                        <Text style={texts.subHeader}>{creator}</Text>
+                    </View>
+                    <ScrollRow
+                        data= {members}
+                        onPress={(id) => {viewProfileHandler(id)}}
+                    />
                 </View>
-                <View style={ boxes.paddedRow }>
-                    <Text style={texts.subHeader}>{itemDate}</Text>
-                    <Text style={texts.subHeader}>{creator}</Text>
+                }  
+                {courseDataLoading && 
+                <View style={{height: 119, justifyContent: "center"}}>
+                    <ActivityIndicator/>
                 </View>
-                <ScrollRow
-                    data= {members}
-                    onPress={(id) => {viewProfileHandler(id)}}
-                />
-
-                {buttonRow()}
+                }  
+                { !evaluated &&
+                <View style={ boxes.paddedRow }>
+                    <ButtonSmall
+                        title={userIsMember ? "Mitglied" : "Beitreten"}
+                        icon={userIsMember ? "checkTrue" : "checkFalse"}
+                        onPress={joinCourseHandler}
+                    />
+                    <ButtonSmall
+                        title={"Neue Idee"}
+                        icon={"plus"}
+                        onPress={() => {setNewIdeaVisible(true)}}
+                    />
+                </View>
+                }
+                { userIsCreator && false && 
+                <View style={ boxes.paddedRow }>
+                    <ButtonLarge
+                        title={"Teams erstellen"}
+                        onPress={() => {}}
+                    />
+                </View>
+                }
+                { userIsCreator &&
+                <View style={ boxes.paddedRow }>
+                    <ButtonLarge
+                        title={"Kurs bearbeiten"}
+                        onPress={() => {setEditCourseVisible(true)}}
+                    />
+                </View>
+                }
             </View>
 
             <SwipeListView

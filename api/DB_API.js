@@ -1,10 +1,45 @@
 import * as firebase from 'firebase';
 import 'firebase/firestore';
 import "firebase/storage";
+import * as Permissions from "expo-permissions";
+import * as Notifications from 'expo-notifications'
+
 import {skillsList} from '../data/AttributesList';
 import { compareAsc, format } from 'date-fns';
 
 const DB = {
+
+    registerPushNotifications: async function(permissionGranted, onSuccess, onError) {
+        const currentUserID = firebase.auth().currentUser.uid;
+
+        if (permissionGranted) {
+            const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+            let finalStatus = existingStatus;
+            if (existingStatus !== 'granted') {
+                const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+                finalStatus = status;
+            }
+            if (finalStatus !== 'granted') {
+                onError();
+                return;
+            }
+            const token = await Notifications.getExpoPushTokenAsync();
+            console.log("––––––– TOKEN –––––––");
+            console.log(token);
+    
+            firebase.firestore().collection("users").doc(currentUserID).set({
+                token: token.data,
+                pushNotificationsAllowed: true
+            }, {merge: true});
+            onSuccess();
+        } else {
+            firebase.firestore().collection("users").doc(currentUserID).set({
+                pushNotificationsAllowed: false
+            }, {merge: true});     
+            onSuccess();
+        }
+    },
+
     // Kopiert von https://stackoverflow.com/questions/48006903/react-unique-id-generation
     guidGenerator: function() {
         var S4 = function() {
@@ -88,17 +123,35 @@ const DB = {
     },
 
     // Einloggen
-    logIn: function(email, password, onError) {
+    logIn: async function(email, password, onError) {
         firebase.auth().signInWithEmailAndPassword(email, password)
         .catch(e => {
             onError(e);
         })
+        .then(async () => {
+            const currentUserID = firebase.auth().currentUser.uid;
+            const snapshotDoc = await firebase.firestore().collection("users").doc(currentUserID).get();
+            if (snapshotDoc.data()) {
+                userInfo = snapshotDoc.data();
+                if (userInfo.pushNotificationsAllowed) {
+                    this.registerPushNotifications(true, () => {}, () => {
+                        // Wenn Notifications nicht aktiviert werden können, wird „Allow“ auf false gesetzt
+                        firebase.firestore().collection("users").doc(currentUserID).set({
+                            pushNotificationsAllowed: false
+                        }, {merge: true});
+                    });
+                }
+            }
+        })
     },
     // Ausloggen
     signOut: function(onSignedOut) {
+        const currentUserID = firebase.auth().currentUser.uid;
         firebase.auth().signOut()
         .then(() => {
-            // console.log("Signed Out");
+            firebase.firestore().collection("users").doc(currentUserID).set({
+                token: null
+            }, {merge: true});
             onSignedOut();
         });
     },
@@ -120,10 +173,10 @@ const DB = {
         const snapshotDoc = await firebase.firestore().collection("users").doc(userId).get();
         if (snapshotDoc.data()) {
             const userInfo = snapshotDoc.data();
-                userName = userInfo.username;
-                userImage = userInfo.image;
-                bio = userInfo.bio;
-                email = userInfo.email;
+            userName = userInfo.username;
+            userImage = userInfo.image;
+            bio = userInfo.bio;
+            email = userInfo.email;
         }
         onSuccess(userName, userImage, bio, email);
     },
@@ -146,7 +199,10 @@ const DB = {
                     email: newEmail
                 }, {merge: true}); 
             })
-            .then(() => {onSuccess()});
+            .then(() => {onSuccess()})
+            .catch(e => {
+                onError(e);
+            });    
         })
         .catch(e => {
             onError(e);
@@ -182,14 +238,14 @@ const DB = {
         const uploadTask = firebase.storage().ref().child("images/" + imageName).put(blob);
         uploadTask.on("state_changed", (snapshot) => {
             var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            // console.log("snapshot: " + snapshot.state + " " + progress + "% done");
+            console.log("snapshot: " + snapshot.state + " " + progress + "% done");
         }, (error) => {
             // Fehler beim Hochladen
             console.log(error);
         }, () => {
             uploadTask.snapshot.ref.getDownloadURL()
             .then((downloadURL) => {
-                // console.log('File available at', downloadURL);
+                console.log('File available at', downloadURL);
                 firebase.firestore().collection("users").doc(currentUserId).set({
                     image: downloadURL,
                     imageName: imageName
@@ -199,15 +255,14 @@ const DB = {
                 if (oldImageName) {
                     firebase.storage().ref().child("images/" + oldImageName).delete()
                     .then(() => {
-                        // console.log("Deleted old image");
+                        console.log("Deleted old image");
                     })
                     .catch((error) => {
-                        // console.log(error);
+                        console.log(error);
                     })
                 }
             })
         });
-
     },
 
     // Neuen Kurs erstellen (Objekt der Klasse course übergeben)
@@ -215,12 +270,13 @@ const DB = {
         const currentUserID = firebase.auth().currentUser.uid;
 
         // Checken ob es die ID schon gibt
-        const courseWithId = firebase.firestore().collection("courses").doc(id)
+        const courseWithId = firebase.firestore().collection("courses").doc(id);
         courseWithId.get()
         .then((docSnapshot) => {
             if (docSnapshot.exists) {
                 onError("Diese ID ist schon vergeben!");
             } else {
+                const semester = id.slice(id.length - 4);
                 firebase.firestore().collection("courses").doc(id).set({
                     creator: currentUserID,
                     title: title,
@@ -228,7 +284,8 @@ const DB = {
                     minMembers: minMembers,
                     maxMembers: maxMembers,
                     prospects: [currentUserID],
-                    members: []
+                    members: [],
+                    semester: semester
                 })
                 .then(() => {
                     onSuccess();
@@ -240,6 +297,7 @@ const DB = {
     // Neue Idee erstellen 
     addIdea: function(courseId, title, description, skills, interests, onSuccess) {
         const currentUserID = firebase.auth().currentUser.uid;
+
         firebase.firestore().collection("courses").doc(courseId).collection("ideas").add({
             title: title,
             description: description,
@@ -256,6 +314,66 @@ const DB = {
             })
         });
     },
+    // Idee bearbeiten
+    editIdea: function(courseId, ideaId, title, description, skills, interests, onSuccess, onError) {
+        firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaId).set({
+            title: title,
+            description: description,
+            interests: interests,
+            skills: skills,
+        }, {merge: true})
+        .catch((e) => {onError(e)})
+        .then(() => {
+            onSuccess();
+        });
+    },
+    // Kurs bearbeiten
+    editCourse: async function(courseId, title, date, minMembers, maxMembers, onSuccess, onError) {
+        const currentUserID = firebase.auth().currentUser.uid;
+
+        const oldCourseSnapshotDoc = await firebase.firestore().collection("courses").doc(courseId).get();
+        const oldCourseData = oldCourseSnapshotDoc.data();
+
+        firebase.firestore().collection("courses").doc(courseId).set({
+            title: title,
+            date: date,
+            minMembers: minMembers,
+            maxMembers: maxMembers
+        }, {merge: true})
+        .catch((e) => {onError(e)})
+        .then(async () => {
+            onSuccess();
+
+            // Alle Mitglieder des Kurses benachrichtigen
+            var changeArray = [];
+            var notificationsArray = [];
+            if (oldCourseData) {
+                if (oldCourseData.title != title) changeArray.push("Neuer Titel: " + title);
+                if (format(oldCourseData.date.toDate(), "dd.MM.yyyy") != format(date, "dd.MM.yyyy")) changeArray.push("Neues Datum: " + format(date, "dd.MM.yyyy"));
+                if (oldCourseData.minMembers != minMembers || oldCourseData.maxMembers != maxMembers) changeArray.push("Neue Gruppengröße: " + minMembers + "–" + maxMembers + " Personen");
+                var changeString = changeArray.join("\n");
+                for (memberId of oldCourseData.members) {
+                    if (memberId != currentUserID && changeString != "") {
+                        const userSnapshot = await firebase.firestore().collection("users").doc(memberId).get();
+                        const userData = userSnapshot.data();
+                        if (userData.token && userData.pushNotificationsAllowed) {
+                            notificationsArray.push({"to": userData.token, "title": ("Kurs "  + title + " geändert"), "body": changeString});   
+                        } 
+                    }
+                }
+                // NotificationsArray verschicken
+                fetch("https://exp.host/--/api/v2/push/send", {
+                    method: "POST",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(notificationsArray)
+                });
+            }
+        });
+    },
+
     // Neuen Kommentar erstellen
     addComment: async function(courseId, ideaId, commentText, replyTo, onSuccess) {
         var currentUserName = "Anonym";
@@ -340,22 +458,35 @@ const DB = {
     getCommentsList: async function(courseId, ideaId, commentsListRetrieved) {
         var commentsList = [];
 
-        const snapshot = await firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaId).collection("comments").orderBy("time", "asc").get();
+        const snapshot = await firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaId).collection("comments").orderBy("time", "desc").get();
+        // Erst normale Kommentare einordnen
         snapshot.forEach((doc) => {
             const comment = doc.data();
-            comment["id"] = doc.id;
             if (!comment.replyTo) {
+                comment["id"] = doc.id;
                 commentsList.push(comment);
-            } else {
+            }
+        });
+        // Dann die Antworten den Kommentaren zusortieren
+        snapshot.forEach((doc) => {
+            const comment = doc.data();
+            if (comment.replyTo) {
+                comment["id"] = doc.id;
                 var index = 0;
                 //Index des ursprünglichen Kommentars finden und dort einsetzen
                 for (const normalComment of commentsList) {
                     if (comment.replyTo == normalComment.id) index = commentsList.indexOf(normalComment);
                 }
-                commentsList.splice(index, 0, comment);
+                commentsList.splice(index + 1, 0, comment);
             }
         });            
-        commentsListRetrieved(commentsList.reverse());
+        for (var comment of commentsList) {
+            await this.getUserInfoById(comment.user, (name, url) => {
+                comment.name = name;
+                comment.url = url;
+            });
+        }
+        commentsListRetrieved(commentsList);
     },
     likeComment: async function(courseId, ideaId, commentId, onSuccess) {
         const currentUserID = firebase.auth().currentUser.uid;
@@ -383,6 +514,19 @@ const DB = {
         const snapshotDoc = await firebase.firestore().collection("courses").doc(courseId).get();
         if (snapshotDoc.data()) {
             courseData = snapshotDoc.data();
+            var membersList = [];
+            for (var memberId of courseData.members) {
+                var member = {userId: memberId};
+                await this.getUserInfoById(memberId, (name, url) => {
+                    member.userName = name;
+                    member.imageUrl = url;
+                });
+                membersList.push(member);
+            }
+            courseData.members = membersList;
+            await this.getUserInfoById(courseData.creator, (name) => {
+                courseData.creatorName = name;
+            });
         }
         onSuccess(courseData);
     },
@@ -396,7 +540,7 @@ const DB = {
         onSuccess(ideaData);
     },
 
-    // Der User wird zur Interessenten-Liste eines Kurses hinzugefügt bzw. entfernt
+    // Der User wird zur Interessenten-Liste eines Kurses hinzugefügt
     addCourseToList: async function(courseId, onSuccess, onError) {
         var prospectsArray = [];
         const currentUserID = firebase.auth().currentUser.uid;
@@ -407,32 +551,26 @@ const DB = {
         courseWithId.get()
         .then((docSnapshot) => {
             if (docSnapshot.exists) {
-                if (docSnapshot.data().prospects) {
-                    prospectsArray = docSnapshot.data().prospects;
-                    prospectsArray.forEach((prospectId) => {
-                        if (prospectId == currentUserID) {
-                            alreadyProspect = true;
-                        }
-                    });
-                }
                 // Wenn der User noch nicht im Kurs ist, wird er ans Array angehängt und dieses neu hochgeladen.
-                if (!alreadyProspect) {
+                prospectsArray = docSnapshot.data().prospects;
+                if (prospectsArray.indexOf(currentUserID) < 0) {
                     prospectsArray.push(currentUserID);
                     firebase.firestore().collection("courses").doc(courseId).set({
                         prospects: prospectsArray
                     }, {merge: true}); 
-        
-                    // console.log(prospectsArray);
 
                     // Der neue Kurs wird zurückgegeben um sofort angezeigt zu werden
                     const addedCourse = docSnapshot.data();
                     addedCourse["id"] = docSnapshot.id;
+                    if (addedCourse.date) addedCourse.date = format(addedCourse.date.toDate(), "dd.MM.yyyy");
+                    else addedCourse.date = "Kein Datum";
                     onSuccess(addedCourse);
+                    // onSuccess();
                 } else {
-                    onError("User ist schon am Kurs interessiert");
+                    onError("Du hast diesen Kurs schon in deiner Liste.");
                 }         
             } else {
-                onError("Diese ID existiert nicht.");
+                onError("Diese Kurs-ID existiert nicht.");
             }
         });
     },

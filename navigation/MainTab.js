@@ -1,7 +1,8 @@
-import React from 'react';
+import React , {useEffect} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { Image, StatusBar } from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import DB from '../api/DB_API';
 
 import { icons, colors } from '../Styles';
 import HomeStack from './HomeStack';
@@ -11,7 +12,7 @@ const Tab = createBottomTabNavigator();
 
   
 export default MainNavigator = () => {
-
+        
     return(
         <NavigationContainer>
             <StatusBar barStyle="light-content"/>

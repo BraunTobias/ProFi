@@ -27,6 +27,11 @@ const icons = {
     like: require("./assets/ui-icons/like.png"),
     reply: require("./assets/ui-icons/reply.png"),
     edit: require("./assets/ui-icons/edit.png"),
+    date: require("./assets/ui-icons/date.png"),
+    info: require("./assets/ui-icons/info.png"),
+    passwordShow: require("./assets/ui-icons/passwordShow.png"),
+    passwordHide: require("./assets/ui-icons/passwordHide.png"),
+    replyComment: require("./assets/ui-icons/replyComment.png"),
 }
 
 const boxes = {
@@ -61,23 +66,26 @@ const boxes = {
         alignItems: "center",
     },
     inputField: {
-        minHeight: 45,
+        minHeight: 40,
         paddingHorizontal: 10,
         marginVertical: 5,
         backgroundColor: colors.white,
         borderBottomWidth: 1,
         borderColor: colors.lightBlue,
         borderRadius: 7,
+        justifyContent: "center"
     },
     inputFieldIcon: {
-        height: 45, 
-        width: 45,
+        height: 40, 
+        width: 40,
         position: "absolute", 
         right: 0,
         borderBottomRightRadius: 7,
         borderTopRightRadius: 7,
         backgroundColor: colors.darkBlue, 
         tintColor: colors.white,
+    },
+    showPwIcon: {
     },
     buttonSmall: {
         height: 45,
@@ -118,6 +126,10 @@ const boxes = {
         backgroundColor: colors.darkBlue,
         borderRadius: 7,
         justifyContent: "center",
+        shadowColor: colors.white,
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 1,
+        shadowRadius: 0,
     },
     buttonLargeTransparent: {
         height: 40,
@@ -185,33 +197,27 @@ const boxes = {
         zIndex: -1
     },
     listTileIcon: {
-        width: 22, 
-        height: 22, 
+        width: 25, 
+        height: 25, 
         tintColor: colors.darkBlue, 
         marginEnd: 5,  
-        marginTop: 0.5  
     },
     commentTile: {
         paddingLeft: 15,
         paddingRight: 35,
         paddingVertical: 10,
         minHeight: 100,
-        width: "100%",
+        // width: width,
         flexDirection: "row",
         alignItems: "flex-start",
         justifyContent: "flex-start",
     },
     commentReplyTile: {
-        paddingLeft: 5,
-        paddingRight: 35,
-        paddingVertical: 10,
-        minHeight: 100,
-        width: width - 45,
-        flexDirection: "row",
-        alignItems: "flex-start",
-        justifyContent: "flex-start",
-        borderLeftWidth: 20,
-        borderLeftColor: colors.lightBlue
+        width: 20, 
+        height: 60, 
+        marginRight: 5, 
+        marginLeft: -5, 
+        tintColor: colors.lightBlue
     },
     commentTileImage: {
         height: 60,
@@ -220,13 +226,19 @@ const boxes = {
         justifyContent: "flex-start"
     },
     commentTileHeader: {
-        width: "100%",
+        // width: "100%",
         flexDirection: "row", 
         justifyContent: "space-between", 
         alignItems: "baseline",
+        marginBottom: 2,
     },
     commentTileContent: {
         width: width - 90, 
+        justifyContent: "center", 
+        paddingStart: 15,
+    },
+    commentReplyTileContent: {
+        width: width - 110, 
         justifyContent: "center", 
         paddingStart: 15,
     },
@@ -252,7 +264,7 @@ const boxes = {
         justifyContent: "center",
     },
     swipeIcon: {
-        width: "65%",
+        width: 40,
         tintColor: colors.white
     },
     swipeRowOne: {
@@ -286,12 +298,22 @@ const boxes = {
         width: width,
         paddingVertical: 10,
     },
+    imageLoading: {
+        position: "absolute",
+        top: 0,
+        height: "100%",
+        aspectRatio: 1,
+        backgroundColor: "rgba(255, 255, 255, 0.8)",
+        borderRadius: 111,
+        justifyContent: "center",
+        alignItems: "center"
+    },
     profileImage: {
         height: "100%",
         marginRight: 7,
         aspectRatio: 1,
         backgroundColor: colors.lightBlue,
-        borderRadius: 111
+        borderRadius: 111,
     },
     profileViewImage: {
         width: width,
@@ -327,6 +349,7 @@ const boxes = {
         height: 25,
         width: 25,
         marginRight: 10,
+        tintColor: colors.darkBlue
     },
     separator: {
         paddingHorizontal: 15,
@@ -335,6 +358,16 @@ const boxes = {
         borderColor: colors.darkBlue,
         backgroundColor: colors.white
     },
+    ideaFooter: {
+        width: "100%",
+        justifyContent: "center",
+        flexDirection: "row",
+        paddingTop: 10,
+        paddingBottom: 15,
+        borderTopWidth: 1,
+        borderColor: colors.darkGrey,
+        opacity: 0.5
+    }
 
 
 }
@@ -356,6 +389,12 @@ const texts = {
         fontFamily: 'Inter_600SemiBold',
         color: colors.darkGrey,
         fontSize: 16,
+    },
+    subHeaderLarge: {
+        fontFamily: 'Inter_600SemiBold',
+        color: colors.darkBlue,
+        fontSize: 18,
+        paddingBottom: 3
     },
     buttonSmall: {
         fontFamily: 'Inter_500Medium',
@@ -382,16 +421,23 @@ const texts = {
         marginBottom: 5,
     },
     commentTileHeader: {
-        fontSize: 18,
+        fontSize: 16,
         color: colors.darkBlue,
         fontFamily: 'Inter_600SemiBold',
-        marginBottom: 5,
+        // marginBottom: 5,
     },
     copy: {
         fontSize: 16,
         lineHeight: 20,
         fontFamily: 'Inter_400Regular',
         color: colors.darkGrey,
+    },
+    link: {
+        fontSize: 16,
+        lineHeight: 20,
+        fontFamily: 'Inter_400Regular',
+        color: colors.darkBlue,
+        textDecorationLine: 'underline'
     },
     sectionListCopy: {
         fontSize: 16,
@@ -404,7 +450,14 @@ const texts = {
         fontSize: 16,
         fontFamily: 'Inter_400Regular',
         color: colors.darkGrey,
-        opacity: 0.5
+        opacity: 0.5,
+        position: "absolute",
+        right: 0,
+    },
+    ideaFooter: {
+        fontSize: 16,
+        fontFamily: 'Inter_400Regular',
+        color: colors.darkGrey,
     },
     numberInput: {
         fontSize: 18,
@@ -419,6 +472,12 @@ const texts = {
     inputField: {
         fontFamily: 'Inter_400Regular',
         fontSize: 16,
+    },
+    errorLine: {
+        fontSize: 14,
+        fontFamily: 'Inter_400Regular',
+        color: colors.red,
+        marginBottom: 10
     }
 }
 

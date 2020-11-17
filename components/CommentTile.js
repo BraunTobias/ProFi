@@ -10,26 +10,24 @@ export default CommentTile = props => {
 
     const userId = props.userId;
     const date = props.timestamp.toDate().toLocaleDateString('de-DE');
-    const [currentUserName, setCurrentUserName] = useState("");
-    const [currentUserImage, setCurrentUserImage] = useState("");
 
     const colorStyle = {
         backgroundColor: props.index % 2 === 0 ? colors.white : colors.lightGrey
     }
     
-    useEffect(() => {
-        DB.getUserInfoById(userId, (name, imageUrl) => {
-            setCurrentUserName(name);
-            if (imageUrl) setCurrentUserImage(imageUrl);
-        });
-    }, []);
-
     return (
-    <View style={[props.isReply ? [boxes.commentReplyTile] : boxes.commentTile, colorStyle]}>
+    <View style={[boxes.commentTile, colorStyle]}>
+        {props.isReply == true && 
+            <Image
+                style={boxes.commentReplyTile}
+                source={icons.replyComment}
+                resizeMode={"contain"}
+            />
+        }
         <View style={boxes.commentTileImage}>
             <ProfileImage
-                userId={userId}
-                imageUrl={currentUserImage}
+                userId={userId} 
+                imageUrl={props.userUrl}
                 onPress={props.onPress}
             />
             <View style={boxes.likesRow}>
@@ -42,16 +40,16 @@ export default CommentTile = props => {
                 <Text style={texts.copy}>{props.likes}</Text>
             </View>
         </View>
-        <View style={boxes.commentTileContent}>
+        <View style={props.isReply ? boxes.commentReplyTileContent : boxes.commentTileContent}>
             <View style={boxes.commentTileHeader}>            
-                <Text style = {texts.commentTileHeader}>{currentUserName}</Text>
+                <Text style = {texts.commentTileHeader}>{props.userName}</Text>
                 <Text style = {texts.commentTileTime}>{date}</Text>
             </View>
             <Autolink 
+                linkStyle={texts.link}
                 style = {texts.copy}
                 text={props.comment}
             />
-            {/* <Text style = {texts.copy}>{props.comment}</Text> */}
         </View>
     </View>
     );
