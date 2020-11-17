@@ -401,14 +401,23 @@ function addEmptyIdeas(unsorted) {
             } 
             //Wenn keine freien Plätze, auf die mit dem meisten Missing skills aufteilen
             missingSkillsList.sort((a,b) => b[1] - a[1]);   
+            console.log(missingSkillsList);
             let i =0;
 
             lastMembers.forEach(member => {
-                if(!members[member].sorted && ideas[missingSkillsList[i][0]].nogos.indexOf(member) < 0){
-                    ideas[missingSkillsList[i][0]].members.push(member); 
-                    members[member].sorted = true;
-                    i+=1;
-                }    
+                //Wenn Nogo dann nächste Idee 
+                if(ideas[missingSkillsList[i][0]].nogos.indexOf(member) >= 0){
+                    if(i == missingSkillsList.length -1){
+                        i = 0;
+                    }
+                    else{
+                        i+=1; 
+                    } 
+                } 
+                ideas[missingSkillsList[i][0]].members.push(member); 
+                console.log(member + " zu " + missingSkillsList[i][0]);
+                members[member].sorted = true;
+                i+=1; 
             });
         } 
     } 
@@ -696,7 +705,6 @@ const printList = () => {
         }
     }
     console.log("");
-    console.log(ideas);
 }
 
 const proFiFunction = () => {
