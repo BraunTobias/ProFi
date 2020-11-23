@@ -121,7 +121,7 @@ const setIdeaSkills = () => {
 
         ideas[ideaName].skills = ideaSkills;
         ideas[ideaName].missingSkills = ideaSkills;
-        ideas[ideaName].members = [];
+        ideas[ideaName].team= [];
         ideas[ideaName].favs = [];
         ideas[ideaName].nogos = [];
     }    

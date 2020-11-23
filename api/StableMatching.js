@@ -7,7 +7,8 @@ const minMembers = 3;
 const maxMembers = 3;
 
  var members ={"Anton":{"skills":["skill1","skill10","skill3","skill5","skill8"],"sorted":false,"interests":["interest2","interest4","interest6","interest7","interest9"]},"Berta":{"skills":["skill0","skill10","skill6","skill9"],"sorted":false,"interests":["interest0","interest4","interest6","interest9"]},"Charlotte":{"skills":["skill2","skill8"],"sorted":false,"interests":["interest1","interest4","interest9"]},"Dora":{"skills":["skill10","skill8"],"sorted":false,"interests":["interest3","interest5","interest6","interest7","interest8"]},"Emil":{"skills":["skill1","skill3","skill5","skill6"],"sorted":false,"interests":["interest0","interest1","interest2","interest4","interest7"]},"Friedrich":{"skills":["skill1","skill10","skill11","skill5","skill8"],"sorted":false,"interests":["interest0","interest6","interest8","interest9"]},"Gustav":{"skills":["skill1","skill2","skill4","skill8"],"sorted":false,"interests":["interest0","interest3","interest6","interest7","interest8"]},"Heinrich":{"skills":["skill11","skill3","skill5"],"sorted":false,"interests":["interest4","interest5","interest8"]},"Ida":{"skills":["skill10","skill3","skill4","skill6","skill8"],"sorted":false,"interests":["interest2","interest5","interest6","interest7"]},"Julia":{"skills":["skill10","skill9"],"sorted":false,"interests":["interest0","interest6","interest8"]},"Konrad":{"skills":["skill4","skill5","skill6","skill9"],"sorted":false,"interests":["interest0","interest1","interest5","interest7","interest9"]},"Ludwig":{"skills":["skill0","skill1","skill5","skill8","skill9"],"sorted":false,"interests":["interest3","interest4","interest8","interest9"]},"Martha":{"skills":["skill1","skill3"],"sorted":false,"interests":["interest1","interest2","interest3","interest5","interest9"]},"Nina":{"skills":["skill3","skill7"],"sorted":false,"interests":["interest1","interest3","interest4","interest5","interest7"]},"Otto":{"skills":["skill10","skill3","skill9"],"sorted":false,"interests":["interest0","interest1","interest4","interest6","interest9"]},"Paula":{"skills":["skill0","skill10","skill3","skill5"],"sorted":false,"interests":["interest3","interest6","interest9"]},"Quentin":{"skills":["skill0","skill10","skill11","skill8","skill9"],"sorted":false,"interests":["interest1","interest5","interest9"]},"Richard":{"skills":["skill0","skill1","skill2"],"sorted":false,"interests":["interest0","interest4","interest9"]},"Sophie":{"skills":["skill1","skill10","skill6","skill7"],"sorted":false,"interests":["interest0","interest2","interest4","interest7","interest9"]},"Theo":{"skills":["skill0","skill11","skill6","skill8"],"sorted":false,"interests":["interest1","interest7","interest9"]},"Ulrike":{"skills":["skill3","skill9"],"sorted":false,"interests":["interest1","interest3","interest6","interest8"]},"Vincent":{"skills":["skill0","skill3","skill6"],"sorted":false,"interests":["interest0","interest4","interest5","interest6"]},"Wilhelm":{"skills":["skill1","skill3","skill4"],"sorted":false,"interests":["interest0","interest3","interest4","interest5"]},"Xenia":{"skills":["skill0","skill2","skill3"],"sorted":false,"interests":["interest3","interest4","interest8"]},"Yvonne":{"skills":["skill1","skill10"],"sorted":false,"interests":["interest0","interest3","interest5","interest6","interest7"]},"Zoe":{"skills":["skill0","skill10","skill3","skill7","skill9"],"sorted":false,"interests":["interest0","interest7","interest8","interest9"]}};
- var ideas ={"ideaA":{"skills":["skill0","skill11","skill2","skill3","skill5","skill6","skill8","skill9"],"missingSkills":["skill0","skill11","skill2","skill3","skill5","skill6","skill8","skill9"],"members":[],"favs":["Anton","Nina","Vincent"],"nogos":["Gustav"],"commonInterests":[]},"ideaB":{"skills":["skill0","skill3","skill4","skill5","skill6","skill7"],"missingSkills":["skill0","skill3","skill4","skill5","skill6","skill7"],"members":[],"favs":["Heinrich","Ida","Yvonne"],"nogos":["Friedrich","Ulrike","Zoe"],"commonInterests":[]},"ideaC":{"skills":["skill0","skill1","skill10","skill11","skill4","skill6","skill7"],"missingSkills":["skill0","skill1","skill10","skill11","skill4","skill6","skill7"],"members":[],"favs":["Charlotte","Emil","Konrad","Otto","Sophie"],"nogos":["Quentin","Wilhelm"],"commonInterests":[]},"ideaD":{"skills":["skill0","skill1","skill10","skill2","skill3","skill4","skill5","skill9"],"missingSkills":["skill0","skill1","skill10","skill2","skill3","skill4","skill5","skill9"],"members":[],"favs":["Berta","Ludwig","Zoe"],"nogos":["Martha"],"commonInterests":[]},"ideaE":{"skills":["skill1","skill10","skill3","skill7","skill9"],"missingSkills":["skill1","skill10","skill3","skill7","skill9"],"members":[],"favs":["Friedrich","Julia","Theo","Ulrike","Wilhelm"],"nogos":["Dora","Richard","Sophie","Xenia"],"commonInterests":[]},"ideaF":{"skills":["skill0","skill1","skill10","skill11","skill2","skill4","skill7"],"missingSkills":["skill0","skill1","skill10","skill11","skill2","skill4","skill7"],"members":[],"favs":["Dora","Martha"],"nogos":["Charlotte","Emil","Ida","Julia","Ludwig","Nina","Otto","Paula"],"commonInterests":[]},"ideaG":{"skills":["skill0","skill10","skill11","skill3","skill6","skill7","skill8"],"missingSkills":["skill0","skill10","skill11","skill3","skill6","skill7","skill8"],"members":[],"favs":["Gustav","Richard","Xenia"],"nogos":["Berta","Heinrich","Konrad","Theo","Vincent"],"commonInterests":[]}};
+ var ideas ={"ideaA":{"skills":["skill0","skill11","skill2","skill3","skill5","skill6","skill8","skill9"],"missingSkills":["skill0","skill11","skill2","skill3","skill5","skill6","skill8","skill9"],"team":[],"favs":["Anton","Nina","Vincent"],"nogos":["Gustav"],"commonInterests":[]},"ideaB":{"skills":["skill0","skill3","skill4","skill5","skill6","skill7"],"missingSkills":["skill0","skill3","skill4","skill5","skill6","skill7"],"team":[],"favs":["Heinrich","Ida","Yvonne"],"nogos":["Friedrich","Ulrike","Zoe"],"commonInterests":[]},"ideaC":{"skills":["skill0","skill1","skill10","skill11","skill4","skill6","skill7"],"missingSkills":["skill0","skill1","skill10","skill11","skill4","skill6","skill7"],"team":[],"favs":["Charlotte","Emil","Konrad","Otto","Sophie"],"nogos":["Quentin","Wilhelm"],"commonInterests":[]},"ideaD":{"skills":["skill0","skill1","skill10","skill2","skill3","skill4","skill5","skill9"],"missingSkills":["skill0","skill1","skill10","skill2","skill3","skill4","skill5","skill9"],"team":[],"favs":["Berta","Ludwig","Zoe"],"nogos":["Martha"],"commonInterests":[]},"ideaE":{"skills":["skill1","skill10","skill3","skill7","skill9"],"missingSkills":["skill1","skill10","skill3","skill7","skill9"],"team":[],"favs":["Friedrich","Julia","Theo","Ulrike","Wilhelm"],"nogos":["Dora","Richard","Sophie","Xenia"],"commonInterests":[]},"ideaF":{"skills":["skill0","skill1","skill10","skill11","skill2","skill4","skill7"],"missingSkills":["skill0","skill1","skill10","skill11","skill2","skill4","skill7"],"team":[],"favs":["Dora","Martha"],"nogos":["Charlotte","Emil","Ida","Julia","Ludwig","Nina","Otto","Paula"],"commonInterests":[]},"ideaG":{"skills":["skill0","skill10","skill11","skill3","skill6","skill7","skill8"],"missingSkills":["skill0","skill10","skill11","skill3","skill6","skill7","skill8"],"team":[],"favs":["Gustav","Richard","Xenia"],"nogos":["Berta","Heinrich","Konrad","Theo","Vincent"],"commonInterests":[]}};
+ var emptyIdeas=[];
  // ___________________________________________________________________________________________________________________________________________________
 
 var skillValues = {};
@@ -146,7 +147,7 @@ const createSingleIdeaScoreList = (ideaId) => {
     // Score-Liste erstellen
     var ideaScoreList = [];
     // Alle Mitglieder die schon in der Idee sind durchgehen
-    ideas[ideaId].members.forEach(memId => {
+    ideas[ideaId].team.forEach(memId => {
 
         var score = 0;
 
@@ -155,7 +156,7 @@ const createSingleIdeaScoreList = (ideaId) => {
 
             // zählen wie oft der Skill schon in der Idee vorkommt
             var skillCoverage = 0;
-            ideas[ideaId].members.forEach(memId2 => {
+            ideas[ideaId].team.forEach(memId2 => {
                 if (members[memId2].skills.indexOf(skill) >= 0) {
                     skillCoverage += 1;
                 }
@@ -176,8 +177,8 @@ const createSingleIdeaScoreList = (ideaId) => {
     // console.log(ideaScoreList);
 
     var lowestUserId = ideaScoreList[ideaScoreList.length - 1][0];
-    var newArray = ideas[ideaId].members.filter(id => id != lowestUserId);
-    ideas[ideaId].members = newArray;
+    var newArray = ideas[ideaId].team.filter(id => id != lowestUserId);
+    ideas[ideaId].team = newArray;
 
     // Rausgeworfener User wird zurückgegeben
     return (lowestUserId);
@@ -207,9 +208,9 @@ const stableMatching = () => {
     
                     console.log(memId + " zu " + prefIdeaId + " hinzufügen …");
                     // User-ID vorübergehend zur Idee hinzufügen
-                    ideas[prefIdeaId].members.push(memId);
+                    ideas[prefIdeaId].team.push(memId);
     
-                    if (ideas[prefIdeaId].members.length <= minMembers) {
+                    if (ideas[prefIdeaId].team.length <= minMembers) {
                         // Wenn die Idee noch nicht überfüllt ist, den User als sortiert markieren 
                         members[memId].sorted  = true;
                         sortedMembers +=1;
@@ -245,7 +246,7 @@ const updateMissingSkills = () => {
         // Alle fehlenden Skills der Idee durchgehen
         for (const missingSkill of missingSkillsList) {
 
-            for (const memberId of ideas[ideaId].members) {
+            for (const memberId of ideas[ideaId].team) {
                 // Wenn der Skill schon bei einem Mitglied vorhanden ist, diesen aus missingSkills entfernen
                 if (members[memberId].skills.indexOf(missingSkill) >= 0) {
                     // console.log(missingSkill + "fehlt nicht mehr");
@@ -266,7 +267,7 @@ const updateCommonInterests = () => {
         var commonInterestsList = ideas[ideaId].commonInterests;
 
         //Jeden Zugeorneten Teilnehmer durchgehen
-        for (const memberId of ideas[ideaId].members) {
+        for (const memberId of ideas[ideaId].team) {
 
             //Wurde der Teilnehmer schon gezählt?
             if(!members[memberId].interestsCounted){
@@ -312,7 +313,7 @@ function addEmptyIdeas(unsorted) {
         missingSkills: [],
         favs: [],
         nogos: [],
-        members: [],
+        team: [],
         commonInterests: []
         }
         var scoreList = [];
@@ -321,8 +322,8 @@ function addEmptyIdeas(unsorted) {
         unsorted.forEach(memId => {
 
             //erster Teilnehmer in Idee speichern
-            if(ideas[newIdea].members.length == 0){
-                ideas[newIdea].members.push(memId);
+            if(ideas[newIdea].team.length == 0){
+                ideas[newIdea].team.push(memId);
                 //Erste skills speichern
                 members[memId].skills.forEach(skill => {
                     ideas[newIdea].skills.push(skill);    
@@ -334,7 +335,7 @@ function addEmptyIdeas(unsorted) {
                 sorted.push(memId);
                 members[memId].sorted = true;
             }
-            else if(ideas[newIdea].members.length < maxMembers){
+            else if(ideas[newIdea].team.length < maxMembers){
                 var score = 0;
 
                 //Score erhöhen wenn User ein gemeinsames Interesse hat 
@@ -358,8 +359,8 @@ function addEmptyIdeas(unsorted) {
 
         scoreList.forEach(member => {
 
-            if(ideas[newIdea].members.length < emptyIdeaMemberCount){
-                ideas[newIdea].members.push(member[0]);
+            if(ideas[newIdea].team.length < emptyIdeaMemberCount){
+                ideas[newIdea].team.push(member[0]);
                 members[member[0]].skills.forEach(skill => {
                     if(ideas[newIdea].skills.indexOf(skill) < 0) ideas[newIdea].skills.push(skill);    
                 });
@@ -374,10 +375,10 @@ function addEmptyIdeas(unsorted) {
     }
     //Letzte Idee Anzahl der Member prüfen, sonst auflösen
     
-    if(ideas[newIdea].members.length < minMembers){
+    if(ideas[newIdea].team.length < minMembers){
 
-        let missingForMinMembers=  1-(ideas[newIdea].members.length / minMembers);
-        var lastMembers = ideas[newIdea].members;
+        let missingForMinMembers=  1-(ideas[newIdea].team.length / minMembers);
+        var lastMembers = ideas[newIdea].team;
 
         // bei über 20% fehlenden Leuten zur MindestAnzahl = auflösen
         //Sonst beibehalten
@@ -392,13 +393,13 @@ function addEmptyIdeas(unsorted) {
 
                 lastMembers.forEach(member => {
 
-                    if(ideas[ideaId].members.length < maxMembers && !members[member].sorted){
-                        ideas[ideaId].members.push(member); 
+                    if(ideas[ideaId].team.length < maxMembers && !members[member].sorted){
+                        ideas[ideaId].team.push(member); 
                         members[member].sorted = true;
                     } 
                 });
 
-                missingSkillsList.push([ideaId, ideas[ideaId]. missingSkills.length]);
+                missingSkillsList.push([ideaId, ideas[ideaId].missingSkills.length]);
             } 
             //Wenn keine freien Plätze, auf die mit dem meisten Missing skills aufteilen
             missingSkillsList.sort((a,b) => b[1] - a[1]);   
@@ -415,7 +416,7 @@ function addEmptyIdeas(unsorted) {
                         i+=1; 
                     } 
                 } 
-                ideas[missingSkillsList[i][0]].members.push(member); 
+                ideas[missingSkillsList[i][0]].team.push(member); 
                 console.log(member + " zu " + missingSkillsList[i][0]);
                 members[member].sorted = true;
                 i+=1; 
@@ -490,7 +491,7 @@ const bestRemainingMatch = () => {
         
         // User mit höchster Übereinstimmung der entsprechenden Idee zuordnen, wenn diese noch nicht voll ist
         var topIdea = missingScoreList[0][1];
-        while (ideas[topIdea].members.length >= maxMembers) {
+        while (ideas[topIdea].team.length >= maxMembers) {
             missingScoreList.shift();
             console.log("! " + topIdea + " ist schon voll, wird daher ignoriert");
             if(missingScoreList.length == 0) break;
@@ -498,7 +499,7 @@ const bestRemainingMatch = () => {
         }
         if(missingScoreList.length == 0) break;
         var topMember = missingScoreList[0][0];
-        ideas[topIdea].members.push(topMember);
+        ideas[topIdea].team.push(topMember);
         members[topMember].sorted = true;
         console.log("-> " + topMember + " zu " + topIdea + " hinzugefügt\n");
         // Nach jedem zugeordneten User muss alles neu kalkuliert werden, damit nicht mehrere User aufgrund des selben Skills zugeordnet werden, der dann gar nicht mehr fehlt
@@ -537,7 +538,7 @@ const bestRemainingMatchFinal = () => {
       
                         }
                     }
-                    missingScoreList.push([memId, ideaId, score, ideas[ideaId].members.length]);
+                    missingScoreList.push([memId, ideaId, score, ideas[ideaId].team.length]);
                 }
             }
         }
@@ -559,8 +560,8 @@ const bestRemainingMatchFinal = () => {
     for (var i = 0; i < missingScoreList.length; i++) {
         const topIdea = missingScoreList[i][1];
         const topMember = missingScoreList[i][0];
-        if (ideas[topIdea].members.length < maxMembers && !members[topMember].sorted) {
-            ideas[topIdea].members.push(topMember);
+        if (ideas[topIdea].team.length < maxMembers && !members[topMember].sorted) {
+            ideas[topIdea].team.push(topMember);
             members[topMember].sorted = true;
             console.log(topMember + " wird " + topIdea + " zugeordnet mit Score " + missingScoreList[i][2]);
         } 
@@ -595,7 +596,7 @@ const bestRemainingMatchFinal = () => {
                 const topIdea = missingScoreList[i][1];
                 const topMember = missingScoreList[i][0];
                 if (!members[topMember].sorted) {
-                    ideas[topIdea].members.push(topMember);
+                    ideas[topIdea].team.push(topMember);
                     members[topMember].sorted = true;
                     console.log(topMember + " wird " + topIdea + " zugeordnet mit Score " + missingScoreList[i][2]);
                 } 
@@ -612,7 +613,7 @@ function resolve(ideaToResolve){
     var freeSpaces = 0;
     for (const ideaId in ideas) {
         if (ideaId != ideaToResolve) {
-            freeSpaces += ((maxMembers+1)- ideas[ideaId].members.length);
+            freeSpaces += ((maxMembers+1)- ideas[ideaId].team.length);
         }
     }
     var freeUsers = 0;
@@ -620,12 +621,12 @@ function resolve(ideaToResolve){
     for (const memId in members) {
         if (!members[memId].sorted) freeUsers ++;
     }
-    freeUsers += ideas[ideaToResolve].members.length;
+    freeUsers += ideas[ideaToResolve].team.length;
 
     if (freeUsers <= freeSpaces) {
         console.log("… und kann aufgelöst werden\n");
         // In diesem Fall kann die Gruppe aufgelöst werden
-        for (const memId of ideas[ideaToResolve].members) {
+        for (const memId of ideas[ideaToResolve].team) {
             members[memId].sorted = false;
         }
         delete ideas[ideaToResolve];
@@ -637,8 +638,8 @@ function resolvePartiallyFilledIdeas() {
 
     var partialIdeas = [];
     for (const ideasId in ideas) {
-        if (ideas[ideasId].members.length < minMembers) {
-            partialIdeas.push([ideasId, ideas[ideasId].missingSkills.length,ideas[ideasId].members.length]);
+        if (ideas[ideasId].team.length < minMembers) {
+            partialIdeas.push([ideasId, ideas[ideasId].missingSkills.length,ideas[ideasId].team.length]);
         }
     }
 
@@ -694,7 +695,7 @@ const printList = () => {
         outputIdeaId = "" + ideaId;
         while (outputIdeaId.length < 8) outputIdeaId = outputIdeaId + " ";
         consoleLog += outputIdeaId + ": ";
-        for(const member in ideas[ideaId].members) consoleLog = consoleLog + ideas[ideaId].members[member] + " | "
+        for(const member in ideas[ideaId].team) consoleLog = consoleLog + ideas[ideaId].team[member] + " | "
         consoleLog += "\n";
     }
     console.log(consoleLog); 
