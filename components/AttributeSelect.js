@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
-import {FlatList, View, Text} from "react-native";
+import React, { useState, useEffect, useLayoutEffect, Fragment } from 'react';
+import {FlatList, View, Text, SafeAreaView} from "react-native";
 
 import { boxes, colors, styles, texts } from '../Styles';
 import AttributeTile from '../components/AttributeTile';
@@ -34,46 +34,47 @@ export default AttributeScreen = (props) => {
     }
 
     return(
-        <View style={{flex: 1}}>
-            <View style={boxes.subHeader}>
-                <Padding
-                    height={50}
-                />
-                <View style={boxes.paddedRow}>
-                    <Text style={texts.separatorText}>Fähigkeiten auswählen</Text>
+        <Fragment>
+            <SafeAreaView style={{ flex: 0, backgroundColor: colors.lightBlue }} />
+            <SafeAreaView style={{flex: 1, backgroundColor: colors.lightGrey}}>
+                <View style={boxes.subHeader}>
+                    <Padding height={10}/>
+                    <View style={boxes.paddedRow}>
+                        <Text style={texts.separatorText}>Fähigkeiten auswählen</Text>
+                    </View>
+                    <ScrollRow
+                        type="attributes"
+                        data= {categoriesList}
+                        currentCategory={currentCategory}
+                        onPress={selectCategoryHandler}
+                    />
                 </View>
-                <ScrollRow
-                    type="attributes"
-                    data= {categoriesList}
-                    currentCategory={currentCategory}
-                    onPress={selectCategoryHandler}
+                <View style={boxes.separator}>
+                    <Text style={texts.separatorText}>{currentCategory}</Text>
+                </View>
+                <FlatList 
+                    style= {{backgroundColor: colors.white, flexGrow: 1}}
+                    data={displayedSkills}
+                    keyExtractor={(item, index) => item }
+                    renderItem={(itemData) => { 
+                        return (
+                            <AttributeTile
+                                text={itemData.item}  
+                                state={props.selectedAttributesList.indexOf(itemData.item) >= 0}
+                                index = {itemData.index}
+                                backgroundColor = {itemData.index % 2 === 0 ? "#ffffff" : "#f5f7f7"}
+                                onPress={() => {props.addAttribute(itemData.item)}}
+                            />
+                        );
+                    }}
                 />
-            </View>
-            <View style={boxes.separator}>
-                <Text style={texts.separatorText}>{currentCategory}</Text>
-            </View>
-            <FlatList 
-                style= {{backgroundColor: colors.white, flexGrow: 1}}
-                data={displayedSkills}
-                keyExtractor={(item, index) => item }
-                renderItem={(itemData) => { 
-                    return (
-                        <AttributeTile
-                            text={itemData.item}  
-                            state={props.selectedAttributesList.indexOf(itemData.item) >= 0}
-                            index = {itemData.index}
-                            backgroundColor = {itemData.index % 2 === 0 ? "#ffffff" : "#f5f7f7"}
-                            onPress={() => {props.addAttribute(itemData.item)}}
-                        />
-                    );
-                }}
-            />
-            <View style={boxes.modalButton}>
-                <ButtonLarge
-                    title={"Bestätigen"}
-                    onPress={props.onDismiss}
-                />
-            </View>
-        </View>
+                <View style={boxes.modalButton}>
+                    <ButtonLarge
+                        title={"Bestätigen"}
+                        onPress={props.onDismiss}
+                    />
+                </View>
+            </SafeAreaView>
+        </Fragment>
     )
 }

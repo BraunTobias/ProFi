@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { View, Text, Modal, Keyboard, Alert } from 'react-native';
+import { View, Text, Modal, Keyboard, Alert, Animated, Switch } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { compareAsc, format } from 'date-fns';
@@ -13,14 +13,17 @@ import ButtonSmall from '../components/ButtonSmall';
 import SwipeButton from '../components/SwipeButton';
 import ListTile from "../components/ListTile";
 import ModalContent from "../components/ModalContent";
+import Padding from '../components/Padding';
 
 export default HomeScreen = ({navigation}) => {
 
     const currentUserId = DB.getCurrentUserId();
+    const defaultTime = new Date();
+    defaultTime.setHours(12);
+    defaultTime.setMinutes(0);
 
     // State Hooks
     const [currentCourses, setCurrentCourses] = useState([]);
-    const [joinedCourses, setJoinedCourses] = useState([]);
     const [swipeListView, setSwipeListView] = useState();
 
     // State Hooks für Modals
@@ -28,9 +31,10 @@ export default HomeScreen = ({navigation}) => {
     const [currentFindCourseId, setCurrentFindCourseId] = useState("");
     const [newCourseVisible, setNewCourseVisible] = useState(false);
     const [newCourseDateVisible, setNewCourseDateVisible] = useState(false);
+    const [newCourseTimeVisible, setNewCourseTimeVisible] = useState(false);
     const [currentNewCourseName, setCurrentNewCourseName] = useState("");
     const [currentNewCourseId, setCurrentNewCourseId] = useState("");
-    const [currentNewCourseDate, setCurrentNewCourseDate] = useState(new Date());
+    const [currentNewCourseDate, setCurrentNewCourseDate] = useState(defaultTime);
     const [newCourseNameErrorVisible, setNewCourseNameErrorVisible] = useState(false);
     const [newCourseIdErrorVisible, setNewCourseIdErrorVisible] = useState(false);
     const [newCourseDateErrorVisible, setNewCourseDateErrorVisible] = useState(false);
@@ -38,6 +42,18 @@ export default HomeScreen = ({navigation}) => {
     const [currentNewCourseMaxMembers, setCurrentNewCourseMaxMembers] = useState(2);
     const [deleteInfoVisible, setDeleteInfoVisible] = useState(false);
     const [deleteInfoReceived, setDeleteInfoReceived] = useState(false);
+
+    // Icon-Animation
+    const rowSwipeAnimatedValues = {};
+    Array(100)
+    .fill('')
+    .forEach((_, i) => {
+        rowSwipeAnimatedValues[`${i}`] = new Animated.Value(0);
+    });
+    const onSwipeValueChange = (swipeData) => {
+        const { key, value } = swipeData;
+        rowSwipeAnimatedValues[key].setValue(Math.abs(value));
+    };
 
     // Für Info-Modal
     const storeInfoReceived = async (info) => {
@@ -55,15 +71,6 @@ export default HomeScreen = ({navigation}) => {
     const loadData = () => {
         DB.getCourseList((courseList) => {
             setCurrentCourses(courseList);
-            var joined = [];
-            for (const section of courseList) {
-                for (const course of section.data) {
-                    if (course.members.indexOf(currentUserId) >= 0) {
-                        joined.push(course.id);
-                    }
-                }
-            }
-            setJoinedCourses(joined);
             getInfoReceived();
         });
     }
@@ -83,20 +90,7 @@ export default HomeScreen = ({navigation}) => {
         if (committed && currentFindCourseId != "") {
             DB.addCourseToList(currentFindCourseId, (addedCourse) => {
                 setCurrentFindCourseId("");
-                var newCourses = currentCourses;
-                var found = false;
-                for (const section in newCourses) {
-                    if (newCourses[section].key == addedCourse.semester) {
-                        newCourses[section].data.push(addedCourse);
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    const newSection = {"key": addedCourse.semester, "data": [addedCourse]}
-                    newCourses.splice(0, 0, newSection);
-                }
-                setCurrentCourses(newCourses);
+                loadData();
                 setFindCourseVisible(false);
             }, (error) => {
                 Alert.alert(
@@ -130,9 +124,12 @@ export default HomeScreen = ({navigation}) => {
             }    
             if (currentNewCourseName == "") setNewCourseNameErrorVisible(true);
             if (currentNewCourseId == "") setNewCourseIdErrorVisible(true);
-            if (currentNewCourseDate - (new Date()) < 0) setNewCourseDateErrorVisible(true);
-        } else {
+            if (currentNewCourseDate - (new Date()) < 0) setNewCourseDateErrorVisible(true);
+        }  else {
             setNewCourseVisible(false);
+            setNewCourseNameErrorVisible(false);
+            setNewCourseIdErrorVisible(false);
+            setNewCourseDateErrorVisible(false);
         }
     }
     const changeNewCourseNameHandler = (enteredText) => {
@@ -154,32 +151,28 @@ export default HomeScreen = ({navigation}) => {
     const changeNewCourseDateHandler = (date) => {
         setCurrentNewCourseDate(date);
         setNewCourseDateVisible(false);
-        console.log(date - (new Date()) > 0)
+        setNewCourseTimeVisible(false);
         if (date - (new Date()) < 0) setNewCourseDateErrorVisible(true);
         else  setNewCourseDateErrorVisible(false);
     }
-
-    const deleteCourseHandler = (id) => {
+    const deleteCourseHandler = (id, date) => {
         if (!deleteInfoReceived) {
             setDeleteInfoVisible(true); 
         } else {
             swipeListView.safeCloseOpenRow();
-            DB.removeCourseFromList(id, () => {
-                // DB.getCourseList((courseList) => {
-                //     setCurrentCourses(courseList);
-                //     var joined = joinedCourses;
-                //     joined = joined.filter((item) => {item != id});
-                //     setJoinedCourses(joined);
-                // });
+            DB.removeCourseFromList(id, "courses", () => {
                 loadData();
             });
         }
     };
 
-    const selectCourseHandler = (id, title, date) => {
+    const selectCourseHandler = (id, title, date, userIsMember) => {
         swipeListView.safeCloseOpenRow();
-        const isMember = joinedCourses.indexOf(id) >= 0
-        navigation.navigate("Course", {itemId: id, itemTitle: title, isMember: isMember, itemDate: date});
+        if (date) {
+            navigation.navigate("Course", {itemId: id, itemTitle: title, isMember: userIsMember, itemDate: date, currentUserId: currentUserId});
+        } else {
+            navigation.navigate("Open course", {itemId: id, itemTitle: title, currentUserId: currentUserId});
+        }
     }
 
     return(
@@ -221,29 +214,22 @@ export default HomeScreen = ({navigation}) => {
                                 <Text style={texts.titleCentered}>{"Kurs erstellen"}</Text>
                                 <InputField
                                     title= "Kursname"
-                                    placeholderText= "Kursname"
+                                    showError={newCourseNameErrorVisible}
+                                    placeholderText= {newCourseNameErrorVisible ? "Bitte einen Namen eingeben." : "z.B. Mobile Systeme"}
                                     value={currentNewCourseName}
                                     onChangeText={changeNewCourseNameHandler}
                                 />
-                                {newCourseNameErrorVisible &&
-                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                                        Bitte einen Namen eingeben.
-                                    </Text>
-                                }
                                 <InputField
-                                    title= "Kurs-ID"
-                                    placeholderText= "KürzelSemesterJahr"
+                                    title= "Kurs-Kürzel"
+                                    showError={newCourseIdErrorVisible}
+                                    placeholderText= {newCourseIdErrorVisible ? "Bitte ein Kürzel eingeben." : "z.B. MOSY"}
                                     value={currentNewCourseId}
                                     onChangeText={changeNewCourseIdHandler}
                                 />
-                                {newCourseIdErrorVisible &&
-                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                                        Bitte eine ID eingeben.
-                                    </Text>
-                                }
                                 <InputField
-                                    title= "End-Datum"
+                                    title= "Team-Einteilung"
                                     isButton= {true}
+                                    showError={newCourseDateErrorVisible}
                                     icon={icons.date}
                                     placeholderText= "Datum auswählen …"
                                     value={format(currentNewCourseDate, "dd.MM.yyyy")}
@@ -256,12 +242,30 @@ export default HomeScreen = ({navigation}) => {
                                 }
                                 <DateTimePickerModal
                                     isVisible={newCourseDateVisible}
+                                    date={currentNewCourseDate}
                                     mode="date"
                                     headerTextIOS="Datum auswählen"
                                     cancelTextIOS="Abbrechen"
                                     confirmTextIOS="OK"
                                     onConfirm={changeNewCourseDateHandler}
                                     onCancel={() => {setNewCourseDateVisible(false)}}
+                                />
+                                <InputField
+                                    isButton={true}
+                                    icon={icons.time}
+                                    placeholderText= "Uhrzeit auswählen …"
+                                    value={format(currentNewCourseDate, "hh:mm")}
+                                    onPress={() => {setNewCourseTimeVisible(true); Keyboard.dismiss()}}
+                                />
+                                <DateTimePickerModal
+                                    isVisible={newCourseTimeVisible}
+                                    date={currentNewCourseDate}
+                                    mode="time"
+                                    headerTextIOS="Uhrzeit auswählen"
+                                    cancelTextIOS="Abbrechen"
+                                    confirmTextIOS="OK"
+                                    onConfirm={changeNewCourseDateHandler}
+                                    onCancel={() => {setNewCourseTimeVisible(false)}}
                                 />
                                 <View style={boxes.unPaddedRow}>
                                     <NumberInput
@@ -287,12 +291,12 @@ export default HomeScreen = ({navigation}) => {
                 <View style={ boxes.paddedRow }>
                     <ButtonSmall
                         title={"Kurs finden"}
-                        icon={"find"}
+                        icon={icons.find}
                         onPress={() => {setFindCourseVisible(true)}}
                     />
                     <ButtonSmall
                         title={"Neuer Kurs"}
-                        icon={"plus"}
+                        icon={icons.plus}
                         onPress={() => {setNewCourseVisible(true)}}
                     />
                 </View>
@@ -303,8 +307,9 @@ export default HomeScreen = ({navigation}) => {
                 ref = {ref => setSwipeListView(ref)}
                 sections={currentCourses}
                 disableLeftSwipe = {true}
-                keyExtractor={(item, index) => index.toString()}
+                keyExtractor={(item, index) => item.listKey}
                 useSectionList
+                onSwipeValueChange={onSwipeValueChange}
                 renderSectionHeader={({ section }) => (
                         <View style={boxes.separator}>
                             <Text style={texts.separatorText}>{section.key}</Text>
@@ -313,24 +318,26 @@ export default HomeScreen = ({navigation}) => {
                 renderItem={({ item, index, section }) => { 
                     return (
                         <ListTile
-                            onPress={() => {selectCourseHandler(item.id, item.title, item.date)}} 
+                            onPress={() => {selectCourseHandler(item.id, item.title, item.date, item.userIsMember)}} 
                             id={item.id}
                             title={item.title}
-                            subtitle={item.members.length + " Mitglieder, Gruppengröße " + item.minMembers + "-" + item.maxMembers + "\n" + item.date}
+                            subtitle={item.date ? item.members.length + " Mitglieder, Gruppengröße " + item.minMembers + "-" + item.maxMembers + "\n" + format(item.date.toDate(), "dd.MM.yyyy") : "Gruppengröße " + item.minMembers + "-" + item.maxMembers + "\n" + "Kein Datum"}
                             index = {index}
-                            isMember = {joinedCourses.indexOf(item.id) >= 0}
+                            isMember = {item.userIsMember}
                         />
                     )
                 }}
-                renderHiddenItem={ (itemData) => {
+                renderHiddenItem={ ({item}) => {
                     return (
-                        <View style={boxes.swipeRowOne}>
+                        <Animated.View style={boxes.swipeRowOne}>
                             <SwipeButton
+                                rowWidth={60}
+                                animation={rowSwipeAnimatedValues[item.listKey]}
                                 backgroundColor={colors.red}
                                 icon={icons.delete}
-                                onPress={(ref) => {deleteCourseHandler(itemData.item.id)}}
+                                onPress={(ref) => {deleteCourseHandler(item.id, item.date)}}
                             />
-                        </View>
+                        </Animated.View>
                     )
                 }}
                 leftOpenValue={60}

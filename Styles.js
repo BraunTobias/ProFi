@@ -28,6 +28,7 @@ const icons = {
     reply: require("./assets/ui-icons/reply.png"),
     edit: require("./assets/ui-icons/edit.png"),
     date: require("./assets/ui-icons/date.png"),
+    time: require("./assets/ui-icons/time.png"),
     info: require("./assets/ui-icons/info.png"),
     passwordShow: require("./assets/ui-icons/passwordShow.png"),
     passwordHide: require("./assets/ui-icons/passwordHide.png"),
@@ -70,22 +71,34 @@ const boxes = {
         paddingHorizontal: 10,
         marginVertical: 5,
         backgroundColor: colors.white,
+        borderWidth: 0,
         borderBottomWidth: 1,
         borderColor: colors.lightBlue,
         borderRadius: 7,
-        justifyContent: "center"
+        justifyContent: "center",
+        overflow: "hidden",
     },
-    inputFieldIcon: {
+    inputFieldError: {
+        borderWidth: 1,
+        borderColor: colors.red,
+        borderBottomColor: colors.red
+    },
+    inputFieldIconBox: {
         height: 40, 
         width: 40,
         position: "absolute", 
         right: 0,
         borderBottomRightRadius: 7,
         borderTopRightRadius: 7,
+        overflow: "hidden",
+        justifyContent: "center",
+        alignItems: "center",
         backgroundColor: colors.darkBlue, 
-        tintColor: colors.white,
     },
-    showPwIcon: {
+    inputFieldIcon: {
+        height: 22, 
+        width: 22, 
+        tintColor: colors.white    
     },
     buttonSmall: {
         height: 45,
@@ -102,7 +115,6 @@ const boxes = {
         shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 1,
         shadowRadius: 0,
-        elevation: 5,
     },
     buttonSmallInactive: {
         height: 45,
@@ -168,14 +180,12 @@ const boxes = {
         alignItems: "flex-start",
         justifyContent: "center",
         backgroundColor: colors.white, 
-        // borderBottomWidth: 1,
-        // borderColor: colors.darkBlue,
+        borderColor: colors.red,
         borderRadius: 7,
         shadowColor: colors.darkBlue,
         shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 0.5,
         shadowRadius: 0,
-        elevation: 5,
     },
     listTile: {
         paddingLeft: 15,
@@ -188,6 +198,9 @@ const boxes = {
     listTileHeader: {
         flexDirection: "row",
         justifyContent: "flex-start",
+        alignItems: "center",
+        marginTop: -2,
+        marginBottom: 2,
     },
     listTileArrow: {
         position: "absolute",
@@ -200,13 +213,20 @@ const boxes = {
         width: 25, 
         height: 25, 
         tintColor: colors.darkBlue, 
-        marginEnd: 5,  
+        marginEnd: 7,  
+    },
+    attributeListTile: {
+        width: "100%",
+        height: 30,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
     },
     commentTile: {
         paddingLeft: 15,
         paddingRight: 35,
         paddingVertical: 10,
-        minHeight: 100,
+        // minHeight: 100,
         // width: width,
         flexDirection: "row",
         alignItems: "flex-start",
@@ -289,14 +309,20 @@ const boxes = {
     modalButton: {
         width: "100%",
         paddingHorizontal: 15,
-        paddingBottom: 25,
-        paddingTop: 10,
+        paddingBottom: 13,
+        paddingTop: 7,
         backgroundColor: colors.lightGrey
     },
     scrollRow: {
         height: 80,
         width: width,
         paddingVertical: 10,
+    },
+    smallProfileRow: {
+        height: 25,
+        marginVertical: 3,
+        marginHorizontal: 5,
+        flexDirection: "row"
     },
     imageLoading: {
         position: "absolute",
@@ -367,6 +393,11 @@ const boxes = {
         borderTopWidth: 1,
         borderColor: colors.darkGrey,
         opacity: 0.5
+    },
+    line: {
+        height: 1,
+        width: "100%",
+        backgroundColor: colors.mediumBlue,
     }
 
 
@@ -377,7 +408,7 @@ const texts = {
         fontFamily: 'Inter_600SemiBold',
         fontSize: 20,
         color: colors.white,
-        textAlign: "center"
+        textAlign: "center",
     },
     titleCentered: {
         fontFamily: 'Inter_400Regular',
@@ -418,7 +449,6 @@ const texts = {
         fontSize: 20,
         color: colors.darkBlue,
         fontFamily: 'Inter_700Bold',
-        marginBottom: 5,
     },
     commentTileHeader: {
         fontSize: 16,
@@ -477,7 +507,7 @@ const texts = {
         fontSize: 14,
         fontFamily: 'Inter_400Regular',
         color: colors.red,
-        marginBottom: 10
+        marginBottom: 5
     }
 }
 

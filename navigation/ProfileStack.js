@@ -1,4 +1,5 @@
 import React from 'react';
+import { View } from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 
 import { icons, colors, boxes, texts } from '../Styles';
@@ -32,7 +33,10 @@ export default HomeNavigator = () => {
                     headerBackTitleVisible: false, 
                     headerLeftContainerStyle: {
                         marginHorizontal: 10
-                    }
+                    },
+                    headerRight: () => (
+                        <View style={{width: 60}}></View>
+                    )   
                 }}
             />
         </HomeStack.Navigator>

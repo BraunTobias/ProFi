@@ -5,14 +5,16 @@ import DB from '../api/DB_API';
 
 export default AttributeListScreen = ({route, navigation}) => {
     const {attributeType} = route.params;
-    const {filter} = route.params;
+    const {filterList} = route.params;
+    const {filterOpenCourse} = route.params;
+    const {filterOpenIdea} = route.params;
     const {title} = route.params;
 
-    const [skillsList, setSkillsList] = useState([]);
+    const [attributesList, setAttributesList] = useState([]);
 
     useEffect(() => {
-        DB.getAllAttributes("skills", filter, (attributesList) => {
-            setSkillsList(attributesList);
+        DB.getAllAttributes(attributeType, filterList, filterOpenCourse, filterOpenIdea, (attributesList) => {
+            setAttributesList(attributesList);
         }, () => {});
     }, []);
 
@@ -25,7 +27,7 @@ export default AttributeListScreen = ({route, navigation}) => {
     return(
         <AttributeList
             attributeType = {attributeType}
-            attList={skillsList}
+            attList = {attributesList}
         />
     );
   

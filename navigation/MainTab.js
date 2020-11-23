@@ -18,6 +18,7 @@ export default MainNavigator = () => {
             <StatusBar barStyle="light-content"/>
 
             <Tab.Navigator 
+                initialRouteName={"Home"}
                 screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused, color, size }) => {
                     let iconName;

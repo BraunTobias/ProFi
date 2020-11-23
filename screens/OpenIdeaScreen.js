@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useLayoutEffect} from 'react';
-import { View, Text, Modal, Keyboard, ActivityIndicator, Animated } from 'react-native';
+import { View, Text, Modal, Keyboard, ActivityIndicator, Animated, Alert } from 'react-native';
 import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view';
 import { compareAsc, format } from 'date-fns';
 
@@ -16,13 +16,15 @@ import ProfileView from '../components/ProfileView';
 import AttributeSelect from '../components/AttributeSelect';
 import Padding from '../components/Padding';
 
-export default IdeaScreen = ({route, navigation}) => {
+export default OpenIdeaScreen = ({route, navigation}) => {
 
     const {itemId} = route.params;
     const {itemTitle} = route.params;
     const {itemDescription} = route.params;
+    const {courseTitle} = route.params;
     const {courseId} = route.params;
     const {currentUserId} = route.params;
+    const {isMember} = route.params;
     const {myTeam} = route.params;
 
     // State Hooks
@@ -34,6 +36,9 @@ export default IdeaScreen = ({route, navigation}) => {
     const [ideaName, setIdeaName] = useState(itemTitle);
     const [ideaCreator, setIdeaCreator] = useState("");
     const [commentsLoading, setCommentsLoading] = useState(true);
+    const [members, setMembers] = useState([]);
+    const [userIsMember, setUserIsMember] = useState(isMember);
+    const [evaluated, setEvaluated] = useState(myTeam);
 
     // State Hooks für Modal
     const [editIdeaVisible, setEditIdeaVisible] = useState(false);
@@ -67,21 +72,12 @@ export default IdeaScreen = ({route, navigation}) => {
         rowSwipeAnimatedValues[key].setValue(Math.abs(value));
         console.log("change");
     };
-    
-    useLayoutEffect(() => {
-        navigation.setOptions({
-            headerTitle: courseId,
-        });
-    }, [navigation]);
 
-    useEffect(() => {
-        DB.getCommentsList(courseId, itemId, "courses", (commentsList) => {
-            setCurrentComments(commentsList);
-            setCommentsLoading(false);
-        });
-        DB.getIdeaData(courseId, itemId, (data) => {
+    const getOpenIdeaData = () => {
+        DB.getOpenIdeaData(courseId, itemId, (data) => {
             setCurrentSkills(data.skills);
             setSelectedSkillsList(data.skills);
+            setMembers(data.members);
             DB.getUserInfoById(data.creator, (userName) => {
                 setIdeaCreator(userName);
             });
@@ -97,24 +93,37 @@ export default IdeaScreen = ({route, navigation}) => {
                             "username": name,
                             "imageUrl": url
                         });
-                        // setTeam(newTeamList);
                     });
                 }
             }
+        });   
+    }
+
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerTitle: courseTitle,
         });
+    }, [navigation]);
+
+    useEffect(() => {
+        DB.getCommentsList(courseId, itemId, "openCourses", (commentsList) => {
+            setCurrentComments(commentsList);
+            setCommentsLoading(false);
+        });
+        getOpenIdeaData();
     }, []);
 
     const likeCommentHandler = (commentId) => {
-        DB.likeComment(courseId, itemId, commentId, "courses", () => {
-            DB.getCommentsList(courseId, itemId, "courses", (commentsList) => {
+        DB.likeComment(courseId, itemId, commentId, "openCourses", () => {
+            DB.getCommentsList(courseId, itemId, "openCourses", (commentsList) => {
                 setCurrentComments(commentsList);
                 swipeListView.safeCloseOpenRow();
             });
         });
     }
     const deleteCommentHandler = (commentId, replyTo) => {
-        DB.deleteComment(courseId, itemId, commentId, "courses", replyTo, () => {
-            DB.getCommentsList(courseId, itemId, "courses", (commentsList) => {
+        DB.deleteComment(courseId, itemId, commentId, "openCourses", replyTo, () => {
+            DB.getCommentsList(courseId, itemId, "openCourses", (commentsList) => {
                 setCurrentComments(commentsList);
                 swipeListView.safeCloseOpenRow();
             });
@@ -138,10 +147,10 @@ export default IdeaScreen = ({route, navigation}) => {
     const pressNewCommentHandler = (committed) => {
         if (committed) {
             if (currentNewCommentText != "") {
-                DB.addComment(courseId, itemId, "courses", currentNewCommentText, "", () => {
+                DB.addComment(courseId, itemId, "openCourses", currentNewCommentText, "", () => {
                     setNewCommentVisible(false);
                     setCurrentNewCommentText("");
-                    DB.getCommentsList(courseId, itemId, "courses", (commentsList) => {
+                    DB.getCommentsList(courseId, itemId, "openCourses", (commentsList) => {
                         setCurrentComments(commentsList);
                     });
                 });
@@ -156,11 +165,10 @@ export default IdeaScreen = ({route, navigation}) => {
     const pressReplyHandler = (committed) => {
         if (committed) {
             if (currentReplyText != "") {
-                DB.addComment(courseId, itemId, "courses", currentReplyText, currentReplyComment.id, () => {
+                DB.addComment(courseId, itemId, "openCourses", currentReplyText, currentReplyComment.id, () => {
                     setNewReplyVisible(false);
-                    setCurrentNewCommentText("");
                     setCurrentReplyText("");
-                    DB.getCommentsList(courseId, itemId, "courses", (commentsList) => {
+                    DB.getCommentsList(courseId, itemId, "openCourses", (commentsList) => {
                         setCurrentComments(commentsList);
                     });
                 });
@@ -195,7 +203,7 @@ export default IdeaScreen = ({route, navigation}) => {
     const pressEditIdeaHandler = (committed) => {
         if (committed) {
             if (editIdeaName.length > 1 && editIdeaText.length > 1 && selectedSkillsList.length > 0) {
-                DB.editIdea(courseId, itemId, "courses", editIdeaName, editIdeaText, selectedSkillsList, [], () => {
+                DB.editIdea(courseId, itemId, "openCourses", editIdeaName, editIdeaText, selectedSkillsList, [], () => {
                     setEditIdeaVisible(false);
                     setEditIdeaTextErrorVisible(false);
                     setEditIdeaNameErrorVisible(false);
@@ -224,6 +232,34 @@ export default IdeaScreen = ({route, navigation}) => {
             setEditIdeaTextErrorVisible(false);
             setSelectedSkillsListErrorVisible(false);
         }
+    }
+
+    const joinIdeaHandler = () => {
+        if (!userIsMember) {
+            DB.joinOpenIdea(courseId, itemId, () => {
+                setUserIsMember(true);
+                getOpenIdeaData();
+            }, (e) => {console.log(e)});
+        } else {
+            DB.exitOpenIdea(courseId, itemId, () => {
+                setUserIsMember(false);
+                setMembers(members);
+                getOpenIdeaData();
+            });
+        }
+    }
+
+    const setTeamHandler = () => {
+        Alert.alert(
+            "Team einteilen",
+            "Möchtest du dieses Team wirklich final festlegen? Frag am besten vorher noch einmal nach, ob alle einverstanden sind.",
+            [   {text: "Abbrechen", onPress: () => console.log("Cancel Pressed"), style: "cancel"},
+                { text: "OK", onPress: () => {
+                    DB.setOpenCourseTeam(courseId, itemId, () => {
+                        setEvaluated(true);
+                    });
+                }}],
+        );              
     }
 
     const swipeButtons = (item) => {
@@ -348,7 +384,7 @@ export default IdeaScreen = ({route, navigation}) => {
                                 />
                                 <AttributePreviewTile
                                     showError={selectedSkillsListErrorVisible}
-                                    title={"Passende Fähigkeiten"}
+                                    title="Passende Fähigkeiten"
                                     subtitle={selectedSkillsListErrorVisible ? "Bitte mindestens eine Fähigkeit angeben." : selectedSkillsList.join(", ")}
                                     index={0}
                                     onPress={() => {setAddSkillsVisible(true)}}
@@ -382,8 +418,17 @@ export default IdeaScreen = ({route, navigation}) => {
                         title="Passende Fähigkeiten"
                         subtitle={currentSkills.join(", ")}
                         index={0}
-                        onPress={() => navigation.navigate('IdeaAttributes', {attributeType: "skills", filterList: currentSkills, title: "Passende Fähigkeiten"})}
+                        onPress={() => navigation.navigate('IdeaAttributes', {attributeType: "skills", filterList: currentSkills, filterOpenCourse: courseId, filterOpenIdea: itemId, title: "Passende Fähigkeiten"})}
                         />
+                </View>
+                <View style={ boxes.paddedRow }>
+                    { !evaluated && 
+                    <ButtonSmall
+                        title={"Beitreten"}
+                        icon={userIsMember ? icons.checkTrue : icons.checkFalse}
+                        onPress={joinIdeaHandler}
+                    />
+                    }
                 </View>
             </View>
 
@@ -417,15 +462,30 @@ export default IdeaScreen = ({route, navigation}) => {
                     </SwipeRow>
                 }
                 ListHeaderComponent={
-                    currentUserIsCreator &&
-                    <View>
-                        <Padding height={5}/>
-                        <View style={ boxes.paddedRow }>
-                            <ButtonLarge
-                                title="Idee bearbeiten"
-                                onPress={() => setEditIdeaVisible(true)}
-                            />
+                    <View style={{backgroundColor: evaluated ? colors.darkBlue : colors.lightGrey}}>
+                        {currentUserIsCreator && !evaluated && 
+                        <View>
+                            <Padding height={5}/>
+                            <View style={ boxes.paddedRow }>
+                                <ButtonSmall
+                                    title="Bearbeiten"
+                                    icon={icons.edit}
+                                    onPress={() => setEditIdeaVisible(true)}
+                                />
+                                <ButtonSmall
+                                    title={"Team einteilen"}
+                                    icon={icons.fav}
+                                    onPress={setTeamHandler}
+                                />
+                            </View>
                         </View>
+                        }
+                        {members.length > 0 &&
+                                <ScrollRow
+                                    data= {members}
+                                    onPress={(id) => {viewProfileHandler(id)}}
+                                />
+                        }
                     </View>
                 }
                 ListFooterComponent={

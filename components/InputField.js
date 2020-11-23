@@ -20,9 +20,9 @@ export default InputField = props => {
     if (props.isButton) {
       return(
         <TouchableOpacity onPress={props.onPress}>
-          <View style={[boxes.inputField, {flexDirection: "row", justifyContent: "space-between", alignItems:"center"}]}>
+          <View style={[boxes.inputField, props.showError ? boxes.inputFieldError : {}, {flexDirection: "row", justifyContent: "space-between", alignItems:"center"}]}>
             <TextInput
-                style= {texts.inputField}
+                style= {[texts.inputField, {color: props.showError ? colors.red : colors.darkGrey}]}
                 autoCapitalize="none"
                 textAlign= "left"
                 placeholder= { props.placeholderText }
@@ -30,19 +30,26 @@ export default InputField = props => {
                 onChangeText= { text => props.onChangeText(text)}
                 pointerEvents={"none"}
             />
-            <Image
-              style={boxes.inputFieldIcon}
-              source={props.icon}
-              resizeMode={"contain"}
-            />
+            <View style={boxes.inputFieldIconBox}>
+              <Image
+                style={boxes.inputFieldIcon}
+                source={props.icon}
+                resizeMode={"contain"}
+              />
+            </View>
           </View>
         </TouchableOpacity>
       )
     } else {
       return (
-        <View style= {[boxes.inputField, {height: props.multiline ? "auto" : 40, paddingTop: props.multiline ? 6 : 0, paddingBottom: props.multiline ? 12 : 0}]}>
+        <View style= {[boxes.inputField, props.showError ? boxes.inputFieldError : {}, {
+          height: props.multiline ? "auto" : 40, 
+          paddingTop: props.multiline ? 6 : 0, 
+          paddingBottom: props.multiline ? 12 : 0,
+          }]}>
           <TextInput
               style= {texts.inputField}
+              placeholderTextColor={props.showError ? colors.red : colors.lightBlue}
               autoCapitalize="none"
               textAlign= "left"
               placeholder= { props.placeholderText }

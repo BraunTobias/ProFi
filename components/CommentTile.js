@@ -1,6 +1,7 @@
 import React , {useState, useEffect} from "react";
 import { StyleSheet, Text, TouchableOpacity, View, Image } from "react-native";
 import Autolink from 'react-native-autolink';
+import { compareAsc, format } from 'date-fns';
 
 import { icons, colors, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
@@ -9,14 +10,14 @@ import ProfileImage from "./ProfileImage";
 export default CommentTile = props => {
 
     const userId = props.userId;
-    const date = props.timestamp.toDate().toLocaleDateString('de-DE');
+    const date = format(props.timestamp.toDate(), "dd.MM.yy");
 
     const colorStyle = {
         backgroundColor: props.index % 2 === 0 ? colors.white : colors.lightGrey
     }
     
     return (
-    <View style={[boxes.commentTile, colorStyle]}>
+    <View style={[boxes.commentTile, colorStyle, {minHeight: props.likes > 0 ? 100 : 70}]}>
         {props.isReply == true && 
             <Image
                 style={boxes.commentReplyTile}
@@ -30,6 +31,7 @@ export default CommentTile = props => {
                 imageUrl={props.userUrl}
                 onPress={props.onPress}
             />
+            {props.likes > 0 && 
             <View style={boxes.likesRow}>
                 <Image
                     style={boxes.likesImage}
@@ -39,6 +41,7 @@ export default CommentTile = props => {
                 />
                 <Text style={texts.copy}>{props.likes}</Text>
             </View>
+            }
         </View>
         <View style={props.isReply ? boxes.commentReplyTileContent : boxes.commentTileContent}>
             <View style={boxes.commentTileHeader}>            

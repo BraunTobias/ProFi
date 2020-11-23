@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import {FlatList, View, Text, SectionList} from "react-native";
+import {FlatList, View, Text, SectionList, Image} from "react-native";
 
 import { boxes, colors, styles, texts } from '../Styles';
+import ProfileImage from './ProfileImage';
+import ScrollRow from '../components/ScrollRow';
+import SmallProfileRow from './SmallProfileRow';
 
 export default AttributeList = props => {
 
     return(
         <SectionList
-            style={{backgroundColor: "white"}}
+            style={{backgroundColor: colors.white}}
             sections={props.attList}
             keyExtractor={(item, index) => index.toString()}
             renderSectionHeader={({ section }) => (
@@ -17,7 +20,13 @@ export default AttributeList = props => {
             )}
             renderItem={({ item }) => { 
                 return (
-                    <Text style={[texts.sectionListCopy]}>{item}</Text> 
+                    <View style={boxes.attributeListTile}>
+                        <Text style={[texts.sectionListCopy]}>{item.name}</Text> 
+                        <SmallProfileRow
+                            data= {item.users}
+                            onPress={() => {}}
+                        />
+                    </View>
                 );
             }}
         />

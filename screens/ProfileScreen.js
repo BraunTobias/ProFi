@@ -13,6 +13,7 @@ import AttributePreviewTile from '../components/AttributePreviewTile';
 import { ScrollView } from 'react-native-gesture-handler';
 import ModalContent from "../components/ModalContent";
 import Padding from '../components/Padding';
+import PushNofiticationSwitch from '../components/PushNofiticationSwitch';
 
 export default ProfileScreen = ({navigation}) => {
 
@@ -27,15 +28,21 @@ export default ProfileScreen = ({navigation}) => {
     const [currentEditPassword, setCurrentEditPassword] = useState("");
     const [currentConfirmPassword, setCurrentConfirmPassword] = useState("");
     const [skillString, setSkillString] = useState("");
+    const [interestString, setInterestString] = useState("");
     const [currentImage, setCurrentImage] = useState("");
     const [imageLoading, setImageLoading] = useState(true);
-    const [pushEnabled, setPushEnabled] = useState(false);
+    const [pushEvaluateEnabled, setPushEvaluateEnabled] = useState(false);
+    const [pushCommentEnabled, setPushCommentEnabled] = useState(false);
+    const [pushDeleteEnabled, setPushDeleteEnabled] = useState(false);
+    const [pushAttChangeEnabled, setPushAttChangeEnabled] = useState(false);
+    const [pushCourseChangeEnabled, setPushCourseChangeEnabled] = useState(false);
 
     // State Hooks für Modals
     const [editNameVisible, setEditNameVisible] = useState(false);
     const [editBioVisible, setEditBioVisible] = useState(false);
     const [editEmailVisible, setEditEmailVisible] = useState(false);
     const [editPasswordVisible, setEditPasswordVisible] = useState(false);
+    const [manageNotificationsVisible, setManageNotificationsVisible] = useState(false);
     const [mailErrorVisible, setMailErrorVisible] = useState(false);
     const [pwErrorVisible, setPwErrorVisible] = useState(false);
     const [confirmPwErrorVisible, setConfirmPwErrorVisible] = useState(false);
@@ -49,12 +56,17 @@ export default ProfileScreen = ({navigation}) => {
             setCurrentBio(data.bio);
             setCurrentEditBio(data.bio);
             setCurrentMail(data.email);
-            if (data.pushNotificationsAllowed) setPushEnabled(data.pushNotificationsAllowed);
+            setPushEvaluateEnabled(data.pushNotificationsAllowed.evaluate);
+            setPushCommentEnabled(data.pushNotificationsAllowed.comment);
+            setPushDeleteEnabled(data.pushNotificationsAllowed.delete);
+            setPushAttChangeEnabled(data.pushNotificationsAllowed.attChange);
+            setPushCourseChangeEnabled(data.pushNotificationsAllowed.courseChange);
             if (data.image) setCurrentImage(data.image);
             setImageLoading(false);
         });
-        DB.userAttributesToString((skills, prefs) => {
+        DB.userAttributesToString((skills, interests) => {
             setSkillString(skills);
+            setInterestString(interests);
         });
     }
 
@@ -65,7 +77,7 @@ export default ProfileScreen = ({navigation}) => {
     }, []);
 
     const logOut = () => {
-        DB.signOut(() => {console.log("Logout")});
+        DB.signOut(() => {});
     }
 
     // Handler für Modals
@@ -85,6 +97,7 @@ export default ProfileScreen = ({navigation}) => {
         }
         else {
             setCurrentEditName(currentName);
+            setNameErrorVisible(false);
         }
         setEditNameVisible(false);
     }
@@ -138,6 +151,8 @@ export default ProfileScreen = ({navigation}) => {
             setEditEmailVisible(false);
             setCurrentEnterPassword("");
             setCurrentEditMail("");
+            setMailErrorVisible(false);
+            setPwErrorVisible(false);
         }
     }
     const changePasswordHandler = (enteredText) => {
@@ -176,19 +191,49 @@ export default ProfileScreen = ({navigation}) => {
             setCurrentEnterPassword("");
             setCurrentEditPassword("");
             setCurrentConfirmPassword("");
+            setPwErrorVisible(false);
+            setEditPwErrorVisible(false);
+            setConfirmPwErrorVisible(false);
         }
     }
 
-    const togglePushNotficationSwitch = () => {
-        DB.registerPushNotifications(!pushEnabled, () => {
-            setPushEnabled(!pushEnabled);
-        }, () => {
-            Alert.alert(
-                "Fehler",
-                "Push-Mitteilungen konnten nicht aktiviert werden",
-                [{ text: "OK" }],
-            );                  
-        });
+    const toggleAllPushNotficationSwitches = () => {
+        if (pushEvaluateEnabled && pushCommentEnabled && pushDeleteEnabled && pushAttChangeEnabled && pushCourseChangeEnabled) {
+            setPushEvaluateEnabled(false);
+            setPushCommentEnabled(false);
+            setPushDeleteEnabled(false);
+            setPushAttChangeEnabled(false);
+            setPushCourseChangeEnabled(false);
+            DB.togglePushNotifications(["evaluate", "comment", "delete", "attChange", "courseChange"], false);
+        } else {
+            setPushEvaluateEnabled(true);
+            setPushCommentEnabled(true);
+            setPushDeleteEnabled(true);
+            setPushAttChangeEnabled(true);
+            setPushCourseChangeEnabled(true);
+            DB.togglePushNotifications(["evaluate", "comment", "delete", "attChange", "courseChange"], true);
+        }
+    }
+
+    const toggleEvaluateSwitch = () => {
+        DB.togglePushNotifications(["evaluate"], !pushEvaluateEnabled);
+        setPushEvaluateEnabled(!pushEvaluateEnabled);
+    }
+    const toggleCommentSwitch = () => {
+        DB.togglePushNotifications(["comment"], !pushCommentEnabled);
+        setPushCommentEnabled(!pushCommentEnabled);
+    }
+    const toggleDeleteSwitch = () => {
+        DB.togglePushNotifications(["delete"], !pushDeleteEnabled);
+        setPushDeleteEnabled(!pushDeleteEnabled);
+    }
+    const toggleAttChangeSwitch = () => {
+        DB.togglePushNotifications(["attChange"], !pushAttChangeEnabled);
+        setPushAttChangeEnabled(!pushAttChangeEnabled);
+    }
+    const toggleCourseChangeSwitch = () => {
+        DB.togglePushNotifications(["courseChange"], !pushCourseChangeEnabled);
+        setPushCourseChangeEnabled(!pushCourseChangeEnabled);
     }
 
     // Profilbild
@@ -240,15 +285,11 @@ export default ProfileScreen = ({navigation}) => {
                             <View style={boxes.mainContainer}>
                                 <Text style={texts.titleCentered}>{"Name ändern"}</Text>
                                 <InputField
-                                    placeholderText= "Name"
+                                    showError={nameErrorVisible}
+                                    placeholderText= {nameErrorVisible ? "Bitte einen Namen eingeben." : "Name"}
                                     value={currentEditName}
                                     onChangeText={changeNameHandler}
                                 />
-                                {nameErrorVisible &&
-                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                                        Bitte einen Namen eingeben.
-                                    </Text>
-                                }
                             </View>
                         )
                     }}
@@ -283,26 +324,18 @@ export default ProfileScreen = ({navigation}) => {
                             <View style={boxes.mainContainer}>
                                 <Text style={texts.titleCentered}>{"E-Mail ändern"}</Text>
                                 <InputField
-                                    placeholderText= "Passwort zur Bestätigung"
+                                    showError={pwErrorVisible}
+                                    placeholderText= {pwErrorVisible ? "Bitte ein Passwort eingeben." : "Passwort zur Bestätigung"}
                                     value={currentEnterPassword}
                                     onChangeText={changeEnterPasswordHandler}
                                     secureTextEntry={true}
                                 />
-                                {pwErrorVisible &&
-                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                                        Bitte ein Passwort eingeben.
-                                    </Text>
-                                }
                                 <InputField
-                                    placeholderText= "Neue E-Mail-Adresse"
+                                    showError={mailErrorVisible}
+                                    placeholderText= {mailErrorVisible ? "Bitte eine E-Mail-Adresse eingeben." : "Neue E-Mail-Adresse"}
                                     value={currentEditMail}
                                     onChangeText={changeEmailHandler}
                                 />
-                                {mailErrorVisible &&
-                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                                        Bitte eine E-Mail-Adresse eingeben.
-                                    </Text>
-                                }
                             </View>
                         )
                     }}
@@ -318,44 +351,96 @@ export default ProfileScreen = ({navigation}) => {
                             <View style={boxes.mainContainer}>
                                 <Text style={texts.titleCentered}>{"Passwort ändern"}</Text>
                                 <InputField
+                                    showError={pwErrorVisible}
                                     title= "Altes Passwort"
-                                    placeholderText= "Altes Passwort"
+                                    placeholderText= {pwErrorVisible ? "Bitte ein Passwort eingeben." : "Altes Passwort"}
                                     value={currentEnterPassword}
                                     onChangeText={changeEnterPasswordHandler}
                                     secureTextEntry={true}
                                 />
-                                {pwErrorVisible &&
-                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                                        Bitte ein Passwort eingeben.
-                                    </Text>
-                                }
                                 <InputField
+                                    showError={editPwErrorVisible}
                                     title= "Neues Passwort"
-                                    placeholderText= "Neues Passwort"
+                                    placeholderText= {editPwErrorVisible ? "Bitte ein Passwort mit mindestens 6 Zeichen eingeben." : "Neues Passwort"}
                                     value={currentEditPassword}
                                     onChangeText={changePasswordHandler}
                                     secureTextEntry={true}
                                 />
-                                {editPwErrorVisible &&
-                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                                        Bitte ein Passwort mit mindestens 6 Zeichen eingeben.
-                                    </Text>
-                                }
                                 <InputField
-                                    placeholderText= "Neues Passwort bestätigen"
+                                    showError={confirmPwErrorVisible}
+                                    placeholderText= {confirmPwErrorVisible ? "Passwörter stimmen nicht überein." : "Neues Passwort bestätigen"}
                                     value={currentConfirmPassword}
                                     onChangeText={changeConfirmPasswordHandler}
                                     secureTextEntry={true}
                                 />
-                                {confirmPwErrorVisible &&
-                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                                        Passwörter stimmen nicht überein.
-                                    </Text>
-                                }
                             </View>
                         )
                     }}
                     onDismiss= {pressEditPasswordHandler}
+                />
+            </Modal>
+            {/* Push-Mitteilungen verwalten */}
+            <Modal visible= { manageNotificationsVisible } animationType= 'slide'>
+                <ModalContent
+                    subheader= { () => {}}
+                    content= { () => {
+                        return(
+                            <View style={boxes.mainContainer}>
+                                <Text style={texts.titleCentered}>{"Push-Mitteilungen erhalten für …"}</Text>
+                                <Padding height={20}/>
+                                <View style={[boxes.unPaddedRow, {alignItems: "center"}]}>
+                                    <Text style={[texts.copy, {fontFamily: 'Inter_600SemiBold'}]}>Alle</Text>
+                                    <PushNofiticationSwitch
+                                        onValueChange={toggleAllPushNotficationSwitches}
+                                        value={pushEvaluateEnabled && pushCommentEnabled && pushDeleteEnabled && pushAttChangeEnabled && pushCourseChangeEnabled}
+                                    />
+                                </View>
+                                <Padding height={10}/>
+                                <View style={boxes.line}></View>
+                                <Padding height={10}/>
+                                <View style={[boxes.unPaddedRow, {alignItems: "center"}]}>
+                                    <Text style={texts.copy}>Einteilung von Ideen (empfohlen)</Text>
+                                    <PushNofiticationSwitch
+                                        onValueChange={toggleEvaluateSwitch}
+                                        value={pushEvaluateEnabled}
+                                    />
+                                </View>
+                                <Padding height={7}/>
+                                <View style={[boxes.unPaddedRow, {alignItems: "center"}]}>
+                                    <Text style={texts.copy}>Neue Kommentare</Text>
+                                    <PushNofiticationSwitch
+                                        onValueChange={toggleCommentSwitch}
+                                        value={pushCommentEnabled}
+                                    />
+                                </View>
+                                <Padding height={7}/>
+                                <View style={[boxes.unPaddedRow, {alignItems: "center"}]}>
+                                    <Text style={texts.copy}>Änderung an meinen Kursen</Text>
+                                    <PushNofiticationSwitch
+                                        onValueChange={toggleCourseChangeSwitch}
+                                        value={pushCourseChangeEnabled}
+                                    />
+                                </View>
+                                <Padding height={7}/>
+                                <View style={[boxes.unPaddedRow, {alignItems: "center"}]}>
+                                    <Text style={texts.copy}>Löschen von Ideen</Text>
+                                    <PushNofiticationSwitch
+                                        onValueChange={toggleDeleteSwitch}
+                                        value={pushDeleteEnabled}
+                                    />
+                                </View>
+                                <Padding height={7}/>
+                                <View style={[boxes.unPaddedRow, {alignItems: "center"}]}>
+                                    <Text style={texts.copy}>Neu verfügbare Fähigkeiten</Text>
+                                    <PushNofiticationSwitch
+                                        onValueChange={toggleAttChangeSwitch}
+                                        value={pushAttChangeEnabled}
+                                    />
+                                </View>
+                            </View>
+                        )
+                    }}
+                    onDismiss= {() => {setManageNotificationsVisible(false)}}
                 />
             </Modal>
 
@@ -408,6 +493,14 @@ export default ProfileScreen = ({navigation}) => {
                         />
                     </View>
                     <View style={boxes.paddedRow}>
+                        <InputField
+                            isButton= {true}
+                            icon={icons.edit}
+                            value="Push-Mitteilungen verwalten"
+                            onPress={() => {setManageNotificationsVisible(true)}}
+                        />
+                    </View>
+                    <View style={boxes.paddedRow}>
                         <AttributePreviewTile
                             title="Meine Fähigkeiten"
                             subtitle={skillString}
@@ -415,14 +508,12 @@ export default ProfileScreen = ({navigation}) => {
                             onPress={() => navigation.navigate('Attributes', {attributeType: "skills"})}
                         />
                     </View>
-                    <Padding height={10}/>
-                    <View style={[boxes.paddedRow, {alignItems: "center", paddingLeft: 25}]}>
-                        <Text style={texts.copy}>Push-Mitteilungen erhalten</Text>
-                        <Switch
-                            onValueChange={togglePushNotficationSwitch}
-                            value={pushEnabled}
-                            trackColor={{ false: colors.lightBlue, true: colors.darkBlue }}
-                            ios_backgroundColor={colors.lightBlue}
+                    <View style={boxes.paddedRow}>
+                        <AttributePreviewTile
+                            title="Meine Interessen"
+                            subtitle={interestString}
+                            index={0}
+                            onPress={() => navigation.navigate('Attributes', {attributeType: "interests"})}
                         />
                     </View>
                     <Padding height={10}/>

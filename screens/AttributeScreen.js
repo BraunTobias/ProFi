@@ -47,7 +47,7 @@ export default AttributeScreen = ({route, navigation}) => {
             DB.getCategoriesFromAttribute(attributeType, (categoriesList) => {
                 setCategoriesList(categoriesList);
                 setCurrentCategory(categoriesList[0]);
-                getInfoReceived();
+                if(attributeType == "skills") getInfoReceived();
                 DB.getUserAttributesFromCategory(attributeType, categoriesList[0], (attributesList) => {
                     setDisplayedSkills(attributesList);
                 }, (error) => {console.log(error)});    
@@ -72,15 +72,11 @@ export default AttributeScreen = ({route, navigation}) => {
             <InfoModal 
                 visible={skillsInfoVisible}
                 onPress={() => {setSkillsInfoVisible(false); storeInfoReceived("skillsInfoReceived");}}
-                title="Fähigkeiten-Auswahl"
+                title={"Fähigkeiten-Auswahl"}
                 copy="Durch das Auswählen einer Fähigkeit erklärst du dich bereit, diese bei Bedarf in einem Projekt zu übernehmen. 
                     Du musst sie noch nicht beherrschen, sondern nur bereit sein, dich damit auseinanderzusetzen."
             />
             <View style={boxes.subHeader}>
-                {/* <View style={boxes.paddedRow}>
-                    <Text style={texts.copy}>Durch Auswählen einer Fähigkeit erklärst du dich bereit, diese ggf. in einem Projekt zu übernehmen. 
-                        Du musst sie noch nicht beherrschen.</Text>
-                </View> */}
                 <ScrollRow
                     type="attributes"
                     data= {categoriesList}

@@ -1,10 +1,13 @@
 import React from 'react';
+import { View } from 'react-native';
 import {createStackNavigator, HeaderBackground} from '@react-navigation/stack';
 
 import { icons, colors, boxes, texts } from '../Styles';
 import HomeScreen from '../screens/HomeScreen';
 import CourseScreen from '../screens/CourseScreen';
+import OpenCourseScreen from '../screens/OpenCourseScreen';
 import IdeaScreen from '../screens/IdeaScreen';
+import OpenIdeaScreen from '../screens/OpenIdeaScreen';
 import AttributeListScreen from '../screens/AttributeListScreen';
 
 const HomeStack = createStackNavigator();
@@ -14,11 +17,10 @@ export default HomeNavigator = () => {
         <HomeStack.Navigator 
             initialRouteName="Home" 
             screenOptions={{
-                headerStyle: boxes.header,
+                headerStyle: {backgroundColor: colors.darkBlue},
                 headerTitleStyle: texts.header,
                 headerTintColor: colors.white,
             }}
-            navigationOptions={{backgroundColor: "red"}}
         >
                 <HomeStack.Screen 
                     name = "Home" 
@@ -33,8 +35,24 @@ export default HomeNavigator = () => {
                     options={{
                         headerBackTitleVisible: false, 
                         headerLeftContainerStyle: {
-                            marginHorizontal: 10
-                        }
+                            marginHorizontal: 10,
+                        },
+                        headerRight: () => (
+                            <View style={{width: 60}}></View>
+                        )                
+                    }}
+                />
+                <HomeStack.Screen 
+                    name = "Open course" 
+                    component = {OpenCourseScreen} 
+                    options={{
+                        headerBackTitleVisible: false, 
+                        headerLeftContainerStyle: {
+                            marginHorizontal: 10,
+                        },
+                        headerRight: () => (
+                            <View style={{width: 60}}></View>
+                        )                
                     }}
                 />
                 <HomeStack.Screen 
@@ -44,7 +62,23 @@ export default HomeNavigator = () => {
                         headerBackTitleVisible: false, 
                         headerLeftContainerStyle: {
                             marginHorizontal: 10
-                        }
+                        },
+                        headerRight: () => (
+                            <View style={{width: 60}}></View>
+                        )              
+                    }}
+                />
+                <HomeStack.Screen 
+                    name = "Open Idea" 
+                    component = {OpenIdeaScreen} 
+                    options={{
+                        headerBackTitleVisible: false, 
+                        headerLeftContainerStyle: {
+                            marginHorizontal: 10
+                        },
+                        headerRight: () => (
+                            <View style={{width: 60}}></View>
+                        )              
                     }}
                 />
                 <HomeStack.Screen 
@@ -54,7 +88,10 @@ export default HomeNavigator = () => {
                         headerBackTitleVisible: false, 
                         headerLeftContainerStyle: {
                             marginHorizontal: 10
-                        }
+                        },
+                        headerRight: () => (
+                            <View style={{width: 60}}></View>
+                        )   
                     }}
                 />
         </HomeStack.Navigator>

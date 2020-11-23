@@ -19,13 +19,14 @@ export default AuthScreen = () => {
     const [registerVisible, setRegisterVisible] = useState(false);
     const [mailErrorVisible, setMailErrorVisible] = useState(false);
     const [pwErrorVisible, setPwErrorVisible] = useState(false);
+    const [resetPwVisible, setResetPwVisible] = useState(false);
     const [confirmPwErrorVisible, setConfirmPwErrorVisible] = useState(false);
     const [nameErrorVisible, setNameErrorVisible] = useState(false);
 
     // Benutzereingaben-Handling
     const changeMailHandler = (enteredText) => {
         setCurrentMail(enteredText);
-        if (enteredText != "") setMailErrorVisible(false);
+        if (enteredText != "") setMailErrorVisible(false); 
     };
     const changePWHandler = (enteredText) => {
         setCurrentPW(enteredText);
@@ -39,6 +40,21 @@ export default AuthScreen = () => {
         setCurrentName(enteredText);
         if (enteredText != "") setNameErrorVisible(false);
     };
+    const resetPwHandler = () => {
+        DB.resetPassword(currentMail, () => {
+            Alert.alert(
+                "E-Mail versendet",
+                "Du kannst dein Passwort mit dem Link in der E-Mail zurücksetzen.",
+                [{ text: "OK", onPress: () => setResetPwVisible(false) }],
+            );              
+        }, (error) => {
+            Alert.alert(
+                "Ungültige Eingabe",
+                "Es existiert kein User mit dieser E-Mail-Adresse",
+                [{ text: "OK" }],
+            );              
+        });
+    }
     const setRegisterHandler = (visible) => {
         setRegisterVisible(visible);
         setCurrentMail("");
@@ -90,8 +106,11 @@ export default AuthScreen = () => {
         } else {
             if (currentName == "") setNameErrorVisible(true);
             if (currentMail == "") setMailErrorVisible(true);
-            if (currentPW.length < 6) setPwErrorVisible(true);
-            else if (currentPW != currentConfirmPW) setConfirmPwErrorVisible(true);
+            if (currentPW.length < 6) {
+                setPwErrorVisible(true); setCurrentPW("");
+            } else if (currentPW != currentConfirmPW) {
+                setConfirmPwErrorVisible(true);
+            }
         }
     }
 
@@ -105,50 +124,33 @@ export default AuthScreen = () => {
                     <Text style={texts.titleCentered}>Registrierung</Text>
                     <InputField 
                         title="Username"
-                        placeholderText= "Username"
+                        showError={nameErrorVisible}
+                        placeholderText={nameErrorVisible ? "Bitte einen Namen eingeben." : "Username"}
                         value={currentName}
                         onChangeText={changeNameHandler}
                     />
-                    {nameErrorVisible &&
-                        <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                            Bitte einen Namen eingeben.
-                        </Text>
-                    }
                     <InputField 
                         title="E-Mail-Adresse"
-                        placeholderText= "user@haw-hamburg.de"
+                        showError={mailErrorVisible}
+                        placeholderText={mailErrorVisible ? "Bitte eine E-Mail-Adresse eingeben." : "user@haw-hamburg.de"}
                         value={currentMail}
                         onChangeText={changeMailHandler}
                     />
-                    {mailErrorVisible &&
-                        <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                            Bitte eine E-Mail-Adresse eingeben.
-                        </Text>
-                    }
                     <InputField 
                         title="Passwort"
                         secureTextEntry={true}
-                        placeholderText= "mind. 6 Zeichen"
+                        showError={pwErrorVisible}
+                        placeholderText= {pwErrorVisible ? "Bitte mind. 6 Zeichen eingeben." : "mind. 6 Zeichen"}
                         value={currentPW}
                         onChangeText={changePWHandler}
                     />
-                    {pwErrorVisible &&
-                        <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                            Bitte ein Passwort mit mindestens 6 Zeichen eingeben.
-                        </Text>
-                    }
                     <InputField 
-                        // title="Passwort bestätigen"
                         secureTextEntry={true}
-                        placeholderText= "Passwort bestätigen"
+                        showError={confirmPwErrorVisible}
+                        placeholderText= {confirmPwErrorVisible ? "Passwörter stimmen nicht überein." : "Passwort bestätigen"}
                         value={currentConfirmPW}
                         onChangeText={changeConfirmPWHandler}
                     />
-                    {confirmPwErrorVisible &&
-                        <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                            Passwörter stimmen nicht überein.
-                        </Text>
-                    }
                     <ButtonLarge 
                         title="Konto anlegen" 
                         onPress={registerHandler}>
@@ -160,31 +162,44 @@ export default AuthScreen = () => {
                     </ButtonLarge>
                 </ScrollView>
             </Modal>
+            {/* Passwort zurücksetzen */}
+            <Modal visible={resetPwVisible} animationType='slide'>
+                <ScrollView alwaysBounceVertical={false} contentContainerStyle= {boxes.mainContainer}>
+                    <Text style={texts.titleCentered}>Passwort zurücksetzen</Text>
+                    <InputField 
+                        showError={mailErrorVisible}
+                        placeholderText={mailErrorVisible ? "Bitte eine E-Mail-Adresse eingeben." : "user@haw-hamburg.de"}
+                        value={currentMail}
+                        onChangeText={changeMailHandler}
+                    />
+                    <ButtonLarge 
+                        title="E-Mail senden" 
+                        onPress={resetPwHandler}>
+                    </ButtonLarge>
+                    <ButtonLarge 
+                        title="Abbrechen" 
+                        onPress={() => {setResetPwVisible(false)}}
+                        transparent={true}>
+                    </ButtonLarge>
+                </ScrollView>
+            </Modal>
 
             {/* Login */}
             <ScrollView alwaysBounceVertical={false} contentContainerStyle= {boxes.mainContainer}>
                 <Text style={texts.titleCentered}>Login</Text>
                 <InputField 
-                    placeholderText= "E-Mail"
+                    placeholderText= {mailErrorVisible ? "Bitte eine E-Mail-Adresse eingeben." : "E-Mail"}
+                    showError = {mailErrorVisible}
                     value={currentMail}
                     onChangeText={changeMailHandler}
                 />
-                {mailErrorVisible &&
-                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                        Bitte eine E-Mail-Adresse eingeben.
-                    </Text>
-                }
                 <InputField 
-                    placeholderText="Passwort"
+                    placeholderText={pwErrorVisible ? "Bitte ein Passwort eingeben." : "Passwort"}
+                    showError = {pwErrorVisible}
                     secureTextEntry={true}
                     value={currentPW}
                     onChangeText={changePWHandler}
                 />
-                {pwErrorVisible &&
-                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                        Bitte ein Passwort eingeben.
-                    </Text>
-                }
                 <ButtonLarge 
                     title="Einloggen" 
                     onPress={logInHandler}>
@@ -193,6 +208,11 @@ export default AuthScreen = () => {
                     title="Noch kein Konto? Registrieren" 
                     transparent={true}
                     onPress={() => {setRegisterHandler(true)}}>
+                </ButtonLarge>
+                <ButtonLarge 
+                    title="Passwort zurücksetzen" 
+                    onPress={() => {setResetPwVisible(true)}}
+                    transparent={true}>
                 </ButtonLarge>
             </ScrollView>
         </View>

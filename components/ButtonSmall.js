@@ -11,14 +11,14 @@ export default ButtonSmall = props => {
       return (boxes.buttonSmallInactive);      
     }
   }
-  var image;
-  switch (props.icon) {
-    case "checkTrue": image = icons.checkTrue; break;
-    case "checkFalse": image = icons.checkFalse; break;
-    case "plus": image = icons.plus; break;
-    case "find": image = icons.find; break;
-    case "exit": image = icons.exit; break;
-  }
+  // var image;
+  // switch (props.icon) {
+  //   case "checkTrue": image = icons.checkTrue; break;
+  //   case "checkFalse": image = icons.checkFalse; break;
+  //   case "plus": image = icons.plus; break;
+  //   case "find": image = icons.find; break;
+  //   case "exit": image = icons.exit; break;
+  // }
 
   return (
     <TouchableOpacity 
@@ -30,7 +30,7 @@ export default ButtonSmall = props => {
       </Text>
       <Image
         style= { boxes.buttonIcon }
-        source= { image }
+        source= { props.icon }
         resizeMode= { "contain" }
       />
     </TouchableOpacity>

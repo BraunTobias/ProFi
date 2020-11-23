@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useLayoutEffect} from 'react';
-import { View, Text, Modal, Keyboard, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, Modal, Keyboard, ActivityIndicator, Alert, Animated } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import AsyncStorage from '@react-native-community/async-storage';
@@ -24,13 +24,13 @@ export default CourseScreen = ({route, navigation}) => {
     const {itemTitle} = route.params;
     const {itemDate} = route.params;
     const {isMember} = route.params;
-    const currentUserId = DB.getCurrentUserId();
+    const {currentUserId} = route.params;
 
     // State Hooks
     const [currentIdeas, setCurrentIdeas] = useState([]);
     const [swipeListView, setSwipeListView] = useState();
     const [courseName, setCourseName] = useState(itemTitle);
-    const [courseDate, setCourseDate] = useState(new Date());
+    const [courseDate, setCourseDate] = useState(itemDate.toDate());
     const [creator, setCreator] = useState("");
     const [members, setMembers] = useState([]);
     const [minMembers, setMinMembers] = useState(0);
@@ -48,10 +48,11 @@ export default CourseScreen = ({route, navigation}) => {
     // State Hooks für Modals
     const [editCourseVisible, setEditCourseVisible] = useState(false);
     const [editCourseDateVisible, setEditCourseDateVisible] = useState(false);
+    const [editCourseTimeVisible, setEditCourseTimeVisible] = useState(false);
     const [editCourseNameErrorVisible, setEditCourseNameErrorVisible] = useState(false);
     const [editCourseDateErrorVisible, setEditCourseDateErrorVisible] = useState(false);
     const [editCourseName, setEditCourseName] = useState(itemTitle);
-    const [editCourseDate, setEditCourseDate] = useState(new Date());
+    const [editCourseDate, setEditCourseDate] = useState(itemDate.toDate());
     const [editCourseMinMembers, setEditCourseMinMembers] = useState(0);
     const [editCourseMaxMembers, setEditCourseMaxMembers] = useState(0);
     const [newIdeaVisible, setNewIdeaVisible] = useState(false);
@@ -73,6 +74,18 @@ export default CourseScreen = ({route, navigation}) => {
     const [viewedUserId, setViewedUserId] = useState(currentUserId);
     const [profileVisible, setProfileVisible] = useState(false);
 
+    // Icon-Animation
+    const rowSwipeAnimatedValues = {};
+    Array(100)
+    .fill('')
+    .forEach((_, i) => {
+        rowSwipeAnimatedValues[`${i}`] = new Animated.Value(0);
+    });
+    const onSwipeValueChange = (swipeData) => {
+        const { key, value } = swipeData;
+        rowSwipeAnimatedValues[key].setValue(Math.abs(value));
+    };
+    
     // Für Info-Modal
     const storeInfoReceived = async (info) => {
         try {
@@ -104,8 +117,6 @@ export default CourseScreen = ({route, navigation}) => {
             setEditCourseMinMembers(data.minMembers);
             setEditCourseMaxMembers(data.maxMembers);
             setMembers(data.members);
-            setCourseDate(data.date.toDate());
-            setEditCourseDate(data.date.toDate());
             setCourseDataLoading(false);
             setUserIsCreator(data.creator == currentUserId);
         });    
@@ -115,7 +126,7 @@ export default CourseScreen = ({route, navigation}) => {
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             getCourseData();
-            DB.getIdeasList(itemId, (ideasList) => {
+            DB.getIdeasList(itemId, "courses", (ideasList) => {
                 setCurrentIdeas(ideasList);
                 for (const idea in ideasList) {
                     if (ideasList[idea].favourites && ideasList[idea].favourites.indexOf(currentUserId) >= 0) {
@@ -129,7 +140,7 @@ export default CourseScreen = ({route, navigation}) => {
         });
     }, []);
 
-    const addFavHandler = (ideaId) => {
+    const addFavHandler = (ideaId, index) => {
         if (!favInfoReceived) {
             setFavInfoVisible(true); 
         } else {
@@ -146,7 +157,7 @@ export default CourseScreen = ({route, navigation}) => {
             }
         }
     }
-    const addNogoHandler = (ideaId) => {
+    const addNogoHandler = (ideaId, index) => {
         if (!nogoInfoReceived) {
             setNogoInfoVisible(true); 
         } else {
@@ -196,8 +207,8 @@ export default CourseScreen = ({route, navigation}) => {
                     setNewIdeaVisible(false);
                     setCurrentNewIdeaName("");
                     setCurrentNewIdeaText("");    
-                    setSelectedSkillsList("");
-                    DB.getIdeasList(itemId, (ideasList) => {
+                    setSelectedSkillsList([]);
+                    DB.getIdeasList(itemId, "courses", (ideasList) => {
                         setCurrentIdeas(ideasList);
                     });
                 }, (error) => {setCurrentWarning(error)});
@@ -209,7 +220,10 @@ export default CourseScreen = ({route, navigation}) => {
             setNewIdeaVisible(false);
             setCurrentNewIdeaName("");
             setCurrentNewIdeaText("");    
-            setSelectedSkillsList("");
+            setNewIdeaNameErrorVisible(false);    
+            setNewIdeaTextErrorVisible(false);
+            setSelectedSkillsListErrorVisible(false);
+            setSelectedSkillsList([]);
         }
     }
     const changeNewIdeaNameHandler = (enteredText) => {
@@ -234,7 +248,7 @@ export default CourseScreen = ({route, navigation}) => {
 
     const pressEditCourseHandler = (committed) => {
         if (committed) {
-            if (editCourseName.length > 1) {
+            if (editCourseName.length > 1 && editCourseDate - (new Date()) >= 0) {
                 DB.editCourse(itemId, editCourseName, editCourseDate, editCourseMinMembers, editCourseMaxMembers, () => {
                     setEditCourseVisible(false);
                     setEditCourseNameErrorVisible(false);
@@ -270,6 +284,7 @@ export default CourseScreen = ({route, navigation}) => {
     const changeEditCourseDateHandler = (date) => {
         setEditCourseDate(date);
         setEditCourseDateVisible(false);
+        setEditCourseTimeVisible(false);
         if (date - (new Date()) < 0) setEditCourseDateErrorVisible(true);
         else setEditCourseDateErrorVisible(false);
     }
@@ -282,9 +297,20 @@ export default CourseScreen = ({route, navigation}) => {
         if (number < editCourseMinMembers) setEditCourseMinMembers(number);
     }
 
-    const selectIdeaHandler = (id, title, description, skills) => {
+    const setTeamsHandler = () => {
+
+    }
+
+    const selectIdeaHandler = (item) => {
         swipeListView.safeCloseOpenRow();
-        navigation.navigate("Idea", {itemId: id, itemTitle: title, itemDescription: description, skillsList: skills, courseId: itemId});
+        navigation.navigate("Idea", {
+            itemId: item.id, 
+            itemTitle: item.title, 
+            itemDescription: item.description, 
+            skillsList: item.skills, 
+            courseId: itemId, 
+            currentUserId: currentUserId,
+            myTeam: item.myTeam});
     }
 
     return(
@@ -325,18 +351,15 @@ export default CourseScreen = ({route, navigation}) => {
                                 <Text style={texts.titleCentered}>{"Kurs bearbeiten"}</Text>
                                 <InputField
                                     title="Kursname"
-                                    placeholderText= "Kursname"
+                                    showError={editCourseNameErrorVisible}
+                                    placeholderText= {editCourseNameErrorVisible ? "Bitte einen Kursnamen angeben." : "Kursname"}
                                     value={editCourseName}
                                     onChangeText={changeEditCourseNameHandler}
                                 />
-                                {editCourseNameErrorVisible &&
-                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                                        Bitte einen Kursnamen angeben.
-                                    </Text>
-                                }
                                 <InputField
-                                    title= "End-Datum"
+                                    title= "Team-Einteilung"
                                     isButton= {true}
+                                    showError={editCourseDateErrorVisible}
                                     icon={icons.date}
                                     placeholderText= "Datum auswählen …"
                                     value={format(editCourseDate, "dd.MM.yyyy")}
@@ -356,6 +379,23 @@ export default CourseScreen = ({route, navigation}) => {
                                     confirmTextIOS="OK"
                                     onConfirm={changeEditCourseDateHandler}
                                     onCancel={() => {setEditCourseDateVisible(false)}}
+                                />
+                                <InputField
+                                    isButton={true}
+                                    icon={icons.time}
+                                    placeholderText= "Uhrzeit auswählen …"
+                                    value={format(editCourseDate, "hh:mm")}
+                                    onPress={() => {setEditCourseTimeVisible(true); Keyboard.dismiss()}}
+                                />
+                                <DateTimePickerModal
+                                    isVisible={editCourseTimeVisible}
+                                    date={editCourseDate}
+                                    mode="time"
+                                    headerTextIOS="Uhrzeit auswählen"
+                                    cancelTextIOS="Abbrechen"
+                                    confirmTextIOS="OK"
+                                    onConfirm={changeEditCourseDateHandler}
+                                    onCancel={() => {setEditCourseTimeVisible(false)}}
                                 />
                                 <View style={boxes.unPaddedRow}>
                                     <NumberInput
@@ -386,37 +426,25 @@ export default CourseScreen = ({route, navigation}) => {
                             <View style={boxes.mainContainer}>
                                 <Text style={texts.titleCentered}>{"Idee hinzufügen"}</Text>
                                 <InputField
-                                    placeholderText= "Titel"
+                                    showError={newIdeaNameErrorVisible}
+                                    placeholderText= {newIdeaNameErrorVisible ? "Bitte einen Namen angeben." : "Titel"}
                                     value={currentNewIdeaName}
                                     onChangeText={changeNewIdeaNameHandler}
                                 />
-                                {newIdeaNameErrorVisible &&
-                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                                        Bitte einen Namen angeben.
-                                    </Text>
-                                }
                                 <InputField
-                                    placeholderText= "Beschreibung"
+                                    showError={newIdeaTextErrorVisible}
+                                    placeholderText= {newIdeaTextErrorVisible ? "Bitte einen Beschreibungstext angeben." : "Beschreibung"}
                                     value={currentNewIdeaText}
                                     onChangeText={changeNewIdeaTextHandler}
                                     multiline={true}
                                 />
-                                {newIdeaTextErrorVisible &&
-                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                                        Bitte einen Beschreibungstext angeben.
-                                    </Text>
-                                }
                                 <AttributePreviewTile
+                                    showError={selectedSkillsListErrorVisible}
                                     title="Passende Fähigkeiten"
-                                    subtitle={selectedSkillsList.length > 0 ? selectedSkillsList.join(", ") : ""}
+                                    subtitle={selectedSkillsListErrorVisible ? "Bitte mindestens eine Fähigkeit angeben." : selectedSkillsList.length > 0 ? selectedSkillsList.join(", ") : ""}
                                     index={0}
                                     onPress={() => {setAddSkillsVisible(true)}}
                                 />
-                                {selectedSkillsListErrorVisible &&
-                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                                        Bitte mindestens eine Fähigkeit angeben.
-                                    </Text>
-                                }
                             </View> 
                         )
                     }}
@@ -447,10 +475,12 @@ export default CourseScreen = ({route, navigation}) => {
                         <Text style={texts.subHeader}>{format(courseDate, "dd.MM.yyyy")}</Text>
                         <Text style={texts.subHeader}>{creator}</Text>
                     </View>
-                    <ScrollRow
-                        data= {members}
-                        onPress={(id) => {viewProfileHandler(id)}}
-                    />
+                    {members.length > 0 &&
+                        <ScrollRow
+                            data= {members}
+                            onPress={viewProfileHandler}
+                        />
+                    }   
                 </View>
                 }  
                 {courseDataLoading && 
@@ -462,25 +492,25 @@ export default CourseScreen = ({route, navigation}) => {
                 <View style={ boxes.paddedRow }>
                     <ButtonSmall
                         title={userIsMember ? "Mitglied" : "Beitreten"}
-                        icon={userIsMember ? "checkTrue" : "checkFalse"}
+                        icon={userIsMember ? icons.checkTrue : icons.checkFalse}
                         onPress={joinCourseHandler}
                     />
                     <ButtonSmall
                         title={"Neue Idee"}
-                        icon={"plus"}
+                        icon={icons.plus}
                         onPress={() => {setNewIdeaVisible(true)}}
                     />
                 </View>
                 }
-                { userIsCreator && false && 
+                { userIsCreator && courseDate - (new Date()) < 0 && !evaluated && 
                 <View style={ boxes.paddedRow }>
                     <ButtonLarge
                         title={"Teams erstellen"}
-                        onPress={() => {}}
+                        onPress={setTeamsHandler}
                     />
                 </View>
                 }
-                { userIsCreator &&
+                { userIsCreator && courseDate - (new Date()) >= 0 && !evaluated && 
                 <View style={ boxes.paddedRow }>
                     <ButtonLarge
                         title={"Kurs bearbeiten"}
@@ -491,38 +521,45 @@ export default CourseScreen = ({route, navigation}) => {
             </View>
 
             <SwipeListView
-                style={{backgroundColor: "white"}}
+                style={{backgroundColor: colors.white}}
                 ref = {ref => setSwipeListView(ref)}
                 data={currentIdeas}
                 disableLeftSwipe = {true}
+                disableRightSwipe = {evaluated}
                 keyExtractor={(item, index) => index.toString()}
-                renderItem={(itemData) => 
+                onSwipeValueChange={onSwipeValueChange}
+                renderItem={({item, index}) => 
                         <ListTile
-                            onPress={() => {selectIdeaHandler(itemData.item.id, itemData.item.title, itemData.item.description, itemData.item.skills)}} 
-                            id={itemData.item.id}
-                            title={itemData.item.title}
-                            subtitle={itemData.item.description}
-                            skills={itemData.item.skills}
-                            isFavourite={itemData.item.id == currentFav}
-                            isNogo={itemData.item.id == currentNogo}
-                            index = {itemData.index}
+                            onPress={() => {selectIdeaHandler(item)}} 
+                            id={item.id}
+                            title={item.title}
+                            subtitle={item.description}
+                            skills={item.skills}
+                            isFavourite={item.id == currentFav}
+                            isNogo={item.id == currentNogo}
+                            index = {index}
+                            myTeam={item.myTeam}
                         />
                 }
-                renderHiddenItem={ (itemData) => 
-                        <View style={boxes.swipeRowTwo}>
+                renderHiddenItem={ ({item, index}) => 
+                        <View style={[boxes.swipeRowTwo, {backgroundColor: item.id == currentNogo ? colors.lightGrey : colors.red}]}>
                             <SwipeButton
+                                rowWidth={120}
                                 icon={icons.fav}
-                                backgroundColor={colors.darkBlue}
-                                onPress={(ref) => {addFavHandler(itemData.item.id)}}
+                                animation={rowSwipeAnimatedValues[index]}
+                                backgroundColor={item.id == currentFav ? colors.lightGrey : colors.darkBlue}
+                                onPress={(ref) => {addFavHandler(item.id)}}
                             />
                             <SwipeButton
+                                rowWidth={120}
                                 icon={icons.nogo}
-                                backgroundColor={colors.red}
-                                onPress={(ref) => {addNogoHandler(itemData.item.id)}}
+                                animation={rowSwipeAnimatedValues[index]}
+                                backgroundColor={item.id == currentNogo ? colors.lightGrey : colors.red}
+                                onPress={(ref) => {addNogoHandler(item.id)}}
                             />
                         </View>
                 }
-                leftOpenValue={120}
+                leftOpenValue={evaluated ? 0 : 120}
             />
 
         </View>
