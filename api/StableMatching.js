@@ -259,15 +259,12 @@ const updateMissingSkills = () => {
     }
 }
 
-const updateCommonInterests = () => {
+const compareInterests = (idea) => {
 
-    //Jede Idee durchgehen
-    for (const ideaId in ideas) {
-
-        var commonInterestsList = ideas[ideaId].commonInterests;
+    var commonInterestsList = idea.commonInterests;
 
         //Jeden Zugeorneten Teilnehmer durchgehen
-        for (const memberId of ideas[ideaId].team) {
+        for (const memberId of idea.team) {
 
             //Wurde der Teilnehmer schon gezählt?
             if(!members[memberId].interestsCounted){
@@ -296,7 +293,23 @@ const updateCommonInterests = () => {
             }     
         }
         //Interessenliste in Idee fest speichern
-        ideas[ideaId].commonInterests = commonInterestsList;
+        return commonInterestsList;
+
+}
+
+const updateCommonInterests = () => {
+
+    //Jede Idee durchgehen
+    for (const ideaId in ideas) {
+
+        ideas[ideaId].commonInterest = compareInterests(ideas[ideaId]);
+    } 
+
+    //Jede  leere Idee durchgehen
+    for (const ideaId in emptyIdeas) {
+
+        emptyIdeas[ideaId].commonInterest = compareInterests(emptyIdeas[ideaId]);
+             
     } 
 }
 
@@ -308,8 +321,8 @@ function addEmptyIdeas(unsorted) {
         newIdeaNumber +=1;
         var newIdea ="empty"+newIdeaNumber;
 
-        ideas[newIdea]={
-        skills: [],// Skills der neuen member abspeichern?
+        emptyIdeas[newIdea]={
+        skills: [],
         missingSkills: [],
         favs: [],
         nogos: [],
@@ -322,24 +335,24 @@ function addEmptyIdeas(unsorted) {
         unsorted.forEach(memId => {
 
             //erster Teilnehmer in Idee speichern
-            if(ideas[newIdea].team.length == 0){
-                ideas[newIdea].team.push(memId);
+            if(emptyIdeas[newIdea].team.length == 0){
+                emptyIdeas[newIdea].team.push(memId);
                 //Erste skills speichern
                 members[memId].skills.forEach(skill => {
-                    ideas[newIdea].skills.push(skill);    
+                    emptyIdeas[newIdea].skills.push(skill);    
                 });
                 //Erste Interessen speichern
                 members[memId].interests.forEach(interest => {
-                    ideas[newIdea].commonInterests.push(interest);    
+                    emptyIdeas[newIdea].commonInterests.push(interest);    
                 });
                 sorted.push(memId);
                 members[memId].sorted = true;
             }
-            else if(ideas[newIdea].team.length < maxMembers){
+            else if(emptyIdeas[newIdea].team.length < maxMembers){
                 var score = 0;
 
                 //Score erhöhen wenn User ein gemeinsames Interesse hat 
-                for (const interest of ideas[newIdea].commonInterests) {
+                for (const interest of emptyIdeas[newIdea].commonInterests) {
                         
                     if (members[memId].interests.indexOf(interest) >= 0) {
                         score += 1;
@@ -359,10 +372,10 @@ function addEmptyIdeas(unsorted) {
 
         scoreList.forEach(member => {
 
-            if(ideas[newIdea].team.length < emptyIdeaMemberCount){
-                ideas[newIdea].team.push(member[0]);
+            if(emptyIdeas[newIdea].team.length < emptyIdeaMemberCount){
+                emptyIdeas[newIdea].team.push(member[0]);
                 members[member[0]].skills.forEach(skill => {
-                    if(ideas[newIdea].skills.indexOf(skill) < 0) ideas[newIdea].skills.push(skill);    
+                    if(emptyIdeas[newIdea].skills.indexOf(skill) < 0) emptyIdeas[newIdea].skills.push(skill);    
                 });
                 sorted.push(member[0]);
                 members[member[0]].sorted = true;
@@ -375,29 +388,33 @@ function addEmptyIdeas(unsorted) {
     }
     //Letzte Idee Anzahl der Member prüfen, sonst auflösen
     
-    if(ideas[newIdea].team.length < minMembers){
+    if(emptyIdeas[newIdea].team.length < minMembers){
 
-        let missingForMinMembers=  1-(ideas[newIdea].team.length / minMembers);
-        var lastMembers = ideas[newIdea].team;
+        let missingForMinMembers=  1-(emptyIdeas[newIdea].team.length / minMembers);
+        var lastMembers = emptyIdeas[newIdea].team;
 
         // bei über 20% fehlenden Leuten zur MindestAnzahl = auflösen
         //Sonst beibehalten
         if(missingForMinMembers > 0.25){
             let missingSkillsList=[];
-            resolve(newIdea);
+            resolve(newIdea, true);
 
             console.log(lastMembers);
             //Auf Ideen mit freien Plätzen aufteilen
-            //Gibt es an diesem Punkt noch Scorepunkte die man mit einbeziehen könnte?
-            for (const ideaId in ideas) {
+            //Erst leere Idee durchgehen
+            for (const ideaId in emptyIdeas) {
 
                 lastMembers.forEach(member => {
 
-                    if(ideas[ideaId].team.length < maxMembers && !members[member].sorted){
-                        ideas[ideaId].team.push(member); 
+                    if(emptyIdeas[ideaId].team.length < maxMembers && !members[member].sorted){
+                        emptyIdeas[ideaId].team.push(member); 
                         members[member].sorted = true;
                     } 
                 });
+            }
+
+            // Dann die vorherigen Ideen durchgehen und missingSkills speichern
+            for (const ideaId in ideas) {
 
                 missingSkillsList.push([ideaId, ideas[ideaId].missingSkills.length]);
             } 
@@ -608,7 +625,8 @@ const bestRemainingMatchFinal = () => {
     updateCommonInterests();
 }
 
-function resolve(ideaToResolve){
+function resolve(ideaToResolve, isEmptyIdea){
+
     // Dafür müssen alle freien Plätze mit freien Usern verglichen werden
     var freeSpaces = 0;
     for (const ideaId in ideas) {
@@ -616,20 +634,42 @@ function resolve(ideaToResolve){
             freeSpaces += ((maxMembers+1)- ideas[ideaId].team.length);
         }
     }
+    for (const ideaId in emptyIdeas) {
+        if (ideaId != ideaToResolve) {
+            freeSpaces += ((maxMembers+1)- emptyIdeas[ideaId].team.length);
+        }
+    }
     var freeUsers = 0;
     
     for (const memId in members) {
         if (!members[memId].sorted) freeUsers ++;
     }
-    freeUsers += ideas[ideaToResolve].team.length;
+
+    if(isEmptyIdea){
+        freeUsers += emptyIdeas[ideaToResolve].team.length;
+    }
+    else{
+        freeUsers += ideas[ideaToResolve].team.length;
+    }
+    
 
     if (freeUsers <= freeSpaces) {
         console.log("… und kann aufgelöst werden\n");
         // In diesem Fall kann die Gruppe aufgelöst werden
-        for (const memId of ideas[ideaToResolve].team) {
-            members[memId].sorted = false;
+
+        if(isEmptyIdea){
+            for (const memId of emptyIdeas[ideaToResolve].team) {
+                members[memId].sorted = false;
+            }
+            delete emptyIdeas[ideaToResolve];
         }
-        delete ideas[ideaToResolve];
+        else{
+            for (const memId of ideas[ideaToResolve].team) {
+            members[memId].sorted = false;
+            }
+            delete ideas[ideaToResolve];
+        }
+        
         // MUSS DIE IDEE NOCH AUS ALLEN SCORELISTEN ENTFERNT WERDEN?
     }
 }
@@ -659,7 +699,7 @@ function resolvePartiallyFilledIdeas() {
     
         // Prüfen, ob die unvollständigste Idee aufgelöst werden kann 
         const ideaToResolve = partialIdeas[i][0];
-        resolve(ideaToResolve); 
+        resolve(ideaToResolve, false); 
     }   
 }
 
@@ -685,7 +725,7 @@ const resolveIncompleteIdeas = () => {
         // Prüfen, ob die unvollständigste Idee aufgelöst werden kann 
         const ideaToResolve = incompleteIdeas[i][0];
 
-        resolve(ideaToResolve); 
+        resolve(ideaToResolve, false); 
     }
 }
 
@@ -696,6 +736,13 @@ const printList = () => {
         while (outputIdeaId.length < 8) outputIdeaId = outputIdeaId + " ";
         consoleLog += outputIdeaId + ": ";
         for(const member in ideas[ideaId].team) consoleLog = consoleLog + ideas[ideaId].team[member] + " | "
+        consoleLog += "\n";
+    }
+    for (const ideaId in emptyIdeas) {
+        outputIdeaId = "" + ideaId;
+        while (outputIdeaId.length < 8) outputIdeaId = outputIdeaId + " ";
+        consoleLog += outputIdeaId + ": ";
+        for(const member in emptyIdeas[ideaId].team) consoleLog = consoleLog + emptyIdeas[ideaId].team[member] + " | "
         consoleLog += "\n";
     }
     console.log(consoleLog); 
