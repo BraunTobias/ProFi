@@ -343,7 +343,8 @@ function addEmptyIdeas(unsorted) {
                 });
                 //Erste Interessen speichern
                 members[memId].interests.forEach(interest => {
-                    emptyIdeas[newIdea].commonInterests.push(interest);    
+                    emptyIdeas[newIdea].commonInterests.push([interest,1]);
+                    members[memId].interestsCounted = true;    
                 });
                 sorted.push(memId);
                 members[memId].sorted = true;
@@ -354,7 +355,7 @@ function addEmptyIdeas(unsorted) {
                 //Score erhöhen wenn User ein gemeinsames Interesse hat 
                 for (const interest of emptyIdeas[newIdea].commonInterests) {
                         
-                    if (members[memId].interests.indexOf(interest) >= 0) {
+                    if (members[memId].interests.indexOf(interest[0]) >= 0) {
                         score += 1;
                     }
                 }
