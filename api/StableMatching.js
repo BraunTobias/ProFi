@@ -302,13 +302,13 @@ const updateCommonInterests = () => {
     //Jede Idee durchgehen
     for (const ideaId in ideas) {
 
-        ideas[ideaId].commonInterest = compareInterests(ideas[ideaId]);
+        ideas[ideaId].commonInterests = compareInterests(ideas[ideaId]);
     } 
 
     //Jede  leere Idee durchgehen
     for (const ideaId in emptyIdeas) {
 
-        emptyIdeas[ideaId].commonInterest = compareInterests(emptyIdeas[ideaId]);
+        emptyIdeas[ideaId].commonInterests = compareInterests(emptyIdeas[ideaId]);
              
     } 
 }
@@ -790,6 +790,7 @@ const proFiFunction = () => {
             console.log(ideas[idea].missingSkills + " fehlt");
         }
     }
+    console.log(emptyIdeas);
 }
 
 proFiFunction();
