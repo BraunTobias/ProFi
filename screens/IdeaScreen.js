@@ -229,7 +229,7 @@ export default IdeaScreen = ({route, navigation}) => {
     const swipeButtons = (item) => {
         if (item.replyTo) {
             return(
-                <View style={[boxes.swipeRowOne, {backgroundColor: colors.red}]}>
+                <View style={[boxes.swipeRowOne, {backgroundColor: item.user == currentUserId ? colors.red : item.likes.indexOf(currentUserId) < 0 ? colors.darkBlue : colors.lightBlue}]}>
                     <SwipeButton
                         animation={new Animated.Value(60)}
                         rowWidth={60}
@@ -273,7 +273,7 @@ export default IdeaScreen = ({route, navigation}) => {
             }
 
             {/* Kommentar schreiben */}
-            <Modal visible= { newCommentVisible } animationType= 'slide'>
+            <Modal visible= { newCommentVisible } animationType= 'slide' onRequestClose={() => setNewCommentVisible(false)}>
                 <ModalContent
                     subheader= { () => {}}
                     content= { () => {
@@ -294,7 +294,7 @@ export default IdeaScreen = ({route, navigation}) => {
                 />
             </Modal>
             {/* Auf Kommentar antworten */}
-            <Modal visible= { newReplyVisible } animationType= 'slide'>
+            <Modal visible= { newReplyVisible } animationType= 'slide' onRequestClose={() => setNewReplyVisible(false)}>
                 <ModalContent
                     subheader= { () => {}}
                     content= { () => {
@@ -326,7 +326,7 @@ export default IdeaScreen = ({route, navigation}) => {
             </Modal>
                 
             {/* // Idee bearbeiten */}
-            <Modal visible= { editIdeaVisible } animationType= 'slide'>
+            <Modal visible= { editIdeaVisible } animationType= 'slide' onRequestClose={() => setEditIdeaVisible(false)}>
                 <ModalContent
                     subheader= { () => {}}
                     content= { () => {
@@ -359,7 +359,7 @@ export default IdeaScreen = ({route, navigation}) => {
                     onDismiss= {pressEditIdeaHandler}
                 />
                 {/* // Idee bearbeiten: Fähigkeiten auswählen */}
-                <Modal visible={addSkillsVisible} animationType='slide'>
+                <Modal visible={addSkillsVisible} animationType='slide' onRequestClose={() => setAddSkillsVisible(false)}>
                     {/* <Text style={texts.titleCentered}>{"Fähigkeiten hinzufügen"}</Text> */}
                     <AttributeSelect
                         attributeType = "skills"

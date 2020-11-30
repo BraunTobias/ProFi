@@ -10,7 +10,7 @@ export default PushNotificationSwitch = props => {
       onValueChange={props.onValueChange}
       value={props.value}
       trackColor={{ false: colors.lightBlue, true: colors.darkBlue }}
-      thumbColor={Platform.OS === 'android' && pushEvaluateEnabled ? colors.lightBlue : colors.white}
+      thumbColor={colors.white}
       ios_backgroundColor={colors.lightBlue}
       />
   );

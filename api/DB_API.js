@@ -50,7 +50,12 @@ const DB = {
     removePushNotifications: async function(onSuccess) {
         const currentUserID = firebase.auth().currentUser.uid;
 
-        const token = await Notifications.getExpoPushTokenAsync();    
+        try {
+            const token = await Notifications.getExpoPushTokenAsync();    
+        } catch(e) {
+            onSuccess();
+            return;
+        }
 
         const snapshotData = await firebase.firestore().collection("users").doc(currentUserID).get();
         if (snapshotData.data().tokens) {
@@ -127,7 +132,6 @@ const DB = {
         })
         .then(async () => {
             if (firebase.auth().currentUser) {
-                console.log("Hallo");
                 const currentUserID = firebase.auth().currentUser.uid;
                 const snapshotDoc = await firebase.firestore().collection("users").doc(currentUserID).get();
                 this.registerPushNotifications(() => {}, () => {});
@@ -591,10 +595,8 @@ const DB = {
         if (snapshotDoc.data().likes)               newLikes = snapshotDoc.data().likes;
         if (newLikes.indexOf(currentUserID) < 0)    newLikes.push(currentUserID);
         else                                        newLikes = newLikes.filter(item => item !== currentUserID);
-
         firebase.firestore().collection(courseType).doc(courseId).collection("ideas").doc(ideaId).collection("comments").doc(commentId).set({
-            
-            likes: [],
+            likes: newLikes
         }, {merge: true}); 
         onSuccess();
     },
@@ -935,9 +937,17 @@ const DB = {
     
     getAttributesFromUser: async function(userId, onSuccess) {
         const attributesList = [];
-        const snapshot = await firebase.firestore().collection("users").doc(userId).collection("skills").get();
+        const skillSnapshot = await firebase.firestore().collection("users").doc(userId).collection("skills").get();
+        const interestSnapshot = await firebase.firestore().collection("users").doc(userId).collection("interests").get();
 
-        snapshot.forEach((categoryDoc) => {
+        skillSnapshot.forEach((categoryDoc) => {
+            for (const title in categoryDoc.data()) {
+                if (categoryDoc.data()[title] == true) {
+                    attributesList.push(title);
+                }
+            }
+        });    
+        interestSnapshot.forEach((categoryDoc) => {
             for (const title in categoryDoc.data()) {
                 if (categoryDoc.data()[title] == true) {
                     attributesList.push(title);

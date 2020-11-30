@@ -27,6 +27,8 @@ const icons = {
     like: require("./assets/ui-icons/like.png"),
     reply: require("./assets/ui-icons/reply.png"),
     edit: require("./assets/ui-icons/edit.png"),
+    notification: require("./assets/ui-icons/notification.png"),
+    security: require("./assets/ui-icons/security.png"),
     date: require("./assets/ui-icons/date.png"),
     time: require("./assets/ui-icons/time.png"),
     info: require("./assets/ui-icons/info.png"),
@@ -39,6 +41,7 @@ const boxes = {
     mainContainer: {
         height: "100%",
         width: "100%",
+        // paddingTop: 50,
         paddingHorizontal: 20,
         backgroundColor: colors.lightGrey,
         alignItems: "center",

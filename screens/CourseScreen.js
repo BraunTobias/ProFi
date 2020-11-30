@@ -20,22 +20,19 @@ import AttributePreviewTile from '../components/AttributePreviewTile';
 
 export default CourseScreen = ({route, navigation}) => {
 
-    const {itemId} = route.params;
-    const {itemTitle} = route.params;
-    const {itemDate} = route.params;
-    const {isMember} = route.params;
     const {currentUserId} = route.params;
+    const {courseInfo} = route.params;
 
     // State Hooks
     const [currentIdeas, setCurrentIdeas] = useState([]);
     const [swipeListView, setSwipeListView] = useState();
-    const [courseName, setCourseName] = useState(itemTitle);
-    const [courseDate, setCourseDate] = useState(itemDate.toDate());
+    const [courseName, setCourseName] = useState(courseInfo.title);
+    const [courseDate, setCourseDate] = useState(courseInfo.date.toDate());
     const [creator, setCreator] = useState("");
     const [members, setMembers] = useState([]);
     const [minMembers, setMinMembers] = useState(0);
     const [maxMembers, setMaxMembers] = useState(0);
-    const [userIsMember, setUserIsMember] = useState(isMember);
+    const [userIsMember, setUserIsMember] = useState(courseInfo.isMember);
     const [userIsCreator, setUserIsCreator] = useState(false);
     const [currentFav, setCurrentFav] = useState();
     const [currentNogo, setCurrentNogo] = useState();
@@ -43,7 +40,7 @@ export default CourseScreen = ({route, navigation}) => {
 
     // States für Auswertungs-Ansicht
     const [evaluating, setEvaluating] = useState(false);
-    const [evaluated, setEvaluated] = useState(false);
+    const [evaluated, setEvaluated] = useState(courseInfo.evaluated);
 
     // State Hooks für Modals
     const [editCourseVisible, setEditCourseVisible] = useState(false);
@@ -51,8 +48,8 @@ export default CourseScreen = ({route, navigation}) => {
     const [editCourseTimeVisible, setEditCourseTimeVisible] = useState(false);
     const [editCourseNameErrorVisible, setEditCourseNameErrorVisible] = useState(false);
     const [editCourseDateErrorVisible, setEditCourseDateErrorVisible] = useState(false);
-    const [editCourseName, setEditCourseName] = useState(itemTitle);
-    const [editCourseDate, setEditCourseDate] = useState(itemDate.toDate());
+    const [editCourseName, setEditCourseName] = useState(courseInfo.title);
+    const [editCourseDate, setEditCourseDate] = useState(courseInfo.date.toDate());
     const [editCourseMinMembers, setEditCourseMinMembers] = useState(0);
     const [editCourseMaxMembers, setEditCourseMaxMembers] = useState(0);
     const [newIdeaVisible, setNewIdeaVisible] = useState(false);
@@ -105,18 +102,19 @@ export default CourseScreen = ({route, navigation}) => {
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerTitle: itemId,
+            headerTitle: courseInfo.id,
         });
     }, [navigation]);
 
     const getCourseData = () => {
-        DB.getCourseData(itemId, (data) => {
+        DB.getCourseData(courseInfo.id, (data) => {
             setCreator(data.creatorName);
             setMinMembers(data.minMembers);
             setMaxMembers(data.maxMembers);
             setEditCourseMinMembers(data.minMembers);
             setEditCourseMaxMembers(data.maxMembers);
             setMembers(data.members);
+            setEvaluated(data.evaluated);
             setCourseDataLoading(false);
             setUserIsCreator(data.creator == currentUserId);
         });    
@@ -126,7 +124,7 @@ export default CourseScreen = ({route, navigation}) => {
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             getCourseData();
-            DB.getIdeasList(itemId, "courses", (ideasList) => {
+            DB.getIdeasList(courseInfo.id, "courses", (ideasList) => {
                 setCurrentIdeas(ideasList);
                 for (const idea in ideasList) {
                     if (ideasList[idea].favourites && ideasList[idea].favourites.indexOf(currentUserId) >= 0) {
@@ -146,11 +144,11 @@ export default CourseScreen = ({route, navigation}) => {
         } else {
             swipeListView.safeCloseOpenRow();
             if (currentFav == ideaId) {
-                DB.deletePref("favourites", itemId, () => {
+                DB.deletePref("favourites", courseInfo.id, () => {
                     setCurrentFav("");
                 });
             } else {
-                DB.addPref("favourites", itemId, ideaId, () => {
+                DB.addPref("favourites", courseInfo.id, ideaId, () => {
                     setCurrentFav(ideaId);
                     if (currentNogo == ideaId) setCurrentNogo("");
                 });
@@ -163,11 +161,11 @@ export default CourseScreen = ({route, navigation}) => {
         } else {
             swipeListView.safeCloseOpenRow();
             if (currentNogo == ideaId) {
-                DB.deletePref("nogos", itemId, () => {
+                DB.deletePref("nogos", courseInfo.id, () => {
                     setCurrentNogo("");
                 });
             } else {
-                DB.addPref("nogos", itemId, ideaId, () => {
+                DB.addPref("nogos", courseInfo.id, ideaId, () => {
                     setCurrentNogo(ideaId);
                     if (currentFav == ideaId) {
                         setCurrentFav("");
@@ -181,12 +179,12 @@ export default CourseScreen = ({route, navigation}) => {
             setJoinInfoVisible(true); 
         } else {
             if (!userIsMember) {
-                DB.joinCourse(itemId, () => {
+                DB.joinCourse(courseInfo.id, () => {
                     setUserIsMember(true);
                     getCourseData();
                 }, (e) => {console.log(e)})
             } else {
-                DB.exitCourse(itemId, () => {
+                DB.exitCourse(courseInfo.id, () => {
                     setUserIsMember(false);
                     getCourseData();
                 })
@@ -203,12 +201,12 @@ export default CourseScreen = ({route, navigation}) => {
     const pressNewIdeaHandler = (committed) => {
         if (committed) {
             if (currentNewIdeaName.length > 1 && currentNewIdeaText.length > 1 && selectedSkillsList.length > 0) {
-                DB.addIdea(itemId, currentNewIdeaName, currentNewIdeaText, selectedSkillsList, [], () => {
+                DB.addIdea(courseInfo.id, currentNewIdeaName, currentNewIdeaText, selectedSkillsList, [], () => {
                     setNewIdeaVisible(false);
                     setCurrentNewIdeaName("");
                     setCurrentNewIdeaText("");    
                     setSelectedSkillsList([]);
-                    DB.getIdeasList(itemId, "courses", (ideasList) => {
+                    DB.getIdeasList(courseInfo.id, "courses", (ideasList) => {
                         setCurrentIdeas(ideasList);
                     });
                 }, (error) => {setCurrentWarning(error)});
@@ -236,12 +234,10 @@ export default CourseScreen = ({route, navigation}) => {
     }
 
     const addSkillHandler = (skill) => {
-        var oldList = selectedSkillsList;
-        if (oldList.indexOf(skill) < 0) {
-            oldList.push(skill);
+        if (selectedSkillsList.indexOf(skill) < 0) {
+            selectedSkillsList.push(skill);
         } else {
-            var newList = oldList.filter(item => item !== skill);
-            setSelectedSkillsList(newList);
+            setSelectedSkillsList(selectedSkillsList.filter(item => item !== skill));
         }
         if (selectedSkillsList.length > 0) setSelectedSkillsListErrorVisible(false);
     }
@@ -249,7 +245,7 @@ export default CourseScreen = ({route, navigation}) => {
     const pressEditCourseHandler = (committed) => {
         if (committed) {
             if (editCourseName.length > 1 && editCourseDate - (new Date()) >= 0) {
-                DB.editCourse(itemId, editCourseName, editCourseDate, editCourseMinMembers, editCourseMaxMembers, () => {
+                DB.editCourse(courseInfo.id, editCourseName, editCourseDate, editCourseMinMembers, editCourseMaxMembers, () => {
                     setEditCourseVisible(false);
                     setEditCourseNameErrorVisible(false);
                     setEditCourseDateErrorVisible(false);
@@ -308,7 +304,7 @@ export default CourseScreen = ({route, navigation}) => {
             itemTitle: item.title, 
             itemDescription: item.description, 
             skillsList: item.skills, 
-            courseId: itemId, 
+            courseId: courseInfo.id, 
             currentUserId: currentUserId,
             myTeam: item.myTeam});
     }
@@ -342,7 +338,7 @@ export default CourseScreen = ({route, navigation}) => {
                 />
             }
             {/* Kurs bearbeiten */}
-            <Modal visible= { editCourseVisible } animationType= 'slide'>
+            <Modal visible= { editCourseVisible } animationType= 'slide' onRequestClose={() => setEditCourseVisible(false)}>
                 <ModalContent
                     subheader= { () => {}}
                     content= { () => {
@@ -418,7 +414,7 @@ export default CourseScreen = ({route, navigation}) => {
 
 
             {/* Idee erstellen */}
-            <Modal visible= { newIdeaVisible } animationType= 'slide'>
+            <Modal visible= { newIdeaVisible } animationType= 'slide' onRequestClose={() => setNewIdeaVisible(false)}>
                 <ModalContent
                     subheader= { () => {}}
                     content= { () => {
@@ -452,7 +448,7 @@ export default CourseScreen = ({route, navigation}) => {
                 />
 
                 {/* // Idee hinzufügen: Fähigkeiten auswählen */}
-                <Modal visible={addSkillsVisible} animationType='slide'>
+                <Modal visible={addSkillsVisible} animationType='slide' onRequestClose={() => setAddSkillsVisible(false)}>
                     {/* <Text style={texts.titleCentered}>{"Fähigkeiten hinzufügen"}</Text> */}
                     <AttributeSelect
                         attributeType = "skills"
@@ -465,7 +461,6 @@ export default CourseScreen = ({route, navigation}) => {
 
 
             <View style={ boxes.subHeader }>
-                {!courseDataLoading && 
                 <View>
                     <View style={ boxes.paddedRow }>
                         <Text style={texts.subHeader}>{courseName}</Text>
@@ -475,16 +470,16 @@ export default CourseScreen = ({route, navigation}) => {
                         <Text style={texts.subHeader}>{format(courseDate, "dd.MM.yyyy")}</Text>
                         <Text style={texts.subHeader}>{creator}</Text>
                     </View>
-                    {members.length > 0 &&
+                    {!courseDataLoading && members.length > 0 &&
                         <ScrollRow
                             data= {members}
                             onPress={viewProfileHandler}
                         />
-                    }   
+                    }
                 </View>
-                }  
+                
                 {courseDataLoading && 
-                <View style={{height: 119, justifyContent: "center"}}>
+                <View style={{height: 80, justifyContent: "center"}}>
                     <ActivityIndicator/>
                 </View>
                 }  

@@ -20,24 +20,18 @@ export default InputField = props => {
     if (props.isButton) {
       return(
         <TouchableOpacity onPress={props.onPress}>
-          <View style={[boxes.inputField, props.showError ? boxes.inputFieldError : {}, {flexDirection: "row", justifyContent: "space-between", alignItems:"center"}]}>
-            <TextInput
-                style= {[texts.inputField, {color: props.showError ? colors.red : colors.darkGrey}]}
-                autoCapitalize="none"
-                textAlign= "left"
-                placeholder= { props.placeholderText }
-                value= { props.value }
-                onChangeText= { text => props.onChangeText(text)}
-                pointerEvents={"none"}
-            />
-            <View style={boxes.inputFieldIconBox}>
-              <Image
-                style={boxes.inputFieldIcon}
-                source={props.icon}
-                resizeMode={"contain"}
-              />
+            <View style={[boxes.inputField, props.showError ? boxes.inputFieldError : {}, {flexDirection: "row", justifyContent: "space-between", alignItems:"center"}]}>
+                <Text style= {[texts.inputField, {color: props.showError ? colors.red : colors.darkGrey}]}>
+                  {props.value}
+                </Text>
+                <View style={boxes.inputFieldIconBox}>
+                    <Image
+                      style={boxes.inputFieldIcon}
+                      source={props.icon}
+                      resizeMode={"contain"}
+                    />
+                </View>
             </View>
-          </View>
         </TouchableOpacity>
       )
     } else {

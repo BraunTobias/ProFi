@@ -4,18 +4,6 @@ import { icons, colors, boxes, texts } from '../Styles';
 
 export default ListTile = props => {
 
-  // const fadeAnim = new Animated.Value(0);
-
-  // const fadeIn = () => {
-  //   if (props.animate) {
-  //     Animated.timing(fadeAnim, {
-  //       toValue: 22,
-  //       duration: 500,
-  //       useNativeDriver: false
-  //     }).start();
-  //   }
-  // };
-
   const colorStyle = {
     backgroundColor: props.myTeam ? colors.darkBlue : props.index % 2 === 0 ? colors.white : colors.lightGrey
   }

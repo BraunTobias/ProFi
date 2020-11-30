@@ -9,6 +9,7 @@ import ModalContent from './ModalContent';
 import AttributeList from './AttributeList';
 import ProfileImage from './ProfileImage';
 import Padding from './Padding';
+import ButtonSmall from './ButtonSmall';
 
 export default ProfileView = props => {
 
@@ -17,6 +18,8 @@ export default ProfileView = props => {
     const [currentEmail, setCurrentEmail] = useState("");
     const [imageUrl, setImageUrl] = useState("");
     const [skillsList, setSkillsList] = useState([]);
+    const [interestsList, setInterestsList] = useState([]);
+    const [viewedList, setViewedList] = useState([]);
    
     useEffect(() => {
         DB.getUserInfoById(props.userId, (name, imageUrl, bio, email) => {
@@ -28,12 +31,16 @@ export default ProfileView = props => {
         DB.getAttributesFromUser(props.userId, (filterList) => {
             DB.getAllAttributes("skills", filterList, "", "", (attributesList) => {
                 setSkillsList(attributesList);
+                setViewedList(attributesList);
+            }, () => {});
+            DB.getAllAttributes("interests", filterList, "", "", (attributesList) => {
+                setInterestsList(attributesList);
             }, () => {});
         });    
     }, []);
 
     return(
-        <Modal visible={props.visible} animationType='slide'>
+        <Modal visible={props.visible} animationType='slide' onRequestClose={props.onDismiss}>
             <Fragment>
                 <SafeAreaView style={{ flex: 0, backgroundColor: colors.lightBlue }} />
                 <SafeAreaView style={{flex: 1, backgroundColor: colors.lightGrey}}>
@@ -59,10 +66,24 @@ export default ProfileView = props => {
                         </View>
                         <Padding height={10}/>
                     </View>
-
+                    <View style={[boxes.paddedRow, {backgroundColor: colors.white}]}>
+                        <ButtonSmall
+                            inactive={viewedList == interestsList}
+                            title="Fähigkeiten"
+                            icon={icons.info}
+                            onPress={() => setViewedList(skillsList)}
+                            />
+                        <ButtonSmall
+                            inactive={viewedList != interestsList}
+                            title="Interessen"
+                            icon={icons.info}
+                            onPress={() => setViewedList(interestsList)}
+                        />
+                    </View>
                     <AttributeList style={{flexGrow: 1, backgroundColor: "red"}}
-                        attList={skillsList}
+                        attList={viewedList}
                     />
+
                     <View style={boxes.modalButton}>
                         <ButtonLarge
                             title={"OK"}

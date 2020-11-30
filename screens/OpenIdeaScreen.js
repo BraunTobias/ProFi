@@ -309,7 +309,7 @@ export default OpenIdeaScreen = ({route, navigation}) => {
             }
 
             {/* Kommentar schreiben */}
-            <Modal visible= { newCommentVisible } animationType= 'slide'>
+            <Modal visible= { newCommentVisible } animationType= 'slide' onRequestClose={() => setAddSkillsVisible(false)}>
                 <ModalContent
                     subheader= { () => {}}
                     content= { () => {
@@ -330,7 +330,7 @@ export default OpenIdeaScreen = ({route, navigation}) => {
                 />
             </Modal>
             {/* Auf Kommentar antworten */}
-            <Modal visible= { newReplyVisible } animationType= 'slide'>
+            <Modal visible= { newReplyVisible } animationType= 'slide' onRequestClose={() => setNewReplyVisible(false)}>
                 <ModalContent
                     subheader= { () => {}}
                     content= { () => {
@@ -362,7 +362,7 @@ export default OpenIdeaScreen = ({route, navigation}) => {
             </Modal>
                 
             {/* // Idee bearbeiten */}
-            <Modal visible= { editIdeaVisible } animationType= 'slide'>
+            <Modal visible= { editIdeaVisible } animationType= 'slide' onRequestClose={() => setEditIdeaVisible(false)}>
                 <ModalContent
                     subheader= { () => {}}
                     content= { () => {
@@ -395,7 +395,7 @@ export default OpenIdeaScreen = ({route, navigation}) => {
                     onDismiss= {pressEditIdeaHandler}
                 />
                 {/* // Idee bearbeiten: Fähigkeiten auswählen */}
-                <Modal visible={addSkillsVisible} animationType='slide'>
+                <Modal visible={addSkillsVisible} animationType='slide' onRequestClose={() => setAddSkillsVisible(false)}>
                     {/* <Text style={texts.titleCentered}>{"Fähigkeiten hinzufügen"}</Text> */}
                     <AttributeSelect
                         attributeType = "skills"
