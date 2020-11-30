@@ -462,7 +462,7 @@ const DB = {
             course["id"] = doc.id;
             course["listKey"] = count;
             count ++;
-            if (course.members.indexOf(currentUserID) >= 0) course.userIsMember = true;
+            if (course.members && course.members.indexOf(currentUserID) >= 0) course.userIsMember = true;
             else course.userIsMember = false;
             if (courseList[course.semester]) courseList[course.semester].push(course);
             else courseList[course.semester] = [course];
@@ -671,6 +671,21 @@ const DB = {
             var sortedSkills = snapshotDoc.data().skills;
             sortedSkills.sort();
             ideaData.skills = sortedSkills;
+
+            if (ideaData.team) {
+                var teamList = [];
+                for (var memberId of ideaData.team) {
+                    var member = {userId: memberId};
+                    await this.getUserInfoById(memberId, (name, url) => {
+                        member.userName = name;
+                        member.imageUrl = url;
+                    });
+                    teamList.push(member);
+                }
+                ideaData.team = teamList;    
+            } else {
+                ideaData.team = [];
+            }
         }
         onSuccess(ideaData);
     },

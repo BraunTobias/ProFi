@@ -24,9 +24,11 @@ export default IdeaScreen = ({route, navigation}) => {
     const {courseId} = route.params;
     const {currentUserId} = route.params;
     const {myTeam} = route.params;
+    const {evaluated} = route.params;
 
     // State Hooks
     const [currentSkills, setCurrentSkills] = useState([]);
+    const [currentInterests, setCurrentInterests] = useState([]);
     const [currentComments, setCurrentComments] = useState([]);
     const [swipeListView, setSwipeListView] = useState();
     const [currentUserIsCreator, setCurrentUserIsCreator] = useState(false);
@@ -34,6 +36,7 @@ export default IdeaScreen = ({route, navigation}) => {
     const [ideaName, setIdeaName] = useState(itemTitle);
     const [ideaCreator, setIdeaCreator] = useState("");
     const [commentsLoading, setCommentsLoading] = useState(true);
+    const [members, setMembers] = useState([]);
 
     // State Hooks für Modal
     const [editIdeaVisible, setEditIdeaVisible] = useState(false);
@@ -80,27 +83,32 @@ export default IdeaScreen = ({route, navigation}) => {
             setCommentsLoading(false);
         });
         DB.getIdeaData(courseId, itemId, (data) => {
-            setCurrentSkills(data.skills);
+            if (data.skills) setCurrentSkills(data.skills);
+            if (data.interests) setCurrentInterests(data.interests);
             setSelectedSkillsList(data.skills);
             DB.getUserInfoById(data.creator, (userName) => {
                 setIdeaCreator(userName);
             });
-            if (data.creator == currentUserId) setCurrentUserIsCreator(true);
-            if (data.team && data.team.length > 0) {
-                const teamUidList = data.team;
-                var newTeamList = [];
-                for (const member in teamUidList) {
-                    const uid = teamUidList[member];
-                    DB.getUserInfoById(uid, (name, url) => {
-                        newTeamList.push({
-                            "userId": uid,
-                            "username": name,
-                            "imageUrl": url
-                        });
-                        // setTeam(newTeamList);
-                    });
-                }
+            if (evaluated) {
+                setMembers(data.team);
             }
+            if (data.creator == currentUserId) setCurrentUserIsCreator(true);
+            setMembers(data.team);
+            // if (data.team && data.team.length > 0) {
+            //     const teamUidList = data.team;
+            //     var newTeamList = [];
+            //     for (const member in teamUidList) {
+            //         const uid = teamUidList[member];
+            //         DB.getUserInfoById(uid, (name, url) => {
+            //             newTeamList.push({
+            //                 "userId": uid,
+            //                 "username": name,
+            //                 "imageUrl": url
+            //             });
+            //             // setTeam(newTeamList);
+            //         });
+            //     }
+            // }
         });
     }, []);
 
@@ -378,13 +386,24 @@ export default IdeaScreen = ({route, navigation}) => {
                     <Text style={texts.copy}>{ideaText}</Text>
                 </View>
                 <View style={ boxes.paddedRow }>
-                    <AttributePreviewTile
+                    { currentInterests.length == 0 &&
+                        <AttributePreviewTile
                         title="Passende Fähigkeiten"
                         subtitle={currentSkills.join(", ")}
                         index={0}
                         onPress={() => navigation.navigate('IdeaAttributes', {attributeType: "skills", filterList: currentSkills, title: "Passende Fähigkeiten"})}
                         />
+                    }
+                    { currentInterests.length > 0 &&
+                        <AttributePreviewTile
+                        title="Gemeinsame Interessen"
+                        subtitle={currentSkills.join(", ")}
+                        index={0}
+                        onPress={() => navigation.navigate('IdeaAttributes', {attributeType: "Interests", filterList: currentInterests, title: "Gemeinsame Interessen"})}
+                        />
+                    }
                 </View>
+
             </View>
 
             {commentsLoading && 
@@ -417,7 +436,8 @@ export default IdeaScreen = ({route, navigation}) => {
                     </SwipeRow>
                 }
                 ListHeaderComponent={
-                    currentUserIsCreator &&
+                    <View style={{backgroundColor: evaluated ? colors.darkBlue : colors.white}}>
+                    { currentUserIsCreator && !evaluated &&
                     <View>
                         <Padding height={5}/>
                         <View style={ boxes.paddedRow }>
@@ -426,6 +446,14 @@ export default IdeaScreen = ({route, navigation}) => {
                                 onPress={() => setEditIdeaVisible(true)}
                             />
                         </View>
+                    </View>
+                    }
+                    {evaluated && members.length > 0 &&
+                        <ScrollRow
+                            data= {members}
+                            onPress={(id) => {viewProfileHandler(id)}}
+                        />
+                    }
                     </View>
                 }
                 ListFooterComponent={

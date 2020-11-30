@@ -32,7 +32,7 @@ export default CourseScreen = ({route, navigation}) => {
     const [members, setMembers] = useState([]);
     const [minMembers, setMinMembers] = useState(0);
     const [maxMembers, setMaxMembers] = useState(0);
-    const [userIsMember, setUserIsMember] = useState(courseInfo.isMember);
+    const [userIsMember, setUserIsMember] = useState(courseInfo.userIsMember);
     const [userIsCreator, setUserIsCreator] = useState(false);
     const [currentFav, setCurrentFav] = useState();
     const [currentNogo, setCurrentNogo] = useState();
@@ -303,6 +303,7 @@ export default CourseScreen = ({route, navigation}) => {
             itemId: item.id, 
             itemTitle: item.title, 
             itemDescription: item.description, 
+            evaluated: evaluated,
             skillsList: item.skills, 
             courseId: courseInfo.id, 
             currentUserId: currentUserId,
@@ -542,15 +543,17 @@ export default CourseScreen = ({route, navigation}) => {
                                 rowWidth={120}
                                 icon={icons.fav}
                                 animation={rowSwipeAnimatedValues[index]}
-                                backgroundColor={item.id == currentFav ? colors.lightGrey : colors.darkBlue}
+                                backgroundColor={colors.darkBlue}
                                 onPress={(ref) => {addFavHandler(item.id)}}
+                                deactivated={item.id == currentFav}
                             />
                             <SwipeButton
                                 rowWidth={120}
                                 icon={icons.nogo}
                                 animation={rowSwipeAnimatedValues[index]}
-                                backgroundColor={item.id == currentNogo ? colors.lightGrey : colors.red}
+                                backgroundColor={colors.red}
                                 onPress={(ref) => {addNogoHandler(item.id)}}
+                                deactivated={item.id == currentNogo}
                             />
                         </View>
                 }
