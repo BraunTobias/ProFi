@@ -418,8 +418,8 @@ export default OpenIdeaScreen = ({route, navigation}) => {
                         title="Passende Fähigkeiten"
                         subtitle={currentSkills.join(", ")}
                         index={0}
-                        onPress={() => navigation.navigate('IdeaAttributes', {attributeType: "skills", filterList: currentSkills, filterOpenCourse: courseId, filterOpenIdea: itemId, title: "Passende Fähigkeiten"})}
-                        />
+                        onPress={() => navigation.navigate("IdeaAttributes", {filterList: currentSkills, courseType: "openCourses", courseId: courseId, ideaId: itemId, title: "Passende Fähigkeiten"})}
+                    />
                 </View>
                 <View style={ boxes.paddedRow }>
                     { !evaluated && 
@@ -472,6 +472,7 @@ export default OpenIdeaScreen = ({route, navigation}) => {
                                     icon={icons.edit}
                                     onPress={() => setEditIdeaVisible(true)}
                                 />
+                                <View style={boxes.buttonSpacing}/>
                                 <ButtonSmall
                                     title={"Team einteilen"}
                                     icon={icons.fav}

@@ -1184,13 +1184,12 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
         onSuccess(ideas, emptyIdeas);
     }
     async function notifyUser(id, message) {
-        functions.logger.log("notify user " + id);
         
         const snapshotUserDoc = await db.collection("users").doc(id).get();
-        functions.logger.log("notify user " + id + " 2");
+        functions.logger.log("notify user " + id);
         if (snapshotUserDoc) {
             const userData = snapshotUserDoc.data();
-            if (userData.pushNotificationsAllowed && userData.pushNotificationsAllowed.evaluate && userData.tokens) {
+            if (userData && userData.pushNotificationsAllowed && userData.pushNotificationsAllowed.evaluate && userData.tokens) {
                 for (const token of userData.tokens) {
                     notificationsArray.push({"to": token, "title": "Du wurdest eingeteilt!", "body": message});   
                     functions.logger.log("sending notification to " + token);
@@ -1273,40 +1272,57 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
         functions.logger.log(courseMembersObj);
 
         proFiFunction(courseMembersObj, courseIdeasObj, minMembers, maxMembers, async (ideas, emptyIdeas) => {
-
-            // Teams für bestehende Ideen speichern
-            for (const ideaId in ideas) {
-                db.collection("courses").doc(id).collection("ideas").doc(ideaId).set({
-                    team: ideas[ideaId].team
-                }, {merge: true});
-
-                // User benachrichtigen
-                for (const userId of ideas[ideaId].team) {
-                    await notifyUser(userId, "Du wurdest der Idee " + ideas[ideaId].title + " im Kurs " + dueCourses[id].title + " zugeteilt!");
-                }
-            }
+            functions.logger.log("________ EMPTY IDEAS 1 ________");
+            functions.logger.log(emptyIdeas);
 
             // Leere Ideen erstellen
-            for (const emptyIdea of emptyIdeas) {
+            for (const emptyIdea in emptyIdeas) {
+                functions.logger.log("________ EMPTY IDEAS 2 ________");
+                functions.logger.log(emptyIdeas[emptyIdea]);
+
+                var interestList = [];
+                for (interest of emptyIdeas[emptyIdea].commonInterests) {
+                    interestList.push(interest[0]);
+                }
+                functions.logger.log(interestList);
+
                 db.collection("courses").doc(id).collection("ideas").add({
                     title: "Team ohne Idee",
                     description: "",
                     creator: "ProFi-Algorithmus",
-                    interests: emptyIdea.interests,
-                    team: emptyIdea.team
+                    interests: interestList,
+                    skills: emptyIdeas[emptyIdea].skills,
+                    team: emptyIdeas[emptyIdea].team
                 }, {merge: true});
-
-                // User benachrichtigen
-                for (const userId of emptyIdea.team) {
-                    await notifyUser(userId, "Du wurdest einem Team im Kurs " + dueCourses[id].title + " zugeteilt!");
-                }
             }
-            
+
+            // Teams für bestehende Ideen speichern
+            for (const ideaId in ideas) {
+                functions.logger.log("________ IDEAS ________");
+                functions.logger.log(ideas[ideaId]);
+
+                db.collection("courses").doc(id).collection("ideas").doc(ideaId).set({
+                    team: ideas[ideaId].team
+                }, {merge: true});
+            }
+
             // Evaluated für den Kurs setzen
             db.collection("courses").doc(id).set({
                 evaluating: false,
                 evaluated: true
             }, {merge: true});
+            
+            // User benachrichtigen
+            for (const emptyIdea in emptyIdeas) {
+                for (const userId of emptyIdeas[emptyIdea].team) {
+                    await notifyUser(userId, "Du wurdest einem Team im Kurs " + dueCourses[id].title + " zugeteilt!");
+                }
+            }
+            for (const ideaId in ideas) {
+                for (const userId of ideas[ideaId].team) {
+                    await notifyUser(userId, "Du wurdest der Idee " + ideas[ideaId].title + " im Kurs " + dueCourses[id].title + " zugeteilt!");
+                }
+            }
 
             functions.logger.log("SENDING ALL");
             fetch("https://exp.host/--/api/v2/push/send", {

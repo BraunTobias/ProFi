@@ -188,7 +188,8 @@ export default OpenCourseScreen = ({route, navigation}) => {
                                         title= {"Mitglieder min."}
                                         value= {editCourseMinMembers}
                                         onChange={changeEditCourseMinMembersHandler}
-                                        />
+                                    />
+                                    <View style={boxes.buttonSpacing}/>
                                     <NumberInput
                                         title= {"Mitglieder max."}
                                         value= {editCourseMaxMembers}

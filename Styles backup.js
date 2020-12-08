@@ -1,5 +1,7 @@
 import { StyleSheet, Dimensions } from "react-native";
 
+const width = Dimensions.get('window').width; //full width
+
 const colors = {
     darkBlue: '#222f56',
     mediumBlue: '#808aa5',
@@ -9,6 +11,7 @@ const colors = {
     red: '#640023',
     white: 'white'
 }
+
 const icons = {
     profilePlaceholder: require("./assets/ui-icons/user.png"),
     checkTrue: require("./assets/ui-icons/check-true.png"),
@@ -103,7 +106,7 @@ const boxes = {
     },
     buttonSmall: {
         height: 45,
-        flexGrow: 1,
+        width: (width - 40) / 2,
         paddingLeft: 15,
         paddingRight: 5,
         marginVertical: 5,
@@ -119,18 +122,17 @@ const boxes = {
     },
     buttonSmallInactive: {
         height: 45,
-        flexGrow: 1,
+        width: (width - 40) / 2,
         paddingLeft: 15,
         paddingRight: 5,
         marginVertical: 5,
         backgroundColor: colors.lightBlue,
         borderRadius: 7,
+        borderWidth: 2,
+        borderColor: colors.white,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center"
-    },
-    buttonSpacing: {
-        width: 10
     },
     buttonLargeSolid: {
         height: 45,
@@ -161,8 +163,10 @@ const boxes = {
         tintColor: colors.white
     },
     numberInput: {
-        maxWidth: "100%",
+        flex: 1,
         alignItems: "center",
+        maxWidth: (width - 50) / 2,
+        marginRight: 0
     },
     numberInputButton: {
         width: 40, 
@@ -223,9 +227,12 @@ const boxes = {
         justifyContent: "space-between",
     },
     commentTile: {
-        width: "100%",
-        paddingHorizontal: 15,
+        flex: 1,
+        paddingLeft: 15,
+        paddingRight: 35,
         paddingVertical: 10,
+        // minHeight: 100,
+        // width: width,
         flexDirection: "row",
         alignItems: "flex-start",
         justifyContent: "flex-start",
@@ -244,14 +251,19 @@ const boxes = {
         justifyContent: "flex-start"
     },
     commentTileHeader: {
+        // width: "100%",
         flexDirection: "row", 
         justifyContent: "space-between", 
         alignItems: "baseline",
         marginBottom: 2,
     },
     commentTileContent: {
-        width: 0, 
-        flexGrow: 1,
+        width: width - 90, 
+        justifyContent: "center", 
+        paddingStart: 15,
+    },
+    commentReplyTileContent: {
+        width: width - 110, 
         justifyContent: "center", 
         paddingStart: 15,
     },
@@ -273,7 +285,6 @@ const boxes = {
         flex: 1,
         height: "100%",
         width: 60,
-        maxWidth: 60,
         alignItems: "center",
         justifyContent: "center",
     },
@@ -283,18 +294,15 @@ const boxes = {
     },
     swipeRowOne: {
         height: "100%", 
-        width: "80%",
+        width: width * 0.8,
         backgroundColor: colors.red,
-        borderBottomColor: colors.lightGrey,
-        borderBottomWidth: 1
     },
     swipeRowTwo: {
         height: "100%", 
-        width: "80%",
+        width: width * 0.8,
         backgroundColor: colors.red,
-        flexDirection: "row",
-        borderBottomColor: colors.lightGrey,
-        borderBottomWidth: 1
+        paddingRight: width * 0.8 -120,
+        flexDirection: "row"
     },
     modal: {
         flex: 1, 
@@ -312,7 +320,7 @@ const boxes = {
     },
     scrollRow: {
         height: 80,
-        width: "100%",
+        width: width,
         paddingVertical: 10,
     },
     smallProfileRow: {
@@ -344,7 +352,7 @@ const boxes = {
         borderRadius: 111,
     },
     profileViewImage: {
-        width: "100%",
+        width: width,
         height: 150,
         alignItems: "center",
         borderRadius: 111

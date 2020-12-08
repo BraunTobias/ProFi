@@ -29,13 +29,13 @@ export default ProfileView = props => {
             if (imageUrl) setImageUrl(imageUrl);
         });
         DB.getAttributesFromUser(props.userId, (filterList) => {
-            DB.getAllAttributes("skills", filterList, "", "", (attributesList) => {
+            DB.getAllAttributes("skills", filterList, null, null, null, (attributesList) => {
                 setSkillsList(attributesList);
                 setViewedList(attributesList);
-            }, () => {});
-            DB.getAllAttributes("interests", filterList, "", "", (attributesList) => {
+            });
+            DB.getAllAttributes("interests", filterList, null, null, null, (attributesList) => {
                 setInterestsList(attributesList);
-            }, () => {});
+            });
         });    
     }, []);
 
@@ -64,15 +64,17 @@ export default ProfileView = props => {
                         <View style={boxes.centeredRow}>
                             <Text style={texts.copy}>{currentEmail}</Text>
                         </View>
-                        <Padding height={10}/>
+                        <Padding height={7}/>
                     </View>
+                    <Padding height={5}/>
                     <View style={[boxes.paddedRow, {backgroundColor: colors.white}]}>
                         <ButtonSmall
                             inactive={viewedList == interestsList}
                             title="Fähigkeiten"
                             icon={icons.info}
                             onPress={() => setViewedList(skillsList)}
-                            />
+                        />
+                        <View style={boxes.buttonSpacing}/>
                         <ButtonSmall
                             inactive={viewedList != interestsList}
                             title="Interessen"

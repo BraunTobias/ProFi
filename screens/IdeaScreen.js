@@ -35,6 +35,7 @@ export default IdeaScreen = ({route, navigation}) => {
     const [ideaText, setIdeaText] = useState(itemDescription);
     const [ideaName, setIdeaName] = useState(itemTitle);
     const [ideaCreator, setIdeaCreator] = useState("");
+    const [ideaCreatorId, setIdeaCreatorId] = useState("");
     const [commentsLoading, setCommentsLoading] = useState(true);
     const [members, setMembers] = useState([]);
 
@@ -86,6 +87,7 @@ export default IdeaScreen = ({route, navigation}) => {
             if (data.skills) setCurrentSkills(data.skills);
             if (data.interests) setCurrentInterests(data.interests);
             setSelectedSkillsList(data.skills);
+            setIdeaCreatorId(data.creator);
             DB.getUserInfoById(data.creator, (userName) => {
                 setIdeaCreator(userName);
             });
@@ -317,6 +319,7 @@ export default IdeaScreen = ({route, navigation}) => {
                                         comment={currentReplyComment.text}
                                         timestamp={currentReplyComment.time}
                                         likes={currentReplyComment.likes.length}
+                                        replyPreview={true}
                                     />
                                 </View>
                                 <InputField
@@ -382,28 +385,19 @@ export default IdeaScreen = ({route, navigation}) => {
                 <View style={ boxes.paddedRow }>
                     <Text style={texts.subHeaderLarge}>{ideaName}</Text>
                 </View>
+                { ideaText.length > 0 &&
+                    <View style={ boxes.paddedRow }>
+                        <Text style={texts.copy}>{ideaText}</Text>
+                    </View>
+                }
                 <View style={ boxes.paddedRow }>
-                    <Text style={texts.copy}>{ideaText}</Text>
-                </View>
-                <View style={ boxes.paddedRow }>
-                    { currentInterests.length == 0 &&
-                        <AttributePreviewTile
-                        title="Passende Fähigkeiten"
-                        subtitle={currentSkills.join(", ")}
+                    <AttributePreviewTile
+                        title={currentInterests.length > 0 ? "Gemeinsamkeiten" : "Passende Fähigkeiten"}
+                        subtitle={currentSkills.length > 0 ? currentSkills.join(", ") : "\n"}
                         index={0}
-                        onPress={() => navigation.navigate('IdeaAttributes', {attributeType: "skills", filterList: currentSkills, title: "Passende Fähigkeiten"})}
-                        />
-                    }
-                    { currentInterests.length > 0 &&
-                        <AttributePreviewTile
-                        title="Gemeinsame Interessen"
-                        subtitle={currentSkills.join(", ")}
-                        index={0}
-                        onPress={() => navigation.navigate('IdeaAttributes', {attributeType: "Interests", filterList: currentInterests, title: "Gemeinsame Interessen"})}
-                        />
-                    }
+                        onPress={() => navigation.navigate("IdeaAttributes", {filterList: currentSkills, secondaryFilterList: currentInterests, courseType: "courses", courseId: courseId, ideaId: itemId, title: currentInterests.length > 0 ? "Gemeinsamkeiten" : "Passende Fähigkeiten"})}
+                    />
                 </View>
-
             </View>
 
             {commentsLoading && 
@@ -459,7 +453,7 @@ export default IdeaScreen = ({route, navigation}) => {
                 ListFooterComponent={
                     !commentsLoading && !currentUserIsCreator &&
                     <View style={boxes.ideaFooter}>
-                        <Text style={texts.ideaFooter}>{"Idee von " + ideaCreator}</Text>
+                        <Text style={texts.ideaFooter}>{ideaCreatorId == "ProFi-Algorithmus" ? "Automatisch erstellte Idee" : "Idee von " + ideaCreator}</Text>
                     </View>
                 }
             />

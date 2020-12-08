@@ -17,7 +17,7 @@ export default CommentTile = props => {
     }
     
     return (
-    <View style={[boxes.commentTile, colorStyle, {minHeight: props.likes > 0 ? 100 : 70}]}>
+    <View style={[colorStyle, boxes.commentTile, {minHeight: props.likes > 0 ? 100 : 70, paddingHorizontal: props.replyPreview ? 0 : 15}]}>
         {props.isReply == true && 
             <Image
                 style={boxes.commentReplyTile}
@@ -43,7 +43,8 @@ export default CommentTile = props => {
             </View>
             }
         </View>
-        <View style={props.isReply ? boxes.commentReplyTileContent : boxes.commentTileContent}>
+
+        <View style={boxes.commentTileContent}>
             <View style={boxes.commentTileHeader}>            
                 <Text style = {texts.commentTileHeader}>{props.userName}</Text>
                 <Text style = {texts.commentTileTime}>{date}</Text>

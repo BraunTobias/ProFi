@@ -1,7 +1,7 @@
 import React  from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
-import { boxes, icons } from "../Styles";
+import { boxes, colors, icons } from "../Styles";
 
 export default Padding = props => {
 
