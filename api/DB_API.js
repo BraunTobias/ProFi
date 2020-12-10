@@ -36,7 +36,7 @@ const DB = {
         const token = await Notifications.getExpoPushTokenAsync();    
 
         const snapshotData = await firebase.firestore().collection("users").doc(currentUserID).get();
-        if (snapshotData.data().tokens) {
+        if (token && snapshotData.data().tokens) {
             var tokenList = snapshotData.data().tokens;
             if (tokenList.indexOf(token.data) < 0) {
                 tokenList.push(token.data);
@@ -50,17 +50,24 @@ const DB = {
     removePushNotifications: async function(onSuccess) {
         const currentUserID = firebase.auth().currentUser.uid;
 
-        const token = await Notifications.getExpoPushTokenAsync();    
+        try {
+            const token = await Notifications.getExpoPushTokenAsync();    
 
-        const snapshotData = await firebase.firestore().collection("users").doc(currentUserID).get();
-        if (snapshotData.data().tokens) {
-            var tokenList = snapshotData.data().tokens;
-            tokenList = tokenList.filter(item => item != token.data);
-            firebase.firestore().collection("users").doc(currentUserID).set({
-                tokens: tokenList,
-            }, {merge: true});
+            const snapshotData = await firebase.firestore().collection("users").doc(currentUserID).get();
+            if (token && snapshotData.data().tokens) {
+                var tokenList = snapshotData.data().tokens;
+                tokenList = tokenList.filter(item => item != token.data);
+                firebase.firestore().collection("users").doc(currentUserID).set({
+                    tokens: tokenList,
+                }, {merge: true});
+                onSuccess();
+            }
+    
+        } catch(e) {
             onSuccess();
+            return;
         }
+
     },
 
     // Kopiert von https://stackoverflow.com/questions/48006903/react-unique-id-generation
@@ -127,7 +134,6 @@ const DB = {
         })
         .then(async () => {
             if (firebase.auth().currentUser) {
-                console.log("Hallo");
                 const currentUserID = firebase.auth().currentUser.uid;
                 const snapshotDoc = await firebase.firestore().collection("users").doc(currentUserID).get();
                 this.registerPushNotifications(() => {}, () => {});
@@ -142,6 +148,36 @@ const DB = {
                 onSignedOut();
             });
         });
+    },
+    // Erhaltene Info abspeichern
+    setInfoReceived: async function(infoType) {
+        const currentUserID = firebase.auth().currentUser.uid;
+        var infoList = [];
+
+        const userSnapshotDoc = await firebase.firestore().collection("users").doc(currentUserID).get();
+        if (userSnapshotDoc && userSnapshotDoc.data().infosReceived) {
+            infoList = userSnapshotDoc.data().infosReceived;
+        }
+        infoList.push(infoType);
+        firebase.firestore().collection("users").doc(currentUserID).set({
+            infosReceived: infoList
+        }, {merge: true}); 
+    },
+    // Erhaltene Info abrufen
+    getInfoReceived: async function(infoType, onFinished) {
+        const currentUserID = firebase.auth().currentUser.uid;
+
+        const userSnapshotDoc = await firebase.firestore().collection("users").doc(currentUserID).get();
+        if (userSnapshotDoc) {
+            const userData = userSnapshotDoc.data();
+            if (userData.infosReceived && userData.infosReceived.indexOf(infoType) >= 0) {
+                onFinished(true);
+            } else {
+                onFinished(false);
+            }
+        } else {
+            onFinished(false);
+        }
     },
     // Passwort zurücksetzen
     resetPassword: function(email, onSuccess, onError) {
@@ -262,7 +298,7 @@ const DB = {
     },
 
     // Neuen Kurs erstellen
-    addCourse: function(title, id, date, minMembers, maxMembers, onSuccess, onError) {
+    addCourse: function(title, id, link, date, minMembers, maxMembers, onSuccess, onError) {
         const currentUserID = firebase.auth().currentUser.uid;
 
         // ID generieren aus Kürzel und Semester
@@ -289,6 +325,7 @@ const DB = {
                 firebase.firestore().collection("courses").doc(courseId).set({
                     creator: currentUserID,
                     title: title,
+                    link: link,
                     date: date,
                     minMembers: minMembers,
                     maxMembers: maxMembers,
@@ -374,7 +411,7 @@ const DB = {
         });
     },
     // Kurs bearbeiten
-    editCourse: async function(courseId, title, date, minMembers, maxMembers, onSuccess, onError) {
+    editCourse: async function(courseId, title, link, date, minMembers, maxMembers, onSuccess, onError) {
         const currentUserID = firebase.auth().currentUser.uid;
 
         const oldCourseSnapshotDoc = await firebase.firestore().collection("courses").doc(courseId).get();
@@ -382,6 +419,7 @@ const DB = {
 
         firebase.firestore().collection("courses").doc(courseId).set({
             title: title,
+            link: link,
             date: date,
             minMembers: minMembers,
             maxMembers: maxMembers
@@ -458,15 +496,19 @@ const DB = {
             course["id"] = doc.id;
             course["listKey"] = count;
             count ++;
-            if (course.members.indexOf(currentUserID) >= 0) course.userIsMember = true;
+            if (course.members && course.members.indexOf(currentUserID) >= 0) course.userIsMember = true;
             else course.userIsMember = false;
             if (courseList[course.semester]) courseList[course.semester].push(course);
             else courseList[course.semester] = [course];
 
             // Kursliste eines Semesters nach Datum sortieren
             courseList[course.semester].sort((a, b) => {
-                if (b.date.toDate() > a.date.toDate()) return -1;
-                else if (b.date.toDate() < a.date.toDate()) return 1;
+                if (b.date.toDate() > a.date.toDate()) return 1;
+                else if (b.date.toDate() < a.date.toDate()) return -1;
+                else return 0;
+            });
+            courseList[course.semester].sort((a, b) => {
+                if (a.evaluated) return -1;
                 else return 0;
             });
         }); 
@@ -543,6 +585,7 @@ const DB = {
         ideasList.sort((a, b) => {
             if (a.myTeam) return -1;
             else if (b.myTeam) return 1;
+            else if (!a.team == -1) return 1;
             else return b.userSkillCount - a.userSkillCount;
         });
         
@@ -591,10 +634,8 @@ const DB = {
         if (snapshotDoc.data().likes)               newLikes = snapshotDoc.data().likes;
         if (newLikes.indexOf(currentUserID) < 0)    newLikes.push(currentUserID);
         else                                        newLikes = newLikes.filter(item => item !== currentUserID);
-
         firebase.firestore().collection(courseType).doc(courseId).collection("ideas").doc(ideaId).collection("comments").doc(commentId).set({
-            
-            likes: [],
+            likes: newLikes
         }, {merge: true}); 
         onSuccess();
     },
@@ -669,6 +710,21 @@ const DB = {
             var sortedSkills = snapshotDoc.data().skills;
             sortedSkills.sort();
             ideaData.skills = sortedSkills;
+
+            if (ideaData.team) {
+                var teamList = [];
+                for (var memberId of ideaData.team) {
+                    var member = {userId: memberId};
+                    await this.getUserInfoById(memberId, (name, url) => {
+                        member.userName = name;
+                        member.imageUrl = url;
+                    });
+                    teamList.push(member);
+                }
+                ideaData.team = teamList;    
+            } else {
+                ideaData.team = [];
+            }
         }
         onSuccess(ideaData);
     },
@@ -805,7 +861,7 @@ const DB = {
                 prospects: newProspectsArray
             }, {merge: true});        
         } 
-        if (snapshotDoc.data().members) {
+        if (snapshotDoc.data().members && !snapshotDoc.data().evaluated) {
             const membersArray = snapshotDoc.data().members;
             const newMembersArray = membersArray.filter(item => item !== currentUserID);
 
@@ -869,35 +925,48 @@ const DB = {
     },
 
     // Liste aller Skills bzw. Präferenzen ausgeben (kann gefiltert werden)
-    getAllAttributes: async function(attributeType, filterList, filterOpenCourse, filterOpenIdea, onSuccess, onError) {
+    getAllAttributes: async function(attributeType, filterList, courseType, courseId, ideaId, onSuccess) {
         var attributesList = [];
         var memberAttributes = {};
         var memberImages = {};
         var ideaMembers;
+        var isEmptyIdea = false;
         const currentUserID = firebase.auth().currentUser.uid;
         const snapshot = await firebase.firestore().collection("users").doc(currentUserID).collection(attributeType).get();
-        if (filterOpenCourse && filterOpenIdea) {
-            const snapshotIdeaDoc = await firebase.firestore().collection("openCourses").doc(filterOpenCourse).collection("ideas").doc(filterOpenIdea).get();
-            ideaMembers = snapshotIdeaDoc.data().members;
-            // Alle Mitglieder der Idee durchgehen und deren Attribute abspeichern
-            for (const member of ideaMembers) {
-                memberAttributes[member] = [];
-                await this.getUserInfoById(member, (name, imageUrl) => {
-                    memberImages[member] = imageUrl;
-                })
-                const snapshotUserAtt = await firebase.firestore().collection("users").doc(member).collection(attributeType).get();
-                if (snapshotUserAtt) {
-                    snapshotUserAtt.forEach(categoryDoc => {
-                        const categoryData = categoryDoc.data();
-                        for (const attribute in categoryData) {
-                            if (categoryData[attribute] && filterList[0] && filterList.indexOf(attribute) >= 0) {
-                                memberAttributes[member].push(attribute);
-                            }
+        // Die Profilbilder und Attribute der Mitglieder abspeichern (sofern die Idee Mitglieder hat)
+        // console.log(attributeType);
+        // console.log(filterList);
+        // console.log(courseType);
+        // console.log(courseId);
+        // console.log(ideaId);
+        if (courseType && courseId && ideaId) {
+            const snapshotIdeaDoc = await firebase.firestore().collection(courseType).doc(courseId).collection("ideas").doc(ideaId).get();
+            if (snapshotIdeaDoc) {
+                if (snapshotIdeaDoc.data().team) ideaMembers = snapshotIdeaDoc.data().team;
+                else if (snapshotIdeaDoc.data().members) ideaMembers = snapshotIdeaDoc.data().members;
+                if (snapshotIdeaDoc.data().creator == "ProFi-Algorithmus") isEmptyIdea = true;
+                if (ideaMembers) {
+                    for (const member of ideaMembers) {
+                        memberAttributes[member] = [];
+                        await this.getUserInfoById(member, (name, imageUrl) => {
+                            memberImages[member] = imageUrl;
+                        })
+                        const snapshotUserAtt = await firebase.firestore().collection("users").doc(member).collection(attributeType).get();
+                        if (snapshotUserAtt) {
+                            snapshotUserAtt.forEach(categoryDoc => {
+                                const categoryData = categoryDoc.data();
+                                for (const attribute in categoryData) {
+                                    if (categoryData[attribute] && filterList[0] && filterList.indexOf(attribute) >= 0) {
+                                        memberAttributes[member].push(attribute);
+                                    }
+                                }
+                            });
                         }
-                    });
+                    }
                 }
             }
         }
+
         // Neue Version für SectionList
         snapshot.forEach((categoryDoc) => {
             const categoryName = categoryDoc.id;
@@ -919,8 +988,10 @@ const DB = {
                             }
                         }
                     } 
-                    categoryAttributes.push(attributeObj);
-
+                    // Attribute nur anhängen wenn es keine leere Idee ist ODER es mehr als 2 User mit dem Attribut gibt 
+                    if (!isEmptyIdea || attributeObj.users.length > 1) {
+                        categoryAttributes.push(attributeObj);
+                    }
                 }
             }
             if (categoryAttributes.length > 0) {
@@ -930,14 +1001,23 @@ const DB = {
                 });
             }
         });  
+        // console.log(attributesList)
         onSuccess(attributesList);
     },
     
     getAttributesFromUser: async function(userId, onSuccess) {
         const attributesList = [];
-        const snapshot = await firebase.firestore().collection("users").doc(userId).collection("skills").get();
+        const skillSnapshot = await firebase.firestore().collection("users").doc(userId).collection("skills").get();
+        const interestSnapshot = await firebase.firestore().collection("users").doc(userId).collection("interests").get();
 
-        snapshot.forEach((categoryDoc) => {
+        skillSnapshot.forEach((categoryDoc) => {
+            for (const title in categoryDoc.data()) {
+                if (categoryDoc.data()[title] == true) {
+                    attributesList.push(title);
+                }
+            }
+        });    
+        interestSnapshot.forEach((categoryDoc) => {
             for (const title in categoryDoc.data()) {
                 if (categoryDoc.data()[title] == true) {
                     attributesList.push(title);

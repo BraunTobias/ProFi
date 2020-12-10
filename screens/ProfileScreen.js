@@ -277,7 +277,7 @@ export default ProfileScreen = ({navigation}) => {
         <TouchableWithoutFeedback onPress= { () => Keyboard.dismiss() }>
         <View style={{flex: 1}}>
             {/* Name ändern */}
-            <Modal visible= { editNameVisible } animationType= 'slide'>
+            <Modal visible= { editNameVisible } animationType= 'slide' onRequestClose={() => setEditNameVisible(false)}>
                 <ModalContent
                     subheader= { () => {}}
                     content= { () => {
@@ -297,7 +297,7 @@ export default ProfileScreen = ({navigation}) => {
                 />
             </Modal>
             {/* Bio ändern */}
-            <Modal visible= { editBioVisible } animationType= 'slide'>
+            <Modal visible= { editBioVisible } animationType= 'slide' onRequestClose={() => setEditBioVisible(false)}>
                 <ModalContent
                     subheader= { () => {}}
                     content= { () => {
@@ -316,7 +316,7 @@ export default ProfileScreen = ({navigation}) => {
                 />
             </Modal>
             {/* E-Mail ändern */}
-            <Modal visible= { editEmailVisible } animationType= 'slide'>
+            <Modal visible= { editEmailVisible } animationType= 'slide' onRequestClose={() => setEditEmailVisible(false)}>
                 <ModalContent
                     subheader= { () => {}}
                     content= { () => {
@@ -343,7 +343,7 @@ export default ProfileScreen = ({navigation}) => {
                 />
             </Modal>
             {/* Passwort ändern */}
-            <Modal visible= { editPasswordVisible } animationType= 'slide'>
+            <Modal visible= { editPasswordVisible } animationType= 'slide' onRequestClose={() => setEditPasswordVisible(false)}>
                 <ModalContent
                     subheader= { () => {}}
                     content= { () => {
@@ -380,7 +380,7 @@ export default ProfileScreen = ({navigation}) => {
                 />
             </Modal>
             {/* Push-Mitteilungen verwalten */}
-            <Modal visible= { manageNotificationsVisible } animationType= 'slide'>
+            <Modal visible= { manageNotificationsVisible } animationType= 'slide' onRequestClose={() => setManageNotificationsVisible(false)}>
                 <ModalContent
                     subheader= { () => {}}
                     content= { () => {
@@ -478,7 +478,7 @@ export default ProfileScreen = ({navigation}) => {
                         <InputField
                             placeholderText="E-Mail"
                             isButton= {true}
-                            icon={icons.edit}
+                            icon={icons.security}
                             value={currentMail}
                             onPress={() => {setEditEmailVisible(true)}}
                         />
@@ -487,7 +487,7 @@ export default ProfileScreen = ({navigation}) => {
                         <InputField
                             placeholderText="Passwort ändern"
                             isButton= {true}
-                            icon={icons.edit}
+                            icon={icons.security}
                             value="•••••••••"
                             onPress={() => {setEditPasswordVisible(true)}}
                         />
@@ -495,7 +495,7 @@ export default ProfileScreen = ({navigation}) => {
                     <View style={boxes.paddedRow}>
                         <InputField
                             isButton= {true}
-                            icon={icons.edit}
+                            icon={icons.notification}
                             value="Push-Mitteilungen verwalten"
                             onPress={() => {setManageNotificationsVisible(true)}}
                         />

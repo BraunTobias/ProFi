@@ -9,6 +9,7 @@ import ModalContent from './ModalContent';
 import AttributeList from './AttributeList';
 import ProfileImage from './ProfileImage';
 import Padding from './Padding';
+import ButtonSmall from './ButtonSmall';
 
 export default ProfileView = props => {
 
@@ -17,6 +18,8 @@ export default ProfileView = props => {
     const [currentEmail, setCurrentEmail] = useState("");
     const [imageUrl, setImageUrl] = useState("");
     const [skillsList, setSkillsList] = useState([]);
+    const [interestsList, setInterestsList] = useState([]);
+    const [viewedList, setViewedList] = useState([]);
    
     useEffect(() => {
         DB.getUserInfoById(props.userId, (name, imageUrl, bio, email) => {
@@ -26,14 +29,18 @@ export default ProfileView = props => {
             if (imageUrl) setImageUrl(imageUrl);
         });
         DB.getAttributesFromUser(props.userId, (filterList) => {
-            DB.getAllAttributes("skills", filterList, "", "", (attributesList) => {
+            DB.getAllAttributes("skills", filterList, null, null, null, (attributesList) => {
                 setSkillsList(attributesList);
-            }, () => {});
+                setViewedList(attributesList);
+            });
+            DB.getAllAttributes("interests", filterList, null, null, null, (attributesList) => {
+                setInterestsList(attributesList);
+            });
         });    
     }, []);
 
     return(
-        <Modal visible={props.visible} animationType='slide'>
+        <Modal visible={props.visible} animationType='slide' onRequestClose={props.onDismiss}>
             <Fragment>
                 <SafeAreaView style={{ flex: 0, backgroundColor: colors.lightBlue }} />
                 <SafeAreaView style={{flex: 1, backgroundColor: colors.lightGrey}}>
@@ -57,12 +64,28 @@ export default ProfileView = props => {
                         <View style={boxes.centeredRow}>
                             <Text style={texts.copy}>{currentEmail}</Text>
                         </View>
-                        <Padding height={10}/>
+                        <Padding height={7}/>
                     </View>
-
+                    <Padding height={5}/>
+                    <View style={[boxes.paddedRow, {backgroundColor: colors.white}]}>
+                        <ButtonSmall
+                            inactive={viewedList == interestsList}
+                            title="Fähigkeiten"
+                            icon={icons.info}
+                            onPress={() => setViewedList(skillsList)}
+                        />
+                        <View style={boxes.buttonSpacing}/>
+                        <ButtonSmall
+                            inactive={viewedList != interestsList}
+                            title="Interessen"
+                            icon={icons.info}
+                            onPress={() => setViewedList(interestsList)}
+                        />
+                    </View>
                     <AttributeList style={{flexGrow: 1, backgroundColor: "red"}}
-                        attList={skillsList}
+                        attList={viewedList}
                     />
+
                     <View style={boxes.modalButton}>
                         <ButtonLarge
                             title={"OK"}

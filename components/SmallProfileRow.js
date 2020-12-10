@@ -9,7 +9,6 @@ export default SmallProfileRow = props => {
 
     var data = props.data;
     var plusNumber = 0;
-    console.log(data);
     if (data.length > 4) {
         plusNumber = data.length - 3;
         data = data.slice(0, 3);

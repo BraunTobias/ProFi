@@ -3,8 +3,13 @@
   "expoServerNgrokUrl": null,
   "packagerNgrokUrl": null,
   "ngrokPid": null,
+<<<<<<< HEAD
   "packagerPort": null,
   "packagerPid": null,
+=======
+  "packagerPort": 19001,
+  "packagerPid": 44265,
+>>>>>>> a2ea88bcc92b147c79d4daa32bf8b99e67c08e15
   "webpackServerPort": null,
   "devToolsPort": 19002
 }

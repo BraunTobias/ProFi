@@ -14,6 +14,7 @@ import SwipeButton from '../components/SwipeButton';
 import ListTile from "../components/ListTile";
 import ModalContent from "../components/ModalContent";
 import Padding from '../components/Padding';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default HomeScreen = ({navigation}) => {
 
@@ -34,6 +35,7 @@ export default HomeScreen = ({navigation}) => {
     const [newCourseTimeVisible, setNewCourseTimeVisible] = useState(false);
     const [currentNewCourseName, setCurrentNewCourseName] = useState("");
     const [currentNewCourseId, setCurrentNewCourseId] = useState("");
+    const [currentNewCourseLink, setCurrentNewCourseLink] = useState("");
     const [currentNewCourseDate, setCurrentNewCourseDate] = useState(defaultTime);
     const [newCourseNameErrorVisible, setNewCourseNameErrorVisible] = useState(false);
     const [newCourseIdErrorVisible, setNewCourseIdErrorVisible] = useState(false);
@@ -54,24 +56,10 @@ export default HomeScreen = ({navigation}) => {
         const { key, value } = swipeData;
         rowSwipeAnimatedValues[key].setValue(Math.abs(value));
     };
-
-    // Für Info-Modal
-    const storeInfoReceived = async (info) => {
-        try {
-          await AsyncStorage.setItem(info, currentUserId);
-        } catch(e) {console.log(e);}
-    }
-    const getInfoReceived = async () => {
-        try {
-          const deleteInfo = await AsyncStorage.getItem("deleteInfoReceived");
-          if (deleteInfo == currentUserId) setDeleteInfoReceived(true);
-        } catch(e) {console.log(e);}
-    }
       
     const loadData = () => {
         DB.getCourseList((courseList) => {
             setCurrentCourses(courseList);
-            getInfoReceived();
         });
     }
 
@@ -79,6 +67,9 @@ export default HomeScreen = ({navigation}) => {
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             loadData();
+            DB.getInfoReceived("deleteCourse", (isReceived) => {
+                setDeleteInfoReceived(isReceived);
+            });    
         });
     }, []);
 
@@ -106,7 +97,7 @@ export default HomeScreen = ({navigation}) => {
     const pressNewCourseHandler = (committed) => {
         if (committed) {
             if (currentNewCourseName != "" && currentNewCourseId != "" && currentNewCourseDate - (new Date()) >= 0) {
-                DB.addCourse(currentNewCourseName, currentNewCourseId, currentNewCourseDate, currentNewCourseMinMembers, currentNewCourseMaxMembers, () => {
+                DB.addCourse(currentNewCourseName, currentNewCourseId, currentNewCourseLink, currentNewCourseDate, currentNewCourseMinMembers, currentNewCourseMaxMembers, () => {
                     setNewCourseVisible(false);
                     setCurrentNewCourseName("");
                     setCurrentNewCourseId("");    
@@ -140,6 +131,9 @@ export default HomeScreen = ({navigation}) => {
         setCurrentNewCourseId(enteredText.toUpperCase());
         if (enteredText != "") setNewCourseIdErrorVisible(false);
     }
+    const changeNewCourseLinkHandler = (enteredText) => {
+        setCurrentNewCourseLink(enteredText);
+    }
     const changeNewCourseMinMembersHandler = (number) => {
         setCurrentNewCourseMinMembers(number);
         if (number > currentNewCourseMaxMembers) setCurrentNewCourseMaxMembers(number);
@@ -149,13 +143,15 @@ export default HomeScreen = ({navigation}) => {
         if (number < currentNewCourseMinMembers) setCurrentNewCourseMinMembers(number);
     }
     const changeNewCourseDateHandler = (date) => {
-        setCurrentNewCourseDate(date);
+        var newDate = date;
+        newDate.setSeconds(0);
         setNewCourseDateVisible(false);
         setNewCourseTimeVisible(false);
-        if (date - (new Date()) < 0) setNewCourseDateErrorVisible(true);
+        setCurrentNewCourseDate(newDate);
+        if (newDate - (new Date()) < 0) setNewCourseDateErrorVisible(true);
         else  setNewCourseDateErrorVisible(false);
     }
-    const deleteCourseHandler = (id, date) => {
+    const deleteCourseHandler = (id) => {
         if (!deleteInfoReceived) {
             setDeleteInfoVisible(true); 
         } else {
@@ -166,12 +162,12 @@ export default HomeScreen = ({navigation}) => {
         }
     };
 
-    const selectCourseHandler = (id, title, date, userIsMember) => {
+    const selectCourseHandler = (courseInfo) => {
         swipeListView.safeCloseOpenRow();
-        if (date) {
-            navigation.navigate("Course", {itemId: id, itemTitle: title, isMember: userIsMember, itemDate: date, currentUserId: currentUserId});
+        if (courseInfo.date) {
+            navigation.navigate("Course", {courseInfo: courseInfo, currentUserId: currentUserId});
         } else {
-            navigation.navigate("Open course", {itemId: id, itemTitle: title, currentUserId: currentUserId});
+            navigation.navigate("Open course", {courseInfo: courseInfo, currentUserId: currentUserId});
         }
     }
 
@@ -180,13 +176,13 @@ export default HomeScreen = ({navigation}) => {
             
             <InfoModal 
                 visible={deleteInfoVisible}
-                onPress={() => {setDeleteInfoVisible(false); storeInfoReceived("deleteInfoReceived"); setDeleteInfoReceived(true);}}
+                onPress={() => {setDeleteInfoVisible(false); DB.setInfoReceived("deleteCourse"); setDeleteInfoReceived(true);}}
                 title="Kurs aus Liste löschen"
                 copy="Durch diese Aktion wird der Kurs aus deiner Liste entfernt. Möchtest du einen Kurs in der Liste behalten, aber kein Mitglied sein, tritt stattdessen auf der Kurs-Seite aus. Natürlich kannst du einen entfernten Kurs jederzeit über den Finden-Button wieder hinzufügen."
             />
 
             {/* Kurs finden */}
-            <Modal visible= { findCourseVisible } animationType= 'slide'>
+            <Modal visible= { findCourseVisible } animationType= 'slide' onRequestClose={() => setFindCourseVisible(false)}>
                 <ModalContent
                     subheader= { () => {}}
                     content= { () => {
@@ -206,11 +202,11 @@ export default HomeScreen = ({navigation}) => {
             </Modal>
 
             {/* Kurs erstellen */}
-            <Modal visible= { newCourseVisible } animationType= 'slide'>
+            <Modal visible= { newCourseVisible } animationType= 'slide' onRequestClose={() => setNewCourseVisible(false)}>
                 <ModalContent
                     subheader= { () => {}}
                     content= { () => 
-                            <View style={boxes.mainContainer}>
+                            <ScrollView nestedScrollEnabled={true} alwaysBounceVertical={false} contentContainerStyle= {boxes.mainContainer}>
                                 <Text style={texts.titleCentered}>{"Kurs erstellen"}</Text>
                                 <InputField
                                     title= "Kursname"
@@ -227,6 +223,15 @@ export default HomeScreen = ({navigation}) => {
                                     onChangeText={changeNewCourseIdHandler}
                                 />
                                 <InputField
+                                    title= "Emil-Link"
+                                    placeholderText= {"Hier Link einsetzen"}
+                                    value={currentNewCourseLink}
+                                    onChangeText={changeNewCourseLinkHandler}
+                                />
+                                <Padding height={5}/>
+                                <Text style={[texts.copy, {width: "100%"}]}>Aus dem Kürzel und dem Semester des Einteilungs-Datums wird die Kurs-ID erstellt.</Text>
+                                <Padding height={15}/>
+                                <InputField
                                     title= "Team-Einteilung"
                                     isButton= {true}
                                     showError={newCourseDateErrorVisible}
@@ -235,6 +240,7 @@ export default HomeScreen = ({navigation}) => {
                                     value={format(currentNewCourseDate, "dd.MM.yyyy")}
                                     onPress={() => {setNewCourseDateVisible(true); Keyboard.dismiss()}}
                                 />
+                                
                                 {newCourseDateErrorVisible &&
                                     <Text style={[boxes.unPaddedRow, texts.errorLine]}>
                                         Das Datum muss in der Zukunft liegen.
@@ -254,32 +260,37 @@ export default HomeScreen = ({navigation}) => {
                                     isButton={true}
                                     icon={icons.time}
                                     placeholderText= "Uhrzeit auswählen …"
-                                    value={format(currentNewCourseDate, "hh:mm")}
+                                    value={format(currentNewCourseDate, "HH:mm")}
                                     onPress={() => {setNewCourseTimeVisible(true); Keyboard.dismiss()}}
                                 />
                                 <DateTimePickerModal
                                     isVisible={newCourseTimeVisible}
                                     date={currentNewCourseDate}
                                     mode="time"
+                                    locale="en_GB"
+                                    is24Hour={true}
                                     headerTextIOS="Uhrzeit auswählen"
                                     cancelTextIOS="Abbrechen"
                                     confirmTextIOS="OK"
                                     onConfirm={changeNewCourseDateHandler}
                                     onCancel={() => {setNewCourseTimeVisible(false)}}
                                 />
+                                <Padding height={10}/>
                                 <View style={boxes.unPaddedRow}>
                                     <NumberInput
                                         title= {"Mitglieder min."}
                                         value= {currentNewCourseMinMembers}
                                         onChange={changeNewCourseMinMembersHandler}
-                                        />
+                                    />
+                                    <View style={boxes.buttonSpacing}/>
                                     <NumberInput
                                         title= {"Mitglieder max."}
                                         value= {currentNewCourseMaxMembers}
                                         onChange={changeNewCourseMaxMembersHandler}
                                     />
                                 </View>
-                            </View> 
+
+                            </ScrollView> 
                     }
                     onDismiss= {(committed) => {pressNewCourseHandler(committed)}}
                 />
@@ -294,6 +305,7 @@ export default HomeScreen = ({navigation}) => {
                         icon={icons.find}
                         onPress={() => {setFindCourseVisible(true)}}
                     />
+                    <View style={boxes.buttonSpacing}/>
                     <ButtonSmall
                         title={"Neuer Kurs"}
                         icon={icons.plus}
@@ -318,12 +330,14 @@ export default HomeScreen = ({navigation}) => {
                 renderItem={({ item, index, section }) => { 
                     return (
                         <ListTile
-                            onPress={() => {selectCourseHandler(item.id, item.title, item.date, item.userIsMember)}} 
+                            onPress={() => {selectCourseHandler(item)}} 
                             id={item.id}
                             title={item.title}
                             subtitle={item.date ? item.members.length + " Mitglieder, Gruppengröße " + item.minMembers + "-" + item.maxMembers + "\n" + format(item.date.toDate(), "dd.MM.yyyy") : "Gruppengröße " + item.minMembers + "-" + item.maxMembers + "\n" + "Kein Datum"}
                             index = {index}
                             isMember = {item.userIsMember}
+                            myTeam= {item.evaluated && item.members.indexOf(currentUserId) >= 0}
+                            inactive= {item.evaluated && item.members.indexOf(currentUserId) < 0}
                         />
                     )
                 }}
@@ -331,10 +345,10 @@ export default HomeScreen = ({navigation}) => {
                     return (
                         <Animated.View style={boxes.swipeRowOne}>
                             <SwipeButton
-                                rowWidth={60}
+                                rowWidth={80}
                                 animation={rowSwipeAnimatedValues[item.listKey]}
                                 backgroundColor={colors.red}
-                                icon={icons.delete}
+                                icon={icons.exit}
                                 onPress={(ref) => {deleteCourseHandler(item.id, item.date)}}
                             />
                         </Animated.View>

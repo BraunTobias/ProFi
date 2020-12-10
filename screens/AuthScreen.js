@@ -119,7 +119,7 @@ export default AuthScreen = () => {
             <StatusBar barStyle="dark-content"/>
 
             {/* Registrierung */}
-            <Modal visible={registerVisible} animationType='slide'>
+            <Modal visible={registerVisible} animationType='slide' onRequestClose={() => setRegisterVisible(false)}>
                 <ScrollView alwaysBounceVertical={false} contentContainerStyle= {boxes.mainContainer}>
                     <Text style={texts.titleCentered}>Registrierung</Text>
                     <InputField 
@@ -163,7 +163,7 @@ export default AuthScreen = () => {
                 </ScrollView>
             </Modal>
             {/* Passwort zurücksetzen */}
-            <Modal visible={resetPwVisible} animationType='slide'>
+            <Modal visible={resetPwVisible} animationType='slide' onRequestClose={() => setResetPwVisible(false)}>
                 <ScrollView alwaysBounceVertical={false} contentContainerStyle= {boxes.mainContainer}>
                     <Text style={texts.titleCentered}>Passwort zurücksetzen</Text>
                     <InputField 

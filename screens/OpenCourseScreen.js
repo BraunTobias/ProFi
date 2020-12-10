@@ -13,13 +13,12 @@ import AttributePreviewTile from '../components/AttributePreviewTile';
 
 export default OpenCourseScreen = ({route, navigation}) => {
 
-    const {itemId} = route.params;
-    const {itemTitle} = route.params;
     const {currentUserId} = route.params;
+    const {courseInfo} = route.params;
 
     // State Hooks
     const [currentIdeas, setCurrentIdeas] = useState([]);
-    const [courseName, setCourseName] = useState(itemTitle);
+    const [courseName, setCourseName] = useState(courseInfo.title);
     const [minMembers, setMinMembers] = useState(0);
     const [maxMembers, setMaxMembers] = useState(0);
     const [courseDataLoading, setCourseDataLoading] = useState(true);
@@ -27,7 +26,7 @@ export default OpenCourseScreen = ({route, navigation}) => {
     // State Hooks für Modals
     const [editCourseVisible, setEditCourseVisible] = useState(false);
     const [editCourseNameErrorVisible, setEditCourseNameErrorVisible] = useState(false);
-    const [editCourseName, setEditCourseName] = useState(itemTitle);
+    const [editCourseName, setEditCourseName] = useState(courseInfo.title);
     const [editCourseMinMembers, setEditCourseMinMembers] = useState(0);
     const [editCourseMaxMembers, setEditCourseMaxMembers] = useState(0);
     const [newIdeaVisible, setNewIdeaVisible] = useState(false);
@@ -53,14 +52,14 @@ export default OpenCourseScreen = ({route, navigation}) => {
     
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerTitle: itemTitle,
+            headerTitle: courseInfo.title,
         });
     }, [navigation]);
 
     // Wird nach dem Rendern ausgeführt
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            DB.getIdeasList(itemId, "openCourses", (ideasList) => {
+            DB.getIdeasList(courseInfo.id, "openCourses", (ideasList) => {
                 setCurrentIdeas(ideasList);
             });
         });
@@ -70,12 +69,12 @@ export default OpenCourseScreen = ({route, navigation}) => {
     const pressNewIdeaHandler = (committed) => {
         if (committed) {
             if (currentNewIdeaName.length > 1 && currentNewIdeaText.length > 1 && selectedSkillsList.length > 0) {
-                DB.addOpenIdea(itemId, currentNewIdeaName, currentNewIdeaText, selectedSkillsList, [], () => {
+                DB.addOpenIdea(courseInfo.id, currentNewIdeaName, currentNewIdeaText, selectedSkillsList, [], () => {
                     setNewIdeaVisible(false);
                     setCurrentNewIdeaName("");
                     setCurrentNewIdeaText("");    
                     setSelectedSkillsList([]);
-                    DB.getIdeasList(itemId, "openCourses", (ideasList) => {
+                    DB.getIdeasList(courseInfo.id, "openCourses", (ideasList) => {
                         setCurrentIdeas(ideasList);
                     });
                 }, (error) => {console.log(error)});
@@ -116,7 +115,7 @@ export default OpenCourseScreen = ({route, navigation}) => {
     const pressEditCourseHandler = (committed) => {
         if (committed) {
             if (editCourseName.length > 1) {
-                DB.editCourse(itemId, editCourseName, editCourseDate, editCourseMinMembers, editCourseMaxMembers, () => {
+                DB.editCourse(courseInfo.id, editCourseName, editCourseDate, editCourseMinMembers, editCourseMaxMembers, () => {
                     setEditCourseVisible(false);
                     setEditCourseNameErrorVisible(false);
                     setCourseName(editCourseName);
@@ -158,8 +157,8 @@ export default OpenCourseScreen = ({route, navigation}) => {
             itemTitle: item.title, 
             itemDescription: item.description, 
             skillsList: item.skills, 
-            courseId: itemId, 
-            courseTitle: itemTitle, 
+            courseId: courseInfo.id, 
+            courseTitle: courseInfo.title, 
             currentUserId: currentUserId, 
             isMember: item.userIsMember,
             myTeam: item.myTeam
@@ -170,7 +169,7 @@ export default OpenCourseScreen = ({route, navigation}) => {
         <View style={{flex:1}}> 
 
             {/* Kurs bearbeiten */}
-            <Modal visible= { editCourseVisible } animationType= 'slide'>
+            <Modal visible= { editCourseVisible } animationType= 'slide' onRequestClose={() => setEditCourseVisible(false)}>
                 <ModalContent
                     subheader= { () => {}}
                     content= { () => {
@@ -189,7 +188,8 @@ export default OpenCourseScreen = ({route, navigation}) => {
                                         title= {"Mitglieder min."}
                                         value= {editCourseMinMembers}
                                         onChange={changeEditCourseMinMembersHandler}
-                                        />
+                                    />
+                                    <View style={boxes.buttonSpacing}/>
                                     <NumberInput
                                         title= {"Mitglieder max."}
                                         value= {editCourseMaxMembers}
@@ -204,7 +204,7 @@ export default OpenCourseScreen = ({route, navigation}) => {
             </Modal>
 
             {/* Idee erstellen */}
-            <Modal visible= { newIdeaVisible } animationType= 'slide'>
+            <Modal visible= { newIdeaVisible } animationType= 'slide' onRequestClose={() => setNewIdeaVisible(false)}>
                 <ModalContent
                     subheader= { () => {}}
                     content= { () => {
@@ -238,7 +238,7 @@ export default OpenCourseScreen = ({route, navigation}) => {
                 />
 
                 {/* // Idee hinzufügen: Fähigkeiten auswählen */}
-                <Modal visible={addSkillsVisible} animationType='slide'>
+                <Modal visible={addSkillsVisible} animationType='slide' onRequestClose={() => setAddSkillsVisible(false)}>
                     {/* <Text style={texts.titleCentered}>{"Fähigkeiten hinzufügen"}</Text> */}
                     <AttributeSelect
                         attributeType = "skills"

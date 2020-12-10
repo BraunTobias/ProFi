@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import {FlatList, View, Text, SectionList, Image} from "react-native";
+import {FlatList, View, Text, SectionList, Image, ActivityIndicator} from "react-native";
 
 import { boxes, colors, styles, texts } from '../Styles';
 import ProfileImage from './ProfileImage';
@@ -29,6 +29,12 @@ export default AttributeList = props => {
                     </View>
                 );
             }}
+            ListFooterComponent={
+                props.loading &&
+                <View style={boxes.listLoading}>
+                    <ActivityIndicator size='small'/>
+                </View>
+            }
         />
     );
   

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import {FlatList, View, Text, Modal} from "react-native";
-import AsyncStorage from '@react-native-community/async-storage';
 
 import { boxes, colors, styles, texts } from '../Styles';
 import AttributeTile from '../components/AttributeTile';
@@ -19,22 +18,7 @@ export default AttributeScreen = ({route, navigation}) => {
     const [currentCategory, setCurrentCategory] = useState("");
     const [categoriesList, setCategoriesList] = useState([]);
     const [displayedSkills, setDisplayedSkills] = useState([]);
-    const [skillsInfoVisible, setSkillsInfoVisible] = useState(false);
-
-    // Für Info-Modal
-    const storeInfoReceived = async (info) => {
-        try {
-          await AsyncStorage.setItem(info, currentUserId);
-          console.log(currentUserId)
-        } catch(e) {console.log(e);}
-    }
-    const getInfoReceived = async () => {
-        try {
-          const skillsInfo = await AsyncStorage.getItem("skillsInfoReceived");
-          console.log(skillsInfo);
-          if (skillsInfo != currentUserId) setSkillsInfoVisible(true);
-        } catch(e) {console.log(e);}
-    }
+    const [attInfoVisible, setAttInfoVisible] = useState(false);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -47,10 +31,13 @@ export default AttributeScreen = ({route, navigation}) => {
             DB.getCategoriesFromAttribute(attributeType, (categoriesList) => {
                 setCategoriesList(categoriesList);
                 setCurrentCategory(categoriesList[0]);
-                if(attributeType == "skills") getInfoReceived();
                 DB.getUserAttributesFromCategory(attributeType, categoriesList[0], (attributesList) => {
                     setDisplayedSkills(attributesList);
                 }, (error) => {console.log(error)});    
+                DB.getInfoReceived(attributeType, (isReceived) => {
+                    setAttInfoVisible(!isReceived);
+                    console.log("Info zu " + attributeType + " erhalten: " + isReceived);
+                })
             });
         });
     }, []);
@@ -70,11 +57,13 @@ export default AttributeScreen = ({route, navigation}) => {
     return(
         <View style={{flex: 1}}>
             <InfoModal 
-                visible={skillsInfoVisible}
-                onPress={() => {setSkillsInfoVisible(false); storeInfoReceived("skillsInfoReceived");}}
-                title={"Fähigkeiten-Auswahl"}
-                copy="Durch das Auswählen einer Fähigkeit erklärst du dich bereit, diese bei Bedarf in einem Projekt zu übernehmen. 
-                    Du musst sie noch nicht beherrschen, sondern nur bereit sein, dich damit auseinanderzusetzen."
+                visible={attInfoVisible}
+                onPress={() => {setAttInfoVisible(false); DB.setInfoReceived(attributeType);}}
+                title={attributeType == "skills" ? "Fähigkeiten-Auswahl" : "Interessen-Auswahl"}
+                copy={attributeType == "skills" ?
+                        "Durch das Auswählen einer Fähigkeit erklärst du dich bereit, diese bei Bedarf in einem Projekt zu übernehmen. Du musst sie noch nicht beherrschen, sondern nur bereit sein, dich damit auseinanderzusetzen."
+                        : "Die Interessen, die du auswählst, helfen uns dabei, dich mit passenden Leuten zusammenzubringen."
+                    }
             />
             <View style={boxes.subHeader}>
                 <ScrollRow

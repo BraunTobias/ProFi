@@ -3,11 +3,12 @@ import InputSpinner from "react-native-input-spinner";
 
 import { View, TextInput, Text } from 'react-native';
 import { icons, colors, boxes, texts } from '../Styles';
+import Padding from './Padding';
 
 export default NumberInput = props => {
   
     return (
-        <View>
+        <View style={{flex: 1, maxWidth: 160}}>
             <Text style={texts.subHeader}>{props.title}</Text>
             <InputSpinner
                 style={boxes.numberInput}

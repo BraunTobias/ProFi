@@ -11,7 +11,9 @@ export default SwipeButton = props => {
       onPress={props.onPress}
     >
         <Animated.Image 
-            style= {[boxes.swipeIcon, {transform: [{
+            style= {[boxes.swipeIcon, {
+                  opacity: props.deactivated ? 0.3 : 1,
+                  transform: [{
                   scale: props.animation ? props.animation.interpolate({
                       inputRange: [0,props.rowWidth], outputRange: [0.3,1]})
                       : 1

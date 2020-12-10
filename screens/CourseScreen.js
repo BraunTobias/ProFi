@@ -2,8 +2,8 @@ import React, {useState, useEffect, useLayoutEffect} from 'react';
 import { View, Text, Modal, Keyboard, ActivityIndicator, Alert, Animated } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import AsyncStorage from '@react-native-community/async-storage';
 import { compareAsc, format } from 'date-fns';
+import Autolink from 'react-native-autolink';
 
 import { icons, colors, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
@@ -17,25 +17,24 @@ import ScrollRow from '../components/ScrollRow';
 import AttributeSelect from '../components/AttributeSelect';
 import ProfileView from '../components/ProfileView';
 import AttributePreviewTile from '../components/AttributePreviewTile';
+import Padding from '../components/Padding';
 
 export default CourseScreen = ({route, navigation}) => {
 
-    const {itemId} = route.params;
-    const {itemTitle} = route.params;
-    const {itemDate} = route.params;
-    const {isMember} = route.params;
     const {currentUserId} = route.params;
+    const {courseInfo} = route.params;
 
     // State Hooks
     const [currentIdeas, setCurrentIdeas] = useState([]);
     const [swipeListView, setSwipeListView] = useState();
-    const [courseName, setCourseName] = useState(itemTitle);
-    const [courseDate, setCourseDate] = useState(itemDate.toDate());
+    const [courseName, setCourseName] = useState(courseInfo.title);
+    const [courseLink, setCourseLink] = useState(courseInfo.link);
+    const [courseDate, setCourseDate] = useState(courseInfo.date.toDate());
     const [creator, setCreator] = useState("");
-    const [members, setMembers] = useState([]);
+    const [members, setMembers] = useState(courseInfo.members);
     const [minMembers, setMinMembers] = useState(0);
     const [maxMembers, setMaxMembers] = useState(0);
-    const [userIsMember, setUserIsMember] = useState(isMember);
+    const [userIsMember, setUserIsMember] = useState(courseInfo.userIsMember);
     const [userIsCreator, setUserIsCreator] = useState(false);
     const [currentFav, setCurrentFav] = useState();
     const [currentNogo, setCurrentNogo] = useState();
@@ -43,7 +42,7 @@ export default CourseScreen = ({route, navigation}) => {
 
     // States für Auswertungs-Ansicht
     const [evaluating, setEvaluating] = useState(false);
-    const [evaluated, setEvaluated] = useState(false);
+    const [evaluated, setEvaluated] = useState(courseInfo.evaluated);
 
     // State Hooks für Modals
     const [editCourseVisible, setEditCourseVisible] = useState(false);
@@ -51,8 +50,9 @@ export default CourseScreen = ({route, navigation}) => {
     const [editCourseTimeVisible, setEditCourseTimeVisible] = useState(false);
     const [editCourseNameErrorVisible, setEditCourseNameErrorVisible] = useState(false);
     const [editCourseDateErrorVisible, setEditCourseDateErrorVisible] = useState(false);
-    const [editCourseName, setEditCourseName] = useState(itemTitle);
-    const [editCourseDate, setEditCourseDate] = useState(itemDate.toDate());
+    const [editCourseName, setEditCourseName] = useState(courseInfo.title);
+    const [editCourseLink, setEditCourseLink] = useState(courseInfo.link);
+    const [editCourseDate, setEditCourseDate] = useState(courseInfo.date.toDate());
     const [editCourseMinMembers, setEditCourseMinMembers] = useState(0);
     const [editCourseMaxMembers, setEditCourseMaxMembers] = useState(0);
     const [newIdeaVisible, setNewIdeaVisible] = useState(false);
@@ -63,9 +63,9 @@ export default CourseScreen = ({route, navigation}) => {
     const [favInfoVisible, setFavInfoVisible] = useState(false);
     const [nogoInfoVisible, setNogoInfoVisible] = useState(false);
     const [joinInfoVisible, setJoinInfoVisible] = useState(false);
-    const [favInfoReceived, setFavInfoReceived] = useState(false);
-    const [nogoInfoReceived, setNogoInfoReceived] = useState(false);
-    const [joinInfoReceived, setJoinInfoReceived] = useState(false);
+    const [favInfoReceived, setFavInfoReceived] = useState(true);
+    const [nogoInfoReceived, setNogoInfoReceived] = useState(true);
+    const [joinInfoReceived, setJoinInfoReceived] = useState(true);
     const [newIdeaNameErrorVisible, setNewIdeaNameErrorVisible] = useState(false);
     const [newIdeaTextErrorVisible, setNewIdeaTextErrorVisible] = useState(false);
     const [selectedSkillsListErrorVisible, setSelectedSkillsListErrorVisible] = useState(false);
@@ -85,38 +85,22 @@ export default CourseScreen = ({route, navigation}) => {
         const { key, value } = swipeData;
         rowSwipeAnimatedValues[key].setValue(Math.abs(value));
     };
-    
-    // Für Info-Modal
-    const storeInfoReceived = async (info) => {
-        try {
-          await AsyncStorage.setItem(info, currentUserId);
-        } catch(e) {console.log(e);}
-    }
-    const getInfoReceived = async () => {
-        try {
-          const favInfo = await AsyncStorage.getItem("favInfoReceived");
-          if(favInfo == currentUserId) setFavInfoReceived(true); 
-          const nogoInfo = await AsyncStorage.getItem("nogoInfoReceived");
-          if(nogoInfo == currentUserId) setNogoInfoReceived(true);
-          const joinInfo = await AsyncStorage.getItem("joinInfoReceived");
-          if(joinInfo == currentUserId) setJoinInfoReceived(true);
-        } catch(e) {console.log(e);}
-      }
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerTitle: itemId,
+            headerTitle: courseInfo.id,
         });
     }, [navigation]);
 
     const getCourseData = () => {
-        DB.getCourseData(itemId, (data) => {
+        DB.getCourseData(courseInfo.id, (data) => {
             setCreator(data.creatorName);
             setMinMembers(data.minMembers);
             setMaxMembers(data.maxMembers);
             setEditCourseMinMembers(data.minMembers);
             setEditCourseMaxMembers(data.maxMembers);
             setMembers(data.members);
+            setEvaluated(data.evaluated);
             setCourseDataLoading(false);
             setUserIsCreator(data.creator == currentUserId);
         });    
@@ -126,7 +110,7 @@ export default CourseScreen = ({route, navigation}) => {
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             getCourseData();
-            DB.getIdeasList(itemId, "courses", (ideasList) => {
+            DB.getIdeasList(courseInfo.id, "courses", (ideasList) => {
                 setCurrentIdeas(ideasList);
                 for (const idea in ideasList) {
                     if (ideasList[idea].favourites && ideasList[idea].favourites.indexOf(currentUserId) >= 0) {
@@ -136,38 +120,46 @@ export default CourseScreen = ({route, navigation}) => {
                     }
                 }
             });
-            getInfoReceived();
+            DB.getInfoReceived("favourites", (isReceived) => {
+                setFavInfoReceived(isReceived);
+            });
+            DB.getInfoReceived("nogos", (isReceived) => {
+                setNogoInfoReceived(isReceived);
+            });
+            DB.getInfoReceived("joinCourse", (isReceived) => {
+                setJoinInfoReceived(isReceived);
+            });    
         });
     }, []);
 
-    const addFavHandler = (ideaId, index) => {
+    const addFavHandler = (ideaId) => {
         if (!favInfoReceived) {
             setFavInfoVisible(true); 
         } else {
             swipeListView.safeCloseOpenRow();
             if (currentFav == ideaId) {
-                DB.deletePref("favourites", itemId, () => {
+                DB.deletePref("favourites", courseInfo.id, () => {
                     setCurrentFav("");
                 });
             } else {
-                DB.addPref("favourites", itemId, ideaId, () => {
+                DB.addPref("favourites", courseInfo.id, ideaId, () => {
                     setCurrentFav(ideaId);
                     if (currentNogo == ideaId) setCurrentNogo("");
                 });
             }
         }
     }
-    const addNogoHandler = (ideaId, index) => {
+    const addNogoHandler = (ideaId) => {
         if (!nogoInfoReceived) {
             setNogoInfoVisible(true); 
         } else {
             swipeListView.safeCloseOpenRow();
             if (currentNogo == ideaId) {
-                DB.deletePref("nogos", itemId, () => {
+                DB.deletePref("nogos", courseInfo.id, () => {
                     setCurrentNogo("");
                 });
             } else {
-                DB.addPref("nogos", itemId, ideaId, () => {
+                DB.addPref("nogos", courseInfo.id, ideaId, () => {
                     setCurrentNogo(ideaId);
                     if (currentFav == ideaId) {
                         setCurrentFav("");
@@ -181,12 +173,12 @@ export default CourseScreen = ({route, navigation}) => {
             setJoinInfoVisible(true); 
         } else {
             if (!userIsMember) {
-                DB.joinCourse(itemId, () => {
+                DB.joinCourse(courseInfo.id, () => {
                     setUserIsMember(true);
                     getCourseData();
                 }, (e) => {console.log(e)})
             } else {
-                DB.exitCourse(itemId, () => {
+                DB.exitCourse(courseInfo.id, () => {
                     setUserIsMember(false);
                     getCourseData();
                 })
@@ -203,12 +195,12 @@ export default CourseScreen = ({route, navigation}) => {
     const pressNewIdeaHandler = (committed) => {
         if (committed) {
             if (currentNewIdeaName.length > 1 && currentNewIdeaText.length > 1 && selectedSkillsList.length > 0) {
-                DB.addIdea(itemId, currentNewIdeaName, currentNewIdeaText, selectedSkillsList, [], () => {
+                DB.addIdea(courseInfo.id, currentNewIdeaName, currentNewIdeaText, selectedSkillsList, [], () => {
                     setNewIdeaVisible(false);
                     setCurrentNewIdeaName("");
                     setCurrentNewIdeaText("");    
                     setSelectedSkillsList([]);
-                    DB.getIdeasList(itemId, "courses", (ideasList) => {
+                    DB.getIdeasList(courseInfo.id, "courses", (ideasList) => {
                         setCurrentIdeas(ideasList);
                     });
                 }, (error) => {setCurrentWarning(error)});
@@ -236,12 +228,10 @@ export default CourseScreen = ({route, navigation}) => {
     }
 
     const addSkillHandler = (skill) => {
-        var oldList = selectedSkillsList;
-        if (oldList.indexOf(skill) < 0) {
-            oldList.push(skill);
+        if (selectedSkillsList.indexOf(skill) < 0) {
+            selectedSkillsList.push(skill);
         } else {
-            var newList = oldList.filter(item => item !== skill);
-            setSelectedSkillsList(newList);
+            setSelectedSkillsList(selectedSkillsList.filter(item => item !== skill));
         }
         if (selectedSkillsList.length > 0) setSelectedSkillsListErrorVisible(false);
     }
@@ -249,11 +239,12 @@ export default CourseScreen = ({route, navigation}) => {
     const pressEditCourseHandler = (committed) => {
         if (committed) {
             if (editCourseName.length > 1 && editCourseDate - (new Date()) >= 0) {
-                DB.editCourse(itemId, editCourseName, editCourseDate, editCourseMinMembers, editCourseMaxMembers, () => {
+                DB.editCourse(courseInfo.id, editCourseName, editCourseLink, editCourseDate, editCourseMinMembers, editCourseMaxMembers, () => {
                     setEditCourseVisible(false);
                     setEditCourseNameErrorVisible(false);
                     setEditCourseDateErrorVisible(false);
                     setCourseName(editCourseName);
+                    setCourseLink(editCourseLink);
                     setCourseDate(editCourseDate);
                     setMinMembers(editCourseMinMembers);
                     setMaxMembers(editCourseMaxMembers);
@@ -281,6 +272,9 @@ export default CourseScreen = ({route, navigation}) => {
         setEditCourseName(enteredText);
         if (enteredText != "") setEditCourseNameErrorVisible(false);
     }
+    const changeEditCourseLinkHandler = (enteredText) => {
+        setEditCourseLink(enteredText);
+    }
     const changeEditCourseDateHandler = (date) => {
         setEditCourseDate(date);
         setEditCourseDateVisible(false);
@@ -307,8 +301,9 @@ export default CourseScreen = ({route, navigation}) => {
             itemId: item.id, 
             itemTitle: item.title, 
             itemDescription: item.description, 
+            evaluated: evaluated,
             skillsList: item.skills, 
-            courseId: itemId, 
+            courseId: courseInfo.id, 
             currentUserId: currentUserId,
             myTeam: item.myTeam});
     }
@@ -317,19 +312,19 @@ export default CourseScreen = ({route, navigation}) => {
         <View style={{flex:1}}>
             <InfoModal 
                 visible={joinInfoVisible}
-                onPress={() => {setJoinInfoVisible(false); storeInfoReceived("joinInfoReceived"); setJoinInfoReceived(true);}}
+                onPress={() => {setJoinInfoVisible(false); DB.setInfoReceived("joinCourse"); setJoinInfoReceived(true);}}
                 title="Einem Kurs beitreten"
                 copy="Wenn du diesem Kurs beitrittst, wirst du bei der Ideenverteilung berücksichtigt. Du kannst jederzeit wieder austreten und dir den Kurs weiter angucken. Aber achte darauf, dass du am oben angegebenen Datum dem Kurs beigetreten bist, um zugeteilt zu werden."
             />
             <InfoModal 
                 visible={favInfoVisible}
-                onPress={() => {setFavInfoVisible(false); storeInfoReceived("favInfoReceived"); setFavInfoReceived(true);}}
+                onPress={() => {setFavInfoVisible(false); DB.setInfoReceived("favourites"); setFavInfoReceived(true);}}
                 title="Favoriten setzen"
                 copy="Wenn du eine Idee als Favorit markierst, erhöht sich die Chance, dass du dieser zugeteilt wirst. Du kannst einen Favoriten pro Kurs setzen. Sobald du eine andere Idee favorisierst, wird dein alter Favorit entfernt."
             />
             <InfoModal 
                 visible={nogoInfoVisible}
-                onPress={() => {setNogoInfoVisible(false); storeInfoReceived("nogoInfoReceived"); setNogoInfoReceived(true);}}
+                onPress={() => {setNogoInfoVisible(false); DB.setInfoReceived("nogos"); setNogoInfoReceived(true);}}
                 title="No-Go setzen"
                 copy="Wenn du eine Idee als No-Go markierst, wirst du dieser auf keinen Fall zugeteilt. Du kannst ein No-Go pro Kurs setzen. Sobald du eine andere Idee als No-Go markierst, wird dein altes No-Go entfernt."
             />
@@ -342,7 +337,7 @@ export default CourseScreen = ({route, navigation}) => {
                 />
             }
             {/* Kurs bearbeiten */}
-            <Modal visible= { editCourseVisible } animationType= 'slide'>
+            <Modal visible= { editCourseVisible } animationType= 'slide' onRequestClose={() => setEditCourseVisible(false)}>
                 <ModalContent
                     subheader= { () => {}}
                     content= { () => {
@@ -355,6 +350,12 @@ export default CourseScreen = ({route, navigation}) => {
                                     placeholderText= {editCourseNameErrorVisible ? "Bitte einen Kursnamen angeben." : "Kursname"}
                                     value={editCourseName}
                                     onChangeText={changeEditCourseNameHandler}
+                                />
+                                <InputField
+                                    title="Emil-Link"
+                                    placeholderText= {"Hier Link einsetzen"}
+                                    value={editCourseLink}
+                                    onChangeText={changeEditCourseLinkHandler}
                                 />
                                 <InputField
                                     title= "Team-Einteilung"
@@ -402,7 +403,8 @@ export default CourseScreen = ({route, navigation}) => {
                                         title= {"Mitglieder min."}
                                         value= {editCourseMinMembers}
                                         onChange={changeEditCourseMinMembersHandler}
-                                        />
+                                    />
+                                    <View style={boxes.buttonSpacing}/>
                                     <NumberInput
                                         title= {"Mitglieder max."}
                                         value= {editCourseMaxMembers}
@@ -418,7 +420,7 @@ export default CourseScreen = ({route, navigation}) => {
 
 
             {/* Idee erstellen */}
-            <Modal visible= { newIdeaVisible } animationType= 'slide'>
+            <Modal visible= { newIdeaVisible } animationType= 'slide' onRequestClose={() => setNewIdeaVisible(false)}>
                 <ModalContent
                     subheader= { () => {}}
                     content= { () => {
@@ -452,7 +454,7 @@ export default CourseScreen = ({route, navigation}) => {
                 />
 
                 {/* // Idee hinzufügen: Fähigkeiten auswählen */}
-                <Modal visible={addSkillsVisible} animationType='slide'>
+                <Modal visible={addSkillsVisible} animationType='slide' onRequestClose={() => setAddSkillsVisible(false)}>
                     {/* <Text style={texts.titleCentered}>{"Fähigkeiten hinzufügen"}</Text> */}
                     <AttributeSelect
                         attributeType = "skills"
@@ -465,26 +467,34 @@ export default CourseScreen = ({route, navigation}) => {
 
 
             <View style={ boxes.subHeader }>
-                {!courseDataLoading && 
                 <View>
                     <View style={ boxes.paddedRow }>
                         <Text style={texts.subHeader}>{courseName}</Text>
-                        <Text style={texts.subHeader}>{minMembers + "-" + maxMembers + " Personen"}</Text>
+                        <Text style={texts.subHeader}>{minMembers == maxMembers ? maxMembers + " Personen" : minMembers + "-" + maxMembers + " Personen"}</Text>
                     </View>
                     <View style={ boxes.paddedRow }>
                         <Text style={texts.subHeader}>{format(courseDate, "dd.MM.yyyy")}</Text>
                         <Text style={texts.subHeader}>{creator}</Text>
                     </View>
-                    {members.length > 0 &&
+                    { typeof courseLink !== 'undefined' && courseLink != "" &&
+                            <View style={ boxes.paddedRow }>
+                                <Autolink 
+                                    linkStyle={texts.link}
+                                    style={texts.subHeader}
+                                    text={courseLink}
+                                />
+                            </View>
+                    }
+                    <Padding height={5}/>
+                    { !courseDataLoading && members.length > 0 &&
                         <ScrollRow
                             data= {members}
                             onPress={viewProfileHandler}
                         />
-                    }   
+                    }
                 </View>
-                }  
-                {courseDataLoading && 
-                <View style={{height: 119, justifyContent: "center"}}>
+                {courseDataLoading && members.length > 0 &&
+                <View style={{height: 80, justifyContent: "center"}}>
                     <ActivityIndicator/>
                 </View>
                 }  
@@ -495,6 +505,7 @@ export default CourseScreen = ({route, navigation}) => {
                         icon={userIsMember ? icons.checkTrue : icons.checkFalse}
                         onPress={joinCourseHandler}
                     />
+                    <View style={boxes.buttonSpacing}/>
                     <ButtonSmall
                         title={"Neue Idee"}
                         icon={icons.plus}
@@ -539,6 +550,9 @@ export default CourseScreen = ({route, navigation}) => {
                             isNogo={item.id == currentNogo}
                             index = {index}
                             myTeam={item.myTeam}
+                            inactive = {evaluated && (!item.team || item.team.length == 0)}
+                            warning = {item.warning}
+                            // warning = {evaluated && item.team && item.team.length > 0 && (item.team.length < minMembers || item.team.length > maxMembers)}
                         />
                 }
                 renderHiddenItem={ ({item, index}) => 
@@ -547,15 +561,17 @@ export default CourseScreen = ({route, navigation}) => {
                                 rowWidth={120}
                                 icon={icons.fav}
                                 animation={rowSwipeAnimatedValues[index]}
-                                backgroundColor={item.id == currentFav ? colors.lightGrey : colors.darkBlue}
+                                backgroundColor={colors.darkBlue}
                                 onPress={(ref) => {addFavHandler(item.id)}}
+                                deactivated={item.id == currentFav}
                             />
                             <SwipeButton
                                 rowWidth={120}
                                 icon={icons.nogo}
                                 animation={rowSwipeAnimatedValues[index]}
-                                backgroundColor={item.id == currentNogo ? colors.lightGrey : colors.red}
+                                backgroundColor={colors.red}
                                 onPress={(ref) => {addNogoHandler(item.id)}}
+                                deactivated={item.id == currentNogo}
                             />
                         </View>
                 }
