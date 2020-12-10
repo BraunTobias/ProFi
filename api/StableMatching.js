@@ -71,11 +71,11 @@ function calculateSkillValues() {
             if(memberSkills[i][0]== ideaSkills[j][0]){
 
                 // Prozent von vorhandenen Member Skills, zu benötigten Idea Skills
-                // Genau Abdeckung = 1; Selter Skill (häufiger benötigt, als vorhanden) > 1; Häufiger Skill < 1; 
+                // Genaue Abdeckung = 1; Selter Skill (häufiger benötigt, als vorhanden) > 1; Häufiger Skill < 1; 
                 let percent = ideaSkills[j][1] / memberSkills[i][1];
 
                 // Prozent * 10 für ganze Werte / 2, damit werte nicht übermäßig goß werden, aufgerundet
-                let value = Math.ceil((percent * 10) /2);
+                let value = Math.ceil(percent * 5);
 
                 // Skill Values bei aufrunden:
                 // 0%-20% = 1
@@ -201,7 +201,7 @@ const stableMatching = () => {
             // Prüfen ob das Mitglied schon vergeben ist
             if (!members[memId].sorted && !members[memId].unmatchable) {
 
-                if (members[memId].scoreList.length > 0) {
+                //if (members[memId].scoreList.length > 0) {
 
                     // console.log(memId + members[memId].scoreList);
                     var prefIdeaId = members[memId].scoreList[0][0];
@@ -226,14 +226,15 @@ const stableMatching = () => {
                         var newScoreList = oldScoreList.filter(idea => idea[0] != prefIdeaId);
                         if(newScoreList.length == 0){
                             unmatchableMembers+=1;
-                            members[memId].unmatchable  = true;
+                            members[overflowUserId].unmatchable  = true;
                         }
                         members[overflowUserId].scoreList = newScoreList;
                     }
-                }
+                //}
             }  
         }
-        console.log(unmatchableMembers+sortedMembers);
+        console.log(unmatchableMembers);
+        console.log(sortedMembers);
     }
 }
 
@@ -394,7 +395,7 @@ function addEmptyIdeas(unsorted) {
         let missingForMinMembers=  1-(emptyIdeas[newIdea].team.length / minMembers);
         var lastMembers = emptyIdeas[newIdea].team;
 
-        // bei über 20% fehlenden Leuten zur MindestAnzahl = auflösen
+        // bei über 25% fehlenden Leuten zur MindestAnzahl = auflösen
         //Sonst beibehalten
         if(missingForMinMembers > 0.25){
             let missingSkillsList=[];
@@ -791,7 +792,8 @@ const proFiFunction = () => {
             console.log(ideas[idea].missingSkills + " fehlt");
         }
     }
-    console.log(emptyIdeas);
+    // console.log(emptyIdeas);
+    // console.log(ideas);
 }
 
 proFiFunction();
