@@ -5,7 +5,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { icons, colors, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
 import InputField from '../components/InputField';
-import ButtonLarge from '../components/ButtonLarge';
+import Button from '../components/Button';
 
 export default AuthScreen = () => {
 
@@ -151,15 +151,15 @@ export default AuthScreen = () => {
                         value={currentConfirmPW}
                         onChangeText={changeConfirmPWHandler}
                     />
-                    <ButtonLarge 
+                    <Button 
                         title="Konto anlegen" 
                         onPress={registerHandler}>
-                    </ButtonLarge>
-                    <ButtonLarge 
+                    </Button>
+                    <Button 
                         title="Schon ein Konto? Anmelden" 
                         onPress={() => {setRegisterHandler(false)}}
                         transparent={true}>
-                    </ButtonLarge>
+                    </Button>
                 </ScrollView>
             </Modal>
             {/* Passwort zurücksetzen */}
@@ -172,15 +172,15 @@ export default AuthScreen = () => {
                         value={currentMail}
                         onChangeText={changeMailHandler}
                     />
-                    <ButtonLarge 
+                    <Button 
                         title="E-Mail senden" 
                         onPress={resetPwHandler}>
-                    </ButtonLarge>
-                    <ButtonLarge 
+                    </Button>
+                    <Button 
                         title="Abbrechen" 
                         onPress={() => {setResetPwVisible(false)}}
                         transparent={true}>
-                    </ButtonLarge>
+                    </Button>
                 </ScrollView>
             </Modal>
 
@@ -200,20 +200,20 @@ export default AuthScreen = () => {
                     value={currentPW}
                     onChangeText={changePWHandler}
                 />
-                <ButtonLarge 
+                <Button 
                     title="Einloggen" 
                     onPress={logInHandler}>
-                </ButtonLarge>
-                <ButtonLarge 
+                </Button>
+                <Button 
                     title="Noch kein Konto? Registrieren" 
                     transparent={true}
                     onPress={() => {setRegisterHandler(true)}}>
-                </ButtonLarge>
-                <ButtonLarge 
+                </Button>
+                <Button 
                     title="Passwort zurücksetzen" 
                     onPress={() => {setResetPwVisible(true)}}
                     transparent={true}>
-                </ButtonLarge>
+                </Button>
             </ScrollView>
         </View>
     );

@@ -13,7 +13,7 @@ export default HomeNavigator = () => {
         <HomeStack.Navigator 
             initialRouteName="Home" 
             screenOptions={{
-                headerStyle: boxes.header,
+                headerStyle: {backgroundColor: colors.darkBlue},
                 headerTitleStyle: texts.header,
                 headerTintColor: colors.white,
             }}

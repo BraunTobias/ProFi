@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect, Fragment } from 'react';
-import {FlatList, Modal, StatusBar, SafeAreaView } from "react-native";
+import {FlatList, Modal, StatusBar, SafeAreaView, StyleSheet } from "react-native";
 
-import { boxes, colors, styles, texts } from '../Styles';
+import { boxes, colors, texts } from '../Styles';
 import { View, Text, Image } from 'react-native';
 import { icons } from '../Styles';
 import DB from '../api/DB_API';
@@ -9,7 +9,9 @@ import ModalContent from './ModalContent';
 import AttributeList from './AttributeList';
 import ProfileImage from './ProfileImage';
 import Padding from './Padding';
-import ButtonSmall from './ButtonSmall';
+import Button from './Button';
+import SubHeader from '../components/SubHeader';
+import FlexRow from '../components/FlexRow';
 
 export default ProfileView = props => {
 
@@ -46,48 +48,48 @@ export default ProfileView = props => {
                 <SafeAreaView style={{flex: 1, backgroundColor: colors.lightGrey}}>
                     <StatusBar barStyle="dark-content"/>
 
-                    <View style={[boxes.subHeader]}>
+                    <SubHeader>
                         <Padding height={5}/>
-                        <View style={boxes.profileViewImage}>
+                        <View style={styles.profileViewImage}>
                             <ProfileImage
                                 imageUrl={imageUrl}
                                 onPress={() => {}}
                                 />
                         </View>
                         <Padding height={10}/>
-                        <View style={boxes.centeredRow}>
+                        <FlexRow center>
                             <Text style={texts.listTileHeader}>{currentName}</Text>
-                        </View>
-                        <View style={boxes.centeredRow}>
+                        </FlexRow>
+                        <FlexRow center>
                             <Text style={texts.copy}>{currentBio}</Text>
-                        </View>
-                        <View style={boxes.centeredRow}>
+                        </FlexRow>
+                        <FlexRow center>
                             <Text style={texts.copy}>{currentEmail}</Text>
-                        </View>
+                        </FlexRow>
                         <Padding height={7}/>
-                    </View>
+                    </SubHeader>
                     <Padding height={5}/>
-                    <View style={[boxes.paddedRow, {backgroundColor: colors.white}]}>
-                        <ButtonSmall
+                    <FlexRow padding>
+                        <Button
                             inactive={viewedList == interestsList}
                             title="Fähigkeiten"
                             icon={icons.info}
                             onPress={() => setViewedList(skillsList)}
                         />
-                        <View style={boxes.buttonSpacing}/>
-                        <ButtonSmall
+                        <Padding width={10}/>
+                        <Button
                             inactive={viewedList != interestsList}
                             title="Interessen"
                             icon={icons.info}
                             onPress={() => setViewedList(interestsList)}
                         />
-                    </View>
+                    </FlexRow>
                     <AttributeList style={{flexGrow: 1, backgroundColor: "red"}}
                         attList={viewedList}
                     />
 
                     <View style={boxes.modalButton}>
-                        <ButtonLarge
+                        <Button
                             title={"OK"}
                             onPress={props.onDismiss}
                         />
@@ -101,3 +103,11 @@ export default ProfileView = props => {
     )        
 }
           
+const styles = StyleSheet.create({
+    profileViewImage: {
+        width: "100%",
+        height: 150,
+        alignItems: "center",
+        borderRadius: 111
+    },
+});

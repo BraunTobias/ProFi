@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, Image, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { View, TextInput, Text, Image, TouchableOpacity, TouchableWithoutFeedback, StyleSheet } from 'react-native';
 // import { ,  } from 'react-native-gesture-handler';
 import { icons, colors, boxes, texts } from '../Styles';
+import FlexRow from './FlexRow';
 
 export default InputField = props => {
 
@@ -20,13 +21,21 @@ export default InputField = props => {
     if (props.isButton) {
       return(
         <TouchableOpacity onPress={props.onPress}>
-            <View style={[boxes.inputField, props.showError ? boxes.inputFieldError : {}, {flexDirection: "row", justifyContent: "space-between", alignItems:"center"}]}>
-                <Text style= {[texts.inputField, {color: props.showError ? colors.red : colors.darkGrey}]}>
+            <View style={[styles.inputField, {
+                  borderWidth: props.showError ? 1 : 0,
+                  borderColor: props.showError ? colors.red : colors.lightBlue,
+                  flexDirection: "row", 
+                  justifyContent: "space-between", 
+                  alignItems:"center"
+            }]}>
+                <Text style= {[texts.inputField, {
+                  color: props.showError ? colors.red : colors.darkGrey
+                }]}>
                   {props.value}
                 </Text>
-                <View style={boxes.inputFieldIconBox}>
+                <View style={styles.inputFieldIconBox}>
                     <Image
-                      style={boxes.inputFieldIcon}
+                      style={styles.inputFieldIcon}
                       source={props.icon}
                       resizeMode={"contain"}
                     />
@@ -36,11 +45,13 @@ export default InputField = props => {
       )
     } else {
       return (
-        <View style= {[boxes.inputField, props.showError ? boxes.inputFieldError : {}, {
+        <View style= {[styles.inputField, {
+          borderWidth: props.showError ? 1 : 0,
+          borderColor: props.showError ? colors.red : colors.lightBlue,
           height: props.multiline ? "auto" : 40, 
           paddingTop: props.multiline ? 6 : 0, 
           paddingBottom: props.multiline ? 12 : 0,
-          }]}>
+        }]}>
           <TextInput
               style= {texts.inputField}
               placeholderTextColor={props.showError ? colors.red : colors.lightBlue}
@@ -77,3 +88,35 @@ export default InputField = props => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  inputField: {
+    minHeight: 40,
+    paddingHorizontal: 10,
+    marginVertical: 5,
+    backgroundColor: colors.white,
+    borderWidth: 0,
+    borderBottomWidth: 1,
+    borderColor: colors.lightBlue,
+    borderRadius: 7,
+    justifyContent: "center",
+    overflow: "hidden",
+  },
+  inputFieldIconBox: {
+    height: 40, 
+    width: 40,
+    position: "absolute", 
+    right: 0,
+    borderBottomRightRadius: 7,
+    borderTopRightRadius: 7,
+    overflow: "hidden",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: colors.darkBlue, 
+  },
+  inputFieldIcon: {
+    height: 22, 
+    width: 22, 
+    tintColor: colors.white    
+  },
+});

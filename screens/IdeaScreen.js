@@ -7,44 +7,47 @@ import { icons, colors, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
 import InputField from '../components/InputField';
 import SwipeButton from '../components/SwipeButton';
+import SwipeButtonRow from '../components/SwipeButtonRow';
 import CommentTile from '../components/CommentTile';
 import ModalContent from "../components/ModalContent";
-import ButtonLarge from '../components/ButtonLarge';
+import Button from '../components/Button';
 import ScrollRow from '../components/ScrollRow';
 import AttributePreviewTile from '../components/AttributePreviewTile';
 import ProfileView from '../components/ProfileView';
 import AttributeSelect from '../components/AttributeSelect';
 import Padding from '../components/Padding';
+import SubHeader from '../components/SubHeader';
+import IdeaFooter from '../components/IdeaFooter';
+import FlexRow from '../components/FlexRow';
 
 export default IdeaScreen = ({route, navigation}) => {
 
-    const {itemId} = route.params;
-    const {itemTitle} = route.params;
-    const {itemDescription} = route.params;
+    const {ideaInfo} = route.params;
     const {courseId} = route.params;
+    const {courseType} = route.params;
     const {currentUserId} = route.params;
-    const {myTeam} = route.params;
     const {evaluated} = route.params;
+    const currentUserIsCreator = (ideaInfo.creator == currentUserId);
 
     // State Hooks
-    const [currentSkills, setCurrentSkills] = useState([]);
-    const [currentInterests, setCurrentInterests] = useState([]);
+    const [currentSkills, setCurrentSkills] = useState(ideaInfo.skills);
     const [currentComments, setCurrentComments] = useState([]);
     const [swipeListView, setSwipeListView] = useState();
-    const [currentUserIsCreator, setCurrentUserIsCreator] = useState(false);
-    const [ideaText, setIdeaText] = useState(itemDescription);
-    const [ideaName, setIdeaName] = useState(itemTitle);
+    const [ideaText, setIdeaText] = useState(ideaInfo.description);
+    const [ideaName, setIdeaName] = useState(ideaInfo.title);
     const [ideaCreator, setIdeaCreator] = useState("");
-    const [ideaCreatorId, setIdeaCreatorId] = useState("");
+    const [ideaCreatorId, setIdeaCreatorId] = useState(ideaInfo.creator);
     const [commentsLoading, setCommentsLoading] = useState(true);
-    const [members, setMembers] = useState([]);
+    const [members, setMembers] = useState(ideaInfo.team);
+    const [refreshing, setRefreshing] = useState(false);
+    const [userIsMember, setUserIsMember] = useState(ideaInfo.userIsMember);
 
     // State Hooks für Modal
     const [editIdeaVisible, setEditIdeaVisible] = useState(false);
     const [addSkillsVisible, setAddSkillsVisible] = useState(false);
-    const [editIdeaName, setEditIdeaName] = useState(itemTitle);
-    const [editIdeaText, setEditIdeaText] = useState(itemDescription);
-    const [selectedSkillsList, setSelectedSkillsList] = useState([]);
+    const [editIdeaName, setEditIdeaName] = useState(ideaInfo.title);
+    const [editIdeaText, setEditIdeaText] = useState(ideaInfo.description);
+    const [selectedSkillsList, setSelectedSkillsList] = useState(ideaInfo.skills);
     const [newCommentVisible, setNewCommentVisible] = useState(false);
     const [newReplyVisible, setNewReplyVisible] = useState(false);
     const [currentNewCommentText, setCurrentNewCommentText] = useState("");
@@ -61,9 +64,7 @@ export default IdeaScreen = ({route, navigation}) => {
 
     // Icon-Animation
     const rowSwipeAnimatedValues = {};
-    Array(100)
-    .fill('')
-    .forEach((_, i) => {
+    Array(100).fill('').forEach((_, i) => {
         rowSwipeAnimatedValues[`${i}`] = new Animated.Value(0);
     });
     const onSwipeValueChange = (swipeData) => {
@@ -79,52 +80,35 @@ export default IdeaScreen = ({route, navigation}) => {
     }, [navigation]);
 
     useEffect(() => {
-        DB.getCommentsList(courseId, itemId, "courses", (commentsList) => {
+        DB.getCommentsList(courseId, ideaInfo.id, courseType, (commentsList) => {
             setCurrentComments(commentsList);
             setCommentsLoading(false);
         });
-        DB.getIdeaData(courseId, itemId, (data) => {
-            if (data.skills) setCurrentSkills(data.skills);
-            if (data.interests) setCurrentInterests(data.interests);
-            setSelectedSkillsList(data.skills);
-            setIdeaCreatorId(data.creator);
-            DB.getUserInfoById(data.creator, (userName) => {
-                setIdeaCreator(userName);
-            });
-            if (evaluated) {
-                setMembers(data.team);
-            }
-            if (data.creator == currentUserId) setCurrentUserIsCreator(true);
-            setMembers(data.team);
-            // if (data.team && data.team.length > 0) {
-            //     const teamUidList = data.team;
-            //     var newTeamList = [];
-            //     for (const member in teamUidList) {
-            //         const uid = teamUidList[member];
-            //         DB.getUserInfoById(uid, (name, url) => {
-            //             newTeamList.push({
-            //                 "userId": uid,
-            //                 "username": name,
-            //                 "imageUrl": url
-            //             });
-            //             // setTeam(newTeamList);
-            //         });
-            //     }
-            // }
+        DB.getUserInfoById(ideaInfo.creator, (userName) => {
+            setIdeaCreator(userName);
         });
+        if (ideaInfo.team && ideaInfo.team.length > 0) {
+            DB.getTeamData(courseId, ideaInfo.id, courseType, (teamList) => {
+                setMembers(teamList);
+            });
+        } else if (ideaInfo.members && ideaInfo.members.length > 0) {
+            DB.getIdeaMembersData(courseId, ideaInfo.id, (membersList) => {
+                setMembers(membersList);
+            });
+        }
     }, []);
 
     const likeCommentHandler = (commentId) => {
-        DB.likeComment(courseId, itemId, commentId, "courses", () => {
-            DB.getCommentsList(courseId, itemId, "courses", (commentsList) => {
+        DB.likeComment(courseId, ideaInfo.id, commentId, courseType, () => {
+            DB.getCommentsList(courseId, ideaInfo.id, courseType, (commentsList) => {
                 setCurrentComments(commentsList);
                 swipeListView.safeCloseOpenRow();
             });
         });
     }
     const deleteCommentHandler = (commentId, replyTo) => {
-        DB.deleteComment(courseId, itemId, commentId, "courses", replyTo, () => {
-            DB.getCommentsList(courseId, itemId, "courses", (commentsList) => {
+        DB.deleteComment(courseId, ideaInfo.id, commentId, courseType, replyTo, () => {
+            DB.getCommentsList(courseId, ideaInfo.id, courseType, (commentsList) => {
                 setCurrentComments(commentsList);
                 swipeListView.safeCloseOpenRow();
             });
@@ -148,10 +132,10 @@ export default IdeaScreen = ({route, navigation}) => {
     const pressNewCommentHandler = (committed) => {
         if (committed) {
             if (currentNewCommentText != "") {
-                DB.addComment(courseId, itemId, "courses", currentNewCommentText, "", () => {
+                DB.addComment(courseId, ideaInfo.id, courseType, currentNewCommentText, "", () => {
                     setNewCommentVisible(false);
                     setCurrentNewCommentText("");
-                    DB.getCommentsList(courseId, itemId, "courses", (commentsList) => {
+                    DB.getCommentsList(courseId, ideaInfo.id, courseType, (commentsList) => {
                         setCurrentComments(commentsList);
                     });
                 });
@@ -166,11 +150,11 @@ export default IdeaScreen = ({route, navigation}) => {
     const pressReplyHandler = (committed) => {
         if (committed) {
             if (currentReplyText != "") {
-                DB.addComment(courseId, itemId, "courses", currentReplyText, currentReplyComment.id, () => {
+                DB.addComment(courseId, ideaInfo.id, courseType, currentReplyText, currentReplyComment.id, () => {
                     setNewReplyVisible(false);
                     setCurrentNewCommentText("");
                     setCurrentReplyText("");
-                    DB.getCommentsList(courseId, itemId, "courses", (commentsList) => {
+                    DB.getCommentsList(courseId, ideaInfo.id, courseType, (commentsList) => {
                         setCurrentComments(commentsList);
                     });
                 });
@@ -205,7 +189,7 @@ export default IdeaScreen = ({route, navigation}) => {
     const pressEditIdeaHandler = (committed) => {
         if (committed) {
             if (editIdeaName.length > 1 && editIdeaText.length > 1 && selectedSkillsList.length > 0) {
-                DB.editIdea(courseId, itemId, "courses", editIdeaName, editIdeaText, selectedSkillsList, [], () => {
+                DB.editIdea(courseId, ideaInfo.id, courseType, editIdeaName, editIdeaText, selectedSkillsList, [], () => {
                     setEditIdeaVisible(false);
                     setEditIdeaTextErrorVisible(false);
                     setEditIdeaNameErrorVisible(false);
@@ -235,23 +219,59 @@ export default IdeaScreen = ({route, navigation}) => {
             setSelectedSkillsListErrorVisible(false);
         }
     }
+    const refreshListHandler = () => {
+        setRefreshing(true);
+
+        DB.getCommentsList(courseId, ideaInfo.id, courseType, (commentsList) => {
+            setCurrentComments(commentsList);
+            setCommentsLoading(false);
+            setRefreshing(false);
+        });
+    };
+    const joinIdeaHandler = () => {
+        if (!userIsMember) {
+            DB.joinOpenIdea(courseId, ideaInfo.id, (membersList) => {
+                setUserIsMember(true);
+                setMembers(membersList);
+            }, (e) => {console.log(e)});
+        } else {
+            DB.exitOpenIdea(courseId, ideaInfo.id, () => {
+                var membersList = members.filter(( item ) => { return item.userId != currentUserId });
+                setUserIsMember(false);
+                setMembers(membersList);
+            });
+        }
+    }
+    const setTeamHandler = () => {
+        Alert.alert(
+            "Team einteilen",
+            "Möchtest du dieses Team wirklich final festlegen? Frag am besten vorher noch einmal nach, ob alle einverstanden sind.",
+            [   {text: "Abbrechen", onPress: () => console.log("Cancel Pressed"), style: "cancel"},
+                { text: "OK", onPress: () => {
+                    DB.setOpenCourseTeam(courseId, ideaInfo.id, () => {
+                        setEvaluated(true);
+                    });
+            }}],
+        );              
+    }
 
     const swipeButtons = (item) => {
         if (item.replyTo) {
             return(
-                <View style={[boxes.swipeRowOne, {backgroundColor: item.user == currentUserId ? colors.red : item.likes.indexOf(currentUserId) < 0 ? colors.darkBlue : colors.lightBlue}]}>
+                <SwipeButtonRow color={item.user == currentUserId ? colors.red : colors.darkBlue}> 
                     <SwipeButton
                         animation={new Animated.Value(60)}
                         rowWidth={60}
                         icon={item.user == currentUserId ? icons.delete : icons.like}
-                        backgroundColor={item.user == currentUserId ? colors.red : item.likes.indexOf(currentUserId) < 0 ? colors.darkBlue : colors.lightBlue}
+                        backgroundColor={item.user == currentUserId ? colors.red : colors.darkBlue}
                         onPress={() => {item.user == currentUserId ? deleteCommentHandler(item.id, item.replyTo) : likeCommentHandler(item.id)}}
+                        deactivated={item.likes.indexOf(currentUserId) >= 0}
                     />
-                </View>
+                </SwipeButtonRow>
             );
         } else {
             return(
-                <View style={[boxes.swipeRowTwo, {backgroundColor: colors.mediumBlue}]}>
+                <SwipeButtonRow color={colors.mediumBlue}> 
                     <SwipeButton
                         animation={new Animated.Value(120)}
                         rowWidth={120}
@@ -266,7 +286,7 @@ export default IdeaScreen = ({route, navigation}) => {
                         backgroundColor={colors.mediumBlue}
                         onPress={() => {setNewReplyVisible(true); setCurrentReplyComment(item)}}
                     />
-                </View>
+                </SwipeButtonRow>
             );
         }
     }
@@ -381,33 +401,38 @@ export default IdeaScreen = ({route, navigation}) => {
                 </Modal>
             </Modal>
 
-            <View style={ boxes.subHeader }>
-                <View style={ boxes.paddedRow }>
+            <SubHeader>
+                <FlexRow padding>
                     <Text style={texts.subHeaderLarge}>{ideaName}</Text>
-                </View>
+                </FlexRow>
                 { ideaText.length > 0 &&
-                    <View style={ boxes.paddedRow }>
+                    <FlexRow padding>
                         <Text style={texts.copy}>{ideaText}</Text>
-                    </View>
+                    </FlexRow>
                 }
-                <View style={ boxes.paddedRow }>
+                <FlexRow padding>
                     <AttributePreviewTile
-                        title={currentInterests.length > 0 ? "Gemeinsamkeiten" : "Passende Fähigkeiten"}
+                        title={ideaInfo.interests.length > 0 ? "Gemeinsamkeiten" : "Passende Fähigkeiten"}
                         subtitle={currentSkills.length > 0 ? currentSkills.join(", ") : "\n"}
                         index={0}
-                        onPress={() => navigation.navigate("IdeaAttributes", {filterList: currentSkills, secondaryFilterList: currentInterests, courseType: "courses", courseId: courseId, ideaId: itemId, title: currentInterests.length > 0 ? "Gemeinsamkeiten" : "Passende Fähigkeiten"})}
+                        onPress={() => navigation.navigate("IdeaAttributes", {filterList: currentSkills, secondaryFilterList: ideaInfo.interests, courseType: courseType, courseId: courseId, ideaId: ideaInfo.id, title: ideaInfo.interests.length > 0 ? "Gemeinsamkeiten" : "Passende Fähigkeiten"})}
                     />
-                </View>
-            </View>
-
-            {commentsLoading && 
-                <View style={{backgroundColor: colors.white, paddingVertical: 30}}>
-                    <ActivityIndicator/>
-                </View>
-            }
+                </FlexRow>
+                { (courseType == "openCourses" && !evaluated) &&
+                <FlexRow padding>
+                    <Button
+                        title={"Beitreten"}
+                        icon={userIsMember ? icons.checkTrue : icons.checkFalse}
+                        onPress={joinIdeaHandler}
+                    />
+                </FlexRow>
+                }
+            </SubHeader>
 
             <SwipeListView
                 onSwipeValueChange={onSwipeValueChange}
+                onRefresh={refreshListHandler}
+                refreshing={refreshing}
                 style={{backgroundColor: colors.white}}
                 ref = {ref => setSwipeListView(ref)}
                 data={currentComments}
@@ -431,18 +456,36 @@ export default IdeaScreen = ({route, navigation}) => {
                 }
                 ListHeaderComponent={
                     <View style={{backgroundColor: evaluated ? colors.darkBlue : colors.white}}>
-                    { currentUserIsCreator && !evaluated &&
+                    { currentUserIsCreator && !evaluated && 
                     <View>
                         <Padding height={5}/>
-                        <View style={ boxes.paddedRow }>
-                            <ButtonLarge
+                        { courseType == "courses" &&
+                        <FlexRow padding>
+                            <Button
                                 title="Idee bearbeiten"
                                 onPress={() => setEditIdeaVisible(true)}
                             />
-                        </View>
+                        </FlexRow>
+                        }
+                        {(courseType == "openCourses" && !evaluated) &&
+                        <FlexRow padding>
+                                <Button
+                                    title="Bearbeiten"
+                                    icon={icons.edit}
+                                    onPress={() => setEditIdeaVisible(true)}
+                                />
+                                <Padding width={10}/>
+                                <Button
+                                    title={"Team einteilen"}
+                                    icon={icons.fav}
+                                    onPress={setTeamHandler}
+                                />
+                        </FlexRow>
+                        }
                     </View>
                     }
-                    {evaluated && members.length > 0 &&
+                    {/* BEI OFFENEN IDEEN MUSS ES NICHT EVALUATED SEIN */}
+                    {(courseType == "openCourses" || (evaluated && members.length > 0)) &&
                         <ScrollRow
                             data= {members}
                             onPress={(id) => {viewProfileHandler(id)}}
@@ -451,20 +494,28 @@ export default IdeaScreen = ({route, navigation}) => {
                     </View>
                 }
                 ListFooterComponent={
-                    !commentsLoading && !currentUserIsCreator &&
-                    <View style={boxes.ideaFooter}>
-                        <Text style={texts.ideaFooter}>{ideaCreatorId == "ProFi-Algorithmus" ? "Automatisch erstellte Idee" : "Idee von " + ideaCreator}</Text>
+                    <View>
+                        {!commentsLoading && !currentUserIsCreator &&
+                            <IdeaFooter ideaCreatorId={ideaCreatorId} ideaCreator={ideaCreator}/>
+                        }
+                        {commentsLoading && 
+                            <View style={{backgroundColor: colors.white, paddingVertical: 30}}>
+                                <ActivityIndicator/>
+                            </View>
+                        }
                     </View>
                 }
             />
-
-            <View style={[boxes.paddedRow, {backgroundColor: colors.white, paddingVertical: 5}]}>
-                <ButtonLarge
-                    title="Kommentar schreiben"
-                    onPress={() => {setNewCommentVisible(true)}}
-                />
+            <View>
+                <Padding height={5}/>
+                <FlexRow padding>
+                    <Button
+                        title="Kommentar schreiben"
+                        onPress={() => {setNewCommentVisible(true)}}
+                    />
+                </FlexRow>
+                <Padding height={5}/>
             </View>
-
         </View>
     )
 }

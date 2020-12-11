@@ -10,41 +10,41 @@ export default ListTile = props => {
     borderBottomWidth: props.myTeam ? 1 : 0
   }
   
-  const PrefIcon = () => {
- if (props.isMember) {
+ const PrefIcon = () => {
+    if (props.isMember) {
       return (
         <Image 
-        style= { [boxes.listTileIcon, {width: 22, height: 22, marginTop: 1, tintColor: props.myTeam ? colors.white : colors.darkBlue}] }
-        source= { icons.checkTrue }
-        defaultSource= { icons.checkTrue }
-        resizeMode= { "contain" }
+          style= { [styles.listTileIcon, {width: 22, height: 22, marginTop: 1, tintColor: props.myTeam ? colors.white : colors.darkBlue}] }
+          source= { icons.checkTrue }
+          defaultSource= { icons.checkTrue }
+          resizeMode= { "contain" }
         />
-    )
+      )
     } else if (props.warning) {
       return (
         <Image 
-        style= { [boxes.listTileIcon, {width: 22, height: 22, marginTop: 1, tintColor: props.myTeam ? colors.white : colors.red}] }
-        source= { icons.warning }
-        defaultSource= { icons.warning }
-        resizeMode= { "contain" }
+          style= { [styles.listTileIcon, {width: 22, height: 22, marginTop: 1, tintColor: props.myTeam ? colors.white : colors.red}] }
+          source= { icons.warning }
+          defaultSource= { icons.warning }
+          resizeMode= { "contain" }
         />
-    )
+      )
     } else if (props.isFavourite) {
       return (
         <Image 
-        style= { [boxes.listTileIcon, {marginTop: -1, tintColor: props.inactive ? colors.lightBlue : props.myTeam ? colors.white : colors.darkBlue}] }
-        source= { icons.fav }
-        defaultSource= { icons.fav }
-        resizeMode= { "contain" }
+          style= { [styles.listTileIcon, {marginTop: -1, tintColor: props.inactive ? colors.mediumBlue : props.myTeam ? colors.white : colors.darkBlue}] }
+          source= { icons.fav }
+          defaultSource= { icons.fav }
+          resizeMode= { "contain" }
         />
       )
     } else if (props.isNogo) {
       return (
         <Image 
-        style= { [boxes.listTileIcon, {tintColor: props.inactive ? colors.lightBlue : props.myTeam ? colors.white : colors.darkBlue}] }
-        source= { icons.nogo }
-        defaultSource= { icons.nogo }
-        resizeMode= { "contain" }
+          style= { [styles.listTileIcon, {tintColor: props.inactive ? colors.mediumBlue : props.myTeam ? colors.white : colors.darkBlue}] }
+          source= { icons.nogo }
+          defaultSource= { icons.nogo }
+          resizeMode= { "contain" }
         />
       )
     } else {
@@ -57,19 +57,50 @@ export default ListTile = props => {
     underlayColor={colors.darkBlue}
     onPress={() => props.onPress(props.id, props.title, props.subtitle)}
     >
-        <View style={[boxes.listTile, colorStyle]}> 
+        <View style={[styles.listTile, colorStyle]}> 
 
             <View>
-                <View style={boxes.listTileHeader}>
+                <View style={styles.listTileHeader}>
                     <PrefIcon/>
-                    <Text numberOfLines={1} style = {[texts.listTileHeader, {color: props.inactive ? colors.lightBlue : props.myTeam ? colors.white : colors.darkBlue}]}>{props.title}</Text>
+                    <Text numberOfLines={1} style = {[texts.listTileHeader, {color: props.inactive ? colors.mediumBlue : props.myTeam ? colors.white : colors.darkBlue}]}>{props.title}</Text>
                 </View>
-                <Text numberOfLines={2} ellipsizeMode="tail" style = {[texts.copy, {color: props.inactive ? colors.lightBlue : props.myTeam ? colors.white : colors.darkGrey}]}>{props.subtitle}</Text>
+                <Text numberOfLines={2} ellipsizeMode="tail" style = {[texts.copy, {color: props.inactive ? colors.mediumBlue : props.myTeam ? colors.white : colors.darkGrey}]}>{props.subtitle}</Text>
             </View>
 
-            <Image style={boxes.listTileArrow} source={require("../assets/ui-icons/arrow-right.png")} resizeMode="contain"/>
+            <Image style={styles.listTileArrow} source={require("../assets/ui-icons/arrow-right.png")} resizeMode="contain"/>
 
         </View>
     </TouchableHighlight>
   );
 };
+
+const styles = StyleSheet.create({
+  listTile: {
+    paddingLeft: 15,
+    paddingRight: 35,
+    height: 90,
+    width: "100%",
+    alignItems: "flex-start",
+    justifyContent: "center",
+  },
+  listTileHeader: {
+      flexDirection: "row",
+      justifyContent: "flex-start",
+      alignItems: "center",
+      marginTop: -2,
+      marginBottom: 2,
+  },
+  listTileArrow: {
+      position: "absolute",
+      right: 15,
+      width: 15,
+      tintColor: colors.lightBlue,
+      zIndex: -1
+  },
+  listTileIcon: {
+      width: 25, 
+      height: 25, 
+      tintColor: colors.darkBlue, 
+      marginEnd: 7,  
+  },
+});

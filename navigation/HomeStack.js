@@ -5,9 +5,7 @@ import {createStackNavigator, HeaderBackground} from '@react-navigation/stack';
 import { icons, colors, boxes, texts } from '../Styles';
 import HomeScreen from '../screens/HomeScreen';
 import CourseScreen from '../screens/CourseScreen';
-import OpenCourseScreen from '../screens/OpenCourseScreen';
 import IdeaScreen from '../screens/IdeaScreen';
-import OpenIdeaScreen from '../screens/OpenIdeaScreen';
 import AttributeListScreen from '../screens/AttributeListScreen';
 
 const HomeStack = createStackNavigator();
@@ -43,34 +41,8 @@ export default HomeNavigator = () => {
                     }}
                 />
                 <HomeStack.Screen 
-                    name = "Open course" 
-                    component = {OpenCourseScreen} 
-                    options={{
-                        headerBackTitleVisible: false, 
-                        headerLeftContainerStyle: {
-                            marginHorizontal: 10,
-                        },
-                        headerRight: () => (
-                            <View style={{width: 60}}></View>
-                        )                
-                    }}
-                />
-                <HomeStack.Screen 
                     name = "Idea" 
                     component = {IdeaScreen} 
-                    options={{
-                        headerBackTitleVisible: false, 
-                        headerLeftContainerStyle: {
-                            marginHorizontal: 10
-                        },
-                        headerRight: () => (
-                            <View style={{width: 60}}></View>
-                        )              
-                    }}
-                />
-                <HomeStack.Screen 
-                    name = "Open Idea" 
-                    component = {OpenIdeaScreen} 
                     options={{
                         headerBackTitleVisible: false, 
                         headerLeftContainerStyle: {

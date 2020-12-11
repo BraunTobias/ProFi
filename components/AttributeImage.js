@@ -1,5 +1,5 @@
 import React  from "react";
-import { Text, Image, TouchableOpacity } from "react-native";
+import { Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { boxes, colors, icons } from "../Styles";
 
 export default AttributeImage = props => {
@@ -19,13 +19,31 @@ export default AttributeImage = props => {
 
     return (
         <TouchableOpacity 
-            style={[boxes.attributeImage, {marginRight: props.isLast ? 30 : 7, backgroundColor: props.isActive ? colors.darkBlue : colors.lightGrey}]}
+            style={[styles.attributeImage, {marginRight: props.isLast ? 30 : 7, backgroundColor: props.isActive ? colors.darkBlue : colors.lightGrey}]}
             onPress={props.onPress}>
             <Image  
-                style={[boxes.attributeIcon, {tintColor: props.isActive ? colors.white : colors.mediumBlue}]}
+                style={[styles.attributeIcon, {tintColor: props.isActive ? colors.white : colors.mediumBlue}]}
                 source={iconName}
                 resizeMode="contain"
             />
         </TouchableOpacity>
     )
 }
+
+const styles = StyleSheet.create({
+    attributeImage: {
+        height: "100%",
+        aspectRatio: 1,
+        marginRight: 7,
+        flex: 1,
+        backgroundColor: colors.lightGrey,
+        borderRadius: 7,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    attributeIcon: {
+        width: "75%",
+        height: "75%",
+        tintColor: colors.mediumBlue,
+    },
+});

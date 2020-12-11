@@ -27,13 +27,13 @@ export default AttributeTile = props => {
        
     return(
         <TouchableOpacity
-            style={[boxes.attributeTile, colorStyle]}
+            style={[styles.attributeTile, colorStyle]}
             onPress={changeIconHandler}
         >
             <Image
                 source={currentIcon}
                 tintColor={colors.darkBlue}
-                style={boxes.attributeCheckmark}
+                style={styles.attributeCheckmark}
             />
             <Text 
                 style = {[texts.subHeader, {color: currentIconState ? colors.darkGrey : colors.mediumBlue}]}
@@ -43,3 +43,21 @@ export default AttributeTile = props => {
         </TouchableOpacity>
     )
 }
+
+const styles = StyleSheet.create({
+    attributeTile: {
+        paddingLeft: 15,
+        paddingRight: 35,
+        height: 45,
+        width: "100%",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-start",
+    },
+    attributeCheckmark: {
+        height: 25,
+        width: 25,
+        marginRight: 10,
+        tintColor: colors.darkBlue
+    },
+});

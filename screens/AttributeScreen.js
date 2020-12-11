@@ -5,9 +5,11 @@ import { boxes, colors, styles, texts } from '../Styles';
 import AttributeTile from '../components/AttributeTile';
 import ScrollRow from '../components/ScrollRow';
 import DB from '../api/DB_API';
-import ButtonLarge from '../components/ButtonLarge';
+import Button from '../components/Button';
 import InfoModal from '../components/InfoModal';
 import Padding from '../components/Padding';
+import SubHeader from '../components/SubHeader';
+import SectionHeader from '../components/SectionHeader';
 
 export default AttributeScreen = ({route, navigation}) => {
 
@@ -65,17 +67,17 @@ export default AttributeScreen = ({route, navigation}) => {
                         : "Die Interessen, die du auswählst, helfen uns dabei, dich mit passenden Leuten zusammenzubringen."
                     }
             />
-            <View style={boxes.subHeader}>
+            <SubHeader>
                 <ScrollRow
                     type="attributes"
                     data= {categoriesList}
                     currentCategory={currentCategory}
                     onPress={selectCategoryHandler}
                 />
-            </View>
-            <View style={boxes.separator}>
+            </SubHeader>
+            <SectionHeader>
                 <Text style={texts.separatorText}>{currentCategory}</Text>
-            </View>
+            </SectionHeader>
             <FlatList 
                 style= {{backgroundColor: colors.white, flexGrow: 1}}
                 data={displayedSkills}

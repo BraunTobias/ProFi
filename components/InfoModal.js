@@ -18,7 +18,7 @@ export default InfoModal = props => {
                             <Padding height={7}/>
                             <Text style={texts.copy}>{props.copy}</Text>
                             <Padding height={20}/>
-                            <ButtonLarge
+                            <Button
                                     title="Verstanden"
                                     onPress={props.onPress}
                             />

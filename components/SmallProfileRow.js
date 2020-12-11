@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { Text, View, StyleSheet } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 
 import { icons, colors, boxes, texts } from '../Styles';
@@ -14,7 +14,7 @@ export default SmallProfileRow = props => {
         data = data.slice(0, 3);
     }
     return(
-        <View style= { boxes.smallProfileRow }>
+        <View style= { styles.smallProfileRow }>
             <FlatList 
                 style={{}}
                 data={data}
@@ -39,3 +39,12 @@ export default SmallProfileRow = props => {
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    smallProfileRow: {
+        height: 25,
+        marginVertical: 3,
+        marginHorizontal: 5,
+        flexDirection: "row"
+    },
+});

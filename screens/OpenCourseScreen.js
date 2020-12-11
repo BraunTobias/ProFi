@@ -4,12 +4,13 @@ import { View, Text, Modal, Keyboard, ActivityIndicator, Alert, Animated, FlatLi
 import { icons, colors, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
 import InputField from '../components/InputField';
-import ButtonSmall from '../components/ButtonSmall';
 import ListTile from "../components/ListTile";
 import ModalContent from "../components/ModalContent";
-import ButtonLarge from '../components/ButtonLarge';
+import Button from '../components/Button';
 import AttributeSelect from '../components/AttributeSelect';
 import AttributePreviewTile from '../components/AttributePreviewTile';
+import SubHeader from '../components/SubHeader';
+import FlexRow from '../components/FlexRow';
 
 export default OpenCourseScreen = ({route, navigation}) => {
 
@@ -152,16 +153,12 @@ export default OpenCourseScreen = ({route, navigation}) => {
     }
 
     const selectIdeaHandler = (item) => {
-        navigation.navigate("Open Idea", {
-            itemId: item.id, 
-            itemTitle: item.title, 
-            itemDescription: item.description, 
-            skillsList: item.skills, 
+        navigation.navigate("Idea", {
+            ideaInfo: ideaInfo, 
+            evaluated: evaluated,
+            courseType: "openCourses",
             courseId: courseInfo.id, 
-            courseTitle: courseInfo.title, 
-            currentUserId: currentUserId, 
-            isMember: item.userIsMember,
-            myTeam: item.myTeam
+            currentUserId: currentUserId,
         });
     }
 
@@ -183,19 +180,19 @@ export default OpenCourseScreen = ({route, navigation}) => {
                                     value={editCourseName}
                                     onChangeText={changeEditCourseNameHandler}
                                 />
-                                <View style={boxes.unPaddedRow}>
+                                <FlexRow>
                                     <NumberInput
                                         title= {"Mitglieder min."}
                                         value= {editCourseMinMembers}
                                         onChange={changeEditCourseMinMembersHandler}
                                     />
-                                    <View style={boxes.buttonSpacing}/>
+                                    <Padding width={10}/>
                                     <NumberInput
                                         title= {"Mitglieder max."}
                                         value= {editCourseMaxMembers}
                                         onChange={changeEditCourseMaxMembersHandler}
                                     />
-                                </View>
+                                </FlexRow>
                             </View> 
                         )
                     }}
@@ -249,15 +246,15 @@ export default OpenCourseScreen = ({route, navigation}) => {
                 </Modal>
             </Modal>
 
-            <View style={ boxes.subHeader }>
-                <View style={ boxes.paddedRow }>
-                    <ButtonSmall
+            <SubHeader>
+                <FlexRow padding>
+                    <Button
                         title={"Neue Idee"}
                         icon={icons.plus}
                         onPress={() => {setNewIdeaVisible(true)}}
                     />
-                </View>
-            </View>
+                </FlexRow>
+            </SubHeader>
 
             <FlatList
                 style={{backgroundColor: colors.white}}

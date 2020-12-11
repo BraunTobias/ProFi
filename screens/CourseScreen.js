@@ -8,40 +8,44 @@ import Autolink from 'react-native-autolink';
 import { icons, colors, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
 import InputField from '../components/InputField';
-import ButtonSmall from '../components/ButtonSmall';
 import SwipeButton from '../components/SwipeButton';
+import SwipeButtonRow from '../components/SwipeButtonRow';
 import ListTile from "../components/ListTile";
 import ModalContent from "../components/ModalContent";
-import ButtonLarge from '../components/ButtonLarge';
+import Button from '../components/Button';
 import ScrollRow from '../components/ScrollRow';
 import AttributeSelect from '../components/AttributeSelect';
 import ProfileView from '../components/ProfileView';
 import AttributePreviewTile from '../components/AttributePreviewTile';
 import Padding from '../components/Padding';
+import SubHeader from '../components/SubHeader';
+import FlexRow from '../components/FlexRow';
 
 export default CourseScreen = ({route, navigation}) => {
 
     const {currentUserId} = route.params;
     const {courseInfo} = route.params;
+    const courseType = courseInfo.courseType;
 
     // State Hooks
     const [currentIdeas, setCurrentIdeas] = useState([]);
     const [swipeListView, setSwipeListView] = useState();
     const [courseName, setCourseName] = useState(courseInfo.title);
     const [courseLink, setCourseLink] = useState(courseInfo.link);
-    const [courseDate, setCourseDate] = useState(courseInfo.date.toDate());
+    const [courseDate, setCourseDate] = useState(courseInfo.date ? courseInfo.date.toDate() : {});
     const [creator, setCreator] = useState("");
     const [members, setMembers] = useState(courseInfo.members);
-    const [minMembers, setMinMembers] = useState(0);
-    const [maxMembers, setMaxMembers] = useState(0);
+    const [minMembers, setMinMembers] = useState(courseInfo.minMembers);
+    const [maxMembers, setMaxMembers] = useState(courseInfo.maxMembers);
     const [userIsMember, setUserIsMember] = useState(courseInfo.userIsMember);
     const [userIsCreator, setUserIsCreator] = useState(false);
-    const [currentFav, setCurrentFav] = useState();
-    const [currentNogo, setCurrentNogo] = useState();
+    const [currentFav, setCurrentFav] = useState("");
+    const [currentNogo, setCurrentNogo] = useState("");
     const [courseDataLoading, setCourseDataLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
 
     // States für Auswertungs-Ansicht
-    const [evaluating, setEvaluating] = useState(false);
+    const [evaluating, setEvaluating] = useState(courseInfo.evaluating);
     const [evaluated, setEvaluated] = useState(courseInfo.evaluated);
 
     // State Hooks für Modals
@@ -52,9 +56,9 @@ export default CourseScreen = ({route, navigation}) => {
     const [editCourseDateErrorVisible, setEditCourseDateErrorVisible] = useState(false);
     const [editCourseName, setEditCourseName] = useState(courseInfo.title);
     const [editCourseLink, setEditCourseLink] = useState(courseInfo.link);
-    const [editCourseDate, setEditCourseDate] = useState(courseInfo.date.toDate());
-    const [editCourseMinMembers, setEditCourseMinMembers] = useState(0);
-    const [editCourseMaxMembers, setEditCourseMaxMembers] = useState(0);
+    const [editCourseDate, setEditCourseDate] = useState(courseInfo.date ? courseInfo.date.toDate() : {});
+    const [editCourseMinMembers, setEditCourseMinMembers] = useState(courseInfo.minMembers);
+    const [editCourseMaxMembers, setEditCourseMaxMembers] = useState(courseInfo.maxMembers);
     const [newIdeaVisible, setNewIdeaVisible] = useState(false);
     const [addSkillsVisible, setAddSkillsVisible] = useState(false);
     const [selectedSkillsList, setSelectedSkillsList] = useState([]);
@@ -76,9 +80,7 @@ export default CourseScreen = ({route, navigation}) => {
 
     // Icon-Animation
     const rowSwipeAnimatedValues = {};
-    Array(100)
-    .fill('')
-    .forEach((_, i) => {
+    Array(100).fill('').forEach((_, i) => {
         rowSwipeAnimatedValues[`${i}`] = new Animated.Value(0);
     });
     const onSwipeValueChange = (swipeData) => {
@@ -94,41 +96,36 @@ export default CourseScreen = ({route, navigation}) => {
 
     const getCourseData = () => {
         DB.getCourseData(courseInfo.id, (data) => {
+            setUserIsCreator(data.creator == currentUserId);
             setCreator(data.creatorName);
-            setMinMembers(data.minMembers);
-            setMaxMembers(data.maxMembers);
-            setEditCourseMinMembers(data.minMembers);
-            setEditCourseMaxMembers(data.maxMembers);
             setMembers(data.members);
             setEvaluated(data.evaluated);
-            setCourseDataLoading(false);
-            setUserIsCreator(data.creator == currentUserId);
+            setEvaluating(data.evaluating);
         });    
     }
 
     // Wird nach dem Rendern ausgeführt
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            getCourseData();
-            DB.getIdeasList(courseInfo.id, "courses", (ideasList) => {
+            if (courseType == "courses") {
+                getCourseData();
+                DB.getInfoReceived("favourites", (isReceived) => {
+                    setFavInfoReceived(isReceived);
+                });
+                DB.getInfoReceived("nogos", (isReceived) => {
+                    setNogoInfoReceived(isReceived);
+                });
+                DB.getInfoReceived("joinCourse", (isReceived) => {
+                    setJoinInfoReceived(isReceived);
+                });        
+            }
+
+            DB.getIdeasList(courseInfo.id, courseType, (ideasList, myFavourite, myNogo) => {
                 setCurrentIdeas(ideasList);
-                for (const idea in ideasList) {
-                    if (ideasList[idea].favourites && ideasList[idea].favourites.indexOf(currentUserId) >= 0) {
-                        setCurrentFav(ideasList[idea].id);
-                    } else if (ideasList[idea].nogos && ideasList[idea].nogos.indexOf(currentUserId) >= 0) {
-                        setCurrentNogo(ideasList[idea].id);
-                    }
-                }
+                setCurrentFav(myFavourite);
+                setCurrentNogo(myNogo);
+                setCourseDataLoading(false);
             });
-            DB.getInfoReceived("favourites", (isReceived) => {
-                setFavInfoReceived(isReceived);
-            });
-            DB.getInfoReceived("nogos", (isReceived) => {
-                setNogoInfoReceived(isReceived);
-            });
-            DB.getInfoReceived("joinCourse", (isReceived) => {
-                setJoinInfoReceived(isReceived);
-            });    
         });
     }, []);
 
@@ -195,12 +192,12 @@ export default CourseScreen = ({route, navigation}) => {
     const pressNewIdeaHandler = (committed) => {
         if (committed) {
             if (currentNewIdeaName.length > 1 && currentNewIdeaText.length > 1 && selectedSkillsList.length > 0) {
-                DB.addIdea(courseInfo.id, currentNewIdeaName, currentNewIdeaText, selectedSkillsList, [], () => {
+                DB.addIdea(courseInfo.id, courseType, currentNewIdeaName, currentNewIdeaText, selectedSkillsList, [], () => {
                     setNewIdeaVisible(false);
                     setCurrentNewIdeaName("");
                     setCurrentNewIdeaText("");    
                     setSelectedSkillsList([]);
-                    DB.getIdeasList(courseInfo.id, "courses", (ideasList) => {
+                    DB.getIdeasList(courseInfo.id, courseType, (ideasList) => {
                         setCurrentIdeas(ideasList);
                     });
                 }, (error) => {setCurrentWarning(error)});
@@ -291,21 +288,28 @@ export default CourseScreen = ({route, navigation}) => {
         if (number < editCourseMinMembers) setEditCourseMinMembers(number);
     }
 
-    const setTeamsHandler = () => {
+    const refreshListHandler = () => {
+        setRefreshing(true);
+        if (courseType == "courses") {
+            getCourseData();
+        }
+        DB.getIdeasList(courseInfo.id, courseType, (ideasList, myFavourite, myNogo) => {
+            setCurrentIdeas(ideasList);
+            setCurrentFav(myFavourite);
+            setCurrentNogo(myNogo);
+            setRefreshing(false);
+        });    
+    };
 
-    }
-
-    const selectIdeaHandler = (item) => {
+    const selectIdeaHandler = (ideaInfo) => {
         swipeListView.safeCloseOpenRow();
         navigation.navigate("Idea", {
-            itemId: item.id, 
-            itemTitle: item.title, 
-            itemDescription: item.description, 
+            ideaInfo: ideaInfo, 
             evaluated: evaluated,
-            skillsList: item.skills, 
+            courseType: courseType,
             courseId: courseInfo.id, 
             currentUserId: currentUserId,
-            myTeam: item.myTeam});
+        });
     }
 
     return(
@@ -367,9 +371,9 @@ export default CourseScreen = ({route, navigation}) => {
                                     onPress={() => {setEditCourseDateVisible(true); Keyboard.dismiss()}}
                                 />
                                 {editCourseDateErrorVisible &&
-                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
+                                    <FlexRow>
                                         Das Datum muss in der Zukunft liegen.
-                                    </Text>
+                                    </FlexRow>
                                 }
                                 <DateTimePickerModal
                                     isVisible={editCourseDateVisible}
@@ -398,19 +402,19 @@ export default CourseScreen = ({route, navigation}) => {
                                     onConfirm={changeEditCourseDateHandler}
                                     onCancel={() => {setEditCourseTimeVisible(false)}}
                                 />
-                                <View style={boxes.unPaddedRow}>
+                                <FlexRow>
                                     <NumberInput
                                         title= {"Mitglieder min."}
                                         value= {editCourseMinMembers}
                                         onChange={changeEditCourseMinMembersHandler}
                                     />
-                                    <View style={boxes.buttonSpacing}/>
+                                    <Padding width={10}/>
                                     <NumberInput
                                         title= {"Mitglieder max."}
                                         value= {editCourseMaxMembers}
                                         onChange={changeEditCourseMaxMembersHandler}
                                     />
-                                </View>
+                                </FlexRow>
                             </View> 
                         )
                     }}
@@ -465,80 +469,82 @@ export default CourseScreen = ({route, navigation}) => {
                 </Modal>
             </Modal>
 
-
-            <View style={ boxes.subHeader }>
+                    
+            <SubHeader>
+                { (courseType == "courses") &&
                 <View>
-                    <View style={ boxes.paddedRow }>
-                        <Text style={texts.subHeader}>{courseName}</Text>
-                        <Text style={texts.subHeader}>{minMembers == maxMembers ? maxMembers + " Personen" : minMembers + "-" + maxMembers + " Personen"}</Text>
+                    <View>
+                        <FlexRow padding>
+                            <Text style={texts.subHeader}>{courseName}</Text>
+                            <Text style={texts.subHeader}>{minMembers == maxMembers ? maxMembers + " Personen" : minMembers + "-" + maxMembers + " Personen"}</Text>
+                        </FlexRow>
+                        <FlexRow padding>
+                            <Text style={texts.subHeader}>{format(courseDate, "dd.MM.yyyy")}</Text>
+                            <Text style={texts.subHeader}>{creator}</Text>
+                        </FlexRow>
+                        { typeof courseLink !== 'undefined' && courseLink != "" &&
+                                <FlexRow padding>
+                                    <Autolink 
+                                        linkStyle={texts.link}
+                                        style={texts.subHeader}
+                                        text={courseLink}
+                                    />
+                                </FlexRow>
+                        }
+                        <Padding height={5}/>
+                        { members.length > 0 &&
+                            <ScrollRow
+                                data= {members}
+                                onPress={viewProfileHandler}
+                            />
+                        }
                     </View>
-                    <View style={ boxes.paddedRow }>
-                        <Text style={texts.subHeader}>{format(courseDate, "dd.MM.yyyy")}</Text>
-                        <Text style={texts.subHeader}>{creator}</Text>
-                    </View>
-                    { typeof courseLink !== 'undefined' && courseLink != "" &&
-                            <View style={ boxes.paddedRow }>
-                                <Autolink 
-                                    linkStyle={texts.link}
-                                    style={texts.subHeader}
-                                    text={courseLink}
-                                />
-                            </View>
-                    }
-                    <Padding height={5}/>
-                    { !courseDataLoading && members.length > 0 &&
-                        <ScrollRow
-                            data= {members}
-                            onPress={viewProfileHandler}
+                    { !evaluated && !evaluating &&
+                    <FlexRow padding>
+                        <Button
+                            title={userIsMember ? "Mitglied" : "Beitreten"}
+                            icon={userIsMember ? icons.checkTrue : icons.checkFalse}
+                            onPress={joinCourseHandler}
                         />
+                        <Padding width={10}/>
+                        <Button
+                            title={"Neue Idee"}
+                            icon={icons.plus}
+                            onPress={() => {setNewIdeaVisible(true)}}
+                        />
+                    </FlexRow>
+                    }
+                    { userIsCreator && !evaluated && !evaluating &&
+                    <FlexRow padding>
+                        <Button
+                            title={"Kurs bearbeiten"}
+                            onPress={() => {setEditCourseVisible(true)}}
+                        />
+                    </FlexRow>
                     }
                 </View>
-                {courseDataLoading && members.length > 0 &&
-                <View style={{height: 80, justifyContent: "center"}}>
-                    <ActivityIndicator/>
-                </View>
-                }  
-                { !evaluated &&
-                <View style={ boxes.paddedRow }>
-                    <ButtonSmall
-                        title={userIsMember ? "Mitglied" : "Beitreten"}
-                        icon={userIsMember ? icons.checkTrue : icons.checkFalse}
-                        onPress={joinCourseHandler}
-                    />
-                    <View style={boxes.buttonSpacing}/>
-                    <ButtonSmall
-                        title={"Neue Idee"}
-                        icon={icons.plus}
-                        onPress={() => {setNewIdeaVisible(true)}}
-                    />
-                </View>
                 }
-                { userIsCreator && courseDate - (new Date()) < 0 && !evaluated && 
-                <View style={ boxes.paddedRow }>
-                    <ButtonLarge
-                        title={"Teams erstellen"}
-                        onPress={setTeamsHandler}
-                    />
-                </View>
+                { (courseType == "openCourses") &&
+                    <FlexRow padding>
+                        <Button
+                            title={"Neue Idee"}
+                            icon={icons.plus}
+                            onPress={() => {setNewIdeaVisible(true)}}
+                        />
+                    </FlexRow>
                 }
-                { userIsCreator && courseDate - (new Date()) >= 0 && !evaluated && 
-                <View style={ boxes.paddedRow }>
-                    <ButtonLarge
-                        title={"Kurs bearbeiten"}
-                        onPress={() => {setEditCourseVisible(true)}}
-                    />
-                </View>
-                }
-            </View>
+            </SubHeader>
 
             <SwipeListView
                 style={{backgroundColor: colors.white}}
                 ref = {ref => setSwipeListView(ref)}
                 data={currentIdeas}
                 disableLeftSwipe = {true}
-                disableRightSwipe = {evaluated}
+                disableRightSwipe = {evaluated || evaluating || courseType == "openCourses"}
                 keyExtractor={(item, index) => index.toString()}
                 onSwipeValueChange={onSwipeValueChange}
+                onRefresh={refreshListHandler}
+                refreshing={refreshing}
                 renderItem={({item, index}) => 
                         <ListTile
                             onPress={() => {selectIdeaHandler(item)}} 
@@ -550,32 +556,42 @@ export default CourseScreen = ({route, navigation}) => {
                             isNogo={item.id == currentNogo}
                             index = {index}
                             myTeam={item.myTeam}
+                            isMember={item.userIsMember}
                             inactive = {evaluated && (!item.team || item.team.length == 0)}
-                            warning = {item.warning}
-                            // warning = {evaluated && item.team && item.team.length > 0 && (item.team.length < minMembers || item.team.length > maxMembers)}
+                            // warning = {item.warning}
+                            warning = {evaluated && item.team && item.team.length > 0 && (item.team.length < minMembers || item.team.length > maxMembers)}
                         />
                 }
                 renderHiddenItem={ ({item, index}) => 
-                        <View style={[boxes.swipeRowTwo, {backgroundColor: item.id == currentNogo ? colors.lightGrey : colors.red}]}>
-                            <SwipeButton
-                                rowWidth={120}
-                                icon={icons.fav}
-                                animation={rowSwipeAnimatedValues[index]}
-                                backgroundColor={colors.darkBlue}
-                                onPress={(ref) => {addFavHandler(item.id)}}
-                                deactivated={item.id == currentFav}
-                            />
-                            <SwipeButton
-                                rowWidth={120}
-                                icon={icons.nogo}
-                                animation={rowSwipeAnimatedValues[index]}
-                                backgroundColor={colors.red}
-                                onPress={(ref) => {addNogoHandler(item.id)}}
-                                deactivated={item.id == currentNogo}
-                            />
-                        </View>
+                    <SwipeButtonRow>
+                        <SwipeButton
+                            rowWidth={120}
+                            icon={icons.fav}
+                            animation={rowSwipeAnimatedValues[index]}
+                            backgroundColor={colors.darkBlue}
+                            onPress={(ref) => {addFavHandler(item.id)}}
+                            deactivated={item.id == currentFav}
+                        />
+                        <SwipeButton
+                            rowWidth={120}
+                            icon={icons.nogo}
+                            animation={rowSwipeAnimatedValues[index]}
+                            backgroundColor={colors.red}
+                            onPress={(ref) => {addNogoHandler(item.id)}}
+                            deactivated={item.id == currentNogo}
+                        />
+                    </SwipeButtonRow>
                 }
                 leftOpenValue={evaluated ? 0 : 120}
+                ListFooterComponent={
+                    <View>
+                        {courseDataLoading && 
+                            <View style={{backgroundColor: colors.white, paddingVertical: 30}}>
+                                <ActivityIndicator/>
+                            </View>
+                        }
+                    </View>
+                }
             />
 
         </View>

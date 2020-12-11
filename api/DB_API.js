@@ -339,35 +339,11 @@ const DB = {
             }
         });
     },
-    // Neuen offenen Kurs erstellen
-    addOpenCourse: function(title, id, minMembers, maxMembers, onSuccess, onError) {
-        const currentUserID = firebase.auth().currentUser.uid;
-
-        // Checken ob es die ID schon gibt
-        const courseWithId = firebase.firestore().collection("openCourses").doc(id);
-        courseWithId.get()
-        .then((docSnapshot) => {
-            if (docSnapshot.exists) {
-                onError("Diese ID ist schon vergeben!");
-            } else {
-                firebase.firestore().collection("openCourses").doc(id).set({
-                    creator: currentUserID,
-                    title: title,
-                    minMembers: minMembers,
-                    maxMembers: maxMembers,
-                    prospects: [currentUserID],
-                })
-                .then(() => {
-                    onSuccess();
-                });
-            }
-        });
-    },
     // Neue Idee erstellen 
-    addIdea: function(courseId, title, description, skills, interests, onSuccess) {
+    addIdea: function(courseId, courseType, title, description, skills, interests, onSuccess) {
         const currentUserID = firebase.auth().currentUser.uid;
 
-        firebase.firestore().collection("courses").doc(courseId).collection("ideas").add({
+        firebase.firestore().collection(courseType).doc(courseId).collection("ideas").add({
             title: title,
             description: description,
             interests: interests,
@@ -377,26 +353,28 @@ const DB = {
             creator: currentUserID
         })
         .then((docRef) => {
-            // Man favorisiert seine neu erstellte Idee automatisch
-            this.addPref("favourites", courseId, docRef.id, () => {
-                onSuccess();
-            })
+            if (courseType == "courses") {
+                // Man favorisiert seine neu erstellte Idee automatisch
+                this.addPref("favourites", courseId, docRef.id, () => {
+                    onSuccess();
+                })
+            }
         });
     },
-    addOpenIdea: function(courseId, title, description, skills, interests, onSuccess) {
-        const currentUserID = firebase.auth().currentUser.uid;
+    // addOpenIdea: function(courseId, title, description, skills, interests, onSuccess) {
+    //     const currentUserID = firebase.auth().currentUser.uid;
 
-        firebase.firestore().collection("openCourses").doc(courseId).collection("ideas").add({
-            title: title,
-            description: description,
-            interests: interests,
-            skills: skills,
-            members: [],
-            creator: currentUserID
-        }).then(() => {
-            onSuccess();
-        })
-    },
+    //     firebase.firestore().collection("openCourses").doc(courseId).collection("ideas").add({
+    //         title: title,
+    //         description: description,
+    //         interests: interests,
+    //         skills: skills,
+    //         members: [],
+    //         creator: currentUserID
+    //     }).then(() => {
+    //         onSuccess();
+    //     })
+    // },
     // Idee bearbeiten
     editIdea: function(courseId, ideaId, courseType, title, description, skills, interests, onSuccess, onError) {
         firebase.firestore().collection(courseType).doc(courseId).collection("ideas").doc(ideaId).set({
@@ -495,6 +473,7 @@ const DB = {
             const course = doc.data();
             course["id"] = doc.id;
             course["listKey"] = count;
+            course["courseType"] = "courses";
             count ++;
             if (course.members && course.members.indexOf(currentUserID) >= 0) course.userIsMember = true;
             else course.userIsMember = false;
@@ -533,6 +512,7 @@ const DB = {
             const openCourse = doc.data();
             openCourse["id"] = doc.id;
             openCourse["listKey"] = count;
+            openCourse["courseType"] = "openCourses";
             count ++;
             openCourseList.push(openCourse);
         }); 
@@ -547,6 +527,8 @@ const DB = {
     // Gibt Liste mit allen Ideen für Kurs-Seite zurück
     getIdeasList: async function(courseId, courseType, ideasListRetrieved) {
         const ideasList = [];
+        var myFavourite = "";
+        var myNogo = "";
         const currentUserID = firebase.auth().currentUser.uid;
 
         const snapshot = await firebase.firestore().collection(courseType).doc(courseId).collection("ideas").get();
@@ -561,6 +543,14 @@ const DB = {
                 idea["myTeam"] = false;
                 ideasList.push(idea);
             }
+            if (idea.favourites && idea.favourites.indexOf(currentUserID) >= 0) {
+                myFavourite = doc.id;
+            } else if (idea.nogos && idea.nogos.indexOf(currentUserID) >= 0) {
+                myNogo = doc.id;
+            }
+            var sortedSkills = idea.skills;
+            sortedSkills.sort();
+            idea.skills = sortedSkills;
         });    
 
         // Skill-Überschneidungen mit User zählen
@@ -588,8 +578,8 @@ const DB = {
             else if (!a.team == -1) return 1;
             else return b.userSkillCount - a.userSkillCount;
         });
-        
-        ideasListRetrieved(ideasList);
+
+        ideasListRetrieved(ideasList, myFavourite, myNogo);
     },
     // Gibt Liste mit allen Kommentaren für Idee-Seite zurück
     getCommentsList: async function(courseId, ideaId, courseType, commentsListRetrieved) {
@@ -701,43 +691,30 @@ const DB = {
         }
         onSuccess(courseData);
     },
-    // Gibt Eigenschaften einer Idee zurück
-    getIdeaData: async function(courseId, ideaId, onSuccess) {
-        var ideaData = {};
-        const snapshotDoc = await firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaId).get();
-        if (snapshotDoc.data()) {
-            ideaData = snapshotDoc.data();
-            var sortedSkills = snapshotDoc.data().skills;
-            sortedSkills.sort();
-            ideaData.skills = sortedSkills;
 
-            if (ideaData.team) {
-                var teamList = [];
-                for (var memberId of ideaData.team) {
-                    var member = {userId: memberId};
-                    await this.getUserInfoById(memberId, (name, url) => {
-                        member.userName = name;
-                        member.imageUrl = url;
-                    });
-                    teamList.push(member);
-                }
-                ideaData.team = teamList;    
-            } else {
-                ideaData.team = [];
+    // Gibt Team einer Idee zurück
+    getTeamData: async function(courseId, ideaId, courseType, onSuccess) {
+        var teamList = [];
+        const snapshotDoc = await firebase.firestore().collection(courseType).doc(courseId).collection("ideas").doc(ideaId).get();
+        if (snapshotDoc.data()) {
+            const ideaData = snapshotDoc.data();
+            for (var memberId of ideaData.team) {
+                var member = {userId: memberId};
+                await this.getUserInfoById(memberId, (name, url) => {
+                    member.userName = name;
+                    member.imageUrl = url;
+                });
+                teamList.push(member);
             }
         }
-        onSuccess(ideaData);
+        onSuccess(teamList);
     },
-    // Gibt Eigenschaften einer Idee zurück
-    getOpenIdeaData: async function(courseId, ideaId, onSuccess) {
-        var ideaData = {};
+    // Gibt Mitglieder einer offenen Idee zurück
+    getIdeaMembersData: async function(courseId, ideaId, onSuccess) {
+        var membersList = [];
         const snapshotDoc = await firebase.firestore().collection("openCourses").doc(courseId).collection("ideas").doc(ideaId).get();
         if (snapshotDoc.data()) {
-            ideaData = snapshotDoc.data();
-            var sortedSkills = snapshotDoc.data().skills;
-            sortedSkills.sort();
-            ideaData.skills = sortedSkills;
-            var membersList = [];
+            const ideaData = snapshotDoc.data();
             for (var memberId of ideaData.members) {
                 var member = {userId: memberId};
                 await this.getUserInfoById(memberId, (name, url) => {
@@ -746,10 +723,31 @@ const DB = {
                 });
                 membersList.push(member);
             }
-            ideaData.members = membersList;
         }
-        onSuccess(ideaData);
+        onSuccess(membersList);
     },
+    // Gibt Eigenschaften einer Idee zurück
+    // getOpenIdeaData: async function(courseId, ideaId, onSuccess) {
+    //     var ideaData = {};
+    //     const snapshotDoc = await firebase.firestore().collection("openCourses").doc(courseId).collection("ideas").doc(ideaId).get();
+    //     if (snapshotDoc.data()) {
+    //         ideaData = snapshotDoc.data();
+    //         var sortedSkills = snapshotDoc.data().skills;
+    //         sortedSkills.sort();
+    //         ideaData.skills = sortedSkills;
+    //         var membersList = [];
+    //         for (var memberId of ideaData.members) {
+    //             var member = {userId: memberId};
+    //             await this.getUserInfoById(memberId, (name, url) => {
+    //                 member.userName = name;
+    //                 member.imageUrl = url;
+    //             });
+    //             membersList.push(member);
+    //         }
+    //         ideaData.members = membersList;
+    //     }
+    //     onSuccess(ideaData);
+    // },
 
     // Der User wird zur Interessenten-Liste eines Kurses hinzugefügt
     addCourseToList: async function(courseId, onSuccess, onError) {
@@ -826,7 +824,17 @@ const DB = {
                     members: membersArray,
                     lastUpdated: currentDate
                 }, {merge: true}); 
-                onSuccess();
+                // Die neue Members-Liste wird zurückgegeben
+                var membersList = [];
+                for (var memberId of membersArray) {
+                    var member = {userId: memberId};
+                    await this.getUserInfoById(memberId, (name, url) => {
+                        member.userName = name;
+                        member.imageUrl = url;
+                    });
+                    membersList.push(member);
+                }
+                onSuccess(membersList);
             } else {
                 onError("User ist schon im Kurs");
             }

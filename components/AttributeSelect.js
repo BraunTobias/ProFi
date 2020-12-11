@@ -6,6 +6,9 @@ import AttributeTile from '../components/AttributeTile';
 import ScrollRow from '../components/ScrollRow';
 import DB from '../api/DB_API';
 import Padding from './Padding';
+import SubHeader from '../components/SubHeader';
+import FlexRow from '../components/FlexRow';
+import SectionHeader from '../components/SectionHeader';
 
 export default AttributeScreen = (props) => {
 
@@ -37,21 +40,21 @@ export default AttributeScreen = (props) => {
         <Fragment>
             <SafeAreaView style={{ flex: 0, backgroundColor: colors.lightBlue }} />
             <SafeAreaView style={{flex: 1, backgroundColor: colors.lightGrey}}>
-                <View style={boxes.subHeader}>
+                <SubHeader>
                     <Padding height={10}/>
-                    <View style={boxes.paddedRow}>
+                    <FlexRow padding>
                         <Text style={texts.separatorText}>Fähigkeiten auswählen</Text>
-                    </View>
+                    </FlexRow>
                     <ScrollRow
                         type="attributes"
                         data= {categoriesList}
                         currentCategory={currentCategory}
                         onPress={selectCategoryHandler}
                     />
-                </View>
-                <View style={boxes.separator}>
+                </SubHeader>
+                <SectionHeader>
                     <Text style={texts.separatorText}>{currentCategory}</Text>
-                </View>
+                </SectionHeader>
                 <FlatList 
                     style= {{backgroundColor: colors.white, flexGrow: 1}}
                     data={displayedSkills}
@@ -69,7 +72,7 @@ export default AttributeScreen = (props) => {
                     }}
                 />
                 <View style={boxes.modalButton}>
-                    <ButtonLarge
+                    <Button
                         title={"Bestätigen"}
                         onPress={props.onDismiss}
                     />

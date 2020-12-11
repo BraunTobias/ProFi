@@ -7,11 +7,11 @@ export default SwipeButton = props => {
   
   return (
     <TouchableOpacity
-      style={[boxes.swipeButton, {backgroundColor: props.backgroundColor}]}
+      style={[styles.swipeButton, {backgroundColor: props.backgroundColor}]}
       onPress={props.onPress}
     >
         <Animated.Image 
-            style= {[boxes.swipeIcon, {
+            style= {[styles.swipeIcon, {
                   opacity: props.deactivated ? 0.3 : 1,
                   transform: [{
                   scale: props.animation ? props.animation.interpolate({
@@ -25,3 +25,18 @@ export default SwipeButton = props => {
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  swipeButton: {
+    flex: 1,
+    height: "100%",
+    width: 60,
+    maxWidth: 60,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  swipeIcon: {
+      width: 40,
+      tintColor: colors.white
+  },
+});

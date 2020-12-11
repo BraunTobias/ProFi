@@ -4,6 +4,7 @@ import {View} from 'react-native';
 import { icons, colors, boxes, texts } from '../Styles';
 import AttributeList from '../components/AttributeList';
 import DB from '../api/DB_API';
+import FlexRow from '../components/FlexRow';
 
 export default AttributeListScreen = ({route, navigation}) => {
     const {filterList} = route.params;
@@ -39,21 +40,21 @@ export default AttributeListScreen = ({route, navigation}) => {
     return(
         <View style={{flex: 1}}>
             { interestsList.length > 0 &&
-                <View style={[boxes.paddedRow, {backgroundColor: colors.white}]}>
-                    <ButtonSmall
+                <FlexRow padding>
+                    <Button
                         inactive={viewedList == interestsList}
                         title="Fähigkeiten"
                         icon={icons.info}
                         onPress={() => setViewedList(skillsList)}
                     />
-                    <View style={boxes.buttonSpacing}/>
-                    <ButtonSmall
+                    <Padding width={10}/>
+                    <Button
                         inactive={viewedList != interestsList}
                         title="Interessen"
                         icon={icons.info}
                         onPress={() => setViewedList(interestsList)}
                     />
-                </View>
+                </FlexRow>
             }
             <AttributeList
                 // attributeType = {attributeType}

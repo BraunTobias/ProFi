@@ -1,9 +1,9 @@
 import React from "react";
-import { View, Text, TouchableWithoutFeedback, Keyboard, StatusBar } from "react-native";
+import { View, Text, TouchableWithoutFeedback, Keyboard, StatusBar, StyleSheet } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
 import { icons, colors, boxes, texts } from '../Styles';
-import ButtonLarge from '../components/ButtonLarge';
+import Button from '../components/Button';
 
 export default ModalComponent = props => {
     return (
@@ -11,23 +11,23 @@ export default ModalComponent = props => {
             <View style={{flex: 1}}>
                 <StatusBar barStyle="dark-content"/>
 
-                <View style={ boxes.modal }>
+                <View style={ styles.modal }>
 
                     { props.subheader() }
 
                     <ScrollView 
                         bounces={false}
-                        contentContainerStyle={boxes.modalScrollView}
+                        contentContainerStyle={styles.modalScrollView}
                     >
                         { props.content() }
                     </ScrollView>
 
-                    <View style={boxes.modalButton}>
-                        <ButtonLarge
+                    <View style={styles.modalButton}>
+                        <Button
                             title={"Bestätigen"}
                             onPress={ () => {props.onDismiss(true)} }
                         />
-                        <ButtonLarge
+                        <Button
                             title={"Abbrechen"}
                             transparent={true}
                             onPress={() => {props.onDismiss(false)} }
@@ -38,3 +38,20 @@ export default ModalComponent = props => {
         </TouchableWithoutFeedback>
     );
 };
+
+const styles = StyleSheet.create({
+    modal: {
+        flex: 1, 
+        justifyContent: "center",
+    },
+    modalScrollView: {
+        flexGrow: 1,
+    },
+    modalButton: {
+        width: "100%",
+        paddingHorizontal: 15,
+        paddingBottom: 13,
+        paddingTop: 7,
+        backgroundColor: colors.lightGrey
+    },
+});

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import {FlatList, View, Text, SectionList, Image, ActivityIndicator} from "react-native";
+import {FlatList, View, Text, SectionList, Image, ActivityIndicator, StyleSheet} from "react-native";
 
-import { boxes, colors, styles, texts } from '../Styles';
+import { boxes, colors, texts } from '../Styles';
 import ProfileImage from './ProfileImage';
 import ScrollRow from '../components/ScrollRow';
 import SmallProfileRow from './SmallProfileRow';
+import SectionHeader from '../components/SectionHeader';
 
 export default AttributeList = props => {
 
@@ -14,13 +15,13 @@ export default AttributeList = props => {
             sections={props.attList}
             keyExtractor={(item, index) => index.toString()}
             renderSectionHeader={({ section }) => (
-                <View style={boxes.separator}>
+                <SectionHeader>
                     <Text style={texts.separatorText}>{section.key}</Text>
-                </View>
+                </SectionHeader>
             )}
             renderItem={({ item }) => { 
                 return (
-                    <View style={boxes.attributeListTile}>
+                    <View style={styles.attributeListTile}>
                         <Text style={[texts.sectionListCopy]}>{item.name}</Text> 
                         <SmallProfileRow
                             data= {item.users}
@@ -31,11 +32,25 @@ export default AttributeList = props => {
             }}
             ListFooterComponent={
                 props.loading &&
-                <View style={boxes.listLoading}>
+                <View style={styles.listLoading}>
                     <ActivityIndicator size='small'/>
                 </View>
             }
         />
-    );
-  
+    ); 
 }
+
+const styles = StyleSheet.create({
+    attributeListTile: {
+        width: "100%",
+        height: 30,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+    },
+    listLoading: {
+        height: 100,
+        justifyContent: "center",
+        alignItems: "center"
+    },
+});

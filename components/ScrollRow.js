@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { Text, View, StyleSheet } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 
 import { icons, colors, boxes, texts } from '../Styles';
@@ -9,7 +9,7 @@ export default ScrollRow = props => {
 
     const data = props.data;
     return(
-        <View style= { boxes.scrollRow }>
+        <View style= { styles.scrollRow }>
             <FlatList 
                 style={{paddingLeft: 15}}
                 data={data}
@@ -41,3 +41,11 @@ export default ScrollRow = props => {
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    scrollRow: {
+        height: 80,
+        width: "100%",
+        paddingVertical: 10,
+    },
+});

@@ -1,9 +1,8 @@
 import React from 'react';
 import InputSpinner from "react-native-input-spinner";
 
-import { View, TextInput, Text } from 'react-native';
+import { View, TextInput, Text, StyleSheet } from 'react-native';
 import { icons, colors, boxes, texts } from '../Styles';
-import Padding from './Padding';
 
 export default NumberInput = props => {
   
@@ -11,10 +10,10 @@ export default NumberInput = props => {
         <View style={{flex: 1, maxWidth: 160}}>
             <Text style={texts.subHeader}>{props.title}</Text>
             <InputSpinner
-                style={boxes.numberInput}
+                style={styles.numberInput}
                 inputStyle={texts.numberInput}
-                buttonStyle={boxes.numberInputButton}
-                buttonPressStyle={boxes.numberInputButton}
+                buttonStyle={styles.numberInputButton}
+                buttonPressStyle={styles.numberInputButton}
                 initialValue={props.value}
                 value={props.value}
                 min= {2}
@@ -27,3 +26,15 @@ export default NumberInput = props => {
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    numberInput: {
+        maxWidth: "100%",
+        alignItems: "center",
+    },
+    numberInputButton: {
+        width: 40, 
+        height: 40,
+        borderRadius: 7
+    },
+});

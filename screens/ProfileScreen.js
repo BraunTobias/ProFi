@@ -6,7 +6,7 @@ import * as ImagePicker from "expo-image-picker"
 
 import { icons, colors, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
-import ButtonLarge from '../components/ButtonLarge';
+import Button from '../components/Button';
 import ProfileImage from '../components/ProfileImage';
 import InputField from '../components/InputField';
 import AttributePreviewTile from '../components/AttributePreviewTile';
@@ -14,6 +14,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import ModalContent from "../components/ModalContent";
 import Padding from '../components/Padding';
 import PushNofiticationSwitch from '../components/PushNofiticationSwitch';
+import FlexRow from '../components/FlexRow';
 
 export default ProfileScreen = ({navigation}) => {
 
@@ -388,55 +389,55 @@ export default ProfileScreen = ({navigation}) => {
                             <View style={boxes.mainContainer}>
                                 <Text style={texts.titleCentered}>{"Push-Mitteilungen erhalten für …"}</Text>
                                 <Padding height={20}/>
-                                <View style={[boxes.unPaddedRow, {alignItems: "center"}]}>
+                                <FlexRow>
                                     <Text style={[texts.copy, {fontFamily: 'Inter_600SemiBold'}]}>Alle</Text>
                                     <PushNofiticationSwitch
                                         onValueChange={toggleAllPushNotficationSwitches}
                                         value={pushEvaluateEnabled && pushCommentEnabled && pushDeleteEnabled && pushAttChangeEnabled && pushCourseChangeEnabled}
                                     />
-                                </View>
+                                </FlexRow>
                                 <Padding height={10}/>
-                                <View style={boxes.line}></View>
+                                <View style={{height: 1, width: "100%", backgroundColor: colors.mediumBlue}}></View>
                                 <Padding height={10}/>
-                                <View style={[boxes.unPaddedRow, {alignItems: "center"}]}>
+                                <FlexRow>
                                     <Text style={texts.copy}>Einteilung von Ideen (empfohlen)</Text>
                                     <PushNofiticationSwitch
                                         onValueChange={toggleEvaluateSwitch}
                                         value={pushEvaluateEnabled}
                                     />
-                                </View>
+                                </FlexRow>
                                 <Padding height={7}/>
-                                <View style={[boxes.unPaddedRow, {alignItems: "center"}]}>
+                                <FlexRow>
                                     <Text style={texts.copy}>Neue Kommentare</Text>
                                     <PushNofiticationSwitch
                                         onValueChange={toggleCommentSwitch}
                                         value={pushCommentEnabled}
                                     />
-                                </View>
+                                </FlexRow>
                                 <Padding height={7}/>
-                                <View style={[boxes.unPaddedRow, {alignItems: "center"}]}>
+                                <FlexRow>
                                     <Text style={texts.copy}>Änderung an meinen Kursen</Text>
                                     <PushNofiticationSwitch
                                         onValueChange={toggleCourseChangeSwitch}
                                         value={pushCourseChangeEnabled}
                                     />
-                                </View>
+                                </FlexRow>
                                 <Padding height={7}/>
-                                <View style={[boxes.unPaddedRow, {alignItems: "center"}]}>
+                                <FlexRow>
                                     <Text style={texts.copy}>Löschen von Ideen</Text>
                                     <PushNofiticationSwitch
                                         onValueChange={toggleDeleteSwitch}
                                         value={pushDeleteEnabled}
                                     />
-                                </View>
+                                </FlexRow>
                                 <Padding height={7}/>
-                                <View style={[boxes.unPaddedRow, {alignItems: "center"}]}>
+                                <FlexRow>
                                     <Text style={texts.copy}>Neu verfügbare Fähigkeiten</Text>
                                     <PushNofiticationSwitch
                                         onValueChange={toggleAttChangeSwitch}
                                         value={pushAttChangeEnabled}
                                     />
-                                </View>
+                                </FlexRow>
                             </View>
                         )
                     }}
@@ -446,7 +447,7 @@ export default ProfileScreen = ({navigation}) => {
 
 
             <ScrollView style={{flex: 1}}>
-                    <View style={boxes.centeredRow}>
+                    <FlexRow center>
                         <View style={{height: 130, marginVertical: 10}}>
                             <ProfileImage
                                 imageUrl={currentImage}
@@ -454,9 +455,9 @@ export default ProfileScreen = ({navigation}) => {
                                 loading={imageLoading}
                             />
                         </View>
-                    </View>
+                    </FlexRow>
 
-                    <View style={boxes.paddedRow}>
+                    <FlexRow padding>
                         <InputField
                             placeholderText="Name"
                             isButton= {true}
@@ -464,8 +465,8 @@ export default ProfileScreen = ({navigation}) => {
                             value={currentName}
                             onPress={() => {setEditNameVisible(true)}}
                         />
-                    </View>
-                    <View style={boxes.paddedRow}>
+                    </FlexRow>
+                    <FlexRow padding>
                         <InputField
                             placeholderText="Kurzbeschreibung"
                             isButton= {true}
@@ -473,8 +474,8 @@ export default ProfileScreen = ({navigation}) => {
                             value={currentBio}
                             onPress={() => {setEditBioVisible(true)}}
                         />
-                    </View>
-                    <View style={boxes.paddedRow}>
+                    </FlexRow>
+                    <FlexRow padding>
                         <InputField
                             placeholderText="E-Mail"
                             isButton= {true}
@@ -482,8 +483,8 @@ export default ProfileScreen = ({navigation}) => {
                             value={currentMail}
                             onPress={() => {setEditEmailVisible(true)}}
                         />
-                    </View>
-                    <View style={boxes.paddedRow}>
+                    </FlexRow>
+                    <FlexRow padding>
                         <InputField
                             placeholderText="Passwort ändern"
                             isButton= {true}
@@ -491,40 +492,40 @@ export default ProfileScreen = ({navigation}) => {
                             value="•••••••••"
                             onPress={() => {setEditPasswordVisible(true)}}
                         />
-                    </View>
-                    <View style={boxes.paddedRow}>
+                    </FlexRow>
+                    <FlexRow padding>
                         <InputField
                             isButton= {true}
                             icon={icons.notification}
                             value="Push-Mitteilungen verwalten"
                             onPress={() => {setManageNotificationsVisible(true)}}
                         />
-                    </View>
-                    <View style={boxes.paddedRow}>
+                    </FlexRow>
+                    <FlexRow padding>
                         <AttributePreviewTile
                             title="Meine Fähigkeiten"
                             subtitle={skillString}
                             index={0}
                             onPress={() => navigation.navigate('Attributes', {attributeType: "skills"})}
                         />
-                    </View>
-                    <View style={boxes.paddedRow}>
+                    </FlexRow>
+                    <FlexRow padding>
                         <AttributePreviewTile
                             title="Meine Interessen"
                             subtitle={interestString}
                             index={0}
                             onPress={() => navigation.navigate('Attributes', {attributeType: "interests"})}
                         />
-                    </View>
+                    </FlexRow>
                     <Padding height={10}/>
-                    <View style={boxes.paddedRow}>
-                        <ButtonLarge 
+                    <FlexRow padding>
+                        <Button 
                             title="Abmelden" 
                             onPress={logOut}
-                            icon="exit"
+                            icon={icons.exit}
                         />
 
-                    </View>
+                    </FlexRow>
                     <Padding height={15}/>
 
             </ScrollView>
