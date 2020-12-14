@@ -441,11 +441,11 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
                     if(memberSkills[i][0]=== ideaSkills[j][0]){
 
                         // Prozent von vorhandenen Member Skills, zu benötigten Idea Skills
-                        // Genau Abdeckung = 1; Selter Skill (häufiger benötigt, als vorhanden) > 1; Häufiger Skill < 1; 
+                        // Genaue Abdeckung = 1; Selter Skill (häufiger benötigt, als vorhanden) > 1; Häufiger Skill < 1; 
                         let percent = ideaSkills[j][1] / memberSkills[i][1];
 
-                        // Prozent * 10 für ganze Werte / 2, damit werte nicht übermäßig goß werden, aufgerundet
-                        let value = Math.ceil((percent * 10) /2);
+                        // Prozent * 5, aufgerundet
+                        let value = Math.ceil(percent * 5);
 
                         // Skill Values bei aufrunden:
                         // 0%-20% = 1
@@ -796,31 +796,45 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
                         });
                     }
 
-                    // Dann die vorherigen Ideen durchgehen und missingSkills speichern
-                    for (const ideaId in ideas) {
-
-                        missingSkillsList.push([ideaId, ideas[ideaId].missingSkills.length]);
-                    } 
-                    //Wenn keine freien Plätze, auf die mit dem meisten Missing skills aufteilen
-                    missingSkillsList.sort((a,b) => b[1] - a[1]);   
-                    // console.log(missingSkillsList);
-                    let i =0;
-
-                    lastMembers.forEach(member => {
-                        //Wenn Nogo dann nächste Idee 
-                        if(ideas[missingSkillsList[i][0]].nogos.indexOf(member) >= 0){
-                            if(i === missingSkillsList.length -1){
-                                i = 0;
-                            }
-                            else{
-                                i+=1; 
-                            } 
+                    if (Object.keys(ideas).length > 0) {
+                        // Dann die vorherigen Ideen durchgehen und missingSkills speichern
+                        for (const ideaId in ideas) {
+                            missingSkillsList.push([ideaId, ideas[ideaId].missingSkills.length]);
                         } 
-                        ideas[missingSkillsList[i][0]].team.push(member); 
-                        // console.log(member + " zu " + missingSkillsList[i][0]);
-                        members[member].sorted = true;
-                        i+=1; 
-                    });
+                        //Wenn keine freien Plätze, auf die mit dem meisten Missing skills aufteilen
+                        missingSkillsList.sort((a,b) => b[1] - a[1]);   
+                        // console.log(missingSkillsList);
+                        let i =0;
+
+                        lastMembers.forEach(member => {
+                            if (!members[member].sorted) {
+                                //Wenn Nogo dann nächste Idee 
+                                if(ideas[missingSkillsList[i][0]].nogos.indexOf(member) >= 0){
+                                    if(i === missingSkillsList.length -1){
+                                        i = 0;
+                                    }
+                                    else{
+                                        i+=1; 
+                                    } 
+                                } 
+                                ideas[missingSkillsList[i][0]].team.push(member); 
+                                // console.log(member + " zu " + missingSkillsList[i][0]);
+                                members[member].sorted = true;
+                                i+=1; 
+                            }
+                        });
+                    } else {
+                        for (const ideaId in emptyIdeas) {
+
+                            lastMembers.forEach(member => {
+    
+                                if(!members[member].sorted){
+                                    emptyIdeas[ideaId].team.push(member); 
+                                    members[member].sorted = true;
+                                } 
+                            });
+                        }    
+                    }
                 } 
             } 
         }
@@ -1139,37 +1153,41 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
             }
             // console.log("");
         }
-
-        functions.logger.log("0");
-        stableMatching();
-        // printList();
-        functions.logger.log("1");
-
-        // Alle optimal zueinanderpassenden übrigen User und Ideen zuordnen
-        bestRemainingMatch();
-        // printList();
-        functions.logger.log("2");
-
-        // Ideen die nicht die Mindestanzahl erreicht haben löschen
-        resolvePartiallyFilledIdeas();
-        // printList();
-        functions.logger.log("3");
-
-        // Alle optimal zueinanderpassenden übrigen User und Ideen zuordnen
-        bestRemainingMatch();
-        // printList();
-        functions.logger.log("4");
-
-        // Prüfen, welche Ideen nicht alle Skills erfüllt haben und diese wenn möglich auflösen
-        resolveIncompleteIdeas();
-        // printList();
-
-        // Jetzt sind alle Ideen-Skills so weit es geht abgedeckt und die übrigen User müssen noch zugeordnet werden 
-        // nun wieder auf Basis aller benötigten Skills und der Favoriten (diese haben nun Priorität).
-        // es werden wieder Scores für alle User/Ideen gebildet und diese Liste abgearbeitet.
-        // console.log("---- Finale Zuordnung ----");
-        bestRemainingMatchFinal();
-
+        if (Object.keys(ideas).length > 0) {
+            functions.logger.log("0");
+            stableMatching();
+            // printList();
+            functions.logger.log("1");
+    
+            // Alle optimal zueinanderpassenden übrigen User und Ideen zuordnen
+            bestRemainingMatch();
+            // printList();
+            functions.logger.log("2");
+    
+            // Ideen die nicht die Mindestanzahl erreicht haben löschen
+            resolvePartiallyFilledIdeas();
+            // printList();
+            functions.logger.log("3");
+    
+            // Alle optimal zueinanderpassenden übrigen User und Ideen zuordnen
+            bestRemainingMatch();
+            // printList();
+            functions.logger.log("4");
+    
+            // Prüfen, welche Ideen nicht alle Skills erfüllt haben und diese wenn möglich auflösen
+            resolveIncompleteIdeas();
+            // printList();
+    
+            // Jetzt sind alle Ideen-Skills so weit es geht abgedeckt und die übrigen User müssen noch zugeordnet werden 
+            // nun wieder auf Basis aller benötigten Skills und der Favoriten (diese haben nun Priorität).
+            // es werden wieder Scores für alle User/Ideen gebildet und diese Liste abgearbeitet.
+            // console.log("---- Finale Zuordnung ----");
+            bestRemainingMatchFinal();
+        } else {
+            addEmptyIdeas(Object.keys(members));
+            updateCommonInterests();
+        }
+ 
         // printList();
         for (const idea in ideas) {
             if (ideas[idea].missingSkills.length > 0) {
@@ -1227,19 +1245,23 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
         
         // Alle Ideen des Kurses abrufen
         const snapshotIdeas = await db.collection("courses").doc(id).collection("ideas").get();
-        snapshotIdeas.forEach(ideaSnap => {
-            // Ideen in neuem Objekt speichern
-            const ideaData = ideaSnap.data();
-            const thisIdeaObj = {};
-            thisIdeaObj.title = ideaData.title;
-            thisIdeaObj.skills = ideaData.skills;
-            thisIdeaObj.missingSkills = ideaData.skills;
-            thisIdeaObj.team = [];
-            thisIdeaObj.favs = ideaData.favourites;
-            thisIdeaObj.nogos = ideaData.nogos;
-            thisIdeaObj.commonInterests = [];
-            courseIdeasObj[ideaSnap.id] = thisIdeaObj;
-        }); 
+        if (snapshotIdeas) {
+            snapshotIdeas.forEach(ideaSnap => {
+                // Ideen in neuem Objekt speichern
+                const ideaData = ideaSnap.data();
+                const thisIdeaObj = {};
+                thisIdeaObj.title = ideaData.title;
+                thisIdeaObj.skills = ideaData.skills;
+                thisIdeaObj.missingSkills = ideaData.skills;
+                thisIdeaObj.team = [];
+                thisIdeaObj.favs = ideaData.favourites;
+                thisIdeaObj.nogos = ideaData.nogos;
+                thisIdeaObj.commonInterests = [];
+                courseIdeasObj[ideaSnap.id] = thisIdeaObj;
+            }); 
+        } else {
+            functions.logger.log("Kurs hat keine Ideen");
+        }
         // User-Infos abrufen
         for (const userId of dueCourses[id].members) {
             const userSkills =[];
@@ -1282,13 +1304,15 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
 
                 var interestList = [];
                 for (interest of emptyIdeas[emptyIdea].commonInterests) {
-                    interestList.push(interest[0]);
+                    if (interest[1] > 1) {
+                        interestList.push(interest[0]);
+                    }
                 }
                 functions.logger.log(interestList);
 
                 db.collection("courses").doc(id).collection("ideas").add({
                     title: "Team ohne Idee",
-                    description: "",
+                    description: "Diese Idee wurde automatisch erstellt",
                     creator: "ProFi-Algorithmus",
                     interests: interestList,
                     skills: emptyIdeas[emptyIdea].skills,
