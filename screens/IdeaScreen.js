@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useLayoutEffect} from 'react';
+import React, {useState, useEffect, useLayoutEffect, useContext} from 'react';
 import { View, Text, Modal, Keyboard, ActivityIndicator, Animated } from 'react-native';
 import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view';
 import { compareAsc, format } from 'date-fns';
@@ -19,8 +19,11 @@ import Padding from '../components/Padding';
 import SubHeader from '../components/SubHeader';
 import IdeaFooter from '../components/IdeaFooter';
 import FlexRow from '../components/FlexRow';
+import { ThemeContext } from '../components/ThemeManager';
 
 export default IdeaScreen = ({route, navigation}) => {
+
+    const {themeColors} = useContext(ThemeContext);
 
     const {ideaInfo} = route.params;
     const {courseId} = route.params;
@@ -258,12 +261,12 @@ export default IdeaScreen = ({route, navigation}) => {
     const swipeButtons = (item) => {
         if (item.replyTo) {
             return(
-                <SwipeButtonRow color={item.user == currentUserId ? colors.red : colors.darkBlue}> 
+                <SwipeButtonRow color={item.user == currentUserId ? themeColors.red : themeColors.primary}> 
                     <SwipeButton
                         animation={new Animated.Value(60)}
                         rowWidth={60}
                         icon={item.user == currentUserId ? icons.delete : icons.like}
-                        backgroundColor={item.user == currentUserId ? colors.red : colors.darkBlue}
+                        backgroundColor={item.user == currentUserId ? themeColors.red : themeColors.primary}
                         onPress={() => {item.user == currentUserId ? deleteCommentHandler(item.id, item.replyTo) : likeCommentHandler(item.id)}}
                         deactivated={item.likes.indexOf(currentUserId) >= 0}
                     />
@@ -271,19 +274,19 @@ export default IdeaScreen = ({route, navigation}) => {
             );
         } else {
             return(
-                <SwipeButtonRow color={colors.mediumBlue}> 
+                <SwipeButtonRow color={themeColors.textInactive}> 
                     <SwipeButton
                         animation={new Animated.Value(120)}
                         rowWidth={120}
                         icon={item.user == currentUserId ? icons.delete : icons.like}
-                        backgroundColor={item.user == currentUserId ? colors.red : item.likes.indexOf(currentUserId) < 0 ? colors.darkBlue : colors.lightBlue}
+                        backgroundColor={item.user == currentUserId ? themeColors.red : item.likes.indexOf(currentUserId) < 0 ? themeColors.primary : themeColors.secondary}
                         onPress={() => {item.user == currentUserId ? deleteCommentHandler(item.id, item.replyTo) : likeCommentHandler(item.id)}}
                     />
                     <SwipeButton
                         animation={new Animated.Value(120)}
                         rowWidth={120}
                         icon={icons.reply}
-                        backgroundColor={colors.mediumBlue}
+                        backgroundColor={themeColors.textInactive}
                         onPress={() => {setNewReplyVisible(true); setCurrentReplyComment(item)}}
                     />
                 </SwipeButtonRow>
@@ -305,11 +308,10 @@ export default IdeaScreen = ({route, navigation}) => {
             {/* Kommentar schreiben */}
             <Modal visible= { newCommentVisible } animationType= 'slide' onRequestClose={() => setNewCommentVisible(false)}>
                 <ModalContent
-                    subheader= { () => {}}
                     content= { () => {
                         return(
                             <View style={boxes.mainContainer}>
-                                <Text style={texts.titleCentered}>{"Kommentar schreiben"}</Text>
+                                <Text style={[texts.titleCentered, {color: themeColors.textCopy}]}>{"Kommentar schreiben"}</Text>
                                 <InputField
                                     showError={currentCommentErrorVisible}
                                     placeholderText= {currentCommentErrorVisible ? "Bitte einen Kommentar eingeben." : "max. 300 Zeichen"}
@@ -326,11 +328,10 @@ export default IdeaScreen = ({route, navigation}) => {
             {/* Auf Kommentar antworten */}
             <Modal visible= { newReplyVisible } animationType= 'slide' onRequestClose={() => setNewReplyVisible(false)}>
                 <ModalContent
-                    subheader= { () => {}}
                     content= { () => {
                         return(
                             <View style={boxes.mainContainer}>
-                                <Text style={texts.titleCentered}>{"Antwort schreiben"}</Text>
+                                <Text style={[texts.titleCentered, {color: themeColors.textCopy}]}>{"Antwort schreiben"}</Text>
                                 <View style={{marginLeft: 20}}>
                                     <CommentTile
                                         userId={currentReplyComment.user}
@@ -359,11 +360,10 @@ export default IdeaScreen = ({route, navigation}) => {
             {/* // Idee bearbeiten */}
             <Modal visible= { editIdeaVisible } animationType= 'slide' onRequestClose={() => setEditIdeaVisible(false)}>
                 <ModalContent
-                    subheader= { () => {}}
                     content= { () => {
                         return(
                             <View style={boxes.mainContainer}>
-                                <Text style={texts.titleCentered}>{"Idee bearbeiten"}</Text>
+                                <Text style={[texts.titleCentered, {color: themeColors.textCopy}]}>{"Idee bearbeiten"}</Text>
                                 <InputField
                                     showError={editIdeaNameErrorVisible}
                                     placeholderText= {editIdeaNameErrorVisible ? "Bitte einen Namen angeben." : "Titel"}
@@ -391,7 +391,6 @@ export default IdeaScreen = ({route, navigation}) => {
                 />
                 {/* // Idee bearbeiten: Fähigkeiten auswählen */}
                 <Modal visible={addSkillsVisible} animationType='slide' onRequestClose={() => setAddSkillsVisible(false)}>
-                    {/* <Text style={texts.titleCentered}>{"Fähigkeiten hinzufügen"}</Text> */}
                     <AttributeSelect
                         attributeType = "skills"
                         selectedAttributesList={selectedSkillsList}
@@ -403,11 +402,11 @@ export default IdeaScreen = ({route, navigation}) => {
 
             <SubHeader>
                 <FlexRow padding>
-                    <Text style={texts.subHeaderLarge}>{ideaName}</Text>
+                    <Text style={[texts.subHeaderLarge, {color: themeColors.textHl}]}>{ideaName}</Text>
                 </FlexRow>
                 { ideaText.length > 0 &&
                     <FlexRow padding>
-                        <Text style={texts.copy}>{ideaText}</Text>
+                        <Text style={[texts.copy, {color: themeColors.textCopy}]}>{ideaText}</Text>
                     </FlexRow>
                 }
                 <FlexRow padding>
@@ -433,7 +432,7 @@ export default IdeaScreen = ({route, navigation}) => {
                 onSwipeValueChange={onSwipeValueChange}
                 onRefresh={refreshListHandler}
                 refreshing={refreshing}
-                style={{backgroundColor: colors.white}}
+                style={{backgroundColor: themeColors.base}}
                 ref = {ref => setSwipeListView(ref)}
                 data={currentComments}
                 keyExtractor={(item, index) => index.toString()}
@@ -455,7 +454,7 @@ export default IdeaScreen = ({route, navigation}) => {
                     </SwipeRow>
                 }
                 ListHeaderComponent={
-                    <View style={{backgroundColor: evaluated ? colors.darkBlue : colors.white}}>
+                    <View style={{backgroundColor: evaluated ? themeColors.primary : themeColors.base}}>
                     { currentUserIsCreator && !evaluated && 
                     <View>
                         <Padding height={5}/>
@@ -485,7 +484,7 @@ export default IdeaScreen = ({route, navigation}) => {
                     </View>
                     }
                     {/* BEI OFFENEN IDEEN MUSS ES NICHT EVALUATED SEIN */}
-                    {(courseType == "openCourses" || (evaluated && members.length > 0)) &&
+                    {(courseType == "openCourses" || (evaluated && members && members.length > 0)) &&
                         <ScrollRow
                             data= {members}
                             onPress={(id) => {viewProfileHandler(id)}}
@@ -499,14 +498,14 @@ export default IdeaScreen = ({route, navigation}) => {
                             <IdeaFooter ideaCreatorId={ideaCreatorId} ideaCreator={ideaCreator}/>
                         }
                         {commentsLoading && 
-                            <View style={{backgroundColor: colors.white, paddingVertical: 30}}>
+                            <View style={{backgroundColor: themeColors.base, paddingVertical: 30}}>
                                 <ActivityIndicator/>
                             </View>
                         }
                     </View>
                 }
             />
-            <View>
+            <View style={{backgroundColor: themeColors.base}}>
                 <Padding height={5}/>
                 <FlexRow padding>
                     <Button

@@ -1,18 +1,21 @@
-import React , {useEffect} from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import React , {useEffect, useContext} from 'react';
+import { NavigationContainer, } from '@react-navigation/native';
 import { Image, StatusBar } from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import DB from '../api/DB_API';
+import { Appearance, AppearanceProvider, useColorScheme } from 'react-native-appearance';
 
+import DB from '../api/DB_API';
 import { icons, colors } from '../Styles';
 import HomeStack from './HomeStack';
 import ProfileStack from './ProfileStack';
+import { ThemeContext } from '../components/ThemeManager';
 
 const Tab = createBottomTabNavigator(); 
 
-  
 export default MainNavigator = () => {
-        
+
+    const {themeColors} = useContext(ThemeContext);
+          
     return(
         <NavigationContainer>
             <StatusBar barStyle="light-content"/>
@@ -33,13 +36,13 @@ export default MainNavigator = () => {
                 },
                 })}
                 tabBarOptions={{
-                    activeTintColor: colors.darkBlue,
-                    inactiveTintColor: colors.lightBlue,
-                    activeBackgroundColor: colors.lightGrey,
-                    inactiveBackgroundColor: colors.lightGrey,
+                    activeTintColor: themeColors.textHl,
+                    inactiveTintColor: themeColors.buttonInactive,
+                    activeBackgroundColor: themeColors.secondary,
+                    inactiveBackgroundColor: themeColors.secondary,
                     showLabel: false,
                     style: {
-                        backgroundColor: colors.lightGrey,
+                        backgroundColor: themeColors.secondary,
                     },
                 }}
             >

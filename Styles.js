@@ -11,6 +11,7 @@ const colors = {
 }
 const icons = {
     profilePlaceholder: require("./assets/ui-icons/user.png"),
+    profilePlaceholderDark: require("./assets/ui-icons/userDark.png"),
     checkTrue: require("./assets/ui-icons/check-true.png"),
     checkFalse: require("./assets/ui-icons/check-false.png"),
     home: require("./assets/ui-icons/home.png"),
@@ -40,7 +41,7 @@ const boxes = {
         height: "100%",
         width: "100%",
         paddingHorizontal: 20,
-        backgroundColor: colors.lightGrey,
+        // backgroundColor: colors.lightGrey,
         alignItems: "center",
         justifyContent: "center",
     },

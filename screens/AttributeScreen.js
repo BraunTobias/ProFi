@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useContext } from 'react';
 import {FlatList, View, Text, Modal} from "react-native";
 
 import { boxes, colors, styles, texts } from '../Styles';
@@ -10,8 +10,11 @@ import InfoModal from '../components/InfoModal';
 import Padding from '../components/Padding';
 import SubHeader from '../components/SubHeader';
 import SectionHeader from '../components/SectionHeader';
+import { ThemeContext } from '../components/ThemeManager';
 
 export default AttributeScreen = ({route, navigation}) => {
+
+    const {themeColors} = useContext(ThemeContext);
 
     const {attributeType} = route.params;
     const currentUserId = DB.getCurrentUserId();
@@ -75,11 +78,9 @@ export default AttributeScreen = ({route, navigation}) => {
                     onPress={selectCategoryHandler}
                 />
             </SubHeader>
-            <SectionHeader>
-                <Text style={texts.separatorText}>{currentCategory}</Text>
-            </SectionHeader>
+            <SectionHeader text={currentCategory}/>
             <FlatList 
-                style= {{backgroundColor: colors.white, flexGrow: 1}}
+                style= {{backgroundColor: themeColors.base, flexGrow: 1}}
                 data={displayedSkills}
                 keyExtractor={(item, index) => item[0] }
                 renderItem={(itemData) => { 

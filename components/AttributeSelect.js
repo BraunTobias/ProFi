@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useLayoutEffect, Fragment } from 'react';
-import {FlatList, View, Text, SafeAreaView} from "react-native";
+import React, { useState, useEffect, useLayoutEffect, Fragment, useContext } from 'react';
+import {FlatList, View, Text, SafeAreaView, StyleSheet} from "react-native";
 
-import { boxes, colors, styles, texts } from '../Styles';
+import { boxes, colors, texts } from '../Styles';
 import AttributeTile from '../components/AttributeTile';
 import ScrollRow from '../components/ScrollRow';
 import DB from '../api/DB_API';
@@ -9,8 +9,11 @@ import Padding from './Padding';
 import SubHeader from '../components/SubHeader';
 import FlexRow from '../components/FlexRow';
 import SectionHeader from '../components/SectionHeader';
+import { ThemeContext } from '../components/ThemeManager';
 
 export default AttributeScreen = (props) => {
+
+    const {themeColors} = useContext(ThemeContext);
 
     const attributeType = props.attributeType;
 
@@ -38,12 +41,12 @@ export default AttributeScreen = (props) => {
 
     return(
         <Fragment>
-            <SafeAreaView style={{ flex: 0, backgroundColor: colors.lightBlue }} />
-            <SafeAreaView style={{flex: 1, backgroundColor: colors.lightGrey}}>
+            <SafeAreaView style={{ flex: 0, backgroundColor: themeColors.base }} />
+            <SafeAreaView style={{flex: 1, backgroundColor: themeColors.base}}>
                 <SubHeader>
                     <Padding height={10}/>
                     <FlexRow padding>
-                        <Text style={texts.separatorText}>Fähigkeiten auswählen</Text>
+                        <Text style={[texts.separatorText, {color: themeColors.textHl}]}>Fähigkeiten auswählen</Text>
                     </FlexRow>
                     <ScrollRow
                         type="attributes"
@@ -52,11 +55,9 @@ export default AttributeScreen = (props) => {
                         onPress={selectCategoryHandler}
                     />
                 </SubHeader>
-                <SectionHeader>
-                    <Text style={texts.separatorText}>{currentCategory}</Text>
-                </SectionHeader>
+                <SectionHeader text={currentCategory}/>
                 <FlatList 
-                    style= {{backgroundColor: colors.white, flexGrow: 1}}
+                    style= {{backgroundColor: themeColors.base, flexGrow: 1}}
                     data={displayedSkills}
                     keyExtractor={(item, index) => item }
                     renderItem={(itemData) => { 
@@ -71,7 +72,7 @@ export default AttributeScreen = (props) => {
                         );
                     }}
                 />
-                <View style={boxes.modalButton}>
+                <View style={styles.modalButton}>
                     <Button
                         title={"Bestätigen"}
                         onPress={props.onDismiss}
@@ -81,3 +82,11 @@ export default AttributeScreen = (props) => {
         </Fragment>
     )
 }
+const styles = StyleSheet.create({
+    modalButton: {
+        width: "100%",
+        paddingHorizontal: 15,
+        paddingBottom: 13,
+        paddingTop: 7,
+    },
+});

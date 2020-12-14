@@ -1,15 +1,20 @@
-import React, {useState} from "react";
+import React, {useState, useContext} from "react";
 import { View, StyleSheet, Text, TouchableOpacity, Image} from "react-native";
 
 import { icons, colors, boxes, texts } from '../Styles';
+import { ThemeContext } from '../components/ThemeManager';
 
 export default AttributeTile = props => {
+
+    const {themeColors} = useContext(ThemeContext);
 
     const [currentIcon, setCurrentIcon] = useState(props.state ? icons.checkTrue : icons.checkFalse);
     const [currentIconState, setCurrentIconState] = useState(props.state);
   
     const colorStyle = {
-        backgroundColor: props.index % 2 === 0 ? colors.white : colors.lightGrey
+        backgroundColor: props.index % 2 === 0 ? themeColors.tile1 : themeColors.tile2,
+        borderColor: themeColors.separator,
+        borderBottomWidth: 1    
     }
 
     const changeIconHandler = () => {
@@ -32,13 +37,12 @@ export default AttributeTile = props => {
         >
             <Image
                 source={currentIcon}
-                tintColor={colors.darkBlue}
-                style={styles.attributeCheckmark}
+                style={[styles.attributeCheckmark, {tintColor: themeColors.textHl}]}
             />
             <Text 
-                style = {[texts.subHeader, {color: currentIconState ? colors.darkGrey : colors.mediumBlue}]}
+                style = {[texts.subHeader, {color: currentIconState ? themeColors.textCopy : themeColors.textInactive}]}
             > 
-            {props.text} 
+                {props.text} 
             </Text>
         </TouchableOpacity>
     )
@@ -58,6 +62,5 @@ const styles = StyleSheet.create({
         height: 25,
         width: 25,
         marginRight: 10,
-        tintColor: colors.darkBlue
     },
 });

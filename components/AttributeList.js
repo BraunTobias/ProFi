@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useContext } from 'react';
 import {FlatList, View, Text, SectionList, Image, ActivityIndicator, StyleSheet} from "react-native";
 
 import { boxes, colors, texts } from '../Styles';
@@ -6,23 +6,24 @@ import ProfileImage from './ProfileImage';
 import ScrollRow from '../components/ScrollRow';
 import SmallProfileRow from './SmallProfileRow';
 import SectionHeader from '../components/SectionHeader';
+import { ThemeContext } from '../components/ThemeManager';
 
 export default AttributeList = props => {
 
+    const {themeColors} = useContext(ThemeContext);
+
     return(
         <SectionList
-            style={{backgroundColor: colors.white}}
+            style={{backgroundColor: themeColors.base}}
             sections={props.attList}
             keyExtractor={(item, index) => index.toString()}
             renderSectionHeader={({ section }) => (
-                <SectionHeader>
-                    <Text style={texts.separatorText}>{section.key}</Text>
-                </SectionHeader>
+                <SectionHeader text={section.key}/>
             )}
             renderItem={({ item }) => { 
                 return (
                     <View style={styles.attributeListTile}>
-                        <Text style={[texts.sectionListCopy]}>{item.name}</Text> 
+                        <Text style={[texts.sectionListCopy, {color: themeColors.textCopy}]}>{item.name}</Text> 
                         <SmallProfileRow
                             data= {item.users}
                             onPress={() => {}}

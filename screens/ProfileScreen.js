@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useLayoutEffect} from 'react';
+import React, {useState, useEffect, useLayoutEffect, useContext} from 'react';
 import { View, Text, TouchableWithoutFeedback, Keyboard, Modal, Alert, Switch } from 'react-native';
 import * as ImageManipulator from "expo-image-manipulator";
 import * as Permissions from "expo-permissions";
@@ -15,8 +15,11 @@ import ModalContent from "../components/ModalContent";
 import Padding from '../components/Padding';
 import PushNofiticationSwitch from '../components/PushNofiticationSwitch';
 import FlexRow from '../components/FlexRow';
+import { ThemeContext } from '../components/ThemeManager';
 
 export default ProfileScreen = ({navigation}) => {
+
+    const {themeColors} = useContext(ThemeContext);
 
     // State Hooks
     const [currentName, setCurrentName] = useState("");
@@ -276,15 +279,14 @@ export default ProfileScreen = ({navigation}) => {
 
     return(
         <TouchableWithoutFeedback onPress= { () => Keyboard.dismiss() }>
-        <View style={{flex: 1}}>
+        <View style={{flex: 1, backgroundColor: themeColors.base}}>
             {/* Name ändern */}
             <Modal visible= { editNameVisible } animationType= 'slide' onRequestClose={() => setEditNameVisible(false)}>
                 <ModalContent
-                    subheader= { () => {}}
                     content= { () => {
                         return(
                             <View style={boxes.mainContainer}>
-                                <Text style={texts.titleCentered}>{"Name ändern"}</Text>
+                                <Text style={[texts.titleCentered, {color: themeColors.textCopy}]}>{"Name ändern"}</Text>
                                 <InputField
                                     showError={nameErrorVisible}
                                     placeholderText= {nameErrorVisible ? "Bitte einen Namen eingeben." : "Name"}
@@ -300,11 +302,10 @@ export default ProfileScreen = ({navigation}) => {
             {/* Bio ändern */}
             <Modal visible= { editBioVisible } animationType= 'slide' onRequestClose={() => setEditBioVisible(false)}>
                 <ModalContent
-                    subheader= { () => {}}
                     content= { () => {
                         return(
                             <View style={boxes.mainContainer}>
-                                <Text style={texts.titleCentered}>{"Kurzbeschreibung ändern"}</Text>
+                                <Text style={[texts.titleCentered, {color: themeColors.textCopy}]}>{"Kurzbeschreibung ändern"}</Text>
                                 <InputField
                                     placeholderText= "Kurzbeschreibung"
                                     value={currentEditBio}
@@ -319,11 +320,10 @@ export default ProfileScreen = ({navigation}) => {
             {/* E-Mail ändern */}
             <Modal visible= { editEmailVisible } animationType= 'slide' onRequestClose={() => setEditEmailVisible(false)}>
                 <ModalContent
-                    subheader= { () => {}}
                     content= { () => {
                         return(
                             <View style={boxes.mainContainer}>
-                                <Text style={texts.titleCentered}>{"E-Mail ändern"}</Text>
+                                <Text style={[texts.titleCentered, {color: themeColors.textCopy}]}>{"E-Mail ändern"}</Text>
                                 <InputField
                                     showError={pwErrorVisible}
                                     placeholderText= {pwErrorVisible ? "Bitte ein Passwort eingeben." : "Passwort zur Bestätigung"}
@@ -346,11 +346,10 @@ export default ProfileScreen = ({navigation}) => {
             {/* Passwort ändern */}
             <Modal visible= { editPasswordVisible } animationType= 'slide' onRequestClose={() => setEditPasswordVisible(false)}>
                 <ModalContent
-                    subheader= { () => {}}
                     content= { () => {
                         return(
                             <View style={boxes.mainContainer}>
-                                <Text style={texts.titleCentered}>{"Passwort ändern"}</Text>
+                                <Text style={[texts.titleCentered, {color: themeColors.textCopy}]}>{"Passwort ändern"}</Text>
                                 <InputField
                                     showError={pwErrorVisible}
                                     title= "Altes Passwort"
@@ -383,24 +382,23 @@ export default ProfileScreen = ({navigation}) => {
             {/* Push-Mitteilungen verwalten */}
             <Modal visible= { manageNotificationsVisible } animationType= 'slide' onRequestClose={() => setManageNotificationsVisible(false)}>
                 <ModalContent
-                    subheader= { () => {}}
                     content= { () => {
                         return(
                             <View style={boxes.mainContainer}>
-                                <Text style={texts.titleCentered}>{"Push-Mitteilungen erhalten für …"}</Text>
+                                <Text style={[texts.titleCentered, {color: themeColors.textCopy}]}>{"Push-Mitteilungen erhalten für …"}</Text>
                                 <Padding height={20}/>
                                 <FlexRow>
-                                    <Text style={[texts.copy, {fontFamily: 'Inter_600SemiBold'}]}>Alle</Text>
+                                    <Text style={[texts.copy, {fontFamily: 'Inter_600SemiBold', color: themeColors.textCopy}]}>Alle</Text>
                                     <PushNofiticationSwitch
                                         onValueChange={toggleAllPushNotficationSwitches}
                                         value={pushEvaluateEnabled && pushCommentEnabled && pushDeleteEnabled && pushAttChangeEnabled && pushCourseChangeEnabled}
                                     />
                                 </FlexRow>
                                 <Padding height={10}/>
-                                <View style={{height: 1, width: "100%", backgroundColor: colors.mediumBlue}}></View>
+                                <View style={{height: 1, width: "100%", backgroundColor: themeColors.textInactive}}></View>
                                 <Padding height={10}/>
                                 <FlexRow>
-                                    <Text style={texts.copy}>Einteilung von Ideen (empfohlen)</Text>
+                                    <Text style={[texts.copy, {color: themeColors.textCopy}]}>Einteilung von Ideen (empfohlen)</Text>
                                     <PushNofiticationSwitch
                                         onValueChange={toggleEvaluateSwitch}
                                         value={pushEvaluateEnabled}
@@ -408,7 +406,7 @@ export default ProfileScreen = ({navigation}) => {
                                 </FlexRow>
                                 <Padding height={7}/>
                                 <FlexRow>
-                                    <Text style={texts.copy}>Neue Kommentare</Text>
+                                    <Text style={[texts.copy, {color: themeColors.textCopy}]}>Neue Kommentare</Text>
                                     <PushNofiticationSwitch
                                         onValueChange={toggleCommentSwitch}
                                         value={pushCommentEnabled}
@@ -416,7 +414,7 @@ export default ProfileScreen = ({navigation}) => {
                                 </FlexRow>
                                 <Padding height={7}/>
                                 <FlexRow>
-                                    <Text style={texts.copy}>Änderung an meinen Kursen</Text>
+                                    <Text style={[texts.copy, {color: themeColors.textCopy}]}>Änderung an meinen Kursen</Text>
                                     <PushNofiticationSwitch
                                         onValueChange={toggleCourseChangeSwitch}
                                         value={pushCourseChangeEnabled}
@@ -424,7 +422,7 @@ export default ProfileScreen = ({navigation}) => {
                                 </FlexRow>
                                 <Padding height={7}/>
                                 <FlexRow>
-                                    <Text style={texts.copy}>Löschen von Ideen</Text>
+                                    <Text style={[texts.copy, {color: themeColors.textCopy}]}>Löschen von Ideen</Text>
                                     <PushNofiticationSwitch
                                         onValueChange={toggleDeleteSwitch}
                                         value={pushDeleteEnabled}
@@ -432,7 +430,7 @@ export default ProfileScreen = ({navigation}) => {
                                 </FlexRow>
                                 <Padding height={7}/>
                                 <FlexRow>
-                                    <Text style={texts.copy}>Neu verfügbare Fähigkeiten</Text>
+                                    <Text style={[texts.copy, {color: themeColors.textCopy}]}>Neu verfügbare Fähigkeiten</Text>
                                     <PushNofiticationSwitch
                                         onValueChange={toggleAttChangeSwitch}
                                         value={pushAttChangeEnabled}

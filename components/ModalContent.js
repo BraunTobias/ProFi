@@ -1,20 +1,21 @@
-import React from "react";
+import React, {useContext} from "react";
 import { View, Text, TouchableWithoutFeedback, Keyboard, StatusBar, StyleSheet } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
 import { icons, colors, boxes, texts } from '../Styles';
 import Button from '../components/Button';
+import { ThemeContext } from '../components/ThemeManager';
 
-export default ModalComponent = props => {
+export default ModalContent = props => {
+
+    const {themeColors} = useContext(ThemeContext);
+
     return (
         <TouchableWithoutFeedback onPress= { () => Keyboard.dismiss() }>
-            <View style={{flex: 1}}>
-                <StatusBar barStyle="dark-content"/>
+            <View style={{flex: 1, backgroundColor: themeColors.tile2}}>
+                <StatusBar barStyle={themeColors.mode == "light" ? "dark-content" : "light-content"}/>
 
                 <View style={ styles.modal }>
-
-                    { props.subheader() }
-
                     <ScrollView 
                         bounces={false}
                         contentContainerStyle={styles.modalScrollView}
@@ -22,7 +23,7 @@ export default ModalComponent = props => {
                         { props.content() }
                     </ScrollView>
 
-                    <View style={styles.modalButton}>
+                    <View style={[styles.modalButton, { backgroundColor: themeColors.separator }]}>
                         <Button
                             title={"Bestätigen"}
                             onPress={ () => {props.onDismiss(true)} }
@@ -52,6 +53,5 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         paddingBottom: 13,
         paddingTop: 7,
-        backgroundColor: colors.lightGrey
     },
 });

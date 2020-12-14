@@ -1,12 +1,16 @@
-import React, {useState, useEffect, useLayoutEffect} from 'react';
+import React, {useState, useEffect, useLayoutEffect, useContext} from 'react';
 import {View} from 'react-native';
 
 import { icons, colors, boxes, texts } from '../Styles';
 import AttributeList from '../components/AttributeList';
 import DB from '../api/DB_API';
 import FlexRow from '../components/FlexRow';
+import { ThemeContext } from '../components/ThemeManager';
 
 export default AttributeListScreen = ({route, navigation}) => {
+
+    const {themeColors} = useContext(ThemeContext);
+
     const {filterList} = route.params;
     const {secondaryFilterList} = route.params;
     const {courseType} = route.params;
@@ -38,7 +42,7 @@ export default AttributeListScreen = ({route, navigation}) => {
     }, [navigation]);
 
     return(
-        <View style={{flex: 1}}>
+        <View style={{flex: 1, backgroundColor: themeColors.base}}>
             { interestsList.length > 0 &&
                 <FlexRow padding>
                     <Button

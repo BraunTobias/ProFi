@@ -1,17 +1,24 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import InputSpinner from "react-native-input-spinner";
 
 import { View, TextInput, Text, StyleSheet } from 'react-native';
 import { icons, colors, boxes, texts } from '../Styles';
+import { ThemeContext } from '../components/ThemeManager';
 
 export default NumberInput = props => {
+
+    const {themeColors} = useContext(ThemeContext);
   
     return (
         <View style={{flex: 1, maxWidth: 160}}>
-            <Text style={texts.subHeader}>{props.title}</Text>
+            <Text style={[texts.subHeader, {color: themeColors.textCopy}]}>{props.title}</Text>
             <InputSpinner
                 style={styles.numberInput}
-                inputStyle={texts.numberInput}
+                inputStyle={{
+                    color: themeColors.textCopy,
+                    fontSize: 18,
+                    fontFamily: 'Inter_400Regular',
+                }}
                 buttonStyle={styles.numberInputButton}
                 buttonPressStyle={styles.numberInputButton}
                 initialValue={props.value}
@@ -19,8 +26,8 @@ export default NumberInput = props => {
                 min= {2}
                 max= {20}
                 step= {1}
-                colorLeft ={props.value <= 2 ? colors.lightBlue : colors.darkBlue}
-                colorRight ={props.value >= 20 ? colors.lightBlue : colors.darkBlue}
+                colorLeft ={props.value <= 2 ? themeColors.secondary : themeColors.primary}
+                colorRight ={props.value >= 20 ? themeColors.secondary : themeColors.primary}
                 onChange={props.onChange}
             />
         </View>

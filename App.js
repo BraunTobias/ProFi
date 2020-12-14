@@ -1,10 +1,12 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import { View } from 'react-native';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { AppLoading, Permissions, Notifications } from 'expo';
 import * as firebase from 'firebase';
 import MainNavigator from './navigation/MainTab';
 import AuthScreen from './screens/AuthScreen';
+import { ThemeProvider } from './components/ThemeManager';
+import { AppearanceProvider } from 'react-native-appearance';
 
 export default App => {
 
@@ -63,7 +65,11 @@ export default App => {
   })
 
   return (
-    authHandler(isLoggedIn)
+    <AppearanceProvider>
+      <ThemeProvider>
+        {authHandler(isLoggedIn)}
+      </ThemeProvider>
+    </AppearanceProvider>
   )
 
 }

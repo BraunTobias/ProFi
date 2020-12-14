@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import { View, Text, Modal, Keyboard, Alert, Animated, Switch } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -19,8 +19,11 @@ import Padding from '../components/Padding';
 import SubHeader from '../components/SubHeader';
 import FlexRow from '../components/FlexRow';
 import SectionHeader from '../components/SectionHeader';
+import { ThemeContext } from '../components/ThemeManager';
 
 export default HomeScreen = ({navigation}) => {
+
+    const {themeColors} = useContext(ThemeContext);
 
     const currentUserId = DB.getCurrentUserId();
     const defaultTime = new Date();
@@ -70,11 +73,11 @@ export default HomeScreen = ({navigation}) => {
     // Wird nach dem Rendern ausgeführt
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-                loadData(() => {
-                    DB.getInfoReceived("deleteCourse", (isReceived) => {
-                        setDeleteInfoReceived(isReceived);
-                    });        
-                });
+            loadData(() => {
+                DB.getInfoReceived("deleteCourse", (isReceived) => {
+                    setDeleteInfoReceived(isReceived);
+                });        
+            });
         });
     }, []);
 
@@ -189,11 +192,10 @@ export default HomeScreen = ({navigation}) => {
             {/* Kurs finden */}
             <Modal visible= { findCourseVisible } animationType= 'slide' onRequestClose={() => setFindCourseVisible(false)}>
                 <ModalContent
-                    subheader= { () => {}}
                     content= { () => {
                         return(
                             <View style={boxes.mainContainer}>
-                                <Text style={texts.titleCentered}>{"Kurs finden"}</Text>
+                                <Text style={[texts.titleCentered, {color: themeColors.textCopy}]}>{"Kurs finden"}</Text>
                                 <InputField
                                     placeholderText= "Kurs-ID eingeben"
                                     value={currentFindCourseId}
@@ -209,10 +211,9 @@ export default HomeScreen = ({navigation}) => {
             {/* Kurs erstellen */}
             <Modal visible= { newCourseVisible } animationType= 'slide' onRequestClose={() => setNewCourseVisible(false)}>
                 <ModalContent
-                    subheader= { () => {}}
                     content= { () => 
                             <ScrollView nestedScrollEnabled={true} alwaysBounceVertical={false} contentContainerStyle= {boxes.mainContainer}>
-                                <Text style={texts.titleCentered}>{"Kurs erstellen"}</Text>
+                                <Text style={[texts.titleCentered, {color: themeColors.textCopy}]}>{"Kurs erstellen"}</Text>
                                 <InputField
                                     title= "Kursname"
                                     showError={newCourseNameErrorVisible}
@@ -234,7 +235,7 @@ export default HomeScreen = ({navigation}) => {
                                     onChangeText={changeNewCourseLinkHandler}
                                 />
                                 <Padding height={5}/>
-                                <Text style={[texts.copy, {width: "100%"}]}>Aus dem Kürzel und dem Semester des Einteilungs-Datums wird die Kurs-ID erstellt.</Text>
+                                <Text style={[texts.copy, {width: "100%", color: themeColors.textCopy}]}>Aus dem Kürzel und dem Semester des Einteilungs-Datums wird die Kurs-ID erstellt.</Text>
                                 <Padding height={15}/>
                                 <InputField
                                     title= "Team-Einteilung"
@@ -321,7 +322,7 @@ export default HomeScreen = ({navigation}) => {
             </SubHeader>
 
             <SwipeListView
-                style={{backgroundColor: colors.white}}
+                style={{backgroundColor: themeColors.base}}
                 ref = {ref => setSwipeListView(ref)}
                 sections={currentCourses}
                 disableLeftSwipe = {true}
@@ -331,9 +332,7 @@ export default HomeScreen = ({navigation}) => {
                 refreshing={refreshing}
                 onSwipeValueChange={onSwipeValueChange}
                 renderSectionHeader={({ section }) => (
-                    <SectionHeader>
-                        <Text style={texts.separatorText}>{section.key}</Text>
-                    </SectionHeader>
+                    <SectionHeader text={section.key}/>
                 )}
                 renderItem={({ item, index, section }) => { 
                     return (
@@ -355,7 +354,7 @@ export default HomeScreen = ({navigation}) => {
                             <SwipeButton
                                 rowWidth={80}
                                 animation={rowSwipeAnimatedValues[item.listKey]}
-                                backgroundColor={colors.red}
+                                backgroundColor={themeColors.red}
                                 icon={icons.exit}
                                 onPress={(ref) => {deleteCourseHandler(item.id, item.date)}}
                             />

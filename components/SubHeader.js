@@ -1,19 +1,14 @@
-import React from "react";
+import React, {useContext} from "react";
 import { View, StyleSheet } from "react-native";
-
-import { colors } from '../Styles';
+import { ThemeContext } from '../components/ThemeManager';
 
 export default SubHeader = (props) => {
+
+    const {themeColors} = useContext(ThemeContext);
+
     return(
-        <View style= { styles.subHeader }>
+        <View style= {{ backgroundColor: themeColors.subheader, paddingVertical: 7 }}>
             {props.children}
         </View>
     );
 };
-
-const styles = StyleSheet.create({
-    subHeader: {
-        backgroundColor: colors.lightBlue,
-        paddingVertical: 7,
-    }
-});

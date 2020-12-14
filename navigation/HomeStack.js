@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import { View } from 'react-native';
 import {createStackNavigator, HeaderBackground} from '@react-navigation/stack';
 
@@ -7,17 +7,21 @@ import HomeScreen from '../screens/HomeScreen';
 import CourseScreen from '../screens/CourseScreen';
 import IdeaScreen from '../screens/IdeaScreen';
 import AttributeListScreen from '../screens/AttributeListScreen';
+import { ThemeContext } from '../components/ThemeManager';
 
 const HomeStack = createStackNavigator();
 
 export default HomeNavigator = () => {
+
+    const {themeColors} = useContext(ThemeContext);
+
     return (
         <HomeStack.Navigator 
             initialRouteName="Home" 
             screenOptions={{
-                headerStyle: {backgroundColor: colors.darkBlue},
+                headerStyle: {backgroundColor: themeColors.primary},
                 headerTitleStyle: texts.header,
-                headerTintColor: colors.white,
+                headerTintColor: themeColors.textHighlight,
             }}
         >
                 <HomeStack.Screen 

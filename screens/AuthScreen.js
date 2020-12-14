@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, Text, Modal, StatusBar, Alert } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import { ThemeContext } from '../components/ThemeManager';
 
 import { icons, colors, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
@@ -8,6 +9,8 @@ import InputField from '../components/InputField';
 import Button from '../components/Button';
 
 export default AuthScreen = () => {
+
+    const {themeColors} = useContext(ThemeContext);
 
     // State Hooks
     const [currentMail, setCurrentMail] = useState("");
@@ -115,13 +118,13 @@ export default AuthScreen = () => {
     }
 
     return (
-        <View>
+        <View style={{backgroundColor: themeColors.base}}>
             <StatusBar barStyle="dark-content"/>
 
             {/* Registrierung */}
             <Modal visible={registerVisible} animationType='slide' onRequestClose={() => setRegisterVisible(false)}>
-                <ScrollView alwaysBounceVertical={false} contentContainerStyle= {boxes.mainContainer}>
-                    <Text style={texts.titleCentered}>Registrierung</Text>
+                <ScrollView alwaysBounceVertical={false} contentContainerStyle= {[boxes.mainContainer, {backgroundColor: themeColors.base}]}>
+                    <Text style={[texts.titleCentered, {color: themeColors.textCopy}]}>Registrierung</Text>
                     <InputField 
                         title="Username"
                         showError={nameErrorVisible}
@@ -164,8 +167,8 @@ export default AuthScreen = () => {
             </Modal>
             {/* Passwort zurücksetzen */}
             <Modal visible={resetPwVisible} animationType='slide' onRequestClose={() => setResetPwVisible(false)}>
-                <ScrollView alwaysBounceVertical={false} contentContainerStyle= {boxes.mainContainer}>
-                    <Text style={texts.titleCentered}>Passwort zurücksetzen</Text>
+                <ScrollView alwaysBounceVertical={false} contentContainerStyle= {[boxes.mainContainer, {backgroundColor: themeColors.base}]}>
+                    <Text style={[texts.titleCentered, {color: themeColors.textCopy}]}>Passwort zurücksetzen</Text>
                     <InputField 
                         showError={mailErrorVisible}
                         placeholderText={mailErrorVisible ? "Bitte eine E-Mail-Adresse eingeben." : "user@haw-hamburg.de"}
@@ -186,7 +189,7 @@ export default AuthScreen = () => {
 
             {/* Login */}
             <ScrollView alwaysBounceVertical={false} contentContainerStyle= {boxes.mainContainer}>
-                <Text style={texts.titleCentered}>Login</Text>
+                <Text style={[texts.titleCentered, {color: themeColors.textCopy}]}>Login</Text>
                 <InputField 
                     placeholderText= {mailErrorVisible ? "Bitte eine E-Mail-Adresse eingeben." : "E-Mail"}
                     showError = {mailErrorVisible}

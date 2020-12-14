@@ -1,12 +1,15 @@
-import React from "react";
+import React, {useContext} from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { colors, texts } from '../Styles';
+import { ThemeContext } from '../components/ThemeManager';
 
 export default IdeaFooter = props => {
 
+    const {themeColors} = useContext(ThemeContext);
+
     return (
-        <View style={styles.ideaFooter}>
-            <Text style={[texts.ideaFooter]}>
+        <View style={[styles.ideaFooter, { borderColor: themeColors.textCopy }]}>
+            <Text style={[texts.ideaFooter, {color: themeColors.textCopy}]}>
                 {props.ideaCreatorId == "ProFi-Algorithmus" ? "Automatisch erstellte Idee" : "Idee von " + props.ideaCreator}
             </Text>
         </View>
@@ -21,7 +24,6 @@ const styles = StyleSheet.create({
         paddingTop: 10,
         paddingBottom: 15,
         borderTopWidth: 1,
-        borderColor: colors.darkGrey,
         opacity: 0.5
     },
 });

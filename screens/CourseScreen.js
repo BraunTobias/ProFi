@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useLayoutEffect} from 'react';
+import React, {useState, useEffect, useLayoutEffect, useContext} from 'react';
 import { View, Text, Modal, Keyboard, ActivityIndicator, Alert, Animated } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -20,8 +20,11 @@ import AttributePreviewTile from '../components/AttributePreviewTile';
 import Padding from '../components/Padding';
 import SubHeader from '../components/SubHeader';
 import FlexRow from '../components/FlexRow';
+import { ThemeContext } from '../components/ThemeManager';
 
 export default CourseScreen = ({route, navigation}) => {
+
+    const {themeColors} = useContext(ThemeContext);
 
     const {currentUserId} = route.params;
     const {courseInfo} = route.params;
@@ -343,11 +346,10 @@ export default CourseScreen = ({route, navigation}) => {
             {/* Kurs bearbeiten */}
             <Modal visible= { editCourseVisible } animationType= 'slide' onRequestClose={() => setEditCourseVisible(false)}>
                 <ModalContent
-                    subheader= { () => {}}
                     content= { () => {
                         return(
                             <View style={boxes.mainContainer}>
-                                <Text style={texts.titleCentered}>{"Kurs bearbeiten"}</Text>
+                                <Text style={[texts.titleCentered, {color: themeColors.textCopy}]}>{"Kurs bearbeiten"}</Text>
                                 <InputField
                                     title="Kursname"
                                     showError={editCourseNameErrorVisible}
@@ -426,11 +428,10 @@ export default CourseScreen = ({route, navigation}) => {
             {/* Idee erstellen */}
             <Modal visible= { newIdeaVisible } animationType= 'slide' onRequestClose={() => setNewIdeaVisible(false)}>
                 <ModalContent
-                    subheader= { () => {}}
                     content= { () => {
                         return(
                             <View style={boxes.mainContainer}>
-                                <Text style={texts.titleCentered}>{"Idee hinzufügen"}</Text>
+                                <Text style={[texts.titleCentered, {color: themeColors.textCopy}]}>{"Idee hinzufügen"}</Text>
                                 <InputField
                                     showError={newIdeaNameErrorVisible}
                                     placeholderText= {newIdeaNameErrorVisible ? "Bitte einen Namen angeben." : "Titel"}
@@ -475,18 +476,18 @@ export default CourseScreen = ({route, navigation}) => {
                 <View>
                     <View>
                         <FlexRow padding>
-                            <Text style={texts.subHeader}>{courseName}</Text>
-                            <Text style={texts.subHeader}>{minMembers == maxMembers ? maxMembers + " Personen" : minMembers + "-" + maxMembers + " Personen"}</Text>
+                            <Text style={[texts.subHeader, {color: themeColors.textCopy}]}>{courseName}</Text>
+                            <Text style={[texts.subHeader, {color: themeColors.textCopy}]}>{minMembers == maxMembers ? maxMembers + " Personen" : minMembers + "-" + maxMembers + " Personen"}</Text>
                         </FlexRow>
                         <FlexRow padding>
-                            <Text style={texts.subHeader}>{format(courseDate, "dd.MM.yyyy")}</Text>
-                            <Text style={texts.subHeader}>{creator}</Text>
+                            <Text style={[texts.subHeader, {color: themeColors.textCopy}]}>{format(courseDate, "dd.MM.yyyy")}</Text>
+                            <Text style={[texts.subHeader, {color: themeColors.textCopy}]}>{creator}</Text>
                         </FlexRow>
                         { typeof courseLink !== 'undefined' && courseLink != "" &&
                                 <FlexRow padding>
                                     <Autolink 
-                                        linkStyle={texts.link}
-                                        style={texts.subHeader}
+                                        linkStyle={[texts.link, {color: themeColors.textHl}]}
+                                        style={[texts.subHeader, {color: themeColors.textCopy}]}
                                         text={courseLink}
                                     />
                                 </FlexRow>
@@ -536,7 +537,7 @@ export default CourseScreen = ({route, navigation}) => {
             </SubHeader>
 
             <SwipeListView
-                style={{backgroundColor: colors.white}}
+                style={{backgroundColor: themeColors.base}}
                 ref = {ref => setSwipeListView(ref)}
                 data={currentIdeas}
                 disableLeftSwipe = {true}
@@ -568,7 +569,7 @@ export default CourseScreen = ({route, navigation}) => {
                             rowWidth={120}
                             icon={icons.fav}
                             animation={rowSwipeAnimatedValues[index]}
-                            backgroundColor={colors.darkBlue}
+                            backgroundColor={themeColors.primary}
                             onPress={(ref) => {addFavHandler(item.id)}}
                             deactivated={item.id == currentFav}
                         />
@@ -576,7 +577,7 @@ export default CourseScreen = ({route, navigation}) => {
                             rowWidth={120}
                             icon={icons.nogo}
                             animation={rowSwipeAnimatedValues[index]}
-                            backgroundColor={colors.red}
+                            backgroundColor={themeColors.red}
                             onPress={(ref) => {addNogoHandler(item.id)}}
                             deactivated={item.id == currentNogo}
                         />
@@ -586,7 +587,7 @@ export default CourseScreen = ({route, navigation}) => {
                 ListFooterComponent={
                     <View>
                         {courseDataLoading && 
-                            <View style={{backgroundColor: colors.white, paddingVertical: 30}}>
+                            <View style={{backgroundColor: themeColors.base, paddingVertical: 30}}>
                                 <ActivityIndicator/>
                             </View>
                         }

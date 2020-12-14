@@ -1,19 +1,27 @@
-import React from "react";
+import React, {useContext} from "react";
 import { StyleSheet, Text, Image, TouchableOpacity, View } from "react-native";
 import { icons, colors, boxes, texts } from '../Styles';
+import { ThemeContext } from '../components/ThemeManager';
 
 export default AttributePreviewTile = props => {
+
+  const {themeColors} = useContext(ThemeContext);
 
   return (
     <TouchableOpacity style={{width: "100%"}}
         onPress={() => props.onPress(props.id, props.title, props.subtitle)}
     >
-        <View style={[styles.attributePreviewTile, {borderColor: colors.red, borderWidth: props.showError ? 1 : 0}]}>
+        <View style={[styles.attributePreviewTile, {
+          borderColor: themeColors.red, 
+          borderWidth: props.showError ? 1 : 0,
+          backgroundColor: themeColors.textInput, 
+          shadowColor: themeColors.textHl,
+        }]}>
             <View>
-                <Text numberOfLines={1} style = {texts.subHeaderLarge}>{props.title}</Text>
-                <Text numberOfLines={2} ellipsizeMode="tail" style = {[texts.copy, {color: props.showError ? colors.red : props.myTeam ? white : colors.darkGrey}]}>{props.subtitle}</Text>
+                <Text numberOfLines={1} style = {[texts.subHeaderLarge, {color: themeColors.textHl}]}>{props.title}</Text>
+                <Text numberOfLines={2} ellipsizeMode="tail" style = {[texts.copy, {color: props.showError ? themeColors.red : props.myTeam ? white : themeColors.textCopy}]}>{props.subtitle}</Text>
             </View>
-            <Image style={styles.listTileArrow} source={require("../assets/ui-icons/arrow-right.png")} resizeMode="contain"/>
+            <Image style={[styles.listTileArrow, { tintColor: themeColors.contrast }]} source={require("../assets/ui-icons/arrow-right.png")} resizeMode="contain"/>
         </View>
     </TouchableOpacity>
   );
@@ -30,10 +38,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     alignItems: "flex-start",
     justifyContent: "center",
-    backgroundColor: colors.white, 
-    borderColor: colors.red,
     borderRadius: 7,
-    shadowColor: colors.darkBlue,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.5,
     shadowRadius: 0,
@@ -42,7 +47,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 15,
     width: 15,
-    tintColor: colors.lightBlue,
     zIndex: -1
   },
 });

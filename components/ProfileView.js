@@ -12,8 +12,11 @@ import Padding from './Padding';
 import Button from './Button';
 import SubHeader from '../components/SubHeader';
 import FlexRow from '../components/FlexRow';
+import { ThemeContext } from '../components/ThemeManager';
 
 export default ProfileView = props => {
+
+    const {themeColors} = useContext(ThemeContext);
 
     const [currentName, setCurrentName] = useState("");
     const [currentBio, setCurrentBio] = useState("");
@@ -44,9 +47,9 @@ export default ProfileView = props => {
     return(
         <Modal visible={props.visible} animationType='slide' onRequestClose={props.onDismiss}>
             <Fragment>
-                <SafeAreaView style={{ flex: 0, backgroundColor: colors.lightBlue }} />
-                <SafeAreaView style={{flex: 1, backgroundColor: colors.lightGrey}}>
-                    <StatusBar barStyle="dark-content"/>
+                <SafeAreaView style={{ flex: 0, backgroundColor: themeColors.subheader }} />
+                <SafeAreaView style={{flex: 1, backgroundColor: themeColors.mode == "light" ? themeColors.base : themeColors.subheader }}>
+                    <StatusBar barStyle={themeColors.mode == "light" ? "dark-content" : "light-content"}/>
 
                     <SubHeader>
                         <Padding height={5}/>
@@ -58,13 +61,13 @@ export default ProfileView = props => {
                         </View>
                         <Padding height={10}/>
                         <FlexRow center>
-                            <Text style={texts.listTileHeader}>{currentName}</Text>
+                            <Text style={[texts.listTileHeader, {color: themeColors.textHl}]}>{currentName}</Text>
                         </FlexRow>
                         <FlexRow center>
-                            <Text style={texts.copy}>{currentBio}</Text>
+                            <Text style={[texts.copy, {color: themeColors.textCopy}]}>{currentBio}</Text>
                         </FlexRow>
                         <FlexRow center>
-                            <Text style={texts.copy}>{currentEmail}</Text>
+                            <Text style={[texts.copy, {color: themeColors.textCopy}]}>{currentEmail}</Text>
                         </FlexRow>
                         <Padding height={7}/>
                     </SubHeader>
@@ -84,17 +87,16 @@ export default ProfileView = props => {
                             onPress={() => setViewedList(interestsList)}
                         />
                     </FlexRow>
-                    <AttributeList style={{flexGrow: 1, backgroundColor: "red"}}
+                    <Padding height={5}/>
+                    <AttributeList style={{flexGrow: 1}}
                         attList={viewedList}
                     />
-
-                    <View style={boxes.modalButton}>
+                    <View style={[styles.modalButton, { backgroundColor: themeColors.mode == "light" ? themeColors.base : themeColors.subheader }]}>
                         <Button
                             title={"OK"}
                             onPress={props.onDismiss}
                         />
                     </View>
-
                 </SafeAreaView>            
             </Fragment>
 
@@ -109,5 +111,11 @@ const styles = StyleSheet.create({
         height: 150,
         alignItems: "center",
         borderRadius: 111
+    },
+    modalButton: {
+        width: "100%",
+        paddingHorizontal: 15,
+        paddingBottom: 13,
+        paddingTop: 7,
     },
 });

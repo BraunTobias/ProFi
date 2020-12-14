@@ -1,8 +1,11 @@
-import React  from "react";
+import React, {useContext}  from "react";
 import { Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { boxes, colors, icons } from "../Styles";
+import { ThemeContext } from '../components/ThemeManager';
 
 export default AttributeImage = props => {
+
+    const {themeColors} = useContext(ThemeContext);
     
     var iconName =  "";
     switch(props.title) {
@@ -19,10 +22,15 @@ export default AttributeImage = props => {
 
     return (
         <TouchableOpacity 
-            style={[styles.attributeImage, {marginRight: props.isLast ? 30 : 7, backgroundColor: props.isActive ? colors.darkBlue : colors.lightGrey}]}
+            style={[styles.attributeImage, {
+                marginRight: props.isLast ? 30 : 7, 
+                backgroundColor: props.isActive ? themeColors.primary : themeColors.separator
+            }]}
             onPress={props.onPress}>
             <Image  
-                style={[styles.attributeIcon, {tintColor: props.isActive ? colors.white : colors.mediumBlue}]}
+                style={[styles.attributeIcon, {
+                    tintColor: props.isActive ? themeColors.textHighlight : themeColors.textInactive
+                }]}
                 source={iconName}
                 resizeMode="contain"
             />
@@ -36,7 +44,6 @@ const styles = StyleSheet.create({
         aspectRatio: 1,
         marginRight: 7,
         flex: 1,
-        backgroundColor: colors.lightGrey,
         borderRadius: 7,
         justifyContent: "center",
         alignItems: "center",
@@ -44,6 +51,5 @@ const styles = StyleSheet.create({
     attributeIcon: {
         width: "75%",
         height: "75%",
-        tintColor: colors.mediumBlue,
     },
 });

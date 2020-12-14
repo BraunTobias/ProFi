@@ -1,7 +1,8 @@
-import React , {useState, useEffect} from "react";
+import React , {useState, useEffect, useContext} from "react";
 import { StyleSheet, Text, TouchableOpacity, View, Image } from "react-native";
 import Autolink from 'react-native-autolink';
 import { compareAsc, format } from 'date-fns';
+import { ThemeContext } from '../components/ThemeManager';
 
 import { icons, colors, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
@@ -9,18 +10,22 @@ import ProfileImage from "./ProfileImage";
 
 export default CommentTile = props => {
 
+    const {themeColors} = useContext(ThemeContext);
+
     const userId = props.userId;
     const date = format(props.timestamp.toDate(), "dd.MM.yy");
     
     return (
     <View style={[styles.commentTile, {
-        backgroundColor: props.index % 2 === 0 ? colors.white : colors.lightGrey,
+        backgroundColor: props.index % 2 === 0 ? themeColors.tile1 : themeColors.tile2,
         minHeight: props.likes > 0 ? 100 : 70, 
-        paddingHorizontal: props.replyPreview ? 0 : 15
+        paddingHorizontal: props.replyPreview ? 0 : 15,
+        borderColor: themeColors.separator,
+        borderBottomWidth: 1    
     }]}>
         {props.isReply == true && 
             <Image
-                style={styles.commentReplyTile}
+                style={[styles.commentReplyTile, { tintColor: themeColors.contrast }]}
                 source={icons.replyComment}
                 resizeMode={"contain"}
             />
@@ -34,24 +39,24 @@ export default CommentTile = props => {
             {props.likes > 0 && 
             <View style={styles.likesRow}>
                 <Image
-                    style={styles.likesImage}
+                    style={[styles.likesImage, { tintColor: themeColors.textHl }]}
                     height={17}
                     width={17}
                     source={icons.like}
                 />
-                <Text style={texts.copy}>{props.likes}</Text>
+                <Text style={[texts.copy, {color: themeColors.textCopy}]}>{props.likes}</Text>
             </View>
             }
         </View>
 
-        <View style={styles.commentTileContent}>
+        <View style={[styles.commentTileContent, {borderColor: themeColors.secondary}]}>
             <View style={styles.commentTileHeader}>            
-                <Text style = {texts.commentTileHeader}>{props.userName}</Text>
-                <Text style = {texts.commentTileTime}>{date}</Text>
+                <Text style = {[texts.commentTileHeader, {color: themeColors.textHl}]}>{props.userName}</Text>
+                <Text style = {[texts.commentTileTime, {color: themeColors.textCopy}]}>{date}</Text>
             </View>
             <Autolink 
-                linkStyle={texts.link}
-                style = {texts.copy}
+                linkStyle = {[texts.link, {color: themeColors.textHl}]}
+                style = {[texts.copy, {color: themeColors.textCopy}]}
                 text={props.comment}
             />
         </View>
@@ -73,7 +78,6 @@ const styles = StyleSheet.create({
         height: 60, 
         marginRight: 5, 
         marginLeft: -5, 
-        tintColor: colors.lightBlue
     },
     commentTileImage: {
         height: 60,
@@ -94,7 +98,6 @@ const styles = StyleSheet.create({
         paddingStart: 7,
         marginLeft: 8,
         // borderLeftWidth: 1,
-        borderColor: colors.lightBlue,
         flex: 1
     },
     likesRow: {
@@ -108,7 +111,6 @@ const styles = StyleSheet.create({
         height: 17,
         width: 17,
         resizeMode: "contain", 
-        tintColor: colors.darkBlue, 
         marginRight: 5    
     },  
 });
