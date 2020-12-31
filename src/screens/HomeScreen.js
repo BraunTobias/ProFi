@@ -71,25 +71,30 @@ export default function HomeScreen ({navigation}) {
 
     // Wird nach dem Rendern ausgeführt
     useEffect(() => {
-        // const unsubscribe = navigation.addListener('focus', () => {
+        const unsubscribe = navigation.addListener('focus', () => {
             loadData(() => {
                 DB.getInfoReceived("deleteCourse", (isReceived) => {
                     setDeleteInfoReceived(isReceived);
                 });        
             });
-        // });
+        });
     }, []);
     
     // Handler für Modals
-    const pressFindCourseHandler = (commit) => {
-        if (commit && currentFindCourseId !== "") {
-            DB.addCourseToList(currentFindCourseId, () => {
+    const pressFindCourseHandler = (committed) => {
+        if (committed && currentFindCourseId !== "") {
+            DB.addCourseToList(currentFindCourseId, (addedCourse) => {
                 setCurrentFindCourseId("");
-                // var courseList = currentCourses;
-                // courseList.push(addedCourse);
-                // setCurrentCourses(courseList);
-                // setFindCourseVisible(false);
-                loadData(() => {setFindCourseVisible(false);});
+                let sem = addedCourse.semester;
+                let courseList = currentCourses;
+                let semList = currentCourses[sem];
+                semList.push(addedCourse);
+                courseList[sem] = semList
+                setCurrentCourses(courseList);
+                setFindCourseVisible(false);
+                // loadData(() => { 
+                //     setFindCourseVisible(false); 
+                // } );
             }, (error) => {
                 setFindErrorVisible(error);           
             })
@@ -109,7 +114,7 @@ export default function HomeScreen ({navigation}) {
                     setCurrentNewCourseAcronym("");    
                     setCurrentNewCourseMinMembers(2);
                     setCurrentNewCourseMaxMembers(2);
-                    setCurrentNewCourseDate(new Date());
+                    setCurrentNewCourseDate( new Date( new Date().getTime() + 24 * 60 *60 *1000 ) );
                     loadData(() => {});
                 }, (error) => {
                     Alert.alert(
@@ -153,21 +158,27 @@ export default function HomeScreen ({navigation}) {
         if (number < currentNewCourseMinMembers) setCurrentNewCourseMinMembers(number);
     }
     const changeNewCourseDateHandler = (date) => {
-        setCurrentNewCourseDate(new Date(date.getFullYear(), date.getMonth(), date.getDate(), currentNewCourseHours, currentNewCourseMinutes));
+        let dateCreated = new Date(date.getFullYear(), date.getMonth(), date.getDate(), currentNewCourseHours, currentNewCourseMinutes);
+        setCurrentNewCourseDate(dateCreated);
+        // console.log(dateCreated);
     }
     const changeNewCourseHoursHandler = (number) => {
         var oldDate = currentNewCourseDate;
         if (number > 23) number = 0;
         else if (number < 0) number = 23;
         setCurrentNewCourseHours(number);
-        setCurrentNewCourseDate(new Date(oldDate.getFullYear(), oldDate.getMonth(), oldDate.getDate(), number, currentNewCourseMinutes));
+        let dateCreated = new Date(oldDate.getFullYear(), oldDate.getMonth(), oldDate.getDate(), number, currentNewCourseMinutes);
+        setCurrentNewCourseDate(dateCreated);
+        // console.log(dateCreated);
     }
     const changeNewCourseMinutesHandler = (number) => {
         var oldDate = currentNewCourseDate;
         if (number > 59) number = 0;
         else if (number < 0) number = 59;
         setCurrentNewCourseMinutes(number);
-        setCurrentNewCourseDate(new Date(oldDate.getFullYear(), oldDate.getMonth(), oldDate.getDate(), currentNewCourseHours, number));
+        let dateCreated = new Date(oldDate.getFullYear(), oldDate.getMonth(), oldDate.getDate(), currentNewCourseHours, number);
+        setCurrentNewCourseDate(dateCreated);
+        // console.log(dateCreated);
     }
 
     const deleteCourseHandler = (id) => {
@@ -348,11 +359,6 @@ export default function HomeScreen ({navigation}) {
                                 onPress= { () => { setFindCourseVisible(true) } }
                             />
                         }
-                        {/* <ButtonSmall
-                            title= { "Kurs finden"}
-                            icon= { "find" }
-                            onPress= { () => {setFindCourseVisible(true) } }
-                        /> */}
                     </View>
                     <ButtonSmall
                         title= { "Neuer Kurs" }

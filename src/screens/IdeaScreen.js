@@ -1,12 +1,10 @@
 import React, {useState, useEffect, useLayoutEffect} from 'react';
 import { View, Text, Modal, FlatList, TouchableHighlight, Keyboard, ActivityIndicator, Alert, Image } from 'react-native';
-// import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view';
 import { compareAsc, format } from 'date-fns';
 
 import { icons, colors, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
 import InputField from '../components/InputField';
-// import SwipeButton from '../components/SwipeButton';
 import CommentTile from '../components/CommentTile';
 import ModalContent from "../components/ModalContent";
 import Button from '../components/Button';
@@ -46,7 +44,6 @@ export default function IdeaScreen ({route, navigation}) {
 
     // State Hooks für Modal
     const [editIdeaVisible, setEditIdeaVisible] = useState(false);
-    const [addSkillsVisible, setAddSkillsVisible] = useState(false);
     const [editIdeaName, setEditIdeaName] = useState(ideaInfo.title);
     const [editIdeaText, setEditIdeaText] = useState(ideaInfo.description);
     const [selectedSkillsList, setSelectedSkillsList] = useState(ideaInfo.skills);
@@ -68,11 +65,11 @@ export default function IdeaScreen ({route, navigation}) {
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerTitle: courseId,
+            headerTitle: courseInfo.title,
             headerRight: () => (
                 <ButtonIcon
                     icon= { "profile" }
-                    status= { "aktive" }
+                    status= { "active" }
                     onPress= { () => { navigation.navigate("Mein Profil", { currentUserId: currentUserId } ) } }
                 />
             ),
@@ -86,7 +83,7 @@ export default function IdeaScreen ({route, navigation}) {
                     <Padding width= { 15 } />
                     <ButtonIcon
                         icon= { "reply" }
-                        status= { "aktive" }
+                        status= { "active" }
                         onPress= { () => { 
                             navigation.navigate("Course", { courseInfo: courseInfo, currentUserId: currentUserId } );
                          } }
@@ -150,7 +147,7 @@ export default function IdeaScreen ({route, navigation}) {
     }
     const pressNewCommentHandler = (committed) => {
         if (committed) {
-            if (currentNewCommentText != "") {
+            if (currentNewCommentText !== "") {
                 DB.addComment(courseId, ideaInfo.id, courseType, currentNewCommentText, "", () => {
                     setNewCommentVisible(false);
                     setCurrentNewCommentText("");
@@ -194,7 +191,7 @@ export default function IdeaScreen ({route, navigation}) {
         setEditIdeaText(enteredText);
         if (editIdeaText.length > 1) setEditIdeaTextErrorVisible(false);
     }
-    const addSkillHandler = (skill) => {
+    const changeSkillsHandler = (skill) => {
         if (selectedSkillsList.indexOf(skill) < 0) {
             var list = selectedSkillsList;
             list.push(skill);
@@ -350,19 +347,19 @@ export default function IdeaScreen ({route, navigation}) {
                             <View style={boxes.mainContainer}>
                                 <InputField
                                     placeholderText= "max. 300 Zeichen"
-                                    value={currentNewCommentText}
-                                    onChangeText={changeNewCommentTextHandler}
-                                    multiline={true}
+                                    value= { currentNewCommentText }
+                                    onChangeText= { changeNewCommentTextHandler }
+                                    multiline= { true }
                                 />
                                 {currentCommentErrorVisible &&
-                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
+                                    <Text style= { [boxes.unPaddedRow, texts.errorLine] } >
                                         Bitte einen Kommentar eingeben.
                                     </Text>
                                 }
                             </View> 
                         )
                     }}
-                    onDismiss= {(committed) => {pressNewCommentHandler(committed)}}
+                    onDismiss= { (committed) => { pressNewCommentHandler(committed) } }
                 />
             </Modal>
             
@@ -481,8 +478,7 @@ export default function IdeaScreen ({route, navigation}) {
                                         <AttributeSelect
                                             attributeType = "skills"
                                             selectedAttributesList= { selectedSkillsList }
-                                            addAttribute = { (skills) => { addSkillHandler(skills) } }
-                                        />
+                                            changeAttribute = { (skills, currentCategory) => { changeSkillsHandler(skills, currentCategory) } }                                        />
                                     </View>
                                 </View>
                             </View> 

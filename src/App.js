@@ -50,7 +50,7 @@ const App: () => React$Node = () => {
   firebase.auth().onAuthStateChanged((user) => {
     if (user) {
         // Wenn der User soeben eingeloggt wurde
-        console.log("Navigation zur App");
+        // console.log("Navigation zur App");
         setIsLoggedIn(true);
     } else {
         // Wenn der User soeben ausgeloggt wurde

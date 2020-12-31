@@ -19,10 +19,10 @@ export default function AttributeImage (props) {
 
     return (
         <TouchableOpacity 
-            style= { [boxes.attributeImage, { marginRight: props.isLast ? 30 : 7, backgroundColor: props.isActive ? colors.darkBlue : colors.lightBlue } ] }
+            style= { [boxes.attributeImage, { backgroundColor: props.isActive ? colors.darkBlue : colors.lightBlue } ] }
             onPress= { () => { props.onPress() } } >
             <Image 
-                style= { [ boxes.attributeIcon, { marginEnd: props.isLast ? 30 : 7, tintColor: props.isActive ? colors.white : colors.mediumBlue } ] } 
+                style= { [ boxes.attributeIcon, { tintColor: props.isActive ? colors.white : colors.mediumBlue } ] } 
                 source= { iconName }
                 resizeMode= "contain"
             />

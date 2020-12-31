@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useLayoutEffect} from 'react';
-import { View, Text, Modal, Alert } from 'react-native';
+import { View, Text, Modal, Alert, ScrollView, useWindowDimensions } from 'react-native';
 
 import { icons, colors, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
@@ -240,10 +240,7 @@ export default function ProfileScreen ({route, navigation}) {
     }
 
     return(
-        <View style= { { 
-            backgroundColor: colors.lightGrey, 
-            height: window.height-80,
-        } } >
+        <View style= { { height: useWindowDimensions().height-80, width: useWindowDimensions().width } } >
 
             {/* Error-Modals */}
             <InfoModal visible= { editErrorVisible }
@@ -252,7 +249,7 @@ export default function ProfileScreen ({route, navigation}) {
                 copy="Ungültige Eingabe"
             />
 
-            {/* Header */}
+            {/* Subheader */}
             <View style= { boxes.subHeader } >
                 <View style={boxes.centeredRow}>
                     <View style={{height: 65, marginVertical: 10}}>
@@ -265,7 +262,7 @@ export default function ProfileScreen ({route, navigation}) {
                 </View>
             </View>
 
-            <View style= { boxes.width }>
+            <ScrollView contentContainerStyle= { [boxes.mainContainer ] }>
                 
                 {/* E-Mail ändern */}
                 <Modal 
@@ -404,8 +401,12 @@ export default function ProfileScreen ({route, navigation}) {
                     </View>
                 </Modal>
 
-
-                <View style={boxes.mainContainer}>
+                <ScrollView 
+                    contentContainerStyle= { [ { alignItems: 'center', width: useWindowDimensions().width } ] }
+                >
+                <View style= { boxes.width }>
+                    
+                    {/* Input Felder */}
                     <View style= { boxes.paddedRow }>
                         <View style= { { width: '50%' } } >
                             <Padding height= { 15 } />
@@ -457,8 +458,9 @@ export default function ProfileScreen ({route, navigation}) {
                             />
                         </View>
                     </View>
+
                     <Padding height= { 18.5 } />
-                    <Text style={texts.copy}>Push-Mitteilungen für dein Handy kannst Du in der App aktivieren.</Text>
+                    <Text style= { texts.copy, boxes.paddedRow } >Push-Mitteilungen für dein Handy kannst Du in der App aktivieren.</Text>
                     <Padding height= { 18.5 } />
 
                     {/* Attribute auswählen */}
@@ -510,13 +512,15 @@ export default function ProfileScreen ({route, navigation}) {
                         </View>
                     </View>
                     <Padding height= { 18.5 } />
+                    
                     <ButtonLarge 
                         title= "Abmelden" 
                         onPress= { logOut }
                         icon= "exit"
                     />
-                </View>
-            </View>
+                    </View>
+                </ScrollView>
+            </ScrollView>
         </View>
     )
 }

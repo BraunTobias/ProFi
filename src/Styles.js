@@ -231,7 +231,7 @@ const boxes = {
     scrollRow: {
         height: 100,
         width: "100%",
-        paddingVertical: 0,
+        paddingVertical: 0
     },
 
     profileImage: {

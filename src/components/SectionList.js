@@ -66,7 +66,8 @@ export default function SectionList (datas) {
                                         id= { item.id }
                                         title= { item.title }
                                         subtitle= { 
-                                            item.members.length + " Mitglieder, Gruppengröße " + item.minMembers + "-" + item.maxMembers + "\n" + 
+                                            item.members.length + " Mitglieder, Gruppengröße " + 
+                                            item.minMembers + "-" + item.maxMembers + "\n" + 
                                             format(item.date.toDate(), "dd.MM.yyyy")
                                         }
                                         index = { index }

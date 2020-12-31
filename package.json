@@ -30,7 +30,6 @@
     "react-native": "^0.63.3",
     "react-native-autolink": "^3.0.0",
     "react-native-elements": "^2.3.2",
-    "react-native-gesture-handler": "^1.8.0",
     "react-native-input-spinner": "^1.3.0",
     "react-native-modal-datetime-picker": "^9.0.0",
     "react-native-numeric-input": "^1.8.3",

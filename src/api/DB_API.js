@@ -176,7 +176,7 @@ const DB = {
             infoList = userSnapshotDoc.data().infosReceived;
         }
         infoList.push(infoType);
-        firebase.firestore().collection("users").doc(currentUserID).set({
+        await firebase.firestore().collection("users").doc(currentUserID).set({
             infosReceived: infoList
         }, {merge: true}); 
     },
@@ -330,17 +330,17 @@ const DB = {
             if (month == 0) year --;
             semester = "WS" + year;
         }
+
         const courseId = id + semester;
 
         // Checken ob es die ID schon gibt
-        const courseWithId = firebase.firestore().collection("courses").doc(id);
+        const courseWithId = firebase.firestore().collection("courses").doc(courseId);
         courseWithId.get()
         .then((docSnapshot) => {
             if (docSnapshot.exists) {
                 onError("Den Kurs " + id + " gibt es in diesem Semester schon.");
             } else {
-                const semester = id.slice(id.length - 4);
-                firebase.firestore().collection("courses").doc(id).set({
+                firebase.firestore().collection("courses").doc(courseId).set({
                     creator: currentUserID,
                     title: title,
                     link: link,
@@ -442,7 +442,7 @@ const DB = {
     },
 
     // Neuen Kommentar erstellen
-    addComment: async function(courseId, ideaId, commentText, replyTo, onSuccess) {
+    addComment: async function(courseId, ideaId, courseType, commentText, replyTo, onSuccess) {
         var currentUserName = "Anonym";
         var currentUserImage  = "";
         const currentUserID = firebase.auth().currentUser.uid;
@@ -451,9 +451,8 @@ const DB = {
             currentUserName = currentUserDoc.data().username;
             currentUserImage = currentUserDoc.data().image;
         }
-        firebase.firestore().collection("courses").doc(courseId).collection("ideas").doc(ideaId).collection("comments").add({
+        firebase.firestore().collection(courseType).doc(courseId).collection("ideas").doc(ideaId).collection("comments").add({
             name: currentUserName,
-            image: currentUserImage,
             user: currentUserID,
             text: commentText,
             time: firebase.firestore.Timestamp.fromDate(new Date()),
@@ -475,8 +474,8 @@ const DB = {
         var count = 1;
         coursesSnap.forEach((doc) => {
             const course = doc.data();
-            console.log('doc.data');
-            console.log(doc.data());
+            // console.log('doc.data');
+            // console.log(doc.data());
             course["id"] = doc.id;
             course["listKey"] = count;
             course["courseType"] = "courses";
@@ -781,9 +780,11 @@ const DB = {
                 // Der neue Kurs wird zurückgegeben um sofort angezeigt zu werden
                 const addedCourse = courseWithId.data();
                 addedCourse["id"] = courseWithId.id;
-                if (addedCourse.date) addedCourse.date = format(addedCourse.date.toDate(), "dd.MM.yyyy");
-                else addedCourse.date = "Kein Datum";
-                onSuccess();
+                addedCourse["courseType"] = courseType;
+                // if (addedCourse.date) addedCourse.date = format(addedCourse.date.toDate(), "dd.MM.yyyy");
+                // else addedCourse.date = "Kein Datum";
+                if (!addedCourse.date) addedCourse.date = "Kein Datum"
+                onSuccess(addedCourse);
             } else {
                 onError("Du hast diesen Kurs schon in deiner Liste.");
             }         

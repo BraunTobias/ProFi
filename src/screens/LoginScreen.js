@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, Modal, ScrollView, useWindowDimensions } from 'react-native';
-//import { ScrollView } from 'react-native-gesture-handler';
 import DB from '../api/DB_API';
 import ButtonLarge from '../components/ButtonLarge';
 import ButtonIcon from '../components/ButtonIcon';
@@ -106,9 +105,10 @@ export default function LoginScreen () {
     }
 
     return(
-        <View style= { { height: useWindowDimensions().height-150 } } >
+        <View style= { { height: useWindowDimensions().height } } >
+            
             {/* Registrierung */}
-            {/* <Modal 
+            <Modal 
                 transparent= {true}
                 visible= { registerVisible } 
                 animationType= 'slide' 
@@ -185,7 +185,7 @@ export default function LoginScreen () {
                         />
                     </ScrollView>
                 </View>
-            </Modal> */}
+            </Modal>
 
             {/* Login */}
             <View style= { { 
@@ -209,7 +209,8 @@ export default function LoginScreen () {
                 </View>
 
                 {/* Content */}
-                <View style= { boxes.mainContainer } >
+                <ScrollView contentContainerStyle= { [boxes.mainContainer, { alignItems: 'center' } ] } >
+                {/* <View style= { boxes.mainContainer } > */}
                     <InputField
                         title= "E-Mail"
                         placeholderText= "benutzer@haw-hamburg.de"
@@ -240,7 +241,8 @@ export default function LoginScreen () {
                         transparent= { true }
                         onPress= { () => { setRegisterHandler(true) } }
                     />
-                </View>             
+                {/* </View> */}
+                </ScrollView>
             </View>
         </View>
     );
