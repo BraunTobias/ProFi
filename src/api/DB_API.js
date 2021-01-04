@@ -362,7 +362,7 @@ const DB = {
     addIdea: function(courseId, courseType, title, description, skills, interests, onSuccess) {
         const currentUserID = firebase.auth().currentUser.uid;
 
-        firebase.firestore().collection("courses").doc(courseId).collection("ideas").add({
+        firebase.firestore().collection(courseType).doc(courseId).collection("ideas").add({
             title: title,
             description: description,
             interests: interests,
@@ -783,7 +783,7 @@ const DB = {
                 addedCourse["courseType"] = courseType;
                 // if (addedCourse.date) addedCourse.date = format(addedCourse.date.toDate(), "dd.MM.yyyy");
                 // else addedCourse.date = "Kein Datum";
-                if (!addedCourse.date) addedCourse.date = "Kein Datum"
+                // if (!addedCourse.date) addedCourse.date = "Kein Datum"
                 onSuccess(addedCourse);
             } else {
                 onError("Du hast diesen Kurs schon in deiner Liste.");
@@ -1037,7 +1037,6 @@ const DB = {
                 });
             }
         });  
-        // console.log(attributesList)
         onSuccess(attributesList);
     },
     

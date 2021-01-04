@@ -10,14 +10,14 @@ export default function ScrollRow (props) {
     const data = props.data;
 
     return(
-        <View style= { boxes.scrollRow }>
+        <View>
             <ScrollView
                 horizontal= { true }
                 // indicatorStyle
                 // showsHorizontalScrollIndicator= { false }
             >
                 <FlatList 
-                    style= { { paddingLeft: 15 } }
+                    style= { { padding: 15 } }
                     horizontal= { true }
                     showsHorizontalScrollIndicator= { false }
                     showsVerticalScrollIndicator= { false }
@@ -40,11 +40,11 @@ export default function ScrollRow (props) {
                                     //onMouseEnter= { (event) => { props.onEnter(itemData.index+1, itemData.item.userId, event.target); } }
                                     // onMouseLeave= { () => { props.onLeave(); } }
                                 >
-                                <ProfileImage
-                                    imageUrl= { itemData.item.imageUrl }
-                                    isLast= { itemData.index === data.length - 1 }
-                                    onPress= { () => { props.onPress(itemData.item.userId) } }
-                                />
+                                    <ProfileImage
+                                        imageUrl= { itemData.item.imageUrl }
+                                        isLast= { itemData.index === data.length - 1 }
+                                        onPress= { () => { props.onPress(itemData.item.userId) } }
+                                    />
                                 </View>
                             );
                         }

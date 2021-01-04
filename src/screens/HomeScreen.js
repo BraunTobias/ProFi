@@ -52,13 +52,6 @@ export default function HomeScreen ({navigation}) {
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerRight: () => (
-                <ButtonIcon
-                    icon= { "profile" }
-                    status= { "active" }
-                    onPress= { () => { navigation.navigate("Mein Profil", { currentUserId: currentUserID } ) } }
-                />
-            ),
             headerLeft: () => (
                 <ButtonIcon
                     icon= { "logo" }
@@ -66,6 +59,14 @@ export default function HomeScreen ({navigation}) {
                     onPress= { () => { navigation.navigate("Home") } }
                 />
             ),
+            headerRight: () => (
+                <ButtonIcon
+                    icon= { "profile" }
+                    status= { "active" }
+                    onPress= { () => { navigation.navigate("Mein Profil", { currentUserId: currentUserID } ) } }
+                />
+            ),
+            
         });
     }, [navigation]);
 
@@ -86,8 +87,14 @@ export default function HomeScreen ({navigation}) {
             DB.addCourseToList(currentFindCourseId, (addedCourse) => {
                 setCurrentFindCourseId("");
                 let sem = addedCourse.semester;
+                
+                // wenn Kurs kein Semester hat ist es ein offener Kurs (Projekt B)
+                if (!sem) sem = 'Freie Projekte'
+
                 let courseList = currentCourses;
                 let semList = currentCourses[sem];
+                
+
                 semList.push(addedCourse);
                 courseList[sem] = semList
                 setCurrentCourses(courseList);
@@ -181,12 +188,12 @@ export default function HomeScreen ({navigation}) {
         // console.log(dateCreated);
     }
 
-    const deleteCourseHandler = (id) => {
+    const deleteCourseHandler = (id, courseType) => {
         
         if (!deleteInfoReceived) {
             setDeleteInfoVisible(true); 
         } else {
-            DB.removeCourseFromList(id, "courses", () => {
+            DB.removeCourseFromList(id, courseType, () => {
                 loadData(() => {});
             });
         }
@@ -331,7 +338,7 @@ export default function HomeScreen ({navigation}) {
 
             {/* Find & Create Buttons */}
             <View style= { boxes.subHeader } >
-                <View style= { [boxes.paddedRow, boxes.width] } >
+                <View style= { [boxes.paddedRow, boxes.width, { paddingBottom: 15 } ] } >
                     <View>
                         { findCourseVisible &&
                             <View style= { [boxes.unPaddedRow, { width: 200 } ] }>
@@ -372,7 +379,7 @@ export default function HomeScreen ({navigation}) {
             <SectionList 
                 data = { Object.keys(currentCourses) }
                 onPress= { (item) => { selectCourseHandler(item) } }
-                onDelete = { (id) => deleteCourseHandler(id) }
+                onDelete= { (id, courseType) => deleteCourseHandler(id, courseType) }
                 currentCourses = { currentCourses }
             />
         </View>

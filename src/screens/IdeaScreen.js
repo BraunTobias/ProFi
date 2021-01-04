@@ -18,6 +18,8 @@ import AttributeSelect from '../components/AttributeSelect';
 import Padding from '../components/Padding';
 import FlexRow from '../components/FlexRow';
 import IdeaFooter from '../components/IdeaFooter';
+import ButtonSmall from '../components/ButtonSmall';
+
 
 export default function IdeaScreen ({route, navigation}) {
 
@@ -507,11 +509,19 @@ export default function IdeaScreen ({route, navigation}) {
                             onPress={() => navigation.navigate("IdeaAttributes", {filterList: currentSkills, secondaryFilterList: ideaInfo.interests, courseType: courseType, courseId: courseId, ideaId: ideaInfo.id, title: ideaInfo.interests.length > 0 ? "Gemeinsamkeiten" : "Passende Fähigkeiten"})}
                         />
                     </FlexRow>
-                    { (courseType == "openCourses" && !evaluated) &&
+                    {/* BEI OFFENEN IDEEN MUSS ES NICHT EVALUATED SEIN */
+                    (courseType === "openCourses" || (evaluated && members.length > 0)) &&
+                        <ScrollRow
+                            data= { members }
+                            onPress= { (id) => { viewProfileHandler(id) } }
+                            onEnter= { (num, id) => viewProfileInfoHandler(num, id) }
+                        />
+                    }
+                    { (courseType === "openCourses" && !evaluated) &&
                     <FlexRow padding>
-                        <Button
-                            title={"Beitreten"}
-                            icon={userIsMember ? icons.checkTrue : icons.checkFalse}
+                        <ButtonSmall
+                            title={userIsMember ? "Mitglied" : "Beitreten"}
+                            icon={userIsMember ? "checkTrue" : "checkFalse"}
                             onPress={joinIdeaHandler}
                         />
                     </FlexRow>
@@ -526,7 +536,7 @@ export default function IdeaScreen ({route, navigation}) {
             }
 
             {/* ListHeaderComponent */}
-            <View style= { [ {backgroundColor: evaluated ? colors.darkBlue : colors.white} ] } >
+            <View style= { [ {backgroundColor: evaluated ? colors.darkBlue : colors.lightBlue} ] } >
                 <View style= {boxes.width}>
                     { currentUserIsCreator && !evaluated && 
                     <View>
@@ -558,20 +568,10 @@ export default function IdeaScreen ({route, navigation}) {
                     </View>
                     }
 
-                    {/* BEI OFFENEN IDEEN MUSS ES NICHT EVALUATED SEIN */}
-                    {(courseType == "openCourses" || (evaluated && members.length > 0)) &&
-                        <ScrollRow
-                            // data= {members}
-                            // onPress={(id) => {viewProfileHandler(id)}}
-
-                            data= { members }
-                            onPress= { (id) => { viewProfileHandler(id) } }
-                            onEnter= { (num, id) => viewProfileInfoHandler(num, id) }
-                            // onLeave= { () => setProfileInfoVisible(0) }
-                        />
-                    }
+                    
                 </View>
             </View>
+            
             {/* FlatList */}
             <FlatList 
                 data= { currentComments }

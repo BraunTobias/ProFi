@@ -228,11 +228,6 @@ const boxes = {
         marginEnd: 5,  
         marginTop: 0.5  
     },
-    scrollRow: {
-        height: 100,
-        width: "100%",
-        paddingVertical: 0
-    },
 
     profileImage: {
             width: 60,
@@ -251,7 +246,7 @@ const boxes = {
         width: width,
         height: 75,
         alignItems: "center",
-        borderRadius: 111
+        // borderRadius: 111
     },
     attributeImage: {
         width: 60,
@@ -414,6 +409,7 @@ const texts = {
         color: colors.darkGrey,
     },
     header: {
+        marginHorizontal: 200,
         fontFamily: 'Inter',
         fontWeight: 600,
         fontSize: 20,

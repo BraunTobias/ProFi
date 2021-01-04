@@ -65,10 +65,14 @@ export default function SectionList (datas) {
                                         onPress= { () => { datas.onPress(item) } } 
                                         id= { item.id }
                                         title= { item.title }
-                                        subtitle= { 
+                                        subtitle= {
+                                            item.date ? 
                                             item.members.length + " Mitglieder, Gruppengröße " + 
-                                            item.minMembers + "-" + item.maxMembers + "\n" + 
-                                            format(item.date.toDate(), "dd.MM.yyyy")
+                                            item.minMembers + "-" + item.maxMembers + "\n"
+                                            + format(item.date.toDate(), "dd.MM.yyyy")
+                                            :
+                                            "Gruppengröße " + item.minMembers + "-" + item.maxMembers + "\n" + 
+                                            "Kein Datum"
                                         }
                                         index = { index }
                                         isMember = { item.userIsMember }
@@ -81,7 +85,7 @@ export default function SectionList (datas) {
                                     >
                                         <ButtonIcon 
                                             icon= { "nogo" }
-                                            onPress= { (ref) => { datas.onDelete(item.id) } }
+                                            onPress= { (ref) => { datas.onDelete(item.id, item.date ? 'courses' : 'openCourses') } }
                                             status= { "neg" }
                                         />
                                     </View>

@@ -24,11 +24,11 @@ export default function ProfileView (props) {
             setCurrentEmail(email);
             if (imageUrl) setImageUrl(imageUrl);
         });
-        DB.getAttributesFromUser(props.userId, (filterList) => {
-            DB.getAllAttributes("skills", filterList, null, null, null, (attributesList) => {
+        DB.getAttributesFromUser(props.userId, (skillList, interestList) => {
+            DB.getAllAttributes("skills", skillList, null, null, null, (attributesList) => {
                 setSkillsList(attributesList);
             });
-            DB.getAllAttributes("interests", filterList, null, null, null, (attributesList) => {
+            DB.getAllAttributes("interests", interestList, null, null, null, (attributesList) => {
                 setInterestsList(attributesList);
             });
         });    
@@ -72,14 +72,20 @@ export default function ProfileView (props) {
                 ) } }
                 content= { () => {
                     return(
-                        <View style={boxes.mainContainer}>
-                            <View style={boxes.width}>
-                                <AttributeList style={{flexGrow: 1, backgroundColor: "red"}}
-                                    attList = {skillsList}
-                                />
-                                <AttributeList style={{flexGrow: 1, backgroundColor: "red"}}
-                                    attList = {interestsList}
-                                />
+                        <View style= { boxes.mainContainer } >
+                            <View style= { boxes.width, boxes.paddedRow }>
+                                <View style= { { width: '49%' } } >
+                                    <Text style= { texts.subHeader }>Fähigkeiten</Text>
+                                    <AttributeList style={{flexGrow: 1, backgroundColor: "red"}}
+                                        attList = {skillsList}
+                                    />
+                                </View>
+                                <View style= { { width: '49%' } } >
+                                    <Text style= { texts.subHeader }>Interessen</Text>
+                                    <AttributeList style={{flexGrow: 1, backgroundColor: "red"}}
+                                        attList = {interestsList}
+                                    />
+                                </View>
                             </View>
                         </View>
                     )

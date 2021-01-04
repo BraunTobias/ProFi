@@ -58,8 +58,8 @@ export default function CourseScreen ({route, navigation}) {
     const [editCourseDate, setEditCourseDate] = useState(courseInfo.date ? courseInfo.date.toDate() : {});
     const [editCourseMinMembers, setEditCourseMinMembers] = useState(courseInfo.minMembers);
     const [editCourseMaxMembers, setEditCourseMaxMembers] = useState(courseInfo.maxMembers);
-    const [editCourseHours, setEditCourseHours] = useState(courseInfo.date.toDate().getHours());
-    const [editCourseMinutes, setEditCourseMinutes] = useState(courseInfo.date.toDate().getMinutes());
+    const [editCourseHours, setEditCourseHours] = useState(courseInfo.date ? courseInfo.date.toDate().getHours() : {});
+    const [editCourseMinutes, setEditCourseMinutes] = useState(courseInfo.date ? courseInfo.date.toDate().getMinutes() : {});
     const [editErrorVisible, setEditErrorVisible] = useState(false);
     const [newIdeaVisible, setNewIdeaVisible] = useState(false);
     const [addSkillsVisible, setAddSkillsVisible] = useState(false);
@@ -91,6 +91,13 @@ export default function CourseScreen ({route, navigation}) {
     useLayoutEffect(() => {
         navigation.setOptions({
             headerTitle: courseInfo.title,
+            headerLeft: () => (
+                <ButtonIcon
+                    icon= { "logo" }
+                    status= { "color" }
+                    onPress= { () => { navigation.navigate("Home") } }
+                />
+            ),
             headerRight: () => (
                 <ButtonIcon
                     icon= { "profile" }
@@ -98,21 +105,7 @@ export default function CourseScreen ({route, navigation}) {
                     onPress= { () => { navigation.navigate("Mein Profil", { currentUserId: currentUserId } ) } }
                 />
             ),
-            headerLeft: () => (
-                <View style= { [boxes.unPaddedRow, { alignItems: "center", } ] }>
-                    <ButtonIcon
-                        icon= { "logo" }
-                        status= { "color" }
-                        onPress= { () => { navigation.navigate("Home") } }
-                    />
-                    <Padding width= { 15 } />
-                    <ButtonIcon
-                        icon= { "reply" }
-                        status= { "active" }
-                        onPress= { () => { navigation.navigate("Home") } }
-                    />
-                </View>
-            ),
+            
         });
     }, [navigation]);
 
@@ -126,6 +119,8 @@ export default function CourseScreen ({route, navigation}) {
         });    
     }
 
+    console.log('nogoInfoReceived 2: ' + nogoInfoReceived);
+
     // Wird nach dem Rendern ausgeführt
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
@@ -136,6 +131,7 @@ export default function CourseScreen ({route, navigation}) {
                 });
                 DB.getInfoReceived("nogos", (isReceived) => {
                     setNogoInfoReceived(isReceived);
+                    console.log(isReceived);
                 });
                 DB.getInfoReceived("joinCourse", (isReceived) => {
                     setJoinInfoReceived(isReceived);
@@ -168,6 +164,7 @@ export default function CourseScreen ({route, navigation}) {
     }
     const addNogoHandler = (ideaId) => {
         if (!nogoInfoReceived) {
+            console.log('!nogoInfoReceived: ' + nogoInfoReceived)
             setNogoInfoVisible(true); 
         } else {
             if (currentNogo === ideaId) {
@@ -349,7 +346,6 @@ export default function CourseScreen ({route, navigation}) {
                 onPress={ () => {
                     setJoinInfoVisible(false); 
                     DB.setInfoReceived("joinCourse"); 
-                    // setJoinInfoReceived(true);
                     setJoinInfoReceived((state) => !state);
                 } }
                 title="Einem Kurs beitreten"
@@ -367,10 +363,10 @@ export default function CourseScreen ({route, navigation}) {
             />
             <InfoModal visible={ nogoInfoVisible }
                 onPress= { () => {
-                    // setNogoInfoReceived(true);
-                    setNogoInfoReceived((state) => !state);
-                    setNogoInfoVisible(false); 
+                    setNogoInfoVisible(false);
+                    console.log('nogoInfoReceived: ' + nogoInfoReceived);
                     DB.setInfoReceived("nogos"); 
+                    setNogoInfoReceived(true);
                 } }
                 title="No-Go setzen"
                 copy="Wenn du eine Idee als No-Go markierst, wirst du dieser auf keinen Fall zugeteilt. Du kannst ein No-Go pro Kurs setzen. Sobald du eine andere Idee als No-Go markierst, wird dein altes No-Go entfernt."
@@ -546,65 +542,73 @@ export default function CourseScreen ({route, navigation}) {
                             </View>
                         )
                     }}
-                    onDismiss= {pressNewIdeaHandler}
+                    onDismiss= { pressNewIdeaHandler }
                 />
             </Modal>
 
             {/* Header */}
             <View style= { boxes.subHeader } >
-                { courseDataLoading && 
-                    <View style={{height: 119, justifyContent: "center"}}>
-                        <ActivityIndicator/>
-                    </View>
-                }  
-                { !courseDataLoading && 
-                    <View style= { [boxes.width] } >
-                        <View style={ boxes.paddedRow }>
-                            <Text style={texts.subHeader}>{courseInfo.id}</Text>
-                            <Text style={texts.subHeader}>{minMembers + "-" + maxMembers + " Personen"}</Text>
+                { (courseType === "courses") &&
+                    <View>
+                    { courseDataLoading && 
+                        <View style={{justifyContent: "center"}}>
+                            <ActivityIndicator/>
                         </View>
-                        <View style={ boxes.paddedRow }>
-                            <Text style={texts.subHeader}>{format(courseDate, "dd.MM.yyyy")}</Text>
-                            <Text style={texts.subHeader}>{creator}</Text>
+                    }  
+                    { !courseDataLoading && 
+                        <View style= { [boxes.width] } >
+                            <View style={ boxes.paddedRow }>
+                                <Text style={texts.subHeader}>{courseInfo.id}</Text>
+                                <Text style={texts.subHeader}>{minMembers + "-" + maxMembers + " Personen"}</Text>
+                            </View>
+                            <View style={ boxes.paddedRow }>
+                                <Text style={texts.subHeader}>{format(courseDate, "dd.MM.yyyy")}</Text>
+                                <Text style={texts.subHeader}>{creator}</Text>
+                            </View>
+                            <ScrollRow
+                                data= { members }
+                                onPress= { (id) => { viewProfileHandler(id) } }
+                                //onEnter= { (num, id, target) => viewProfileInfoHandler(num, id, target) }
+                                // onLeave= { () => setProfileInfoVisible(0) }
+                            />
                         </View>
-                        <ScrollRow
-                            data= { members }
-                            onPress= { (id) => { viewProfileHandler(id) } }
-                            //onEnter= { (num, id, target) => viewProfileInfoHandler(num, id, target) }
-                            // onLeave= { () => setProfileInfoVisible(0) }
+                    }
+                    { !evaluated && !evaluating &&
+                    <View style= { [boxes.paddedRow, boxes.width] } >
+                        <ButtonSmall
+                            title={userIsMember ? "Mitglied" : "Beitreten"}
+                            icon={userIsMember ? "checkTrue" : "checkFalse"}
+                            onPress={joinCourseHandler}
+                        />
+                        { userIsCreator &&
+                        <ButtonLarge
+                            title={"Kurs bearbeiten"}
+                            onPress={() => {setEditCourseVisible(true)}}
+                        />
+                        }
+                        <ButtonSmall
+                            title={"Neue Idee"}
+                            icon={"plus"}
+                            onPress={() => {setNewIdeaVisible(true)}}
                         />
                     </View>
-                }
-                { !evaluated &&
-                <View style= { [boxes.paddedRow, boxes.width] } >
-                    <ButtonSmall
-                        title={userIsMember ? "Mitglied" : "Beitreten"}
-                        icon={userIsMember ? "checkTrue" : "checkFalse"}
-                        onPress={joinCourseHandler}
-                    />
-                    { userIsCreator &&
-                    <ButtonLarge
-                        title={"Kurs bearbeiten"}
-                        onPress={() => {setEditCourseVisible(true)}}
-                    />
                     }
-                    <ButtonSmall
-                        title={"Neue Idee"}
-                        icon={"plus"}
-                        onPress={() => {setNewIdeaVisible(true)}}
-                    />
-                </View>
+                    </View>
                 }
-                { userIsCreator && false && 
-                <View style={ boxes.paddedRow }>
-                    <ButtonLarge
-                        title={"Teams erstellen"}
-                        onPress={() => {}}
-                    />
-                </View>
+                { (courseType === "openCourses") &&
+                    <View style= { [boxes.width] } >
+                        <View style= { [boxes.paddedRow] } >
+                        <ButtonSmall
+                            title={"Neue Idee"}
+                            icon={"plus"}
+                            onPress={() => {setNewIdeaVisible(true)}}
+                        />
+                        </View>
+                    </View>
                 }
+                <Padding height= { 15 } />
             </View>
-            
+
             {/* Ideas List */}
             <FlatList 
                 style= { boxes.width }
@@ -625,25 +629,29 @@ export default function CourseScreen ({route, navigation}) {
                                     backgroundColor: itemData.index % 2 === 0 ? colors.white : colors.lightGrey,
                                 } }
                             >
-                                <View
-                                    style= { {
+                                <View style= { {
+                                    flexDirection: "row", 
+                                    paddingLeft: 15,
+                                } } >
+                                    { (courseType === "courses") &&
+                                    <View style= { {
                                         flexDirection: "row", 
-                                        paddingHorizontal: 10,
-                                    } }
-                                >
-                                    <ButtonIcon 
-                                        icon= { "fav" }
-                                        onPress= { (ref) => { 
-                                            addFavHandler(itemData.item.id) } }
-                                        status= { currentFav === itemData.item.id ? "inactive" : "active" }
-                                    />
-                                    <Padding width= { 15 } />
-                                    <ButtonIcon 
-                                        icon= { "exit" }
-                                        onPress= { (ref) => { 
-                                            addNogoHandler(itemData.item.id) } }
-                                        status= { currentNogo === itemData.item.id ? "negactive" : "neg" }
-                                    />
+                                    } } >
+                                        <ButtonIcon 
+                                            icon= { "fav" }
+                                            onPress= { (ref) => { 
+                                                addFavHandler(itemData.item.id) } }
+                                            status= { currentFav === itemData.item.id ? "inactive" : "active" }
+                                        />
+                                        <Padding width= { 15 } />
+                                        <ButtonIcon 
+                                            icon= { "exit" }
+                                            onPress= { (ref) => { 
+                                                addNogoHandler(itemData.item.id) } }
+                                            status= { currentNogo === itemData.item.id ? "negactive" : "neg" }
+                                        />
+                                    </View>
+                                    }
                                 </View>
                                 <ListTile
                                     id= { itemData.item.id }
