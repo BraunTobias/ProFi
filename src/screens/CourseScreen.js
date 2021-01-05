@@ -379,6 +379,7 @@ export default function CourseScreen ({route, navigation}) {
                 copy="Kurs konnte nicht bearbeitet werden"
             />
 
+            {/* Mitglieds-Profil */}
             { profileVisible && 
                 <ProfileView
                     userId= { viewedUserId }
@@ -549,30 +550,31 @@ export default function CourseScreen ({route, navigation}) {
             {/* Header */}
             <View style= { boxes.subHeader } >
                 { (courseType === "courses") &&
-                    <View>
+                <View>
                     { courseDataLoading && 
-                        <View style={{justifyContent: "center"}}>
-                            <ActivityIndicator/>
-                        </View>
+                    <View style={{justifyContent: "center"}}>
+                        <ActivityIndicator/>
+                    </View>
                     }  
                     { !courseDataLoading && 
-                        <View style= { [boxes.width] } >
-                            <View style={ boxes.paddedRow }>
-                                <Text style={texts.subHeader}>{courseInfo.id}</Text>
-                                <Text style={texts.subHeader}>{minMembers + "-" + maxMembers + " Personen"}</Text>
-                            </View>
-                            <View style={ boxes.paddedRow }>
-                                <Text style={texts.subHeader}>{format(courseDate, "dd.MM.yyyy")}</Text>
-                                <Text style={texts.subHeader}>{creator}</Text>
-                            </View>
-                            <ScrollRow
-                                data= { members }
-                                onPress= { (id) => { viewProfileHandler(id) } }
-                                //onEnter= { (num, id, target) => viewProfileInfoHandler(num, id, target) }
-                                // onLeave= { () => setProfileInfoVisible(0) }
-                            />
+                    <View style= { [boxes.width] } >
+                        <View style={ boxes.paddedRow }>
+                            <Text style={texts.subHeader}>{courseInfo.id}</Text>
+                            <Text style={texts.subHeader}>{minMembers + "-" + maxMembers + " Personen"}</Text>
                         </View>
+                        <View style={ boxes.paddedRow }>
+                            <Text style={texts.subHeader}>{format(courseDate, "dd.MM.yyyy")}</Text>
+                            <Text style={texts.subHeader}>{creator}</Text>
+                        </View>
+                        <ScrollRow
+                            data= { members }
+                            onPress= { (id) => { viewProfileHandler(id) } }
+                            //onEnter= { (num, id, target) => viewProfileInfoHandler(num, id, target) }
+                            // onLeave= { () => setProfileInfoVisible(0) }
+                        />
+                    </View>
                     }
+                    {/* Button-Leiste */}
                     { !evaluated && !evaluating &&
                     <View style= { [boxes.paddedRow, boxes.width] } >
                         <ButtonSmall
@@ -593,7 +595,7 @@ export default function CourseScreen ({route, navigation}) {
                         />
                     </View>
                     }
-                    </View>
+                </View>
                 }
                 { (courseType === "openCourses") &&
                     <View style= { [boxes.width] } >

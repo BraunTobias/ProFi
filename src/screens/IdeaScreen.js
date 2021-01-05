@@ -1,8 +1,9 @@
 import React, {useState, useEffect, useLayoutEffect} from 'react';
-import { View, Text, Modal, FlatList, TouchableHighlight, Keyboard, ActivityIndicator, Alert, Image } from 'react-native';
+import { View, Text, Modal, FlatList, ScrollView, StyleSheet, ActivityIndicator, Alert, Image, useWindowDimensions, TouchableHighlight } from 'react-native';
 import { compareAsc, format } from 'date-fns';
+import Autolink from 'react-native-autolink';
 
-import { icons, colors, boxes, texts } from '../Styles';
+import { icons, colors, boxes, texts, height } from '../Styles';
 import DB from '../api/DB_API';
 import InputField from '../components/InputField';
 import CommentTile from '../components/CommentTile';
@@ -19,9 +20,13 @@ import Padding from '../components/Padding';
 import FlexRow from '../components/FlexRow';
 import IdeaFooter from '../components/IdeaFooter';
 import ButtonSmall from '../components/ButtonSmall';
+import ProfileImage from '../components/ProfileImage';
+// import { ScrollView } from 'react-native-web';
 
 
 export default function IdeaScreen ({route, navigation}) {
+
+    let window = useWindowDimensions();
 
     const {ideaInfo} = route.params;
     const {courseInfo} = route.params;
@@ -32,6 +37,8 @@ export default function IdeaScreen ({route, navigation}) {
     const currentUserIsCreator = (ideaInfo.creator == currentUserId);
 
     // State Hooks
+    const [currentUserName, setCurrentUserName] = useState("");
+    const [currentUserImage, setCurrentUserImage] = useState("");
     const [currentSkills, setCurrentSkills] = useState(ideaInfo.skills);
     const [currentComments, setCurrentComments] = useState([]);
     const [swipeListView, setSwipeListView] = useState();
@@ -103,6 +110,10 @@ export default function IdeaScreen ({route, navigation}) {
         DB.getUserInfoById(ideaInfo.creator, (userName) => {
             setIdeaCreator(userName);
         });
+        DB.getUserInfoById(currentUserId, (userName, userImage) => {
+            setCurrentUserName(userName);
+            setCurrentUserImage(userImage);
+        });
         if (ideaInfo.team && ideaInfo.team.length > 0) {
             DB.getTeamData(courseId, ideaInfo.id, courseType, (teamList) => {
                 setMembers(teamList);
@@ -133,15 +144,11 @@ export default function IdeaScreen ({route, navigation}) {
         setViewedUserId(id);
         setProfileVisible(true);
     }
-    const viewProfileInfoHandler = (num, id) => {
-        setViewedUserId(id);
-        setProfileInfoVisible(num);
-    }
 
     // Handler für Modal
     const changeNewCommentTextHandler = (enteredText) => {
         setCurrentNewCommentText(enteredText);
-        if (enteredText != "") setCurrentCommentErrorVisible(false);
+        if (enteredText !== "") setCurrentCommentErrorVisible(false);
     }
     const changeReplyTextHandler = (enteredText) => {
         setCurrentReplyText(enteredText);
@@ -150,6 +157,7 @@ export default function IdeaScreen ({route, navigation}) {
     const pressNewCommentHandler = (committed) => {
         if (committed) {
             if (currentNewCommentText !== "") {
+                console.log('commit')
                 DB.addComment(courseId, ideaInfo.id, courseType, currentNewCommentText, "", () => {
                     setNewCommentVisible(false);
                     setCurrentNewCommentText("");
@@ -158,9 +166,11 @@ export default function IdeaScreen ({route, navigation}) {
                     });
                 });
             } else {
+                console.log('no comment-text')
                 setCurrentCommentErrorVisible(true);
             }
         } else {
+            console.log('no commit')
             setNewCommentVisible(false);
             setCurrentCommentErrorVisible(false);
         }
@@ -239,15 +249,6 @@ export default function IdeaScreen ({route, navigation}) {
             setSelectedSkillsListErrorVisible(false);
         }
     }
-    const refreshListHandler = () => {
-        setRefreshing(true);
-
-        DB.getCommentsList(courseId, ideaInfo.id, courseType, (commentsList) => {
-            setCurrentComments(commentsList);
-            setCommentsLoading(false);
-            setRefreshing(false);
-        });
-    };
     const joinIdeaHandler = () => {
         if (!userIsMember) {
             DB.joinOpenIdea(courseId, ideaInfo.id, (membersList) => {
@@ -274,42 +275,82 @@ export default function IdeaScreen ({route, navigation}) {
             }}],
         );              
     }
-
-    const swipeButtons = (item) => {
-        if (item.replyTo) {
-            // Comment-autor: delete-button
-            return(
-                <View style={ [boxes.paddedRow, { backgroundColor: colors.mediumBlue } ] } >
-                    <ButtonIcon 
-                        icon= { item.user == currentUserId ? 'delete' : 'like' }
-                        onPress= { (ref) => { item.user == currentUserId ? deleteCommentHandler(item.id) : likeCommentHandler(item.id) } }
-                        status= { item.user == currentUserId ? 'neg' : 
-                            item.likes.indexOf(currentUserId) < 0 ? "active" : "inactive"
-                        }
-                    />
-                </View>
-            );
-        } 
-        // Comment-reader: Fav- & Reply-button
-        else {
-            return(
-                <View style= { [boxes.paddedRow, { backgroundColor: colors.mediumBlue } ] } >
-                    <ButtonIcon 
-                        icon= { item.user == currentUserId ? 'delete' : 'like' }
-                        onPress= { (ref) => { item.user == currentUserId ? deleteCommentHandler(item.id) : likeCommentHandler(item.id) } }
-                        status= { item.user == currentUserId ? 'neg' : 
-                            item.likes.indexOf(currentUserId) < 0 ? "active" : "inactive"
-                        }
-                    />
-                    <ButtonIcon 
-                        icon= { 'reply' }
-                        onPress= { (ref) => { setNewReplyVisible(true); setCurrentReplyComment(item) } }
-                        status= { "active" }
-                    />
-                </View>
-            );
-        }
+    const ButtonMember = () => {
+        if (courseType === "openCourses") return (
+            <ButtonSmall
+                title={userIsMember ? "Mitglied" : "Beitreten"}
+                icon={userIsMember ? "checkTrue" : "checkFalse"}
+                onPress={joinIdeaHandler}
+            />
+        );
+        else return <View style= { { width: 150 } } />
     }
+
+    const Styles = StyleSheet.create({
+        
+        commentTile: {
+            paddingVertical: 10,
+            paddingHorizontal: 15,
+            minHeight: 200,
+            flexDirection: "row",
+
+        },
+        repliedTile: {
+            backgroundColor: colors.mediumGrey,
+            minHeight: 100,
+            paddingVertical: 10,
+            paddingHorizontal: 15,
+            flexDirection: "row"
+        },
+        replyImage: {
+            width: 30,
+            height: 30,
+            tintColor: colors.mediumGrey,
+            marginRight: 15,
+            alignSelf: 'center'
+        },
+        infoArea: {
+            width: 60,
+            marginRight: 15
+        },
+        rightArea: {
+            position: "absolute",
+            right: 10,
+            width: 250,
+            height: 150,
+            alignItems: 'flex-end',
+        },
+        buttons: {
+            // position: "absolute",
+            // right: 10,
+            // top: 50,
+            // width: 250,
+            flexDirection: 'column',
+            justifyContent: 'space-between'
+        },
+        likes: {
+            width: "100%",
+            marginTop: 5, 
+            flexDirection: "row", 
+            justifyContent: "center", 
+            alignItems: "center"
+        },
+        likesImage: {
+            height: 17,
+            width: 17,
+            resizeMode: "contain", 
+            tintColor: colors.darkBlue, 
+            marginRight: 5    
+        },
+        commentTileTime: {
+            fontSize: 16,
+            fontFamily: 'Inter',
+            fontWeight: 400,
+            color: colors.darkGrey,
+            opacity: 0.5,
+            paddingBottom: 15
+        }
+    });
 
     return(
         <View style= { {
@@ -317,105 +358,15 @@ export default function IdeaScreen ({route, navigation}) {
             height: window.height-80,
         } } >
 
-            { profileVisible &&
+            {/* Mitglieds-Profil */}
+            { profileVisible && 
             <ProfileView
-                userId={viewedUserId}
-                visible={profileVisible}
-                onDismiss={() => {setProfileVisible(false)}}
+                userId= { viewedUserId }
+                visible= { profileVisible }
+                onDismiss= { () => { setProfileVisible(false) } }
+                infoScreen= { true }
             />
             }
-
-            {/* Kommentar schreiben */}
-            <Modal visible= { newCommentVisible }
-                transparent= {true}
-                animationType= 'slide'
-                style= { { 
-                width: window.width,
-                height: window.height,
-            } } >
-                <ModalContent
-                    subheader= { () => { return(
-                        <View style= { [boxes.subHeader, {
-                            height: 70,
-                            width: window.width,
-                            justifyContent: 'center',
-                            alignContent: 'center',
-                        } ] } >
-                            <Text style= { [texts.titleCentered, { alignSelf: 'center' }] } >Kommentar schreiben</Text>
-                        </View>
-                    ) } }
-                    content= { () => {
-                        return(
-                            <View style={boxes.mainContainer}>
-                                <InputField
-                                    placeholderText= "max. 300 Zeichen"
-                                    value= { currentNewCommentText }
-                                    onChangeText= { changeNewCommentTextHandler }
-                                    multiline= { true }
-                                />
-                                {currentCommentErrorVisible &&
-                                    <Text style= { [boxes.unPaddedRow, texts.errorLine] } >
-                                        Bitte einen Kommentar eingeben.
-                                    </Text>
-                                }
-                            </View> 
-                        )
-                    }}
-                    onDismiss= { (committed) => { pressNewCommentHandler(committed) } }
-                />
-            </Modal>
-            
-            {/* Auf Kommentar antworten */}
-            <Modal visible= { newReplyVisible } 
-                transparent= {true}
-                animationType= 'slide'
-                style= { { 
-                    width: window.width,
-                    height: window.height,
-            } } >
-                <ModalContent
-                    subheader= { () => { return(
-                        <View style= { [boxes.subHeader, {
-                            height: 70,
-                            width: window.width,
-                            justifyContent: 'center',
-                            alignContent: 'center',
-                        } ] } >
-                            <Text style= { [texts.titleCentered, { alignSelf: 'center' }] } >Antwort schreiben</Text>
-                        </View>
-                    ) } }
-                    content= { () => {
-                        return(
-                            <View style={boxes.mainContainer}>
-                                <View style= { { width: '50%' } } >
-                                    <View style={{marginLeft: 20}}>
-                                        <CommentTile
-                                            userId={currentReplyComment.user}
-                                            userName={currentReplyComment.name}
-                                            userUrl={currentReplyComment.url}
-                                            comment={currentReplyComment.text}
-                                            timestamp={currentReplyComment.time}
-                                            likes={currentReplyComment.likes.length}
-                                        />
-                                    </View>
-                                    <InputField
-                                        placeholderText= "max. 300 Zeichen"
-                                        value={currentReplyText}
-                                        onChangeText={changeReplyTextHandler}
-                                        multiline={true}
-                                    />
-                                    {currentCommentErrorVisible &&
-                                        <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                                            Bitte eine Antwort eingeben.
-                                        </Text>
-                                    }
-                                </View> 
-                            </View> 
-                        )
-                    }}
-                    onDismiss= {pressReplyHandler}
-                />
-            </Modal>
                 
             {/* Idee bearbeiten */}
             <Modal visible= { editIdeaVisible } 
@@ -493,148 +444,215 @@ export default function IdeaScreen ({route, navigation}) {
             {/* Header */}
             <View style= { boxes.subHeader } >
                 <View style= { [boxes.width] } >
-                    <FlexRow padding>
-                        <Text style={texts.subHeaderLarge}>{ideaName}</Text>
-                    </FlexRow>
-                    { ideaText.length > 0 &&
-                        <FlexRow padding>
+                    {/* Idea Infos */}
+                    <View style= { { paddingHorizontal: 15 } } >
+                        <Text style={texts.subHeaderLarge}>{ ideaName }</Text>
+                        { ideaText.length > 0 &&
                             <Text style={texts.copy}>{ideaText}</Text>
-                        </FlexRow>
-                    }
-                    <FlexRow padding>
+                        }
+                        <Padding height= { 15 } />
                         <AttributePreviewTile
                             title={ideaInfo.interests.length > 0 ? "Gemeinsamkeiten" : "Passende Fähigkeiten"}
                             subtitle={currentSkills.length > 0 ? currentSkills.join(", ") : "\n"}
                             index={0}
                             onPress={() => navigation.navigate("IdeaAttributes", {filterList: currentSkills, secondaryFilterList: ideaInfo.interests, courseType: courseType, courseId: courseId, ideaId: ideaInfo.id, title: ideaInfo.interests.length > 0 ? "Gemeinsamkeiten" : "Passende Fähigkeiten"})}
                         />
-                    </FlexRow>
-                    {/* BEI OFFENEN IDEEN MUSS ES NICHT EVALUATED SEIN */
-                    (courseType === "openCourses" || (evaluated && members.length > 0)) &&
-                        <ScrollRow
-                            data= { members }
-                            onPress= { (id) => { viewProfileHandler(id) } }
-                            onEnter= { (num, id) => viewProfileInfoHandler(num, id) }
-                        />
-                    }
-                    { (courseType === "openCourses" && !evaluated) &&
-                    <FlexRow padding>
-                        <ButtonSmall
-                            title={userIsMember ? "Mitglied" : "Beitreten"}
-                            icon={userIsMember ? "checkTrue" : "checkFalse"}
-                            onPress={joinIdeaHandler}
-                        />
-                    </FlexRow>
-                    }
-                </View>
-            </View>
-
-            {commentsLoading && 
-                <View style={{backgroundColor: "white", paddingVertical: 30}}>
-                    <ActivityIndicator/>
-                </View>
-            }
-
-            {/* ListHeaderComponent */}
-            <View style= { [ {backgroundColor: evaluated ? colors.darkBlue : colors.lightBlue} ] } >
-                <View style= {boxes.width}>
-                    { currentUserIsCreator && !evaluated && 
-                    <View>
-                        <Padding height={5}/>
-                        { courseType == "courses" &&
-                        <FlexRow padding>
-                            <Button
-                                title="Idee bearbeiten"
-                                onPress={() => setEditIdeaVisible(true)}
+                        {/* Memebers Icons */}
+                        {members && members.length > 0 &&
+                            <ScrollRow
+                                data= { members }
+                                onPress= { (id) => { viewProfileHandler(id) } }
+                                // onEnter= { (num, id) => viewProfileInfoHandler(num, id) }
                             />
-                        </FlexRow>
-                        }
-
-                        {(courseType == "openCourses" && !evaluated) &&
-                        <FlexRow padding>
-                                <Button
-                                    title="Bearbeiten"
-                                    icon={icons.edit}
-                                    onPress={() => setEditIdeaVisible(true)}
-                                />
-                                <Padding width={10}/>
-                                <Button
-                                    title={"Team einteilen"}
-                                    icon={icons.fav}
-                                    onPress={setTeamHandler}
-                                />
-                        </FlexRow>
                         }
                     </View>
-                    }
-
-                    
+                    {/* Button-Leiste */}
+                    <View style= { boxes.paddedRow } >
+                        <ButtonMember/>
+                        { currentUserIsCreator && !evaluated && 
+                        <ButtonLarge
+                            title="Idee bearbeiten"
+                            icon={icons.edit}
+                            onPress={() => setEditIdeaVisible(true)}
+                        />
+                        }
+                        { currentUserIsCreator && !evaluated && courseType === "openCourses" && 
+                        <ButtonLarge
+                            title={"Team einteilen"}
+                            icon={icons.fav}
+                            onPress={setTeamHandler}
+                        />
+                        }
+                        <ButtonSmall
+                            title="Kommentar schreiben"
+                            onPress={() => {setNewCommentVisible(true)}}
+                        />
+                    </View>
+                    <Padding height= { 15 } />
                 </View>
             </View>
-            
-            {/* FlatList */}
-            <FlatList 
-                data= { currentComments }
-                keyExtractor= { (item, index) => index.toString() }
-                renderItem= { (itemData) => { 
-                    return (
-                        <TouchableHighlight
-                            underlayColor={colors.darkBlue}
-                            style={{width:"100%"}}
-                        >
-                            <View style= { { 
-                                flexDirection: "row",
-                            //     justifyContent: "space-between",
-                            //     alignItems: "center",
-                                width: '75%',
-                            } } >
-                                {itemData.item.replyTo && itemData.item.replyTo.length > 0 && 
-                                    <Image
-                                        style={ boxes.commentReplyTile }
-                                        source={icons.reply}
-                                        resizeMode={"contain"}
-                                    />
-                                }
-                                <View style= { { paddingRight: '17.5%', paddingLeft: itemData.item.replyTo ? 15 : '17.5%' } } >
-                                    <CommentTile
-                                        id={itemData.item.id}
-                                        userId={itemData.item.user}
-                                        userName={itemData.item.name}
-                                        userUrl={itemData.item.url}
-                                        comment={itemData.item.text}
-                                        timestamp={itemData.item.time}
-                                        likes={itemData.item.likes.length}
-                                        isReply={itemData.item.replyTo && itemData.item.replyTo.length > 0}
-                                        index = {itemData.index}
-                                        onPress = {() => {viewProfileHandler(itemData.item.user)}}
-                                    />
-                                    {swipeButtons(itemData.item)}
-                                </View>
-                            </View>
-                        </TouchableHighlight>
-                    )
-                }}
-            />
 
-            {/* ListFooterComponent */}
-            <View>
-                {!commentsLoading && !currentUserIsCreator &&
-                    <IdeaFooter ideaCreatorId={ideaCreatorId} ideaCreator={ideaCreator}/>
-                }
+            <ScrollView>
                 {commentsLoading && 
-                    <View style={{backgroundColor: colors.white, paddingVertical: 30}}>
+                    <View style={{backgroundColor: "white", paddingVertical: 30}}>
                         <ActivityIndicator/>
                     </View>
                 }
-            </View>
-
-            <View style={[boxes.paddedRow, {backgroundColor: colors.white, paddingVertical: 5}]}>
-                <ButtonLarge
-                    title="Kommentar schreiben"
-                    onPress={() => {setNewCommentVisible(true)}}
+                
+                {/* FlatList */}
+                <FlatList 
+                    data= { currentComments }
+                    keyExtractor= { (item, index) => index.toString() }
+                    renderItem= { (itemData) => { 
+                        return (
+                            <CommentTile
+                                id={itemData.item.id}
+                                userId={itemData.item.user}
+                                userName={itemData.item.name}
+                                userUrl={itemData.item.url}
+                                comment={itemData.item.text}
+                                timestamp={itemData.item.time}
+                                likes={itemData.item.likes.length}
+                                isReply={itemData.item.replyTo && itemData.item.replyTo.length > 0}
+                                index = {itemData.index}
+                                onPress = {() => {viewProfileHandler(itemData.item.user)}}
+                                onReply = { () => { setNewReplyVisible(true); setCurrentReplyComment(itemData.item) } }
+                                onDelete = { () => { deleteCommentHandler(itemData.item.id) } }
+                                onLike = { () => { likeCommentHandler(itemData.item.id) } }
+                                currentUser = { currentUserId }
+                            />
+                        )
+                    }}
                 />
-            </View>
 
+                {/* ListFooterComponent */}
+                <View>
+                    {!commentsLoading && !currentUserIsCreator &&
+                        <IdeaFooter ideaCreatorId={ideaCreatorId} ideaCreator={ideaCreator}/>
+                    }
+                    {commentsLoading && 
+                        <View style={{backgroundColor: colors.white, paddingVertical: 30}}>
+                            <ActivityIndicator/>
+                        </View>
+                    }
+                </View>
+            </ScrollView>
+            
+            {/* Kommentar schreiben */}
+            {newCommentVisible &&
+            <View style= { [boxes.width, Styles.commentTile] } >
+                <View style= { Styles.infoArea } >
+                    <ProfileImage
+                        userId= { currentUserId }
+                        imageUrl= {currentUserImage}
+                        onPress= { () => {} }
+                    />
+                </View>
+                <View>
+                    <Text style = { texts.commentTileHeader } >{ currentUserName }</Text>
+                    <InputField
+                        placeholderText= "max. 300 Zeichen"
+                        value= { currentNewCommentText }
+                        onChangeText= { changeNewCommentTextHandler }
+                        multiline= { true }
+                    />
+                </View>
+                <View style= { Styles.rightArea } >
+                    <Text style= { Styles.commentTileTime } >{ new Date().toLocaleDateString('de-DE') }</Text>
+                    
+                    <ButtonLarge 
+                        title="Kommentar senden"
+                        onPress= { () => { pressNewCommentHandler(true) } }
+                    />
+                    <ButtonLarge
+                        title={"Abbrechen"}
+                        transparent={true}
+                        onPress={ () => { 
+                            setNewCommentVisible(false);
+                            setCurrentCommentErrorVisible(false);
+                        } }
+                    />
+                </View>
+            </View>
+            }
+
+            {/* Auf Kommentar antworten */}
+            {newReplyVisible &&
+            <View style= { [boxes.width] } >
+                
+                <View style= { [Styles.repliedTile] } >
+                    <View style= { Styles.infoArea } >
+                        <ProfileImage
+                            userId= { currentReplyComment.user }
+                            imageUrl= { currentReplyComment.userUrl }
+                            onPress= { () => { viewProfileHandler(currentReplyComment.user) } }
+                        />
+                        <View style= { Styles.likes } >
+                            <Image
+                                style= { Styles.likesImage }
+                                height= { 17 }
+                                width= { 17 }
+                                source= { icons.like }
+                            />
+                            <Text style= { texts.copy } >{ currentReplyComment.likes.length }</Text>
+                        </View>
+                    </View>
+                    <View>
+                        <Text style = { texts.commentTileHeader } >{ currentReplyComment.name }</Text>
+                        <Autolink 
+                            linkStyle= { texts.link }
+                            style = { texts.copy }
+                            text= { currentReplyComment.text }
+                        />
+                    </View>
+                    <View style= { Styles.rightArea } >            
+                        <Text style = { Styles.commentTileTime } >{ currentReplyComment.time.toDate().toLocaleDateString('de-DE') }</Text>
+                    </View>
+                </View>
+                
+                <View style= { Styles.commentTile } >
+                    <Image
+                        style= { Styles.replyImage }
+                        source= { icons.replyComment }
+                        resizeMode= { "contain" }
+                    />
+                    <View style= { Styles.infoArea } >
+                        <ProfileImage
+                            userId= { currentUserId }
+                            imageUrl= {currentUserImage}
+                            onPress= { () => {} }
+                        />
+                    </View>
+                    <View>
+                        <Text style = { texts.commentTileHeader } >{ currentUserName }</Text>
+                        <InputField
+                            placeholderText= "max. 300 Zeichen"
+                            value= { currentReplyText }
+                            onChangeText= { changeReplyTextHandler }
+                            multiline= { true }
+                        />
+                    </View>
+                    <View style= { Styles.rightArea } >
+                        <Text style= { Styles.commentTileTime } >{ new Date().toLocaleDateString('de-DE') }</Text>
+                        
+                        {/* <View style= { Styles.buttons } > */}
+                            <ButtonLarge 
+                                title="Kommentar senden"
+                                onPress= { () => { pressReplyHandler(true) } }
+                            />
+                            <ButtonLarge
+                                title={"Abbrechen"}
+                                transparent={true}
+                                onPress={ () => { 
+                                    setNewReplyVisible(false);
+                                    setCurrentCommentErrorVisible(false);
+                                } }
+                            />
+                        {/* </View> */}
+                    </View>
+                </View>
+            </View>
+            }
         </View>
     )
 }

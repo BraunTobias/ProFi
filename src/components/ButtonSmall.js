@@ -32,7 +32,7 @@ export default function ButtonSmall (props) {
         { props.title }
       </Text>
       <Image
-        style= { boxes.buttonIcon }
+        style= { boxes.buttonIconImage }
         source= { image }
         resizeMode= { "contain" }
       />

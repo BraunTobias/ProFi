@@ -1,19 +1,54 @@
 import React from "react";
-import { TouchableOpacity, Image } from "react-native";
-import { icons, boxes } from '../Styles';
+import { TouchableOpacity, Image, StyleSheet } from "react-native";
+import { icons, boxes, colors } from '../Styles';
 
 export default function ButtonIcon (props) {
 
-  var style;
-  switch (props.status) {
-    case "active": style = boxes.buttonIconActive; break;
-    case "inactive": style = boxes.buttonIconInactive; break;
-    case "neg": style = boxes.buttonIconNeg; break;
-    case "negactive": style = boxes.buttonIconNegActive; break;
-    case "color": style = boxes.buttonIconColor; break;
-    default: style = boxes.buttonIconInactive;
-  }
+  const Styles = StyleSheet.create({
+    
+    button: {
+      height: 45,
+      width: 45,
+      marginVertical: 5,
+      marginHorizontal: 0,
+      borderRadius: 7,
+      justifyContent: "center",
+      alignItems: "center"
+    },
+    buttonColor: {
+      backgroundColor:  props.status === "active" ? colors.darkBlue : 
+                        props.status === "inactive" ? colors.lightBlue : 
+                        props.status === "neg" ? colors.red : colors.lightRed
+    },
+    icon: {
+        width: 35,
+        height: 35,
+    },
+    iconColor: {
+      tintColor:  props.status !== "transparent" && props.status !== "color" ? "white" : 
+                  props.icon === "nogo" || props.icon === "delete" ? colors.red : colors.darkBlue
+    },
+    logo: {
+      width: 45,
+      height: 45,
+    },
 
+  })
+
+  // Button-Einstellungen & -Farbe
+  var buttonSettings;
+  if (props.status !== "color" && props.status !== "transparent") buttonSettings = [Styles.button, Styles.buttonColor];
+  else buttonSettings = Styles.button;
+
+  // Icon-Einstellungen & -Farbe
+  var iconSettings;
+  // sonstige Buttons
+  if (props.status !== "color") iconSettings= [Styles.icon, Styles.iconColor];
+  // Logo
+  else iconSettings= Styles.logo
+
+
+  // Icon-Image
   var image;
   switch (props.icon) {
     case "checkTrue": image = icons.checkTrue; break;
@@ -34,11 +69,11 @@ export default function ButtonIcon (props) {
 
   return (
     <TouchableOpacity 
-      style= { style } 
+      style= { buttonSettings } 
       onPress= { () => props.onPress() }
     >
       <Image
-        style= { props.status === 'color'? boxes.buttonLogo : boxes.buttonIcon }
+        style= { iconSettings }
         source= { image }
         resizeMode= { "contain" }
       />

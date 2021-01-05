@@ -1,14 +1,14 @@
 import React from "react";
-import { TouchableOpacity, Text } from "react-native";
-import { texts, boxes } from '../Styles';
+import { TouchableOpacity, Text, StyleSheet } from "react-native";
+import { colors, texts } from '../Styles';
 
 export default function ButtonLarge (props) {
   
   const selectBoxStyle = () => {
     if (!props.transparent) {
-      return (boxes.buttonLargeSolid);      
+      return (Styles.buttonLargeSolid);      
     } else {
-      return (boxes.buttonLargeTransparent);      
+      return (Styles.buttonLargeTransparent);      
     }
   }
   const selectTextStyle = () => {
@@ -30,3 +30,24 @@ export default function ButtonLarge (props) {
     </TouchableOpacity>
   );
 };
+
+const Styles = StyleSheet.create({
+  buttonLargeSolid: {
+    height: 45,
+    width: 150,
+    paddingHorizontal: 10,
+    marginVertical: 5,
+    backgroundColor: colors.darkBlue,
+    borderRadius: 7,
+    justifyContent: "center",
+  },
+  buttonLargeTransparent: {
+    height: 40,
+    width: 150,
+    paddingHorizontal: 10,
+    marginVertical: 5,
+    backgroundColor: "none",
+    borderRadius: 0,
+    justifyContent: "center",
+  },
+})

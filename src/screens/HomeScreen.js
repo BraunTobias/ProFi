@@ -88,7 +88,7 @@ export default function HomeScreen ({navigation}) {
                 setCurrentFindCourseId("");
                 let sem = addedCourse.semester;
                 
-                // wenn Kurs kein Semester hat ist es ein offener Kurs (Projekt B)
+                // wenn ein Kurs kein Semester hat ist es ein offener Kurs (Projekt B)
                 if (!sem) sem = 'Freie Projekte'
 
                 let courseList = currentCourses;

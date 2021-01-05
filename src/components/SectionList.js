@@ -84,9 +84,9 @@ export default function SectionList (datas) {
                                         } }
                                     >
                                         <ButtonIcon 
-                                            icon= { "nogo" }
+                                            icon= { "delete" }
                                             onPress= { (ref) => { datas.onDelete(item.id, item.date ? 'courses' : 'openCourses') } }
-                                            status= { "neg" }
+                                            status= { "transparent" }
                                         />
                                     </View>
                                 </View>

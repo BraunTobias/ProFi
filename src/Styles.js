@@ -80,7 +80,6 @@ const boxes = {
     inputField: {
         minHeight: 45,
         paddingLeft: 15,
-        // paddingHorizontal: 0,
         marginVertical: 5,
         backgroundColor: "white",
         borderBottomWidth: 1,
@@ -91,51 +90,7 @@ const boxes = {
         fontSize: 16,
         color: 'black',
     },
-    buttonIcon: {
-        width: 35,
-        height: 35,
-        tintColor: "white"
-    },
-    buttonIconInactive:{
-        height: 45,
-        width: 45,
-        marginVertical: 5,
-        marginHorizontal: 0,
-        backgroundColor: colors.lightBlue,
-        borderRadius: 7,
-        justifyContent: "center",
-        alignItems: "center"
-    },
-    buttonIconActive:{
-        height: 45,
-        width: 45,
-        marginVertical: 5,
-        marginHorizontal: 0,
-        backgroundColor: colors.darkBlue,
-        borderRadius: 7,
-        justifyContent: "center",
-        alignItems: "center"
-    },
-    buttonIconNeg: {
-        height: 45,
-        width: 45,
-        marginVertical: 5,
-        marginHorizontal: 0,
-        backgroundColor: colors.red,
-        borderRadius: 7,
-        justifyContent: "center",
-        alignItems: "center"
-    },
-    buttonIconNegActive: {
-        height: 45,
-        width: 45,
-        marginVertical: 5,
-        marginHorizontal: 0,
-        backgroundColor: colors.lightRed,
-        borderRadius: 7,
-        justifyContent: "center",
-        alignItems: "center"
-    },
+
     buttonClose:{
         height: 30,
         width: 30,
@@ -143,20 +98,6 @@ const boxes = {
         borderRadius: 7,
         justifyContent: "center",
         alignItems: "center",
-    },
-    buttonLogo: {
-        width: 45,
-        height: 45,
-    },
-    buttonIconColor: {
-        height: 45,
-        width: 45,
-        marginVertical: 5,
-        marginHorizontal: 0,
-        borderRadius: 7,
-        justifyContent: "center",
-        alignItems: "center",
-        
     },
     buttonSmall: {
         height: 45,
@@ -183,24 +124,6 @@ const boxes = {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center"
-    },
-    buttonLargeSolid: {
-        height: 45,
-        width: "50%",
-        paddingHorizontal: 10,
-        marginVertical: 5,
-        backgroundColor: colors.darkBlue,
-        borderRadius: 7,
-        justifyContent: "center",
-    },
-    buttonLargeTransparent: {
-        height: 40,
-        width: "50%",
-        paddingHorizontal: 10,
-        marginVertical: 5,
-        backgroundColor: "none",
-        borderRadius: 0,
-        justifyContent: "center",
     },
     listTile: {
         paddingLeft: 15,
@@ -280,56 +203,7 @@ const boxes = {
         marginRight: 10,
         tintColor: colors.darkBlue
     },
-    commentTile: {
-        paddingLeft: 15,
-        paddingRight: 35,
-        paddingVertical: 10,
-        minHeight: 100,
-        // width: width,
-        flexDirection: "row",
-        alignItems: "flex-start",
-        justifyContent: "flex-start",
-    },
-    commentReplyTile: {
-        width: 20, 
-        height: 60, 
-        marginRight: 15, 
-        marginLeft: '17.5%', 
-        tintColor: colors.lightBlue,
-    },
-    commentTileImage: {
-        height: 60,
-        width: 60,
-        alignItems: "flex-start",
-        justifyContent: "flex-start"
-    },
-    commentTileHeader: {
-        // width: "100%",
-        flexDirection: "row", 
-        justifyContent: "space-between", 
-        alignItems: "baseline",
-        marginBottom: 2,
-    },
-    commentTileContent: {
-        width: width/4*3 - 140,
-    },
-    commentReplyTileContent: {
-        width: width/4*3 -190, 
-    },
-    likesRow: {
-        width: "100%",
-        marginTop: 5, 
-        flexDirection: "row", 
-        justifyContent: "center", 
-        alignItems: "center"
-    },
-    likesImage: {
-        height: 17,
-        width: 17,
-        resizeMode: "contain", 
-        tintColor: colors.darkBlue, 
-        marginRight: 5    
-    },
+    
     separator: {
         paddingLeft: 15,
         paddingVertical: 7,
@@ -426,14 +300,14 @@ const texts = {
     subHeader: {
         fontFamily: 'Inter',
         fontWeight: 600,
-        color: colors.darkGrey,
         fontSize: 16,
+        color: colors.darkGrey,
     },
     subHeaderLarge: {
         fontFamily: 'Inter',
         fontWeight: 600,
-        color: colors.darkBlue,
         fontSize: 18,
+        color: colors.darkBlue,
         paddingBottom: 3 
     },
     buttonSmall: {
@@ -597,6 +471,14 @@ const texts = {
         fontSize: 18,
         color: colors.darkBlue,
     },
+
+    sectionListCopy: {
+        fontFamily: 'Inter',
+        fontWeight: 400,
+        fontSize: 16,
+        color: colors.darkGrey,
+    },
+
 }
 
 const profileImage = {
