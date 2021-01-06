@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { View, TextInput, Text, Image, TouchableOpacity, TouchableWithoutFeedback, StyleSheet } from 'react-native';
+import { View, TextInput, Text, Image, TouchableOpacity, TouchableWithoutFeedback, StyleSheet, ActivityIndicator } from 'react-native';
 // import { ,  } from 'react-native-gesture-handler';
 import { icons, colors, boxes, texts } from '../Styles';
 import FlexRow from './FlexRow';
@@ -32,10 +32,13 @@ export default InputField = props => {
                   justifyContent: "space-between", 
                   alignItems:"center"
             }]}>
+                {(props.value == "" && !props.loaded) && 
+                  <ActivityIndicator style={{width: "100%"}} color={themeColors.textHl}/>
+                }
                 <Text style= {[texts.inputField, {
-                  color: props.showError ? themeColors.red : themeColors.textCopy
+                  color: props.showError ? themeColors.red : props.value == "" ? themeColors.textInactive : themeColors.textCopy,
                 }]}>
-                  {props.value}
+                  {props.value != "" ? props.value : props.placeholderText}
                 </Text>
                 <View style={[styles.inputFieldIconBox, { backgroundColor: themeColors.primary }]}>
                     <Image
@@ -62,7 +65,7 @@ export default InputField = props => {
                 color: props.showError ? themeColors.red : themeColors.textCopy
               }]}
               placeholderTextColor={props.showError ? themeColors.red : themeColors.textInactive}
-              autoCapitalize="none"
+              autoCapitalize={props.caps ? "characters" : "none"}
               textAlign= "left"
               placeholder= { props.placeholderText }
               value= { props.value }

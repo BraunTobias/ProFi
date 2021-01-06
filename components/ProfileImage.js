@@ -8,7 +8,7 @@ export default ProfileImage = props => {
 
     const {themeColors} = useContext(ThemeContext);
 
-    const source = props.imageUrl ? {uri: props.imageUrl} : themeColors.mode == "dark" ? icons.profilePlaceholderDark : icons.profilePlaceholder;
+    const source = (props.imageUrl && props.imageUrl != "noImage") ? {uri: props.imageUrl} : themeColors.mode == "dark" ? icons.profilePlaceholderDark : icons.profilePlaceholder;
 
     return (
         <TouchableWithoutFeedback onPress={props.onPress}>
@@ -21,7 +21,7 @@ export default ProfileImage = props => {
                     <View style={[styles.imageLoading, {
                         backgroundColor: themeColors.mode == "dark" ? "rgba(14, 14, 14, 0.8)" : "rgba(255, 255, 255, 0.8)",
                     }]}> 
-                        <ActivityIndicator size={props.loading ? 'large' : 'small'}/>
+                        <ActivityIndicator size={props.loading ? 'large' : 'small'} color={themeColors.textHl}/>
                     </View>
                 }
             </View>

@@ -23,17 +23,17 @@ export default MainNavigator = () => {
             <Tab.Navigator 
                 initialRouteName={"Home"}
                 screenOptions={({ route }) => ({
-                tabBarIcon: ({ focused, color, size }) => {
-                    let iconName;
-        
-                    if (route.name === 'Home') {
-                        iconName = icons.home;
-                    } else if (route.name === 'Profile') {
-                        iconName = icons.profile;
-                    }
-                    
-                    return <Image source={iconName} style= { { width: 25, height: 25, tintColor: color}}/>;
-                },
+                    tabBarIcon: ({ focused, color, size }) => {
+                        let iconName;
+            
+                        if (route.name === 'Home') {
+                            iconName = icons.home;
+                        } else if (route.name === 'Profile') {
+                            iconName = icons.profile;
+                        }
+                        
+                        return <Image source={iconName} style= { { width: 25, height: 25, tintColor: color}}/>;
+                    },
                 })}
                 tabBarOptions={{
                     activeTintColor: themeColors.textHl,

@@ -60,7 +60,7 @@ export default HomeScreen = ({navigation}) => {
     });
     const onSwipeValueChange = (swipeData) => {
         const { key, value } = swipeData;
-        rowSwipeAnimatedValues[key].setValue(Math.abs(value));
+        if (rowSwipeAnimatedValues[key]) rowSwipeAnimatedValues[key].setValue(Math.abs(value));
     };
       
     const loadData = (onSuccess) => {
@@ -83,13 +83,33 @@ export default HomeScreen = ({navigation}) => {
 
     // Handler für Modals
     const changeFindCourseIdHandler = (enteredText) => {
-        setCurrentFindCourseId(enteredText.toUpperCase());
+        setCurrentFindCourseId(enteredText);
     }
     const pressFindCourseHandler = (committed) => {
         if (committed && currentFindCourseId != "") {
-            DB.addCourseToList(currentFindCourseId, (addedCourse) => {
+            DB.addCourseToList(currentFindCourseId.toUpperCase(), (addedCourse) => {
                 setCurrentFindCourseId("");
-                loadData(() => {setFindCourseVisible(false);});
+
+                // Kurs manuell hinzufügen, da loadData() nicht schnell genug ist
+                const newCourseList = currentCourses;
+                var foundSemester = false;
+                for (const semesterObj of newCourseList) {
+                    if (!foundSemester && semesterObj.key == addedCourse.semester) {
+                        semesterObj.data.push(addedCourse);
+                        foundSemester = true;
+                        console.log("Semester already exists!")
+                    }
+                }
+                if (!foundSemester) {
+                    newCourseList.unshift({
+                        "key": addedCourse.semester,
+                        "data": [addedCourse]
+                    })
+                }
+                console.log(addedCourse)
+                setCurrentCourses(newCourseList);
+                setFindCourseVisible(false);
+
             }, (error) => {
                 Alert.alert(
                     "Ungültige Eingabe",
@@ -104,7 +124,7 @@ export default HomeScreen = ({navigation}) => {
     const pressNewCourseHandler = (committed) => {
         if (committed) {
             if (currentNewCourseName != "" && currentNewCourseId != "" && currentNewCourseDate - (new Date()) >= 0) {
-                DB.addCourse(currentNewCourseName, currentNewCourseId, currentNewCourseLink, currentNewCourseDate, currentNewCourseMinMembers, currentNewCourseMaxMembers, () => {
+                DB.addCourse(currentNewCourseName, currentNewCourseId.toUpperCase(), currentNewCourseLink, currentNewCourseDate, currentNewCourseMinMembers, currentNewCourseMaxMembers, () => {
                     setNewCourseVisible(false);
                     setCurrentNewCourseName("");
                     setCurrentNewCourseId("");    
@@ -135,7 +155,7 @@ export default HomeScreen = ({navigation}) => {
         if (enteredText != "") setNewCourseNameErrorVisible(false);
     }
     const changeNewCourseIdHandler = (enteredText) => {
-        setCurrentNewCourseId(enteredText.toUpperCase());
+        setCurrentNewCourseId(enteredText);
         if (enteredText != "") setNewCourseIdErrorVisible(false);
     }
     const changeNewCourseLinkHandler = (enteredText) => {
@@ -197,6 +217,7 @@ export default HomeScreen = ({navigation}) => {
                             <View style={boxes.mainContainer}>
                                 <Text style={[texts.titleCentered, {color: themeColors.textCopy}]}>{"Kurs finden"}</Text>
                                 <InputField
+                                    caps
                                     placeholderText= "Kurs-ID eingeben"
                                     value={currentFindCourseId}
                                     onChangeText={changeFindCourseIdHandler}
@@ -222,6 +243,7 @@ export default HomeScreen = ({navigation}) => {
                                     onChangeText={changeNewCourseNameHandler}
                                 />
                                 <InputField
+                                    caps
                                     title= "Kurs-Kürzel"
                                     showError={newCourseIdErrorVisible}
                                     placeholderText= {newCourseIdErrorVisible ? "Bitte ein Kürzel eingeben." : "z.B. MOSY"}

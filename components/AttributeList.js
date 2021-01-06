@@ -34,7 +34,7 @@ export default AttributeList = props => {
             ListFooterComponent={
                 props.loading &&
                 <View style={styles.listLoading}>
-                    <ActivityIndicator size='small'/>
+                    <ActivityIndicator size='small' color={themeColors.textHl}/>
                 </View>
             }
         />

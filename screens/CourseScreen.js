@@ -29,7 +29,6 @@ export default CourseScreen = ({route, navigation}) => {
     const {currentUserId} = route.params;
     const {courseInfo} = route.params;
     const courseType = courseInfo.courseType;
-
     // State Hooks
     const [currentIdeas, setCurrentIdeas] = useState([]);
     const [swipeListView, setSwipeListView] = useState();
@@ -276,10 +275,12 @@ export default CourseScreen = ({route, navigation}) => {
         setEditCourseLink(enteredText);
     }
     const changeEditCourseDateHandler = (date) => {
-        setEditCourseDate(date);
+        var newDate = date;
+        newDate.setSeconds(0);
         setEditCourseDateVisible(false);
         setEditCourseTimeVisible(false);
-        if (date - (new Date()) < 0) setEditCourseDateErrorVisible(true);
+        setEditCourseDate(newDate);
+        if (newDate - (new Date()) < 0) setEditCourseDateErrorVisible(true);
         else setEditCourseDateErrorVisible(false);
     }
     const changeEditCourseMinMembersHandler = (number) => {
@@ -308,7 +309,7 @@ export default CourseScreen = ({route, navigation}) => {
         swipeListView.safeCloseOpenRow();
         navigation.navigate("Idea", {
             ideaInfo: ideaInfo, 
-            evaluated: evaluated,
+            courseEvaluated: evaluated,
             courseType: courseType,
             courseId: courseInfo.id, 
             currentUserId: currentUserId,
@@ -374,7 +375,9 @@ export default CourseScreen = ({route, navigation}) => {
                                 />
                                 {editCourseDateErrorVisible &&
                                     <FlexRow>
-                                        Das Datum muss in der Zukunft liegen.
+                                        <Text style={texts.errorLine}>
+                                            Das Datum muss in der Zukunft liegen.
+                                        </Text>
                                     </FlexRow>
                                 }
                                 <DateTimePickerModal
@@ -391,13 +394,14 @@ export default CourseScreen = ({route, navigation}) => {
                                     isButton={true}
                                     icon={icons.time}
                                     placeholderText= "Uhrzeit auswählen …"
-                                    value={format(editCourseDate, "hh:mm")}
+                                    value={format(editCourseDate, "HH:mm")}
                                     onPress={() => {setEditCourseTimeVisible(true); Keyboard.dismiss()}}
                                 />
                                 <DateTimePickerModal
                                     isVisible={editCourseTimeVisible}
                                     date={editCourseDate}
                                     mode="time"
+                                    locale="en_GB"
                                     headerTextIOS="Uhrzeit auswählen"
                                     cancelTextIOS="Abbrechen"
                                     confirmTextIOS="OK"
@@ -448,7 +452,7 @@ export default CourseScreen = ({route, navigation}) => {
                                 <AttributePreviewTile
                                     showError={selectedSkillsListErrorVisible}
                                     title="Passende Fähigkeiten"
-                                    subtitle={selectedSkillsListErrorVisible ? "Bitte mindestens eine Fähigkeit angeben." : selectedSkillsList.length > 0 ? selectedSkillsList.join(", ") : ""}
+                                    subtitle={selectedSkillsListErrorVisible ? "Bitte mindestens eine Fähigkeit angeben." : selectedSkillsList.length > 0 ? selectedSkillsList.join(", ") : "Bitte auswählen…"}
                                     index={0}
                                     onPress={() => {setAddSkillsVisible(true)}}
                                 />
@@ -558,9 +562,10 @@ export default CourseScreen = ({route, navigation}) => {
                             index = {index}
                             myTeam={item.myTeam}
                             isMember={item.userIsMember}
-                            inactive = {evaluated && (!item.team || item.team.length == 0)}
-                            // warning = {item.warning}
-                            warning = {evaluated && item.team && item.team.length > 0 && (item.team.length < minMembers || item.team.length > maxMembers)}
+                            inactive = {(evaluated && (!item.team || item.team.length == 0)) ||
+                                        (item.team && item.team.indexOf(currentUserId) < 0)
+                                        }
+                            warning = {item.warning && item.warning != ""}
                         />
                 }
                 renderHiddenItem={ ({item, index}) => 
@@ -588,7 +593,7 @@ export default CourseScreen = ({route, navigation}) => {
                     <View>
                         {courseDataLoading && 
                             <View style={{backgroundColor: themeColors.base, paddingVertical: 30}}>
-                                <ActivityIndicator/>
+                                <ActivityIndicator color={themeColors.textHl}/>
                             </View>
                         }
                     </View>

@@ -119,7 +119,7 @@ export default AuthScreen = () => {
 
     return (
         <View style={{backgroundColor: themeColors.base}}>
-            <StatusBar barStyle="dark-content"/>
+            <StatusBar barStyle={themeColors.mode == "light" ? "dark-content" : "light-content"}/>
 
             {/* Registrierung */}
             <Modal visible={registerVisible} animationType='slide' onRequestClose={() => setRegisterVisible(false)}>

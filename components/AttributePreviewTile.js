@@ -1,5 +1,5 @@
 import React, {useContext} from "react";
-import { StyleSheet, Text, Image, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, Image, TouchableOpacity, View, ActivityIndicator } from "react-native";
 import { icons, colors, boxes, texts } from '../Styles';
 import { ThemeContext } from '../components/ThemeManager';
 
@@ -17,9 +17,14 @@ export default AttributePreviewTile = props => {
           backgroundColor: themeColors.textInput, 
           shadowColor: themeColors.textHl,
         }]}>
-            <View>
+            <View style={{width: "100%"}}>
                 <Text numberOfLines={1} style = {[texts.subHeaderLarge, {color: themeColors.textHl}]}>{props.title}</Text>
-                <Text numberOfLines={2} ellipsizeMode="tail" style = {[texts.copy, {color: props.showError ? themeColors.red : props.myTeam ? white : themeColors.textCopy}]}>{props.subtitle}</Text>
+                {props.subtitle == "" &&
+                  <ActivityIndicator style={{paddingTop: 10}} color={themeColors.textHl}/>
+                }
+                {props.subtitle != "" &&
+                  <Text numberOfLines={2} ellipsizeMode="tail" style = {[texts.copy, {color: props.showError ? themeColors.red : props.myTeam ? white : themeColors.textCopy}]}>{props.subtitle}</Text>
+                }
             </View>
             <Image style={[styles.listTileArrow, { tintColor: themeColors.contrast }]} source={require("../assets/ui-icons/arrow-right.png")} resizeMode="contain"/>
         </View>

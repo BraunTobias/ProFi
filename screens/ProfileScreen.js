@@ -47,6 +47,7 @@ export default ProfileScreen = ({navigation}) => {
     const [editEmailVisible, setEditEmailVisible] = useState(false);
     const [editPasswordVisible, setEditPasswordVisible] = useState(false);
     const [manageNotificationsVisible, setManageNotificationsVisible] = useState(false);
+    const [deleteUserVisible, setDeleteUserVisible] = useState(false);
     const [mailErrorVisible, setMailErrorVisible] = useState(false);
     const [pwErrorVisible, setPwErrorVisible] = useState(false);
     const [confirmPwErrorVisible, setConfirmPwErrorVisible] = useState(false);
@@ -82,6 +83,29 @@ export default ProfileScreen = ({navigation}) => {
 
     const logOut = () => {
         DB.signOut(() => {});
+    }
+    const deleteUser = (committed) => {
+        if (committed) {
+            if (currentEnterPassword != "") {
+                DB.deleteUser(currentMail, currentEnterPassword, () => {
+                    console.log("success")
+                }, (error) => {
+                    console.log(error);
+                    Alert.alert(
+                        "Ungültige Eingabe",
+                        "Passwort nicht korrekt",
+                        [{ text: "OK" }],
+                    );                  
+                });
+                console.log("delete");
+            } else {
+                setPwErrorVisible(true);
+                return;    
+            }
+        } else {
+            setCurrentEnterPassword("");
+            setDeleteUserVisible(false);
+        }
     }
 
     // Handler für Modals
@@ -442,6 +466,27 @@ export default ProfileScreen = ({navigation}) => {
                     onDismiss= {() => {setManageNotificationsVisible(false)}}
                 />
             </Modal>
+            {/* User löschen */}
+            <Modal visible= { deleteUserVisible } animationType= 'slide' onRequestClose={() => setDeleteUserVisible(false)}>
+                <ModalContent
+                    content= { () => {
+                        return(
+                            <View style={boxes.mainContainer}>
+                                <Text style={[texts.titleCentered, {color: themeColors.textCopy}]}>{"User löschen"}</Text>
+                                <InputField
+                                    showError={pwErrorVisible}
+                                    title= "Mit Passwort bestätigen"
+                                    placeholderText= {pwErrorVisible ? "Bitte ein Passwort eingeben." : "Passwort"}
+                                    value={currentEnterPassword}
+                                    onChangeText={changeEnterPasswordHandler}
+                                    secureTextEntry={true}
+                                />
+                            </View>
+                        )
+                    }}
+                    onDismiss= {deleteUser}
+                />
+            </Modal>
 
 
             <ScrollView style={{flex: 1}}>
@@ -469,6 +514,7 @@ export default ProfileScreen = ({navigation}) => {
                             placeholderText="Kurzbeschreibung"
                             isButton= {true}
                             icon={icons.edit}
+                            loaded={!imageLoading}
                             value={currentBio}
                             onPress={() => {setEditBioVisible(true)}}
                         />
@@ -522,7 +568,13 @@ export default ProfileScreen = ({navigation}) => {
                             onPress={logOut}
                             icon={icons.exit}
                         />
-
+                    </FlexRow>
+                    <FlexRow padding>
+                        <Button 
+                            transparent
+                            title="User löschen" 
+                            onPress={() => {setDeleteUserVisible(true)}}
+                        />
                     </FlexRow>
                     <Padding height={15}/>
 

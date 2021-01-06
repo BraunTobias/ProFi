@@ -1297,6 +1297,8 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
             functions.logger.log("________ EMPTY IDEAS 1 ________");
             functions.logger.log(emptyIdeas);
 
+            var warning = "";
+
             // Leere Ideen erstellen
             for (const emptyIdea in emptyIdeas) {
                 functions.logger.log("________ EMPTY IDEAS 2 ________");
@@ -1310,13 +1312,20 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
                 }
                 functions.logger.log(interestList);
 
+                // Warnungen abspeichern
+                warning = "";
+                if (emptyIdeas[emptyIdea].team.length < minMembers) warning = "underMin";
+                else if (emptyIdeas[emptyIdea].team.length > maxMembers) warning = "overMax";
+                functions.logger.log("warning: " + warning);
+
                 db.collection("courses").doc(id).collection("ideas").add({
                     title: "Team ohne Idee",
                     description: "Diese Idee wurde automatisch erstellt",
                     creator: "ProFi-Algorithmus",
                     interests: interestList,
                     skills: emptyIdeas[emptyIdea].skills,
-                    team: emptyIdeas[emptyIdea].team
+                    team: emptyIdeas[emptyIdea].team,
+                    warning: warning
                 }, {merge: true});
             }
 
@@ -1325,8 +1334,15 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
                 functions.logger.log("________ IDEAS ________");
                 functions.logger.log(ideas[ideaId]);
 
+                // Warnungen abspeichern
+                warning = "";
+                if (ideas[ideaId].team.length < minMembers) warning = "underMin";
+                else if (ideas[ideaId].team.length > maxMembers) warning = "overMax";
+                functions.logger.log("warning: " + warning);
+
                 db.collection("courses").doc(id).collection("ideas").doc(ideaId).set({
-                    team: ideas[ideaId].team
+                    team: ideas[ideaId].team,
+                    warning: warning
                 }, {merge: true});
             }
 

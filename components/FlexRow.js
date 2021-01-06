@@ -7,7 +7,7 @@ export default FlexRow = (props) => {
     return(
         <View style= { [styles.flexRow, {
             paddingHorizontal: props.padding ? 15 : 0,
-            justifyContent: props.center ? "center" : "space-between"
+            justifyContent: props.center ? "center" : props.left ? "left" : "space-between"
         }] }>
             {props.children}
         </View>

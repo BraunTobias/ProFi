@@ -8,7 +8,6 @@ import { compareAsc, format } from 'date-fns';
 
 const DB = {
 
-    
     togglePushNotifications: function(notificationTypeArray, isTrue) {
         const currentUserID = firebase.auth().currentUser.uid;
         for (const type of notificationTypeArray) {
@@ -96,6 +95,8 @@ const DB = {
                     "attChange" : true,
                 },
                 tokens: [],
+                image: "noImage",
+                imageName: "noImage"
             })        
             .then(() => {
                  onSuccess();
@@ -250,6 +251,42 @@ const DB = {
             onError(e);
         })
     },
+    deleteUser: function(email, password, onSuccess, onError) {
+        firebase.auth().signInWithEmailAndPassword(email, password)
+        .then(async () => {
+            const currentUserId = firebase.auth().currentUser.uid;
+            // User bei allen Kursen löschen, die noch nicht eingeteilt sind
+            const userCoursesSnap = await firebase.firestore().collection("courses").where("members", "array-contains", currentUserId).get();
+            userCoursesSnap.forEach((doc) => {
+                const course = doc.data();
+                if (!course.evaluating && !course.evaluated) {
+                    const courseId = doc.id;
+                    const members = course.members.filter(item => item !== currentUserId);
+                    const prospects = course.prospects.filter(item => item !== currentUserId);
+                    firebase.firestore().collection("courses").doc(courseId).set({
+                        members: members,
+                        prospects: prospects
+                    }, {merge: true}); 
+                }
+            }); 
+            // In DB Usernamen und Beschreibung entfernen
+            firebase.firestore().collection("users").doc(currentUserId).set({
+                bio: "",
+                email: "",
+                image: "noImage",
+                imageName: "noImage",
+                username: "Gelöschter User"
+            }, {merge: true})
+            .then(() => {
+                firebase.auth().currentUser.delete()
+                .then(() => {onSuccess()});
+            }) 
+
+        })
+        .catch(e => {
+            onError(e);
+        })
+    },
     testProfileImage: async function(uri) {
         const response = await fetch(uri);
         // console.log("Success");
@@ -284,7 +321,7 @@ const DB = {
                 }, {merge: true}); 
             })
             .then(() => {
-                if (oldImageName) {
+                if (oldImageName && oldImageName != "noImage") {
                     firebase.storage().ref().child("images/" + oldImageName).delete()
                     .then(() => {
                         console.log("Deleted old image");
@@ -339,8 +376,10 @@ const DB = {
             }
         });
     },
+    
+    // DB.addIdea(courseInfo.id, courseType, currentNewIdeaName, currentNewIdeaText, selectedSkillsList, [], () => {
     // Neue Idee erstellen 
-    addIdea: function(courseId, courseType, title, description, skills, interests, onSuccess) {
+    addIdea: function(courseId, courseType, title, description, skills, interests, onSuccess, onError) {
         const currentUserID = firebase.auth().currentUser.uid;
 
         firebase.firestore().collection(courseType).doc(courseId).collection("ideas").add({
@@ -348,6 +387,7 @@ const DB = {
             description: description,
             interests: interests,
             skills: skills,
+            members: [],
             favourites: [],
             nogos: [],
             creator: currentUserID
@@ -358,8 +398,14 @@ const DB = {
                 this.addPref("favourites", courseId, docRef.id, () => {
                     onSuccess();
                 })
+            } else {
+                onSuccess();
             }
-        });
+        })
+        .catch((e) => {
+            console.log(e);
+            onError(e);
+        })
     },
     // addOpenIdea: function(courseId, title, description, skills, interests, onSuccess) {
     //     const currentUserID = firebase.auth().currentUser.uid;
@@ -774,8 +820,9 @@ const DB = {
                 // Der neue Kurs wird zurückgegeben um sofort angezeigt zu werden
                 const addedCourse = courseWithId.data();
                 addedCourse["id"] = courseWithId.id;
-                if (addedCourse.date) addedCourse.date = format(addedCourse.date.toDate(), "dd.MM.yyyy");
-                else addedCourse.date = "Kein Datum";
+                addedCourse["courseType"] = courseType;
+                // if (addedCourse.date) addedCourse.date = format(addedCourse.date.toDate(), "dd.MM.yyyy");
+                if (!addedCourse.date) addedCourse.date = "Kein Datum";
                 onSuccess(addedCourse);
             } else {
                 onError("Du hast diesen Kurs schon in deiner Liste.");

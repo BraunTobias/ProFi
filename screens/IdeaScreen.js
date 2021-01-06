@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useLayoutEffect, useContext} from 'react';
-import { View, Text, Modal, Keyboard, ActivityIndicator, Animated } from 'react-native';
+import { View, Text, Modal, Keyboard, ActivityIndicator, Animated, Alert, Image } from 'react-native';
 import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view';
 import { compareAsc, format } from 'date-fns';
 
@@ -29,7 +29,7 @@ export default IdeaScreen = ({route, navigation}) => {
     const {courseId} = route.params;
     const {courseType} = route.params;
     const {currentUserId} = route.params;
-    const {evaluated} = route.params;
+    const {courseEvaluated} = route.params;
     const currentUserIsCreator = (ideaInfo.creator == currentUserId);
 
     // State Hooks
@@ -60,6 +60,7 @@ export default IdeaScreen = ({route, navigation}) => {
     const [editIdeaNameErrorVisible, setEditIdeaNameErrorVisible] = useState(false);
     const [editIdeaTextErrorVisible, setEditIdeaTextErrorVisible] = useState(false);
     const [selectedSkillsListErrorVisible, setSelectedSkillsListErrorVisible] = useState(false);
+    const [evaluated, setEvaluated] = useState(courseEvaluated);
 
     // State Hooks für Profilansicht
     const [viewedUserId, setViewedUserId] = useState(currentUserId);
@@ -91,6 +92,7 @@ export default IdeaScreen = ({route, navigation}) => {
             setIdeaCreator(userName);
         });
         if (ideaInfo.team && ideaInfo.team.length > 0) {
+            setEvaluated(true);
             DB.getTeamData(courseId, ideaInfo.id, courseType, (teamList) => {
                 setMembers(teamList);
             });
@@ -409,12 +411,23 @@ export default IdeaScreen = ({route, navigation}) => {
                         <Text style={[texts.copy, {color: themeColors.textCopy}]}>{ideaText}</Text>
                     </FlexRow>
                 }
+                { ideaInfo.warning && ideaInfo.warning != "" &&
+                    <View>
+                        <Padding height={5}/>
+                        <FlexRow padding left>
+                            <Image source={icons.warning} style= {{ tintColor: themeColors.red, width: 25, height: 25, marginEnd: 7}} resizeMode= { "contain" }/>
+                            <Text style={[texts.copy, {color: themeColors.red}]}>{
+                                ideaInfo.warning == "underMin" ? "Minimale Gruppengröße nicht erreicht" : "Maximale Gruppengröße überschritten"
+                            }</Text>
+                        </FlexRow>
+                    </View>
+                }
                 <FlexRow padding>
                     <AttributePreviewTile
-                        title={ideaInfo.interests.length > 0 ? "Gemeinsamkeiten" : "Passende Fähigkeiten"}
+                        title={ideaCreatorId == "ProFi-Algorithmus" ? "Gemeinsamkeiten" : "Passende Fähigkeiten"}
                         subtitle={currentSkills.length > 0 ? currentSkills.join(", ") : "\n"}
                         index={0}
-                        onPress={() => navigation.navigate("IdeaAttributes", {filterList: currentSkills, secondaryFilterList: ideaInfo.interests, courseType: courseType, courseId: courseId, ideaId: ideaInfo.id, title: ideaInfo.interests.length > 0 ? "Gemeinsamkeiten" : "Passende Fähigkeiten"})}
+                        onPress={() => navigation.navigate("IdeaAttributes", {filterList: currentSkills, secondaryFilterList: ideaInfo.interests, courseType: courseType, courseId: courseId, ideaId: ideaInfo.id, title: ideaCreatorId == "ProFi-Algorithmus" ? "Gemeinsamkeiten" : "Passende Fähigkeiten"})}
                     />
                 </FlexRow>
                 { (courseType == "openCourses" && !evaluated) &&
@@ -499,7 +512,7 @@ export default IdeaScreen = ({route, navigation}) => {
                         }
                         {commentsLoading && 
                             <View style={{backgroundColor: themeColors.base, paddingVertical: 30}}>
-                                <ActivityIndicator/>
+                                <ActivityIndicator color={themeColors.textHl}/>
                             </View>
                         }
                     </View>
