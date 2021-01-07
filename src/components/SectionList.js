@@ -76,8 +76,9 @@ export default function SectionList (datas) {
                                         }
                                         index = { index }
                                         isMember = { item.userIsMember }
+                                        onDelete = { () => datas.onDelete(item.id, item.date ? 'courses' : 'openCourses') }
                                     />
-                                    <View
+                                    {/* <View
                                         style= { {
                                             flexDirection: "row", 
                                             paddingHorizontal: 10,
@@ -88,7 +89,7 @@ export default function SectionList (datas) {
                                             onPress= { (ref) => { datas.onDelete(item.id, item.date ? 'courses' : 'openCourses') } }
                                             status= { "transparent" }
                                         />
-                                    </View>
+                                    </View> */}
                                 </View>
                             </TouchableHighlight>
                         )

@@ -4,9 +4,9 @@ import { FlatList, View, Text, useWindowDimensions, ScrollView } from "react-nat
 import { boxes, colors, texts } from '../Styles';
 import AttributeTile from './AttributeTile';
 import ScrollRow from './ScrollRow';
-import ButtonLarge from './ButtonLarge';
 import Padding from './Padding';
 import DB from '../api/DB_API';
+// import { ScrollView } from 'react-native';
 
 export default function AttributeScreen (props) {
 
@@ -42,18 +42,19 @@ export default function AttributeScreen (props) {
 
     return(
         <View style= { { 
-            height: useWindowDimensions().height-365,
+            width: '50%',
+            height: '100%'
         } } >
-            <View style= { boxes.subHeader } >
-                <Padding
-                    height= { 9.25 }
-                />
+            {/* Header */}
+            <View style= { [boxes.subHeader, {
+                borderTopLeftRadius: 7,
+                borderTopRightRadius: 7
+            } ] } >
+                <Padding height= { 9.25 } />
                 <View style= { boxes.paddedRow } >
                     <Text style= { texts.separatorText } >Fähigkeiten auswählen</Text>
                 </View>
-                <Padding
-                    height= { 9.25 }
-                />
+                <Padding height= { 9.25 } />
                 <ScrollRow
                     type= "attributes"
                     data= { categoriesList }
@@ -64,23 +65,27 @@ export default function AttributeScreen (props) {
             <View style= { boxes.separator } >
                 <Text style= { texts.separatorText, { paddingHorizontal: 15 } } >{ currentCategory }</Text>
             </View>
-            <FlatList 
-                style= { { backgroundColor: colors.white, flexGrow: 1 } }
-                data= { displayedSkills }
-                keyExtractor= { (item, index) => item }
-                renderItem= { (itemData) => { 
-                    return (
-                        <AttributeTile
-                            text= { itemData.item }
-                            state= { props.selectedAttributesList.indexOf(itemData.item) >= 0 }
-                            index = { itemData.index }
-                            backgroundColor = { itemData.index % 2 === 0 ? "#ffffff" : "#f5f7f7" }
-                            onPress= { () => { 
-                                props.changeAttribute(itemData.item, currentCategory);
-                            } }
-                        />
-                    );
-            } } />
+            <ScrollView contentContainerStyle= { { 
+                height: '100%'
+            } } >
+                <FlatList 
+                    style= { { backgroundColor: colors.lightGrey, flexGrow: 1 } }
+                    data= { displayedSkills }
+                    keyExtractor= { (item, index) => item }
+                    renderItem= { (itemData) => { 
+                        return (
+                            <AttributeTile
+                                text= { itemData.item }
+                                state= { props.selectedAttributesList.indexOf(itemData.item) >= 0 }
+                                index = { itemData.index }
+                                backgroundColor = { itemData.index % 2 === 0 ? "#ffffff" : "#f5f7f7" }
+                                onPress= { () => { 
+                                    props.changeAttribute(itemData.item, currentCategory);
+                                } }
+                            />
+                        );
+                } } />
+            </ScrollView>
         </View>
     )
 }

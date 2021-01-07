@@ -1,6 +1,6 @@
-import React, { useState  } from 'react';
-import { View,  Text, TextInput, Image, TouchableOpacity } from 'react-native';
-import { icons, boxes, texts } from '../Styles';
+import React, { useState } from 'react';
+import { View,  Text, TextInput, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { icons, boxes, texts, colors } from '../Styles';
 
 export default function NumberInput (props) {
 
@@ -46,16 +46,15 @@ export default function NumberInput (props) {
                 
                 {/* Button Minus */}
                 <TouchableOpacity 
-                    style= { props.value <= 2 ? boxes.buttonIconInactive : boxes.buttonIconActive } 
+                    style= { [Styles.button, props.value <= 2 ? Styles.buttonInactive : Styles.buttonActive] } 
                     onPress= { () => { if (props.value > 2) { 
                         props.onChange(props.value - 1) 
                         setErrorVisible(false);
                         setOldText(props.value - 1) 
-                        console.log(oldText)
                     } } }
                 >
                     <Image
-                        style= { boxes.buttonIcon }
+                        style= { [Styles.icon, Styles.iconColor] }
                         source= { icons.minus }
                         resizeMode= { "contain" }
                     />
@@ -63,7 +62,7 @@ export default function NumberInput (props) {
                 
                 {/* Textfeld */}
                 <TextInput
-                    style= { [ boxes.inputField, { height: 45, maxWidth: 45, marginHorizontal: 5, textAlign: "center" } ] }
+                    style= { [ Styles.inputField, Styles.inputText ] }
                     maxLength={ 2 }
                     value= { props.value }
                     onChangeText= { text => checkText(text)}
@@ -72,16 +71,15 @@ export default function NumberInput (props) {
 
                 {/* Button Plus */}
                 <TouchableOpacity 
-                    style= { props.value >= 20 ? boxes.buttonIconInactive : boxes.buttonIconActive } 
+                    style= { [Styles.button, props.value >= 20 ? Styles.buttonInactive : Styles.buttonActive] } 
                     onPress= { () => { if (props.value < 20) { 
                         props.onChange(props.value + 1) 
                         setErrorVisible(false);
                         setOldText(props.value + 1) 
-                        console.log(oldText)
                     } } }
                 >
                     <Image
-                        style= { boxes.buttonIcon }
+                        style= { [Styles.icon, Styles.iconColor] }
                         source= { icons.plus }
                         resizeMode= { "contain" }
                     />
@@ -96,3 +94,46 @@ export default function NumberInput (props) {
         </View>
     );
 };
+
+const Styles = StyleSheet.create({
+    
+    button: {
+      height: 45,
+      width: 45,
+      paddingHorizontal: 15,
+      marginVertical: 5,
+      marginHorizontal: 0,
+      borderRadius: 7,
+      justifyContent: "center",
+      alignItems: "center"
+    },
+    buttonActive: {
+      backgroundColor:  colors.darkBlue
+    },
+    buttonInactive: {
+        backgroundColor:  colors.lightBlue
+    },
+    icon: {
+        width: 35,
+        height: 35,
+    },
+    iconColor: {
+        tintColor:  colors.white
+    },
+    inputField: {
+        height: 45,
+        width: 45,
+        marginVertical: 5,
+        backgroundColor: "white",
+        borderBottomWidth: 1,
+        borderColor: colors.lightBlue,
+        borderRadius: 7,
+    },
+    inputText: {
+        fontFamily: 'Inter',
+        fontWeight: 400,
+        fontSize: 16,
+        color: 'black',
+        textAlign: 'center'
+    }
+});

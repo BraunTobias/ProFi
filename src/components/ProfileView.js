@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Modal } from "react-native";
+import { View, Text, Modal, Image, StyleSheet, ScrollView, useWindowDimensions } from "react-native";
 
 import DB from '../api/DB_API';
 import AttributeList from './AttributeList';
-import ProfileImage from './ProfileImage';
 import Padding from './Padding';
-import { boxes, texts } from '../Styles';
+import { boxes, texts, icons } from '../Styles';
 import ModalContent from "../components/ModalContent";
 
 export default function ProfileView (props) {
+
+    const window = useWindowDimensions();
 
     const [currentName, setCurrentName] = useState("");
     const [currentBio, setCurrentBio] = useState("");
@@ -16,6 +17,28 @@ export default function ProfileView (props) {
     const [imageUrl, setImageUrl] = useState("");
     const [skillsList, setSkillsList] = useState([]);
     const [interestsList, setInterestsList] = useState([]);
+
+    const Styles = StyleSheet.create({
+        image: {
+            width: 60,
+            height: 60,
+            borderRadius: 111,
+            aspectRatio: 1,
+            marginRight: 7,
+        },
+        imageContainer: {
+            width: '100%',
+            height: 75,
+            alignItems: "center",
+        },
+        listLeft: {
+            width: window.width /8*3 -15,
+            paddingHorizontal: 15
+        },
+        listRight: {
+            width: window.width /8*3 -15,
+        }  
+    })
     
     useEffect(() => {
         DB.getUserInfoById(props.userId, (name, imageUrl, bio, email) => {
@@ -51,11 +74,11 @@ export default function ProfileView (props) {
                         alignContent: 'center',
                     } ] } >
                         <Padding height={5}/>
-                        <View style= { boxes.profileViewImage } >
-                            <ProfileImage
-                                imageUrl= { imageUrl }
-                                onPress= { () => {} }
-                                />
+                        <View style= { Styles.imageContainer } >
+                            <Image 
+                                style= { Styles.image }
+                                source= { imageUrl ? { uri: imageUrl } : icons.profilePlaceholder }    
+                            />
                         </View>
                         <Padding height= { 0 } />
                         <View style= { boxes.centeredRow } >
@@ -72,21 +95,19 @@ export default function ProfileView (props) {
                 ) } }
                 content= { () => {
                     return(
-                        <View style= { boxes.mainContainer } >
-                            <View style= { boxes.width, boxes.paddedRow }>
-                                <View style= { { width: '49%' } } >
-                                    <Text style= { texts.subHeader }>Fähigkeiten</Text>
-                                    <AttributeList style={{flexGrow: 1, backgroundColor: "red"}}
-                                        attList = {skillsList}
-                                    />
+                        <View style= { [boxes.mainContainer, boxes.width, { height: window.height -345 } ] } >
+                            <ScrollView>
+                                <View style= { boxes.paddedRow }>
+                                    <View style= { Styles.listLeft } >
+                                        <Text style= { texts.subHeader }>Fähigkeiten</Text>
+                                        <AttributeList attList = {skillsList} />
+                                    </View>
+                                    <View style= { Styles.listRight } >
+                                        <Text style= { texts.subHeader }>Interessen</Text>
+                                        <AttributeList attList = {interestsList} />
+                                    </View>
                                 </View>
-                                <View style= { { width: '49%' } } >
-                                    <Text style= { texts.subHeader }>Interessen</Text>
-                                    <AttributeList style={{flexGrow: 1, backgroundColor: "red"}}
-                                        attList = {interestsList}
-                                    />
-                                </View>
-                            </View>
+                            </ScrollView>
                         </View>
                     )
                 }}
@@ -96,4 +117,6 @@ export default function ProfileView (props) {
         </Modal>
     )     
 }
-          
+
+
+

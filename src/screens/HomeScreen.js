@@ -86,16 +86,15 @@ export default function HomeScreen ({navigation}) {
         if (committed && currentFindCourseId !== "") {
             DB.addCourseToList(currentFindCourseId, (addedCourse) => {
                 setCurrentFindCourseId("");
-                let sem = addedCourse.semester;
-                
-                // wenn ein Kurs kein Semester hat ist es ein offener Kurs (Projekt B)
-                if (!sem) sem = 'Freie Projekte'
 
                 let courseList = currentCourses;
+                // wenn ein Kurs kein Semester hat ist es ein offener Kurs (z.B. Kurs: Projekt B)
+                let sem = addedCourse.semester ? addedCourse.semester : 'Freie Projekte';
                 let semList = currentCourses[sem];
                 
-
-                semList.push(addedCourse);
+                if (semList) semList.push(addedCourse);
+                else semList = [addedCourse]
+                
                 courseList[sem] = semList
                 setCurrentCourses(courseList);
                 setFindCourseVisible(false);

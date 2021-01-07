@@ -359,7 +359,7 @@ const DB = {
     },
 
     // Neue Idee erstellen 
-    addIdea: function(courseId, courseType, title, description, skills, interests, onSuccess) {
+    addIdea: function(courseId, courseType, title, description, skills, interests, onSuccess, onError) {
         const currentUserID = firebase.auth().currentUser.uid;
 
         firebase.firestore().collection(courseType).doc(courseId).collection("ideas").add({
@@ -367,18 +367,25 @@ const DB = {
             description: description,
             interests: interests,
             skills: skills,
+            members: [],
             favourites: [],
             nogos: [],
             creator: currentUserID
         })
         .then((docRef) => {
-            if (courseType == "courses") {
+            if (courseType === "courses") {
                 // Man favorisiert seine neu erstellte Idee automatisch
                 this.addPref("favourites", courseId, docRef.id, () => {
                     onSuccess();
                 })
+            } else {
+                onSuccess();
             }
-        });
+        })
+        .catch((e) => {
+            console.log(e);
+            onError(e);
+        })
     },
     // Idee bearbeiten
     editIdea: function(courseId, ideaId, courseType, title, description, skills, interests, onSuccess, onError) {
@@ -429,14 +436,14 @@ const DB = {
                     }
                 }
                 // NotificationsArray verschicken
-                fetch("https://exp.host/--/api/v2/push/send", {
-                    method: "POST",
-                    headers: {
-                        "Accept": "application/json",
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(notificationsArray)
-                });
+                // fetch("https://exp.host/--/api/v2/push/send", {
+                //     method: "POST",
+                //     headers: {
+                //         "Accept": "application/json",
+                //         "Content-Type": "application/json"
+                //     },
+                //     body: JSON.stringify(notificationsArray)
+                // });
             }
         });
     },
@@ -782,8 +789,6 @@ const DB = {
                 addedCourse["id"] = courseWithId.id;
                 addedCourse["courseType"] = courseType;
                 // if (addedCourse.date) addedCourse.date = format(addedCourse.date.toDate(), "dd.MM.yyyy");
-                // else addedCourse.date = "Kein Datum";
-                // if (!addedCourse.date) addedCourse.date = "Kein Datum"
                 onSuccess(addedCourse);
             } else {
                 onError("Du hast diesen Kurs schon in deiner Liste.");
@@ -867,7 +872,23 @@ const DB = {
             } else {
                 onError("User ist schon im Kurs");
             }
-        }
+        } 
+        // else {
+        //     membersArray.push(currentUserID);
+        //     firebase.firestore().collection("openCourses").doc(courseId).collection("ideas").doc(ideaId).set({
+        //         members: membersArray,
+        //         lastUpdated: currentDate
+        //     }, {merge: true});
+        //     // Die neue Members-Liste wird zurückgegeben
+        //     var membersList = [];
+        //     var member = {userId: currentUserID};
+        //     await this.getUserInfoById(currentUserID, (name, url) => {
+        //         member.userName = name;
+        //         member.imageUrl = url;
+        //     });
+        //     membersList.push(member);
+        //     onSuccess(membersList);
+        // }
     },
     exitOpenIdea: async function(courseId, ideaId, onSuccess) {
         var membersArray = [];

@@ -1,6 +1,6 @@
 import React, { useState  } from 'react';
-import { View,  Text, TextInput, Image, TouchableOpacity } from 'react-native';
-import { icons, boxes, texts } from '../Styles';
+import { View,  Text, TextInput, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { icons, boxes, texts, colors } from '../Styles';
 
 export default function NumberInput (props) {
 
@@ -46,7 +46,7 @@ export default function NumberInput (props) {
                 
                 {/* Button Minus */}
                 <TouchableOpacity 
-                    style= { boxes.buttonIconActive } 
+                    style= { Styles.button } 
                     onPress= { () => { 
                         if (props.value > min) { 
                             props.onChange(props.value - step) 
@@ -61,7 +61,7 @@ export default function NumberInput (props) {
                     } } }
                 >
                     <Image
-                        style= { boxes.buttonIcon }
+                        style= { Styles.icon }
                         source= { icons.minus }
                         resizeMode= { "contain" }
                     />
@@ -69,7 +69,7 @@ export default function NumberInput (props) {
                 
                 {/* Textfeld */}
                 <TextInput
-                    style= { [ boxes.inputField, { height: 45, maxWidth: 45, marginHorizontal: 5, textAlign: "center" } ] }
+                    style= { [ Styles.inputField, Styles.inputText ] }
                     maxLength={ 2 }
                     value= { props.value }
                     onChangeText= { text => checkText(text)}
@@ -78,7 +78,7 @@ export default function NumberInput (props) {
 
                 {/* Button Plus */}
                 <TouchableOpacity 
-                    style= { boxes.buttonIconActive } 
+                    style= { Styles.button } 
                     onPress= { () => {
                         if (props.value < max) { 
                             props.onChange(props.value + step) 
@@ -93,7 +93,7 @@ export default function NumberInput (props) {
                 } } }
                 >
                     <Image
-                        style= { boxes.buttonIcon }
+                        style= { Styles.icon }
                         source= { icons.plus }
                         resizeMode= { "contain" }
                     />
@@ -108,3 +108,39 @@ export default function NumberInput (props) {
         </View>
     );
 };
+
+const Styles = StyleSheet.create({
+    
+    button: {
+      height: 45,
+      width: 45,
+      paddingHorizontal: 15,
+      marginVertical: 5,
+      marginHorizontal: 0,
+      borderRadius: 7,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor:  colors.darkBlue
+    },
+    icon: {
+        width: 35,
+        height: 35,
+        tintColor:  colors.white
+    },
+    inputField: {
+        height: 45,
+        width: 45,
+        marginVertical: 5,
+        backgroundColor: "white",
+        borderBottomWidth: 1,
+        borderColor: colors.lightBlue,
+        borderRadius: 7,
+    },
+    inputText: {
+        fontFamily: 'Inter',
+        fontWeight: 400,
+        fontSize: 16,
+        color: 'black',
+        textAlign: 'center'
+    }
+});

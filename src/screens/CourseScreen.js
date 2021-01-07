@@ -49,10 +49,7 @@ export default function CourseScreen ({route, navigation}) {
 
     // State Hooks für Modals
     const [editCourseVisible, setEditCourseVisible] = useState(false);
-    const [editCourseDateVisible, setEditCourseDateVisible] = useState(false);
-    const [editCourseTimeVisible, setEditCourseTimeVisible] = useState(false);
     const [editCourseNameErrorVisible, setEditCourseNameErrorVisible] = useState(false);
-    const [editCourseDateErrorVisible, setEditCourseDateErrorVisible] = useState(false);
     const [editCourseName, setEditCourseName] = useState(courseInfo.title);
     const [editCourseLink, setEditCourseLink] = useState(courseInfo.link);
     const [editCourseDate, setEditCourseDate] = useState(courseInfo.date ? courseInfo.date.toDate() : {});
@@ -60,21 +57,15 @@ export default function CourseScreen ({route, navigation}) {
     const [editCourseMaxMembers, setEditCourseMaxMembers] = useState(courseInfo.maxMembers);
     const [editCourseHours, setEditCourseHours] = useState(courseInfo.date ? courseInfo.date.toDate().getHours() : {});
     const [editCourseMinutes, setEditCourseMinutes] = useState(courseInfo.date ? courseInfo.date.toDate().getMinutes() : {});
-    const [editErrorVisible, setEditErrorVisible] = useState(false);
     const [newIdeaVisible, setNewIdeaVisible] = useState(false);
-    const [addSkillsVisible, setAddSkillsVisible] = useState(false);
     const [selectedSkillsList, setSelectedSkillsList] = useState([]);
     const [skillsListText, setSkillsListText] = useState([]);
     const [currentNewIdeaName, setCurrentNewIdeaName] = useState("");
     const [currentNewIdeaText, setCurrentNewIdeaText] = useState("");
-    const [favInfoVisible, setFavInfoVisible] = useState(false);
-    const [nogoInfoVisible, setNogoInfoVisible] = useState(false);
-    const [joinInfoVisible, setJoinInfoVisible] = useState(false);
 
-    const [favInfoReceived, setFavInfoReceived] = useState(false);
-    const [nogoInfoReceived, setNogoInfoReceived] = useState(false);
-    const [joinInfoReceived, setJoinInfoReceived] = useState(false);
-
+    const [errorMessage, setErrorMessage] = useState(false);
+    const [infosReceived, setInfosReceived] = useState(false);
+    
     const [newIdeaNameErrorVisible, setNewIdeaNameErrorVisible] = useState(false);
     const [newIdeaTextErrorVisible, setNewIdeaTextErrorVisible] = useState(false);
     const [selectedSkillsListErrorVisible, setSelectedSkillsListErrorVisible] = useState(false);
@@ -92,11 +83,21 @@ export default function CourseScreen ({route, navigation}) {
         navigation.setOptions({
             headerTitle: courseInfo.title,
             headerLeft: () => (
-                <ButtonIcon
-                    icon= { "logo" }
-                    status= { "color" }
-                    onPress= { () => { navigation.navigate("Home") } }
-                />
+                <View style= { [boxes.unPaddedRow, { alignItems: "center", } ] }>
+                    <ButtonIcon
+                        icon= { "logo" }
+                        status= { "color" }
+                        onPress= { () => { navigation.navigate("Home") } }
+                    />
+                    <Padding width= { 15 } />
+                    <ButtonIcon
+                        icon= { "back" }
+                        status= { "active" }
+                        onPress= { () => { 
+                            navigation.navigate("Home");
+                         } }
+                    />
+                </View>
             ),
             headerRight: () => (
                 <ButtonIcon
@@ -119,22 +120,28 @@ export default function CourseScreen ({route, navigation}) {
         });    
     }
 
-    console.log('nogoInfoReceived 2: ' + nogoInfoReceived);
-
     // Wird nach dem Rendern ausgeführt
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             if (courseType === "courses") {
                 getCourseData();
+                let favsRecieved = false;
+                let nogosRecieved = false;
+                let joinRecieved = false;
                 DB.getInfoReceived("favourites", (isReceived) => {
-                    setFavInfoReceived(isReceived);
-                });
-                DB.getInfoReceived("nogos", (isReceived) => {
-                    setNogoInfoReceived(isReceived);
-                    console.log(isReceived);
-                });
-                DB.getInfoReceived("joinCourse", (isReceived) => {
-                    setJoinInfoReceived(isReceived);
+                    favsRecieved = isReceived;
+                    DB.getInfoReceived("nogos", (isReceived) => {
+                        nogosRecieved = isReceived;
+                        DB.getInfoReceived("joinCourse", (isReceived) => {
+                            joinRecieved = isReceived;
+                            let infos = {
+                                fav: favsRecieved,
+                                nogo: nogosRecieved,
+                                join: joinRecieved
+                            };
+                            setInfosReceived(infos);
+                        });
+                    });
                 });
             }
             DB.getIdeasList(courseInfo.id, courseType, (ideasList, myFavourite, myNogo) => {
@@ -147,8 +154,18 @@ export default function CourseScreen ({route, navigation}) {
     }, []);
 
     const addFavHandler = (ideaId) => {
-        if (!favInfoReceived) {
-            setFavInfoVisible(true); 
+        if (!infosReceived.fav) {
+            let message = {
+                title: "Favoriten setzen",
+                copy: "Wenn du eine Idee als Favorit markierst, erhöht sich die Chance, dass du dieser zugeteilt wirst. Du kannst einen Favoriten pro Kurs setzen. Sobald du eine andere Idee favorisierst, wird dein alter Favorit entfernt.",
+                onPress: () => { setErrorMessage(false); }
+            }
+            DB.setInfoReceived("favourites"); 
+            setErrorMessage(message);
+            let infos = infosReceived;
+            infos.fav = true;
+            setInfosReceived(infos);
+
         } else {
             if (currentFav === ideaId) {
                 DB.deletePref("favourites", courseInfo.id, () => {
@@ -163,9 +180,17 @@ export default function CourseScreen ({route, navigation}) {
         }
     }
     const addNogoHandler = (ideaId) => {
-        if (!nogoInfoReceived) {
-            console.log('!nogoInfoReceived: ' + nogoInfoReceived)
-            setNogoInfoVisible(true); 
+        if (!infosReceived.nogo) {
+            let message = {
+                title: "No-Go setzen",
+                copy: "Wenn du eine Idee als No-Go markierst, wirst du dieser auf keinen Fall zugeteilt. Du kannst ein No-Go pro Kurs setzen. Sobald du eine andere Idee als No-Go markierst, wird dein altes No-Go entfernt.",
+                onPress: () => { setErrorMessage(false); }
+            }
+            DB.setInfoReceived("nogos"); 
+            setErrorMessage(message);
+            let infos = infosReceived;
+            infos.nogo = true;
+            setInfosReceived(infos);
         } else {
             if (currentNogo === ideaId) {
                 DB.deletePref("nogos", courseInfo.id, () => {
@@ -182,8 +207,17 @@ export default function CourseScreen ({route, navigation}) {
         }
     }
     const joinCourseHandler = () => {
-        if (!joinInfoReceived) {
-            setJoinInfoVisible(true); 
+        if (!infosReceived.join) {
+            let message = {
+                title: "Einem Kurs beitreten",
+                copy: "Wenn du diesem Kurs beitrittst, wirst du bei der Ideenverteilung berücksichtigt. Du kannst jederzeit wieder austreten und dir den Kurs weiter angucken. Aber achte darauf, dass du am oben angegebenen Datum dem Kurs beigetreten bist, um zugeteilt zu werden.",
+                onPress: () => { setErrorMessage(false); }
+            }
+            DB.setInfoReceived("joinCourse"); 
+            setErrorMessage(message);
+            let infos = infosReceived;
+            infos.join = true;
+            setInfosReceived(infos);
         } else {
             if (!userIsMember) {
                 DB.joinCourse(courseInfo.id, () => {
@@ -205,13 +239,14 @@ export default function CourseScreen ({route, navigation}) {
     const selectIdeaHandler = (ideaInfo) => {
         navigation.navigate("Idea", {
             ideaInfo: ideaInfo, 
-            evaluated: evaluated,
+            courseEvaluated: evaluated,
             courseType: courseType,
             courseId: courseInfo.id, 
             currentUserId: currentUserId,
             courseInfo: courseInfo,
         });
     }
+
     // Handler für Modals
     const pressNewIdeaHandler = (committed) => {
         if (committed) {
@@ -224,11 +259,11 @@ export default function CourseScreen ({route, navigation}) {
                     DB.getIdeasList(courseInfo.id, courseType, (ideasList) => {
                         setCurrentIdeas(ideasList);
                     });
-                }, (error) => {console.error(error)});
+                }, () => {} );
             }
-            if (currentNewIdeaName.length <= 1) setNewIdeaNameErrorVisible(true);
-            if (currentNewIdeaText.length <= 1) setNewIdeaTextErrorVisible(true);
-            if (selectedSkillsList.length === 0) setSelectedSkillsListErrorVisible(true);
+            if (currentNewIdeaName.length <= 1) setNewIdeaNameErrorVisible("Bitte einen Namen angeben.");
+            if (currentNewIdeaText.length <= 1) setNewIdeaTextErrorVisible("Bitte einen Beschreibungstext angeben.");
+            if (selectedSkillsList.length === 0) setSelectedSkillsListErrorVisible("Bitte mindestens eine Fähigkeit angeben.");
         } else {
             setNewIdeaVisible(false);
             setCurrentNewIdeaName("");
@@ -268,26 +303,24 @@ export default function CourseScreen ({route, navigation}) {
                 DB.editCourse(courseInfo.id, editCourseName, editCourseLink, editCourseDate, editCourseMinMembers, editCourseMaxMembers, () => {
                     setEditCourseVisible(false);
                     setEditCourseNameErrorVisible(false);
-                    setEditCourseDateErrorVisible(false);
                     setCourseName(editCourseName);
                     setCourseDate(editCourseDate);
                     setMinMembers(editCourseMinMembers);
                     setMaxMembers(editCourseMaxMembers);
                     navigation.setOptions({ headerTitle: editCourseName });
                 }, () => {
-                    // Alert.alert(
-                    //     "Fehler",
-                    //     "Kurs konnte nicht bearbeitet werden",
-                    //     [{ text: "OK", onPress: () => {}}],
-                    // );              
+                    // setEditErrorVisible = true;
+                    let message = {
+                        title: "Fehler",
+                        copy: "Kurs konnte nicht bearbeitet werden"
+                    }
+                    setErrorMessage(message);
                 });
             }
             if (editCourseName.length === "") setEditCourseNameErrorVisible(true);
-            if (editCourseDate - (new Date()) < 0) setEditCourseDateErrorVisible(true);
         } else {
             setEditCourseVisible(false);
             setEditCourseNameErrorVisible(false);
-            setEditCourseDateErrorVisible(false);
             setEditCourseName(courseName);
             setEditCourseDate(courseDate);
             setEditCourseMinMembers(minMembers);
@@ -325,14 +358,8 @@ export default function CourseScreen ({route, navigation}) {
     }
 
     const ErrorInfoHandler = (props) => {
-        if (props.visible) return (
-            <Text style= { [boxes.unPaddedRow, texts.errorLine] } >
-                { props.message }
-            </Text>
-        );
-        else return (
-            <Padding height= { 18.5 } />
-        );
+        if (props.visible) return <Text style= { [boxes.unPaddedRow, texts.errorLine] } >{ props.visible }</Text>
+        else return <Padding height= { 18.5 } />
     }
     
     return(
@@ -341,42 +368,11 @@ export default function CourseScreen ({route, navigation}) {
             height: window.height-80,
         } } >
 
-            {/* Info-Modals */}
-            <InfoModal visible={joinInfoVisible}
-                onPress={ () => {
-                    setJoinInfoVisible(false); 
-                    DB.setInfoReceived("joinCourse"); 
-                    setJoinInfoReceived((state) => !state);
-                } }
-                title="Einem Kurs beitreten"
-                copy="Wenn du diesem Kurs beitrittst, wirst du bei der Ideenverteilung berücksichtigt. Du kannst jederzeit wieder austreten und dir den Kurs weiter angucken. Aber achte darauf, dass du am oben angegebenen Datum dem Kurs beigetreten bist, um zugeteilt zu werden."
-            />
-            <InfoModal visible={ favInfoVisible }
-                onPress= { () => {
-                    // setFavInfoReceived(true);
-                    setFavInfoReceived((state) => !state);
-                    setFavInfoVisible(false); 
-                    DB.setInfoReceived("favourites"); 
-                } }
-                title="Favoriten setzen"
-                copy="Wenn du eine Idee als Favorit markierst, erhöht sich die Chance, dass du dieser zugeteilt wirst. Du kannst einen Favoriten pro Kurs setzen. Sobald du eine andere Idee favorisierst, wird dein alter Favorit entfernt."
-            />
-            <InfoModal visible={ nogoInfoVisible }
-                onPress= { () => {
-                    setNogoInfoVisible(false);
-                    console.log('nogoInfoReceived: ' + nogoInfoReceived);
-                    DB.setInfoReceived("nogos"); 
-                    setNogoInfoReceived(true);
-                } }
-                title="No-Go setzen"
-                copy="Wenn du eine Idee als No-Go markierst, wirst du dieser auf keinen Fall zugeteilt. Du kannst ein No-Go pro Kurs setzen. Sobald du eine andere Idee als No-Go markierst, wird dein altes No-Go entfernt."
-            />
-            <InfoModal visible= { editErrorVisible }
-                onPress= { () => { 
-                    setEditErrorVisible(false);
-                } }
-                title="Fehler"
-                copy="Kurs konnte nicht bearbeitet werden"
+            {/* Info-Modal */}
+            <InfoModal visible= { errorMessage }
+                onPress= { errorMessage.onPress }
+                title= { errorMessage.title }
+                copy= { errorMessage.copy }
             />
 
             {/* Mitglieds-Profil */}
@@ -419,10 +415,7 @@ export default function CourseScreen ({route, navigation}) {
                                             value={editCourseName}
                                             onChangeText={changeEditCourseNameHandler}
                                         />
-                                        <ErrorInfoHandler 
-                                            visible= { editCourseNameErrorVisible }
-                                            message= 'Gebe einen Namen für den Kurs ein.'
-                                        />
+                                        <ErrorInfoHandler visible= { editCourseNameErrorVisible } />
                                         <View style={boxes.unPaddedRow}>
                                             <NumberInput
                                                 title= {"Mitglieder min."}
@@ -499,11 +492,7 @@ export default function CourseScreen ({route, navigation}) {
                                             value={currentNewIdeaName}
                                             onChangeText={changeNewIdeaNameHandler}
                                         />
-                                        {newIdeaNameErrorVisible &&
-                                            <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                                                Bitte einen Namen angeben.
-                                            </Text>
-                                        }
+                                        <ErrorInfoHandler visible= { newIdeaNameErrorVisible } />
                                         <InputField
                                             title= "Beschreibung"
                                             placeholderText= "beschreibender Text"
@@ -512,11 +501,7 @@ export default function CourseScreen ({route, navigation}) {
                                             multiline={true}
                                             numberOfLines={5}
                                         />
-                                        {newIdeaTextErrorVisible &&
-                                            <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                                                Bitte einen Beschreibungstext angeben.
-                                            </Text>
-                                        }
+                                        <ErrorInfoHandler visible= { newIdeaTextErrorVisible } />
                                         
                                         {/* Fähigkeiten auflisten */}
                                         <AttributePreviewTile
@@ -524,14 +509,10 @@ export default function CourseScreen ({route, navigation}) {
                                             subtitle= { skillsListText }
                                             index= { 0 }
                                         />
-                                        {selectedSkillsListErrorVisible &&
-                                            <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                                                Bitte mindestens eine Fähigkeit angeben.
-                                            </Text>
-                                        }
+                                        <ErrorInfoHandler visible= { selectedSkillsListErrorVisible } />
                                     </View> 
                                     <Padding width= { 15 } />
-                                    <View>
+                                    <View style= { { width: '100%', height: window.height -80 -60 -85 } } >
                                         {/* Fähigkeiten auswählen */}
                                         <AttributeSelect
                                             attributeType = "skills"
@@ -583,8 +564,9 @@ export default function CourseScreen ({route, navigation}) {
                             onPress={joinCourseHandler}
                         />
                         { userIsCreator &&
-                        <ButtonLarge
+                        <ButtonSmall
                             title={"Kurs bearbeiten"}
+                            icon={"edit"}
                             onPress={() => {setEditCourseVisible(true)}}
                         />
                         }
@@ -620,37 +602,32 @@ export default function CourseScreen ({route, navigation}) {
                     return (
                         <TouchableHighlight
                             underlayColor={colors.darkBlue}
-                            // onPress={ () => { selectIdeaHandler(itemData.item.id, itemData.item.title, itemData.item.description, itemData.item.skills) } }
                             onPress={ () => { selectIdeaHandler(itemData.item) } }
                         >
                             <View
                                 style= { {
                                     flexDirection: "row", 
-                                    //justifyContent: "space-between", 
                                     alignItems: "center",
                                     backgroundColor: itemData.index % 2 === 0 ? colors.white : colors.lightGrey,
                                 } }
                             >
                                 <View style= { {
                                     flexDirection: "row", 
-                                    paddingLeft: 15,
                                 } } >
                                     { (courseType === "courses") &&
-                                    <View style= { {
-                                        flexDirection: "row", 
-                                    } } >
+                                    <View style= { { flexDirection: "row", marginHorizontal: 15 } } >
                                         <ButtonIcon 
                                             icon= { "fav" }
                                             onPress= { (ref) => { 
                                                 addFavHandler(itemData.item.id) } }
-                                            status= { currentFav === itemData.item.id ? "inactive" : "active" }
+                                            status= { currentFav === itemData.item.id ? "active" : "transparent" }
                                         />
-                                        <Padding width= { 15 } />
+                                        <Padding width= { 5 } />
                                         <ButtonIcon 
-                                            icon= { "exit" }
+                                            icon= { "nogo" }
                                             onPress= { (ref) => { 
                                                 addNogoHandler(itemData.item.id) } }
-                                            status= { currentNogo === itemData.item.id ? "negactive" : "neg" }
+                                            status= { currentNogo === itemData.item.id ? "neg" : "transparent" }
                                         />
                                     </View>
                                     }
@@ -658,7 +635,17 @@ export default function CourseScreen ({route, navigation}) {
                                 <ListTile
                                     id= { itemData.item.id }
                                     title= { itemData.item.title }
+                                    subtitle={itemData.item.description}
+                                    skills={itemData.item.skills}
+                                    // isFavourite={itemData.item.id === currentFav}
+                                    // isNogo={itemData.item.id === currentNogo}
                                     index = { itemData.index }
+                                    myTeam={itemData.item.myTeam}
+                                    isMember={itemData.item.userIsMember}
+                                    inactive = {(evaluated && (!itemData.item.team || itemData.item.team.length == 0)) ||
+                                        (itemData.item.team && itemData.item.team.indexOf(currentUserId) < 0)
+                                    }
+                                    warning = {itemData.item.warning && itemData.item.warning != ""}
                                 />
                                 
                             </View>

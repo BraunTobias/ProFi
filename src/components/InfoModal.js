@@ -25,10 +25,18 @@ export default function InfoModal (props) {
                             <Padding height={7}/>
                             <Text style={texts.copy}>{props.copy}</Text>
                             <Padding height={20}/>
-                            <ButtonLarge
-                                    title="Verstanden"
-                                    onPress={props.onPress}
-                            />
+                            <View style= { boxes.paddedRow } >
+                                <ButtonLarge
+                                    title= { props.onDismiss ? "OK" : "Verstanden" }
+                                    onPress= { props.onPress }
+                                />
+                                {props.onDismiss &&
+                                <ButtonLarge
+                                        title= "Abbrechen"
+                                        onPress= { props.onDismiss }
+                                />
+                                }
+                            </View>
                             <Padding height={15}/>
                         </View>
                     </View>

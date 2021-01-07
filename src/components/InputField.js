@@ -53,7 +53,7 @@ export default function InputField (props) {
           props.showError ? boxes.inputFieldError : {},
           {
             height: props.multiline ? 160 : 40, 
-            width: props.multiline ? 400 : '100%', 
+            width: props.multiline ? '100%' : '100%', 
             paddingTop: props.multiline ? 6 : 0, 
             paddingBottom: props.multiline ? 12 : 0,
             flexDirection: 'row', 

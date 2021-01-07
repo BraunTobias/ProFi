@@ -1,62 +1,121 @@
 import React from "react";
-import { Text, Image, View } from "react-native";
+import { Text, Image, View, StyleSheet } from "react-native";
 import { icons, colors, boxes, texts } from '../Styles';
+import ButtonIcon from "../components/ButtonIcon";
 
 export default function ListTile (props) {
 
+  const colorStyle = {
+    backgroundColor: props.myTeam ? colors.primary : props.index % 2 === 0 ? colors.tile1 : colors.tile2,
+    borderColor: colors.separator,
+    borderBottomWidth: 1
+  }
+
   const PrefIcon = () => {
-    if (props.isFavourite) {
+    if (props.isMember) {
       return (
         <Image 
-          style= { boxes.listTileIcon }
+          style= { [Styles.listTileIcon, {width: 22, height: 22, marginTop: 1, tintColor: props.myTeam ? colors.textHighlight : colors.textHl}] }
+          source= { icons.checkTrue }
+          defaultSource= { icons.checkTrue }
+          resizeMode= { "contain" }
+        />
+      )
+    } else if (props.warning) {
+      return (
+        <Image 
+          style= { [Styles.listTileIcon, {width: 22, height: 22, marginTop: 1, tintColor: props.myTeam ? colors.textHighlight : colors.red}] }
+          source= { icons.warning }
+          defaultSource= { icons.warning }
+          resizeMode= { "contain" }
+        />
+      )
+    } else if (props.isFavourite) {
+      return (
+        <Image 
+          style= { [Styles.listTileIcon, {marginTop: -1, tintColor: props.inactive ? colors.textInactive : props.myTeam ? colors.textHighlight : colors.textHl}] }
           source= { icons.fav }
+          defaultSource= { icons.fav }
           resizeMode= { "contain" }
         />
       )
     } else if (props.isNogo) {
       return (
         <Image 
-        style= { boxes.listTileIcon }
-        source= { icons.nogo }
-        resizeMode= { "contain" }
+          style= { [Styles.listTileIcon, {tintColor: props.inactive ? colors.textInactive : props.myTeam ? colors.textHighlight : colors.textHl}] }
+          source= { icons.nogo }
+          defaultSource= { icons.nogo }
+          resizeMode= { "contain" }
         />
       )
-    } else if (props.isMember) {
-      return (
-        <Image 
-        style= { boxes.listTileIcon }
-        source= { icons.checkTrue }
-        resizeMode= { "contain" }
-        />
-    )
     } else {
       return(<View/>);
     }
   }
 
   return (
-    <View style= { [ boxes.listTile, /*colorStyle*/ ] }> 
-      <View>
-        <View style= { boxes.listTileHeader }>
+    <View style= { [ Styles.listTile, colorStyle ] }> 
+      <View style= { Styles.content } >
+        <View style= { Styles.listTileHeader }>
           <PrefIcon/>
-          <Text 
-            numberOfLines={1} 
-            style = { [ texts.listTileHeader, { color: props.myTeam ? colors.white : colors.darkBlue } ] }
-          >
-            { props.title }
-          </Text>
+          <Text numberOfLines={1} style = { [ texts.listTileHeader, { 
+            color: props.inactive ? colors.textInactive : 
+            props.myTeam ? colors.textHighlight : 
+            colors.textHl
+          } ] } >{ props.title } </Text>
         </View>
-        <Text 
-          numberOfLines={2} 
-          ellipsizeMode="tail" 
-          style = { [texts.copy, { color: props.myTeam ? colors.white : colors.darkGrey } ] }
-        >
-          {props.subtitle}
-        </Text>
+        <Text numberOfLines={2} ellipsizeMode="tail" style = { [texts.copy, { 
+          color: props.inactive ? colors.textInactive : 
+          props.myTeam ? colors.textHighlight : 
+          colors.textCopy
+        } ] } >{ props.subtitle }</Text>
       </View>
-
-      <Image style={boxes.listTileArrow} source={require("../assets/icons/arrow-right.png")} resizeMode="contain"/>
-
+      {props.onDelete &&
+        <View style= { Styles.deletebox } >
+          <ButtonIcon 
+            icon= { "delete" }
+            onPress= { () => { props.onDelete() } }
+            status= { "transparent" }
+          />
+        </View>
+        }
     </View>
   );
 };
+
+const Styles = StyleSheet.create({
+  deletebox: {
+    height: '100%',
+    justifyContent: 'center',
+    paddingRight: 15
+  },
+  content: {
+    height: '100%',
+    justifyContent: 'center'
+  },
+  listTile: {
+    paddingLeft: 15,
+    height: 90,
+    width: "100%",
+    justifyContent: "space-between",
+    flexDirection: "row"
+  },
+  listTileHeader: {
+      flexDirection: "row",
+      justifyContent: "flex-start",
+      alignItems: "center",
+      marginTop: -2,
+      marginBottom: 2,
+  },
+  listTileArrow: {
+      position: "absolute",
+      right: 15,
+      width: 15,
+      zIndex: -1
+  },
+  listTileIcon: {
+      width: 25, 
+      height: 25, 
+      marginEnd: 7,  
+  },
+});

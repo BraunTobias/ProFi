@@ -21,8 +21,8 @@ import FlexRow from '../components/FlexRow';
 import IdeaFooter from '../components/IdeaFooter';
 import ButtonSmall from '../components/ButtonSmall';
 import ProfileImage from '../components/ProfileImage';
-// import { ScrollView } from 'react-native-web';
-
+import InfoModal from '../components/InfoModal';
+import AttributeList from '../components/AttributeList';
 
 export default function IdeaScreen ({route, navigation}) {
 
@@ -33,7 +33,7 @@ export default function IdeaScreen ({route, navigation}) {
     const {courseId} = route.params;
     const {courseType} = route.params;
     const {currentUserId} = route.params;
-    const {evaluated} = route.params;
+    const {courseEvaluated} = route.params;
     const currentUserIsCreator = (ideaInfo.creator == currentUserId);
 
     // State Hooks
@@ -41,15 +41,20 @@ export default function IdeaScreen ({route, navigation}) {
     const [currentUserImage, setCurrentUserImage] = useState("");
     const [currentSkills, setCurrentSkills] = useState(ideaInfo.skills);
     const [currentComments, setCurrentComments] = useState([]);
-    const [swipeListView, setSwipeListView] = useState();
     const [ideaText, setIdeaText] = useState(ideaInfo.description);
     const [ideaName, setIdeaName] = useState(ideaInfo.title);
     const [ideaCreator, setIdeaCreator] = useState("");
     const [ideaCreatorId, setIdeaCreatorId] = useState(ideaInfo.creator);
     const [commentsLoading, setCommentsLoading] = useState(true);
     const [members, setMembers] = useState(ideaInfo.team);
-    const [refreshing, setRefreshing] = useState(false);
     const [userIsMember, setUserIsMember] = useState(ideaInfo.userIsMember);
+    const [evaluated, setEvaluated] = useState(courseEvaluated);
+    const [errorMessage, setErrorMessage] = useState(false);
+    // State Hooks für "Fähigkeiten anzeigen"
+    const [skillsList, setSkillsList] = useState([]);
+    const [interestsList, setInterestsList] = useState([]);
+    const [viewedList, setViewedList] = useState([]);
+    const [listLoading, setListLoading] = useState(true);
 
     // State Hooks für Modal
     const [editIdeaVisible, setEditIdeaVisible] = useState(false);
@@ -66,11 +71,12 @@ export default function IdeaScreen ({route, navigation}) {
     const [editIdeaNameErrorVisible, setEditIdeaNameErrorVisible] = useState(false);
     const [editIdeaTextErrorVisible, setEditIdeaTextErrorVisible] = useState(false);
     const [selectedSkillsListErrorVisible, setSelectedSkillsListErrorVisible] = useState(false);
+    const [attributesModalVisible, setAttributesModalVisible] = useState(false);
 
     // State Hooks für Profilansicht
     const [viewedUserId, setViewedUserId] = useState(currentUserId);
     const [profileVisible, setProfileVisible] = useState(false);
-    const [profileInfoVisible, setProfileInfoVisible] = useState(0);
+    // const [profileInfoVisible, setProfileInfoVisible] = useState(0);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -91,7 +97,7 @@ export default function IdeaScreen ({route, navigation}) {
                     />
                     <Padding width= { 15 } />
                     <ButtonIcon
-                        icon= { "reply" }
+                        icon= { "back" }
                         status= { "active" }
                         onPress= { () => { 
                             navigation.navigate("Course", { courseInfo: courseInfo, currentUserId: currentUserId } );
@@ -101,6 +107,8 @@ export default function IdeaScreen ({route, navigation}) {
             ),
         });
     }, [navigation]);
+
+    console.log("setEvaluated: " + evaluated);
 
     useEffect(() => {
         DB.getCommentsList(courseId, ideaInfo.id, courseType, (commentsList) => {
@@ -115,12 +123,24 @@ export default function IdeaScreen ({route, navigation}) {
             setCurrentUserImage(userImage);
         });
         if (ideaInfo.team && ideaInfo.team.length > 0) {
+            setEvaluated(true);
             DB.getTeamData(courseId, ideaInfo.id, courseType, (teamList) => {
                 setMembers(teamList);
+                
             });
         } else if (ideaInfo.members && ideaInfo.members.length > 0) {
             DB.getIdeaMembersData(courseId, ideaInfo.id, (membersList) => {
                 setMembers(membersList);
+            });
+        }
+        DB.getAllAttributes("skills", currentSkills, courseType, courseId, ideaInfo.id, (attributesList) => {
+            setSkillsList(attributesList);
+            setViewedList(attributesList);
+            setListLoading(false);
+        });
+        if (ideaInfo.interests) {
+            DB.getAllAttributes("interests", ideaInfo.interests, courseType, courseId, ideaInfo.id, (attributesList) => {
+                setInterestsList(attributesList);
             });
         }
     }, []);
@@ -236,9 +256,9 @@ export default function IdeaScreen ({route, navigation}) {
                     );              
                 });
             }
-            if (editIdeaName.length <= 1) setEditIdeaNameErrorVisible(true);
-            if (editIdeaText.length <= 1) setEditIdeaTextErrorVisible(true);
-            if (selectedSkillsList.length == 0) setSelectedSkillsListErrorVisible(true);
+            if (editIdeaName.length <= 1) setEditIdeaNameErrorVisible("Bitte einen Namen angeben.");
+            if (editIdeaText.length <= 1) setEditIdeaTextErrorVisible("Bitte einen Beschreibungstext angeben.");
+            if (selectedSkillsList.length == 0) setSelectedSkillsListErrorVisible("Bitte mindestens eine Fähigkeit angeben.");
         } else {
             setEditIdeaVisible(false);
             setEditIdeaName(ideaName);
@@ -250,12 +270,15 @@ export default function IdeaScreen ({route, navigation}) {
         }
     }
     const joinIdeaHandler = () => {
+        
         if (!userIsMember) {
+            console.log('!userIsMember')
             DB.joinOpenIdea(courseId, ideaInfo.id, (membersList) => {
                 setUserIsMember(true);
                 setMembers(membersList);
             }, (e) => {console.log(e)});
         } else {
+            console.log('else: userIsMember')
             DB.exitOpenIdea(courseId, ideaInfo.id, () => {
                 var membersList = members.filter(( item ) => { return item.userId != currentUserId });
                 setUserIsMember(false);
@@ -264,19 +287,22 @@ export default function IdeaScreen ({route, navigation}) {
         }
     }
     const setTeamHandler = () => {
-        Alert.alert(
-            "Team einteilen",
-            "Möchtest du dieses Team wirklich final festlegen? Frag am besten vorher noch einmal nach, ob alle einverstanden sind.",
-            [   {text: "Abbrechen", onPress: () => console.log("Cancel Pressed"), style: "cancel"},
-                { text: "OK", onPress: () => {
-                    DB.setOpenCourseTeam(courseId, ideaInfo.id, () => {
-                        evaluated(true);
-                    });
-            }}],
-        );              
+        let message = {
+            title: "Team einteilen",
+            copy: "Möchtest du dieses Team wirklich final festlegen? Frag am besten vorher noch einmal nach, ob alle einverstanden sind.",
+            onPress: () => { 
+                DB.setOpenCourseTeam(courseId, ideaInfo.id, () => {
+                    setEvaluated(true);
+                    setErrorMessage(false);
+                });
+             },
+             onDismiss: () => { setErrorMessage(false); }
+        }
+        setErrorMessage(message); 
     }
+
     const ButtonMember = () => {
-        if (courseType === "openCourses") return (
+        if (courseType === "openCourses" && !evaluated) return (
             <ButtonSmall
                 title={userIsMember ? "Mitglied" : "Beitreten"}
                 icon={userIsMember ? "checkTrue" : "checkFalse"}
@@ -284,6 +310,10 @@ export default function IdeaScreen ({route, navigation}) {
             />
         );
         else return <View style= { { width: 150 } } />
+    }
+    const ErrorInfoHandler = (props) => {
+        if (props.visible) return <Text style= { [boxes.unPaddedRow, texts.errorLine] } >{ props.visible }</Text>
+        else return <Padding height= { 18.5 } />
     }
 
     const Styles = StyleSheet.create({
@@ -358,6 +388,14 @@ export default function IdeaScreen ({route, navigation}) {
             height: window.height-80,
         } } >
 
+            {/* Info-Modal */}
+            <InfoModal visible= { errorMessage }
+                onPress= { errorMessage.onPress }
+                onDismiss= { errorMessage.onDismiss }
+                title= { errorMessage.title }
+                copy= { errorMessage.copy }
+            />
+
             {/* Mitglieds-Profil */}
             { profileVisible && 
             <ProfileView
@@ -367,7 +405,62 @@ export default function IdeaScreen ({route, navigation}) {
                 infoScreen= { true }
             />
             }
-                
+            
+            {/* Fähigkeiten anzeigen */}
+            <Modal visible= { attributesModalVisible } 
+                transparent= {true}
+                animationType= 'slide'
+                style= { { 
+                width: window.width,
+                height: window.height,
+            } } >
+                <ModalContent
+                    subheader= { () => { return(
+                        <View style= { [boxes.subHeader, {
+                            height: 70,
+                            width: window.width,
+                            justifyContent: 'center',
+                            alignContent: 'center',
+                        } ] } >
+                            <Text style= { [texts.titleCentered, { alignSelf: 'center' }] } >{ideaInfo.interests.length > 0 ? "Gemeinsamkeiten" : "Passende Fähigkeiten"}</Text>
+                        </View>
+                    ) } }
+                    content= { () => {
+                        return(
+                            <View style={boxes.mainContainer}>
+                                <View style={{flex: 1, backgroundColor: colors.base}}>
+                                    { interestsList.length > 0 &&
+                                        <View>
+                                            <Button
+                                                inactive={viewedList == interestsList}
+                                                title="Fähigkeiten"
+                                                icon={icons.info}
+                                                onPress={() => setViewedList(skillsList)}
+                                            />
+                                            <Padding width={10}/>
+                                            <Button
+                                                inactive={viewedList != interestsList}
+                                                title="Interessen"
+                                                icon={icons.info}
+                                                onPress={() => setViewedList(interestsList)}
+                                            />
+                                        </View>
+                                    }
+                                    <AttributeList
+                                        // attributeType = {attributeType}
+                                        attList = {viewedList}
+                                        loading={listLoading}
+                                    />
+                                </View>
+                            </View>
+                        );
+                    } }
+                    onDismiss= { () => setAttributesModalVisible(false) }
+                    infoScreen= { true }
+                />
+            
+            </Modal>
+
             {/* Idee bearbeiten */}
             <Modal visible= { editIdeaVisible } 
                 transparent= {true}
@@ -390,54 +483,46 @@ export default function IdeaScreen ({route, navigation}) {
                     content= { () => {
                         return(
                             <View style={boxes.mainContainer}>
-                                <View style= { boxes.paddedRow }>
+                                <View style= { boxes.unPaddedRow }>
                                     <View style= { { width: '50%' } } >
                                         <InputField
+                                            title= "Titel"
                                             placeholderText= "Titel"
                                             value={editIdeaName}
                                             onChangeText={changeEditIdeaNameHandler}
                                         />
-                                        {editIdeaNameErrorVisible &&
-                                            <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                                                Bitte einen Namen angeben.
-                                            </Text>
-                                        }
+                                        <ErrorInfoHandler visible= { editIdeaNameErrorVisible } />
                                         <InputField
+                                            title= "Beschreibung"
                                             placeholderText= "Beschreibung"
                                             value={editIdeaText}
                                             onChangeText={changeEditIdeaTextHandler}
                                             multiline={true}
                                         />
-                                        {editIdeaTextErrorVisible &&
-                                            <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                                                Bitte einen Beschreibungstext angeben.
-                                            </Text>
-                                        }
+                                        <ErrorInfoHandler visible= { editIdeaTextErrorVisible } />
+                                        
                                         {/* Fähigkeiten auflisten */}
                                         <AttributePreviewTile
                                             title= "Passende Fähigkeiten"
                                             subtitle= { skillsListText }
                                             index= { 0 }
                                         />
-                                        {selectedSkillsListErrorVisible &&
-                                            <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                                                Bitte mindestens eine Fähigkeit angeben.
-                                            </Text>
-                                        }
+                                        <ErrorInfoHandler visible= { selectedSkillsListErrorVisible } />
                                     </View> 
                                     <Padding width= { 15 } />
-                                    <View>
+                                    <View style= { { width: '100%', height: window.height -80 -60 -85 } } >
                                         {/* Fähigkeiten auswählen */}
                                         <AttributeSelect
                                             attributeType = "skills"
                                             selectedAttributesList= { selectedSkillsList }
-                                            changeAttribute = { (skills, currentCategory) => { changeSkillsHandler(skills, currentCategory) } }                                        />
+                                            changeAttribute = { (skills, currentCategory) => { changeSkillsHandler(skills, currentCategory) } }
+                                        />
                                     </View>
                                 </View>
                             </View> 
                         )
                     }}
-                    onDismiss= {pressEditIdeaHandler}
+                    onDismiss= { () => pressEditIdeaHandler(false) }
                 />
             </Modal>
 
@@ -451,11 +536,39 @@ export default function IdeaScreen ({route, navigation}) {
                             <Text style={texts.copy}>{ideaText}</Text>
                         }
                         <Padding height= { 15 } />
+                        
+                        { ideaInfo.warning && ideaInfo.warning != "" &&
+                            <View>
+                                <Padding height={5}/>
+                                <FlexRow padding left>
+                                    <Image source={icons.warning} style= {{ tintColor: colors.red, width: 25, height: 25, marginEnd: 7}} resizeMode= { "contain" }/>
+                                    <Text style={[texts.copy, {color: colors.red}]}>{
+                                        ideaInfo.warning == "underMin" ? "Minimale Gruppengröße nicht erreicht" : "Maximale Gruppengröße überschritten"
+                                    }</Text>
+                                </FlexRow>
+                            </View>
+                        }
+
                         <AttributePreviewTile
-                            title={ideaInfo.interests.length > 0 ? "Gemeinsamkeiten" : "Passende Fähigkeiten"}
+                            // title={ideaInfo.interests.length > 0 ? "Gemeinsamkeiten" : "Passende Fähigkeiten"}
+                            title={ideaCreatorId === "ProFi-Algorithmus" ? "Gemeinsamkeiten" : "Passende Fähigkeiten"}
                             subtitle={currentSkills.length > 0 ? currentSkills.join(", ") : "\n"}
                             index={0}
-                            onPress={() => navigation.navigate("IdeaAttributes", {filterList: currentSkills, secondaryFilterList: ideaInfo.interests, courseType: courseType, courseId: courseId, ideaId: ideaInfo.id, title: ideaInfo.interests.length > 0 ? "Gemeinsamkeiten" : "Passende Fähigkeiten"})}
+                            // onPress={() => navigation.navigate("IdeaAttributes", {
+                            //     filterList: currentSkills, 
+                            //     secondaryFilterList: ideaInfo.interests, 
+                            //     courseType: courseType, 
+                            //     courseId: courseId, 
+                            //     ideaId: ideaInfo.id, 
+                            //     title: ideaInfo.interests.length > 0 ? "Gemeinsamkeiten" : "Passende Fähigkeiten"})}
+                            // onPress={() => navigation.navigate("IdeaAttributes", {
+                            //     filterList: currentSkills, 
+                            //     secondaryFilterList: ideaInfo.interests, 
+                            //     courseType: courseType, 
+                            //     courseId: courseId, 
+                            //     ideaId: ideaInfo.id, 
+                            //     title: ideaCreatorId == "ProFi-Algorithmus" ? "Gemeinsamkeiten" : "Passende Fähigkeiten"})}
+                            onPress= { () => { setAttributesModalVisible(true); } }
                         />
                         {/* Memebers Icons */}
                         {members && members.length > 0 &&
@@ -466,27 +579,31 @@ export default function IdeaScreen ({route, navigation}) {
                             />
                         }
                     </View>
+                    
                     {/* Button-Leiste */}
                     <View style= { boxes.paddedRow } >
                         <ButtonMember/>
                         { currentUserIsCreator && !evaluated && 
-                        <ButtonLarge
+                        <ButtonSmall
                             title="Idee bearbeiten"
-                            icon={icons.edit}
+                            icon="edit"
                             onPress={() => setEditIdeaVisible(true)}
                         />
                         }
                         { currentUserIsCreator && !evaluated && courseType === "openCourses" && 
-                        <ButtonLarge
+                        <ButtonSmall
                             title={"Team einteilen"}
-                            icon={icons.fav}
-                            onPress={setTeamHandler}
+                            icon="fav"
+                            onPress={ () => setTeamHandler() }
                         />
                         }
                         <ButtonSmall
                             title="Kommentar schreiben"
-                            onPress={() => {setNewCommentVisible(true)}}
-                        />
+                            icon="plus"
+                            onPress= { () => {
+                                setNewReplyVisible(false); 
+                                setNewCommentVisible(true)
+                        } } />
                     </View>
                     <Padding height= { 15 } />
                 </View>
@@ -516,7 +633,10 @@ export default function IdeaScreen ({route, navigation}) {
                                 isReply={itemData.item.replyTo && itemData.item.replyTo.length > 0}
                                 index = {itemData.index}
                                 onPress = {() => {viewProfileHandler(itemData.item.user)}}
-                                onReply = { () => { setNewReplyVisible(true); setCurrentReplyComment(itemData.item) } }
+                                onReply = { () => { 
+                                    setNewReplyVisible(true); 
+                                    setNewCommentVisible(false);
+                                    setCurrentReplyComment(itemData.item); } }
                                 onDelete = { () => { deleteCommentHandler(itemData.item.id) } }
                                 onLike = { () => { likeCommentHandler(itemData.item.id) } }
                                 currentUser = { currentUserId }
@@ -548,7 +668,7 @@ export default function IdeaScreen ({route, navigation}) {
                         onPress= { () => {} }
                     />
                 </View>
-                <View>
+                <View style= { { width: window.width/4*3 -265 } } >
                     <Text style = { texts.commentTileHeader } >{ currentUserName }</Text>
                     <InputField
                         placeholderText= "max. 300 Zeichen"
@@ -579,7 +699,7 @@ export default function IdeaScreen ({route, navigation}) {
             {/* Auf Kommentar antworten */}
             {newReplyVisible &&
             <View style= { [boxes.width] } >
-                
+                {/* Original-Beitrag */}
                 <View style= { [Styles.repliedTile] } >
                     <View style= { Styles.infoArea } >
                         <ProfileImage
@@ -609,7 +729,7 @@ export default function IdeaScreen ({route, navigation}) {
                         <Text style = { Styles.commentTileTime } >{ currentReplyComment.time.toDate().toLocaleDateString('de-DE') }</Text>
                     </View>
                 </View>
-                
+                {/* Eingabefeld */}
                 <View style= { Styles.commentTile } >
                     <Image
                         style= { Styles.replyImage }
@@ -623,7 +743,7 @@ export default function IdeaScreen ({route, navigation}) {
                             onPress= { () => {} }
                         />
                     </View>
-                    <View>
+                    <View style= { { width: window.width/4*3 -310 } } >
                         <Text style = { texts.commentTileHeader } >{ currentUserName }</Text>
                         <InputField
                             placeholderText= "max. 300 Zeichen"

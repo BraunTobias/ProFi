@@ -1,18 +1,18 @@
 import React, {useState, useEffect, useLayoutEffect} from 'react';
-import { View, Text, Modal, Alert, ScrollView, useWindowDimensions } from 'react-native';
+import { View, Text, Modal, ScrollView, useWindowDimensions, Image, StyleSheet } from 'react-native';
 
 import { icons, colors, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
 import ButtonLarge from '../components/ButtonLarge';
-import ProfileImage from '../components/ProfileImage';
 import InputField from '../components/InputField';
 import AttributePreviewTile from '../components/AttributePreviewTile';
 import AttributeSelect from '../components/AttributeSelect';
 import ModalContent from "../components/ModalContent";
 import InfoModal from '../components/InfoModal';
+import ButtonIcon from '../components/ButtonIcon';
 import Padding from '../components/Padding';
 
-export default function ProfileScreen ({route, navigation}) {
+export default function ProfileScreen ({ route, navigation }) {
 
     const {currentUserId} = route.params;
 
@@ -45,7 +45,8 @@ export default function ProfileScreen ({route, navigation}) {
     const [editPasswordVisible, setEditPasswordVisible] = useState(false);
     const [mailErrorVisible, setMailErrorVisible] = useState(false);
     const [pwErrorVisible, setPwErrorVisible] = useState(false);
-    const [confirmPwErrorVisible, setConfirmPwErrorVisible] = useState(false);
+    const [newPwErrorVisible, setNewPwErrorVisible] = useState(false);
+    const [currentPwErrorVisible, setCurrentPwErrorVisible] = useState(false);
     const [editPwErrorVisible, setEditPwErrorVisible] = useState(false);
     const [nameErrorVisible, setNameErrorVisible] = useState(false);
 
@@ -55,9 +56,24 @@ export default function ProfileScreen ({route, navigation}) {
 
     useLayoutEffect(() => {
         navigation.setOptions({
+            headerLeft: () => (
+                <View style= { [boxes.unPaddedRow, { alignItems: "center", } ] }>
+                    <ButtonIcon
+                        icon= { "logo" }
+                        status= { "color" }
+                        onPress= { () => navigation.navigate("Home") }
+                    />
+                    <Padding width= { 15 } />
+                    <ButtonIcon
+                        icon= { "back" }
+                        status= { "active" }
+                        onPress= { () => navigation.goBack() }
+                    />
+                </View>
+            ),
             headerRight: () => (
                 <View/>
-            ),
+            )
         });
     }, [navigation]);
 
@@ -83,9 +99,9 @@ export default function ProfileScreen ({route, navigation}) {
     }
 
     useEffect(() => {
-        // const unsubscribe = navigation.addListener('focus', () => {
+        const unsubscribe = navigation.addListener('focus', () => {
             getUserData();
-        // });
+        });
     }, []);
 
     const logOut = () => {
@@ -131,29 +147,27 @@ export default function ProfileScreen ({route, navigation}) {
                     setEditEmailVisible(false);
                     setCurrentEnterPassword("");
                 }, (error) => {
-                    var errorText = error.message;
+                    var errorText = "";
                     switch (error.code) {
-                        case "auth/invalid-email": errorText = "Bitte eine gültige E-Mail-Adresse eingeben."; break;
-                        case "auth/email-already-in-use": errorText = "Diese E-Mail-Adresse ist schon vergeben."; break;
-                        case "auth/wrong-password": errorText = "Falsches Passwort eingegeben."; setCurrentEnterPassword(""); break;
-                        default: errorText = "";
+                        case "auth/invalid-email": errorText = "Bitte eine gültige E-Mail-Adresse eingeben."; setPwErrorVisible(errorText); break;
+                        case "auth/email-already-in-use": errorText = "Diese E-Mail-Adresse ist schon vergeben."; setPwErrorVisible(errorText); break;
+                        case "auth/wrong-password": errorText = "Falsches Passwort eingegeben."; setPwErrorVisible(errorText); setCurrentEnterPassword(""); break;
+                        default: errorText = error.code;
                     }
-                    Alert.alert(
-                        "Ungültige Eingabe",
-                        errorText,
-                        [{ text: "OK" }],
-                    );                  
-                });            
+                    console.log(errorText)
+                });
             } else {
-                if (currentEditMail === "") setMailErrorVisible(true);
-                if (currentEnterPassword === "") setPwErrorVisible(true);
+                var errorText = "";
+                if (currentEditMail === "") errorText = "Gebe eine E-Mail-Adresse ein."; setPwErrorVisible(errorText);
+                if (currentEnterPassword === "") errorText = "Gebe dein Passwort ein."; setPwErrorVisible(errorText);
+                console.log(errorText);
             }
         } else {
-            setEditEmailVisible(false);
+            setCurrentEditMail(currentMail);
             setCurrentEnterPassword("");
-            setCurrentEditMail("");
             setMailErrorVisible(false);
             setPwErrorVisible(false);
+            setEditEmailVisible(false);
         }
     }
     const changeEnterPasswordHandler = (enteredText) => {
@@ -166,7 +180,7 @@ export default function ProfileScreen ({route, navigation}) {
     }
     const changeConfirmPasswordHandler = (enteredText) => {
         setCurrentConfirmPassword(enteredText);
-        if (enteredText === currentEditPassword) setConfirmPwErrorVisible(false);
+        if (enteredText === currentEditPassword) setCurrentPwErrorVisible(false);
     }
     const pressEditPasswordHandler = (committed) => {
         if (committed) {
@@ -179,23 +193,32 @@ export default function ProfileScreen ({route, navigation}) {
                 }, (error) => {
                     let errorText = error.message;
                     switch (error.code) {
-                        case "auth/wrong-password": errorText = "Falsches Passwort eingegeben."; setCurrentEnterPassword(""); break;
-                        default: errorText = "";
+                        case "auth/wrong-password": 
+                            errorText = "Falsches Passwort eingegeben."; 
+                            setPwErrorVisible(errorText); 
+                            setCurrentEnterPassword(""); 
+                            break;
+                        default: errorText = error.code;
                     }
-                    setEditErrorVisible(true)          
+                    console.log(errorText);
                 });            
+            } else {
+                var errorText = "";
+                if (currentEnterPassword === "") errorText= "Bitte ein Passwort eingeben."; setPwErrorVisible(errorText);
+                if (currentEditPassword.length < 6) { 
+                    errorText= "Das neues Passwort ist zu kurz."; 
+                    setNewPwErrorVisible(errorText)
+                }
+                else if (currentEditPassword !== currentConfirmPassword) errorText= "Das eingegebene Passwort stimmt nicht mit dem neuen überein."; setNewPwErrorVisible(errorText);
+                console.log(errorText);
             }
-            if (currentEnterPassword === "") setPwErrorVisible(true);
-            if (currentEditPassword.length < 6) setEditPwErrorVisible(true);
-            else if (currentEditPassword !== currentConfirmPassword) setConfirmPwErrorVisible(true);
         } else {
             setEditPasswordVisible(false);
             setCurrentEnterPassword("");
             setCurrentEditPassword("•••••••••");
             setCurrentConfirmPassword("");
             setPwErrorVisible(false);
-            setEditPwErrorVisible(false);
-            setConfirmPwErrorVisible(false);
+            setNewPwErrorVisible(false);
         }
     }
     const ErrorInfoHandler = ( props ) => {
@@ -239,6 +262,48 @@ export default function ProfileScreen ({route, navigation}) {
         DB.toggleAttributeState("interests", currentCategory, interest, () => {} );
     }
 
+    const Styles = StyleSheet.create({
+        image: {
+            width: 60,
+            height: 60,
+            borderRadius: 111,
+            aspectRatio: 1,
+            marginRight: 7,
+        },
+        emailConfirm: {
+            paddingBottom: 12.5,
+            width: 400, 
+            backgroundColor: colors.lightGrey,
+            alignSelf: 'center',
+            marginTop: '30%',
+
+            shadowColor: "#000",
+            shadowOffset: {
+                width: 0,
+                height: 7,
+            },
+            shadowOpacity: 0.5,
+            shadowRadius: 10,
+            elevation: 10,
+        },
+        psConfirm: {
+            paddingBottom: 12.5,
+            width: 400, 
+            backgroundColor: colors.lightGrey,
+            alignSelf: 'center',
+            marginTop: '30%',
+
+            shadowColor: "#000",
+            shadowOffset: {
+                width: 0,
+                height: 7,
+            },
+            shadowOpacity: 0.5,
+            shadowRadius: 10,
+            elevation: 10,
+        }
+    })
+
     return(
         <View style= { { height: useWindowDimensions().height-80, width: useWindowDimensions().width } } >
 
@@ -253,16 +318,21 @@ export default function ProfileScreen ({route, navigation}) {
             <View style= { boxes.subHeader } >
                 <View style={boxes.centeredRow}>
                     <View style={{height: 65, marginVertical: 10}}>
-                        <ProfileImage
-                            imageUrl={currentImage}
-                            loading={imageLoading}
-                            onPress={()=>{}}
+                        <Image 
+                            style= { Styles.image }
+                            source= { currentImage ? { uri: currentImage } : icons.profilePlaceholder }    
                         />
                     </View>
+                    <ButtonLarge 
+                        title= "Abmelden" 
+                        onPress= { logOut }
+                        icon= "exit"
+                    />
+                    <Padding height= {15} />
                 </View>
             </View>
 
-            <ScrollView contentContainerStyle= { [boxes.mainContainer ] }>
+            <ScrollView contentContainerStyle= { boxes.mainContainer } >
                 
                 {/* E-Mail ändern */}
                 <Modal 
@@ -271,30 +341,14 @@ export default function ProfileScreen ({route, navigation}) {
                     animationType= 'slide' 
                     style= { { 
                         width: window.width,
-                        height: window.height,
-                        
+                        height: window.height
                 } } >
-                    <View style= { { 
-                        height: 215, 
-                        width: 400, 
-                        backgroundColor: colors.lightGrey,
-                        alignSelf: 'center',
-                        marginTop: '30%',
-
-                        shadowColor: "#000",
-                        shadowOffset: {
-                            width: 0,
-                            height: 7,
-                        },
-                        shadowOpacity: 0.5,
-                        shadowRadius: 10,
-                        elevation: 10,
-                    } } >
+                    <View style= { Styles.emailConfirm } >
                         <View style= { { 
                             height: 50, 
                             backgroundColor: colors.darkBlue, 
                         } } />
-                        <View style= { { padding: 15, } } >
+                        <View style= { { padding: 15 } } >
                             <Text>Änderung der E-Mail bitte mit Passwort bestätigen.</Text>
                             <InputField
                                 placeholderText= "Passwort zur Bestätigung"
@@ -303,9 +357,7 @@ export default function ProfileScreen ({route, navigation}) {
                                 secureTextEntry={true}
                             />
                             {pwErrorVisible &&
-                                <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                                    Bitte ein Passwort eingeben.
-                                </Text>
+                                <Text style={[boxes.unPaddedRow, texts.errorLine]}>{ pwErrorVisible }</Text>
                             }
                         </View>
                         <View style={boxes.paddedRow}>
@@ -316,13 +368,7 @@ export default function ProfileScreen ({route, navigation}) {
                             <ButtonLarge
                                 title={"Abbrechen"}
                                 transparent={true}
-                                onPress={ () => { 
-                                    setCurrentEditMail(currentMail);
-                                    setCurrentEnterPassword("");
-                                    setMailErrorVisible(false);
-                                    setPwErrorVisible(false);
-                                    setEditEmailVisible(false);
-                            } } />
+                                onPress={ () => { pressEditEmailHandler(false) } } />
                         </View>
                     </View>
                 </Modal>
@@ -337,22 +383,7 @@ export default function ProfileScreen ({route, navigation}) {
                         height: window.height,
                         
                 } } >
-                    <View style= { { 
-                        height: 290, 
-                        width: 400, 
-                        backgroundColor: colors.lightGrey,
-                        alignSelf: 'center',
-                        marginTop: '30%',
-
-                        shadowColor: "#000",
-                        shadowOffset: {
-                            width: 0,
-                            height: 7,
-                        },
-                        shadowOpacity: 0.5,
-                        shadowRadius: 10,
-                        elevation: 10,
-                    } } >
+                    <View style= { Styles.psConfirm } >
                         <View style= { { 
                             height: 50, 
                             backgroundColor: colors.darkBlue, 
@@ -365,10 +396,8 @@ export default function ProfileScreen ({route, navigation}) {
                                 onChangeText= { changeConfirmPasswordHandler }
                                 secureTextEntry= { true }
                             />
-                            {pwErrorVisible &&
-                                <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                                    Bitte ein Passwort eingeben.
-                                </Text>
+                            {newPwErrorVisible &&
+                                <Text style= { [boxes.unPaddedRow, texts.errorLine] } >{ newPwErrorVisible }</Text>
                             }
                             <Text>Änderung des Passworts mit altem Passwort bestätigen.</Text>
                             <InputField
@@ -378,9 +407,7 @@ export default function ProfileScreen ({route, navigation}) {
                                 secureTextEntry= { true }
                             />
                             {pwErrorVisible &&
-                                <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                                    Bitte ein Passwort eingeben.
-                                </Text>
+                                <Text style= { [boxes.unPaddedRow, texts.errorLine] } >{ pwErrorVisible }</Text>
                             }
                         </View>
                         <View style={boxes.paddedRow}>
@@ -404,122 +431,112 @@ export default function ProfileScreen ({route, navigation}) {
                 <ScrollView 
                     contentContainerStyle= { [ { alignItems: 'center', width: useWindowDimensions().width } ] }
                 >
-                <View style= { boxes.width }>
-                    
-                    {/* Input Felder */}
-                    <View style= { boxes.paddedRow }>
-                        <View style= { { width: '50%' } } >
-                            <Padding height= { 15 } />
-                            <InputField
-                                title= "Name ändern"
-                                placeholderText= "Name"
-                                value= { currentEditName }
-                                onChangeText= { changeNameHandler }
-                                needConfirmation= { pressEditNameHandler }
-                            />
-                            <ErrorInfoHandler 
-                                visible= { nameErrorVisible }
-                                message= 'Gebe einen Benutzernamen an'
-                            />
-                            <InputField
-                                title= "Kurzbeschreibung ändern"
-                                placeholderText= "Kurzbeschreibung"
-                                value= { currentEditBio }
-                                onChangeText= { changeBioHandler }
-                                needConfirmation= { pressEditBioHandler }
-                            />
+                    <View style= { boxes.width }>
+                        
+                        {/* Input Felder */}
+                        <View style= { boxes.paddedRow }>
+                            <View style= { { width: '50%' } } >
+                                <Padding height= { 15 } />
+                                <InputField
+                                    title= "Name ändern"
+                                    placeholderText= "Name"
+                                    value= { currentEditName }
+                                    onChangeText= { changeNameHandler }
+                                    needConfirmation= { pressEditNameHandler }
+                                />
+                                <ErrorInfoHandler 
+                                    visible= { nameErrorVisible }
+                                    message= 'Gebe einen Benutzernamen an'
+                                />
+                                <InputField
+                                    title= "Kurzbeschreibung ändern"
+                                    placeholderText= "Kurzbeschreibung"
+                                    value= { currentEditBio }
+                                    onChangeText= { changeBioHandler }
+                                    needConfirmation= { pressEditBioHandler }
+                                />
+                            </View>
+                            <Padding width= { 15 } />
+                            <View style= { { width: '50%' } } >
+                                <Padding height= { 15 } />
+                                <InputField
+                                    title= "E-Mail ändern"
+                                    placeholderText= "E-Mail"
+                                    value= { currentEditMail } 
+                                    onChangeText= { changeEmailHandler }
+                                    needConfirmation= { () => setEditEmailVisible(true) }
+                                />
+                                <Padding height= { 18.5 } />
+                                <InputField
+                                    title= "Passwort ändern"
+                                    placeholderText= "Passwort"
+                                    value= { currentEditPassword } 
+                                    onChangeText= { changePasswordHandler }
+                                    needConfirmation= { () => setEditPasswordVisible(true) }
+                                    secureTextEntry= { true }
+                                />
+                            </View>
                         </View>
-                        <Padding width= { 15 } />
-                        <View style= { { width: '50%' } } >
-                            <Padding height= { 15 } />
-                            <InputField
-                                title= "E-Mail ändern"
-                                placeholderText= "E-Mail"
-                                value= { currentEditMail } 
-                                onChangeText= { changeEmailHandler }
-                                needConfirmation= { () => setEditEmailVisible(true) }
-                            />
-                            <Padding height= { 18.5 } />
-                            {/* <InputField
-                                title= "Passwort ändern"
-                                placeholderText="Passwort ändern"
-                                isButton= {true}
-                                icon={icons.edit}
-                                value="•••••••••"
-                                onPress={() => {setEditPasswordVisible(true)}}
-                            /> */}
-                            <InputField
-                                title= "Passwort ändern"
-                                placeholderText= "Passwort"
-                                value= { currentEditPassword } 
-                                onChangeText= { changePasswordHandler }
-                                needConfirmation= { () => setEditPasswordVisible(true) }
-                                secureTextEntry= { true }
-                            />
-                        </View>
-                    </View>
 
-                    <Padding height= { 18.5 } />
-                    <Text style= { texts.copy, boxes.paddedRow } >Push-Mitteilungen für dein Handy kannst Du in der App aktivieren.</Text>
-                    <Padding height= { 18.5 } />
+                        <Padding height= { 18.5 } />
+                        <Text style= { texts.copy, boxes.paddedRow } >Push-Mitteilungen für dein Handy kannst Du in der App aktivieren.</Text>
+                        <Padding height= { 18.5 } />
 
-                    {/* Attribute auswählen */}
-                    <View style= { boxes.paddedRow }>
-                        <View style= { { width: '50%' } } >
-                            
-                            {/* Fähigkeiten auflisten */}
-                            <AttributePreviewTile
-                                title= "Meine Fähigkeiten"
-                                subtitle= { skillsListText }
-                                index= { 0 }
-                            />
-                            <Padding height= { 18.5 } />
-                            
-                            {/* Fähigkeiten auswählen */}
-                            <AttributeSelect
-                                attributeType = "skills"
-                                selectedAttributesList= { selectedSkillsList }
-                                changeAttribute = { (skills, currentCategory) => { changeSkillsHandler(skills, currentCategory) } }
-                            />
-                            {selectedSkillsListErrorVisible &&
-                                <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                                    Bitte mindestens eine Fähigkeit angeben.
-                                </Text>
-                            }
+                        {/* Attribute auswählen */}
+                        <View style= { boxes.paddedRow }>
+                            <View style= { { width: '50%' } } >
+                                
+                                {/* Fähigkeiten auflisten */}
+                                <AttributePreviewTile
+                                    title= "Meine Fähigkeiten"
+                                    subtitle= { skillsListText }
+                                    index= { 0 }
+                                />
+                                <Padding height= { 18.5 } />
+                                
+                                {/* Fähigkeiten auswählen */}
+                                <View style= { { width: '200%', height: window.height -80 -60 -85 } } >
+                                    <AttributeSelect
+                                        attributeType = "skills"
+                                        selectedAttributesList= { selectedSkillsList }
+                                        changeAttribute = { (skills, currentCategory) => { changeSkillsHandler(skills, currentCategory) } }
+                                    />
+                                </View>
+                                {selectedSkillsListErrorVisible &&
+                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
+                                        Bitte mindestens eine Fähigkeit angeben.
+                                    </Text>
+                                }
+                            </View>
+                            <Padding width= { 15 } />
+                            <View style= { { width: '50%' } } >
+                                
+                                {/* Interessen auflisten */}
+                                <AttributePreviewTile
+                                    title= "Meine Interessen"
+                                    subtitle= { interestsListText }
+                                    index= { 0 }
+                                />
+                                <Padding height= { 18.5 } />
+                                
+                                {/* Interessen auswählen */}
+                                <View style= { { width: '200%', height: window.height -80 -60 -85 } } >
+                                    <AttributeSelect
+                                        attributeType = "interests"
+                                        selectedAttributesList= { selectedInterestsList }
+                                        changeAttribute = { (interests, currentCategory) => { changeInterestsHandler(interests, currentCategory) } }
+                                    />
+                                </View>
+                                {selectedInterestsListErrorVisible &&
+                                    <Text style={[boxes.unPaddedRow, texts.errorLine]}>
+                                        Bitte mindestens ein Interesse angeben.
+                                    </Text>
+                                }
+                            </View>
                         </View>
-                        <Padding width= { 15 } />
-                        <View style= { { width: '50%' } } >
-                            
-                            {/* Interessen auflisten */}
-                            <AttributePreviewTile
-                                title= "Meine Interessen"
-                                subtitle= { interestsListText }
-                                index= { 0 }
-                            />
-                            <Padding height= { 18.5 } />
-                            
-                            {/* Interessen auswählen */}
-                            <AttributeSelect
-                                attributeType = "interests"
-                                selectedAttributesList= { selectedInterestsList }
-                                changeAttribute = { (interests, currentCategory) => { changeInterestsHandler(interests, currentCategory) } }
-                            />
-                            {selectedInterestsListErrorVisible &&
-                                <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                                    Bitte mindestens ein Interesse angeben.
-                                </Text>
-                            }
-                        </View>
-                    </View>
-                    <Padding height= { 18.5 } />
-                    
-                    <ButtonLarge 
-                        title= "Abmelden" 
-                        onPress= { logOut }
-                        icon= "exit"
-                    />
                     </View>
                 </ScrollView>
+                
             </ScrollView>
         </View>
     )

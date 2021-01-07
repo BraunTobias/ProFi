@@ -1,16 +1,31 @@
 import React from "react";
-import { Text, TouchableOpacity, Image } from "react-native";
-import { icons, boxes, texts } from '../Styles';
+import { Text, TouchableOpacity, Image, StyleSheet } from "react-native";
+import { icons, boxes, texts, colors } from '../Styles';
 
 export default function ButtonSmall (props) {
 
-  const selectBoxStyle = () => {
-    if (!props.inactive) {
-      return (boxes.buttonSmall);      
-    } else {
-      return (boxes.buttonSmallInactive);      
-    }
-  }
+  const Styles = StyleSheet.create({
+    button: {
+      height: 45,
+      width: 150,
+      paddingLeft: 15,
+      paddingRight: 5,
+      marginVertical: 5,
+      borderRadius: 7,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center"
+    },
+    buttonColor: {
+      backgroundColor:  props.status === "inactive" ? colors.lightBlue : colors.darkBlue
+    },
+    icon: {
+        width: 35,
+        height: 35,
+        tintColor: colors.white
+    },
+  })
+
   var image;
   switch (props.icon) {
     case "checkTrue": image = icons.checkTrue; break;
@@ -20,19 +35,21 @@ export default function ButtonSmall (props) {
     case "exit": image = icons.exit; break;
     case "nogo": image = icons.nogo; break;
     case "logo": image = icons.logo; break;
+    case "edit": image = icons.edit; break;
+    case "fav": image = icons.fav; break;
     default: image = icons.logo;
   }
 
   return (
     <TouchableOpacity 
-      style= { selectBoxStyle() } 
+      style= { [Styles.button, Styles.buttonColor] } 
       onPress= { () => props.onPress() }
     >
       <Text style= { texts.buttonSmall }>
         { props.title }
       </Text>
       <Image
-        style= { boxes.buttonIconImage }
+        style= { [Styles.icon, Styles.iconColor] }
         source= { image }
         resizeMode= { "contain" }
       />

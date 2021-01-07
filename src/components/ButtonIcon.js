@@ -25,8 +25,13 @@ export default function ButtonIcon (props) {
         height: 35,
     },
     iconColor: {
-      tintColor:  props.status !== "transparent" && props.status !== "color" ? "white" : 
-                  props.icon === "nogo" || props.icon === "delete" ? colors.red : colors.darkBlue
+      // tintColor:  props.status !== "transparent" && props.status !== "color" ? "white" : 
+      //             props.icon === "nogo" || props.icon === "delete" ? colors.red : colors.darkBlue
+      tintColor:  props.status !== "transparent" && (props.icon === "nogo" || props.icon === "delete") ? colors.red :
+                  props.status !== "transparent" && (props.icon === "back" || props.icon === "profile") ? colors.lightBlue : 
+                  props.status !== "transparent" && (props.icon !== "nogo" || props.icon !== "delete") ? colors.darkBlue : 
+                  props.status === "transparent" && (props.icon === "nogo" || props.icon === "delete") ? colors.lightRed :
+                  colors.lightBlue
     },
     logo: {
       width: 45,
@@ -37,8 +42,9 @@ export default function ButtonIcon (props) {
 
   // Button-Einstellungen & -Farbe
   var buttonSettings;
-  if (props.status !== "color" && props.status !== "transparent") buttonSettings = [Styles.button, Styles.buttonColor];
-  else buttonSettings = Styles.button;
+  // if (props.status !== "color" && props.status !== "transparent") buttonSettings = [Styles.button, Styles.buttonColor];
+  // else 
+  buttonSettings = Styles.button;
 
   // Icon-Einstellungen & -Farbe
   var iconSettings;
@@ -64,6 +70,7 @@ export default function ButtonIcon (props) {
     case "reply": image = icons.reply; break;
     case "profile": image = icons.profile; break;
     case "logo": image = icons.logo; break;
+    case "back": image = icons.back; break;
     default: image = icons.logo;
   }
 

@@ -1,27 +1,42 @@
-import { format } from "date-fns";
 import { Platform, Dimensions } from "react-native";
 
-const width = Dimensions.get('window').width; //full width
-const height = Dimensions.get('window').height; //full width
+const width = Dimensions.get('window').width;
+const height = Dimensions.get('window').height;
 
 const colors = {
     darkBlue: '#222f56',
     mediumBlue: '#808aa5',
     lightBlue: '#ced7e4',
-    whiteBlue: '#e5eaf0',
-    lightGrey: '#f2f2f2',
-    mediumGrey: '#d2d3d4',
+    whiteBlue: '#e5eaf0', // Neue Web-Farbe benötigt für das Date-Modal
+    lightGrey: '#f2f3f4',
+    mediumGrey: '#d2d3d4', // Neue Web-Farbe benötigt für Kommentar-Antworten auf der Idee-Seite
     darkGrey: '#333333',
     red: '#640023',
-    lightRed: '#a46073',
-    white: 'white'
+    lightRed: '#a46073', // Neue Web-Farbe benötigt für Nogo-Button auf der Kurs-Seite
+    white: 'white',
+
+    // Kacheln
+    tile1: 'white', 
+    tile2: '#f2f3f4', 
+    // Texte
+    textHl: '#222f56',
+    textCopy: '#333333',
+    textHighlight: 'white',
+    textInactive: '#808aa5',
+    buttonInactive: '#f2f3f4',
+    textInput: 'white',
+    // Generelle Farben
+    base: '#f2f3f4',
+    separator: '#f2f3f4', 
+    contrast: '#808aa5',
+    primary: '#222f56',
+    secondary: '#ced7e4',
+    subheader: '#ced7e4',
+    red: '#640023',
 }
 
 const iconsize = 35;
 const iconsizeAdd = 60;
-
-const headerHeight = 100;
-const padding = 15;
 
 const boxes = {
     mainContainer: {
@@ -31,13 +46,7 @@ const boxes = {
         backgroundColor: colors.lightGrey,
         alignItems: "center",
         paddingTop: 15,
-        // justifyContent: "center",
     },
-    // modal: {
-    //     flex: 1, 
-    //     justifyContent: 'flex-start',
-    //     flexDirection: 'column',
-    // },
     header: {
         height: 80,
         backgroundColor: colors.darkBlue,
@@ -99,32 +108,7 @@ const boxes = {
         justifyContent: "center",
         alignItems: "center",
     },
-    buttonSmall: {
-        height: 45,
-        width: 150,//('100%' - 40) / 2,
-        paddingLeft: 15,
-        paddingRight: 5,
-        marginVertical: 5,
-        backgroundColor: colors.darkBlue,
-        borderRadius: 7,
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center"
-    },
-    buttonSmallInactive: {
-        height: 45,
-        width: 150,//('100%' - 40) / 2,
-        paddingLeft: 15,
-        paddingRight: 5,
-        marginVertical: 5,
-        backgroundColor: colors.lightBlue,
-        borderRadius: 7,
-        borderWidth: 2,
-        borderColor: colors.white,
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center"
-    },
+    
     listTile: {
         paddingLeft: 15,
         paddingRight: 35,
@@ -151,26 +135,7 @@ const boxes = {
         marginEnd: 5,  
         marginTop: 0.5  
     },
-
-    profileImage: {
-            width: 60,
-            height: 60,
-            borderRadius: 111,
-            aspectRatio: 1,
-            marginRight: 7,
-            //tintColor: colors.white
-        // height: "100%",
-        // marginRight: 7,
-        // aspectRatio: 1,
-        // backgroundColor: colors.lightBlue,
-        // borderRadius: 111
-    },
-    profileViewImage: {
-        width: width,
-        height: 75,
-        alignItems: "center",
-        // borderRadius: 111
-    },
+    
     attributeImage: {
         width: 60,
         height: 60,
@@ -505,8 +470,8 @@ const profileImage = {
 
 const icons = {
     profilePlaceholder: require("./assets/ui-icons/user.png"),
-    checkTrue: require("./assets/icons/check-true.png"),
-    checkFalse: require("./assets/icons/check-false.png"),
+    checkTrue: require("./assets/ui-icons/check-true.png"),
+    checkFalse: require("./assets/ui-icons/check-false.png"),
     home: require("./assets/ui-icons/home.png"),
     profile: require("./assets/ui-icons/profile.png"),
     plus: require("./assets/ui-icons/plus.png"),
@@ -527,6 +492,8 @@ const icons = {
     replyComment: require("./assets/ui-icons/replyComment.png"),
     close: require("./assets/ui-icons/close.png"),
     logo: require("./assets/logo.png"),
+    back: require("./assets/ui-icons/back.png"),
+    warning: require("./assets/ui-icons/warning.png"),
 }
 
 export { boxes, buttons, texts, colors, iconsize, iconsizeAdd, icons, profileImage, width, height }

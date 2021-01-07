@@ -1,5 +1,5 @@
 import React  from "react";
-import { Image, TouchableOpacity } from "react-native";
+import { Image, TouchableOpacity, StyleSheet } from "react-native";
 import { boxes, icons } from "../Styles";
 
 export default function ProfileImage (props) {
@@ -11,9 +11,20 @@ export default function ProfileImage (props) {
             onPress= { () => props.onPress() }
         >
             <Image 
-                style= { [ boxes.profileImage, { marginEnd: props.isLast ? 30 : 7 } ] }
+                style= { [ Styles.profileImage, { marginEnd: props.isLast ? 30 : 7 } ] }
                 source= { source }
             />
         </TouchableOpacity>
     )
 }
+
+const Styles = StyleSheet.create({
+    profileImage: {
+        width: 60,
+        height: 60,
+        borderRadius: 111,
+        aspectRatio: 1,
+        marginRight: 7,
+    },
+})
+
