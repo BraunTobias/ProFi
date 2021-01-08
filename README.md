@@ -16,6 +16,7 @@ Alternativ kann die App auf einem Virtual Device gestartet werden.
 ```
 expo
 react-native
+npm
 ```
 
 ### Installation
