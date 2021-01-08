@@ -13,11 +13,7 @@ Die App soll das Finden und Zuteilen von Interessenten in Projektteams unterstü
 
 ### Installation
 
-Packages installieren:
 
-```
-npm install
-```
 
 ### Ausführen
 
