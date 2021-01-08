@@ -64,7 +64,7 @@ Run on iOS simulator
 ## Autoren
 
 * **Tobias Braun** - [BraunTobias](https://github.com/BraunTobias)
-* **Nikolas Kolbeck** - [nkolbeck](https://github.com/nkolbeck)
+* **Nicolas Kolbeck** - [nkolbeck](https://github.com/nkolbeck)
 * **Melina Zanon** - [melinazanon](https://github.com/melinazanon)
 
 
