@@ -1,10 +1,9 @@
-import React, {useState, useEffect, useLayoutEffect, useContext} from 'react';
+import React, {useState, useEffect, useLayoutEffect } from 'react';
 import {View} from 'react-native';
 
-import { icons, colors, boxes, texts } from '../Styles';
+import { icons, colors } from '../Styles';
 import AttributeList from '../components/AttributeList';
 import DB from '../api/DB_API';
-import FlexRow from '../components/FlexRow';
 
 import Button from "../components/Button"
 import Padding from "../components/Padding"
@@ -46,14 +45,14 @@ export default function AttributeListScreen ({route, navigation}) {
             { interestsList.length > 0 &&
                 <View>
                     <Button
-                        inactive={viewedList == interestsList}
+                        inactive={viewedList === interestsList}
                         title="Fähigkeiten"
                         icon={icons.info}
                         onPress={() => setViewedList(skillsList)}
                     />
                     <Padding width={10}/>
                     <Button
-                        inactive={viewedList != interestsList}
+                        inactive={viewedList !== interestsList}
                         title="Interessen"
                         icon={icons.info}
                         onPress={() => setViewedList(interestsList)}

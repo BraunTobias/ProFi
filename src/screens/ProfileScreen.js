@@ -7,7 +7,6 @@ import ButtonLarge from '../components/ButtonLarge';
 import InputField from '../components/InputField';
 import AttributePreviewTile from '../components/AttributePreviewTile';
 import AttributeSelect from '../components/AttributeSelect';
-import ModalContent from "../components/ModalContent";
 import InfoModal from '../components/InfoModal';
 import ButtonIcon from '../components/ButtonIcon';
 import Padding from '../components/Padding';
@@ -24,16 +23,10 @@ export default function ProfileScreen ({ route, navigation }) {
     const [currentMail, setCurrentMail] = useState("");
     const [currentEditMail, setCurrentEditMail] = useState("");
     const [currentEnterPassword, setCurrentEnterPassword] = useState("");
-    const [currentPassword, setCurrentPassword] = useState("");
     const [currentEditPassword, setCurrentEditPassword] = useState("•••••••••");
     const [currentConfirmPassword, setCurrentConfirmPassword] = useState("");
     const [currentImage, setCurrentImage] = useState("");
     const [imageLoading, setImageLoading] = useState(true);
-    const [pushEvaluateEnabled, setPushEvaluateEnabled] = useState(false);
-    const [pushCommentEnabled, setPushCommentEnabled] = useState(false);
-    const [pushDeleteEnabled, setPushDeleteEnabled] = useState(false);
-    const [pushAttChangeEnabled, setPushAttChangeEnabled] = useState(false);
-    const [pushCourseChangeEnabled, setPushCourseChangeEnabled] = useState(false);
     
     const [selectedSkillsList, setSelectedSkillsList] = useState([]);
     const [skillsListText, setSkillsListText] = useState("");

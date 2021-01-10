@@ -20,9 +20,25 @@ export default function ButtonSmall (props) {
       backgroundColor:  props.status === "inactive" ? colors.lightBlue : colors.darkBlue
     },
     icon: {
-        width: 35,
-        height: 35,
-        tintColor: colors.white
+      height:
+        props.icon === "plus" ? 30 :
+        // props.icon === "fav" ? 30 : 
+        props.icon === "checkTrue" ? 25 : 
+        props.icon === "checkFalse" ? 25 :
+        props.icon === "edit" ? 40 :
+        35,
+      width: 
+        props.icon === "plus" ? 30 :
+        // props.icon === "fav" ? 30 : 
+        props.icon === "checkTrue" ? 25 : 
+        props.icon === "checkFalse" ? 25 :
+        props.icon === "edit" ? 40 :
+        35,
+      tintColor: colors.white,
+      marginRight: 
+        props.icon === "checkTrue" ? 5 : 
+        props.icon === "checkFalse" ? 5 :
+        0
     },
   })
 

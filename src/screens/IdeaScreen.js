@@ -1,9 +1,8 @@
 import React, {useState, useEffect, useLayoutEffect} from 'react';
-import { View, Text, Modal, FlatList, ScrollView, StyleSheet, ActivityIndicator, Alert, Image, useWindowDimensions, TouchableHighlight } from 'react-native';
-import { compareAsc, format } from 'date-fns';
+import { View, Text, Modal, FlatList, ScrollView, StyleSheet, ActivityIndicator, Image, useWindowDimensions } from 'react-native';
 import Autolink from 'react-native-autolink';
 
-import { icons, colors, boxes, texts, height } from '../Styles';
+import { icons, colors, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
 import InputField from '../components/InputField';
 import CommentTile from '../components/CommentTile';
@@ -14,7 +13,6 @@ import ButtonIcon from '../components/ButtonIcon';
 import ScrollRow from '../components/ScrollRow';
 import AttributePreviewTile from '../components/AttributePreviewTile';
 import ProfileView from '../components/ProfileView';
-import ProfileBox from '../components/ProfileBox';
 import AttributeSelect from '../components/AttributeSelect';
 import Padding from '../components/Padding';
 import FlexRow from '../components/FlexRow';
@@ -34,7 +32,7 @@ export default function IdeaScreen ({route, navigation}) {
     const {courseType} = route.params;
     const {currentUserId} = route.params;
     const {courseEvaluated} = route.params;
-    const currentUserIsCreator = (ideaInfo.creator == currentUserId);
+    const currentUserIsCreator = (ideaInfo.creator === currentUserId);
 
     // State Hooks
     const [currentUserName, setCurrentUserName] = useState("");
@@ -172,7 +170,7 @@ export default function IdeaScreen ({route, navigation}) {
     }
     const changeReplyTextHandler = (enteredText) => {
         setCurrentReplyText(enteredText);
-        if (enteredText != "") setCurrentCommentErrorVisible(false);
+        if (enteredText !== "") setCurrentCommentErrorVisible(false);
     }
     const pressNewCommentHandler = (committed) => {
         if (committed) {
@@ -197,7 +195,7 @@ export default function IdeaScreen ({route, navigation}) {
     }
     const pressReplyHandler = (committed) => {
         if (committed) {
-            if (currentReplyText != "") {
+            if (currentReplyText !== "") {
                 DB.addComment(courseId, ideaInfo.id, courseType, currentReplyText, currentReplyComment.id, () => {
                     setNewReplyVisible(false);
                     setCurrentNewCommentText("");
@@ -225,12 +223,12 @@ export default function IdeaScreen ({route, navigation}) {
     }
     const changeSkillsHandler = (skill) => {
         if (selectedSkillsList.indexOf(skill) < 0) {
-            var list = selectedSkillsList;
+            let list = selectedSkillsList;
             list.push(skill);
             setSkillsListText(list.join(", "));
             setSelectedSkillsList(list);
         } else {
-            var list = selectedSkillsList.filter(item => item !== skill);
+            let list = selectedSkillsList.filter(item => item !== skill);
             setSkillsListText(list.join(", "));
             setSelectedSkillsList(list);
         }
@@ -249,16 +247,18 @@ export default function IdeaScreen ({route, navigation}) {
                     setIdeaName(editIdeaName);
                     setIdeaText(editIdeaText);
                 }, () => {
-                    Alert.alert(
-                        "Fehler",
-                        "Idee konnte nicht bearbeitet werden",
-                        [{ text: "OK", onPress: () => {}}],
-                    );              
+                    console.log("Idee konnte nicht bearbeitet werde.")
+                    let message = {
+                        title: "Fehler",
+                        copy: "Idee konnte nicht bearbeitet werde.",
+                        onDismiss: () => { setErrorMessage(false); }
+                    }
+                    setErrorMessage(message); 
                 });
             }
             if (editIdeaName.length <= 1) setEditIdeaNameErrorVisible("Bitte einen Namen angeben.");
             if (editIdeaText.length <= 1) setEditIdeaTextErrorVisible("Bitte einen Beschreibungstext angeben.");
-            if (selectedSkillsList.length == 0) setSelectedSkillsListErrorVisible("Bitte mindestens eine Fähigkeit angeben.");
+            if (selectedSkillsList.length === 0) setSelectedSkillsListErrorVisible("Bitte mindestens eine Fähigkeit angeben.");
         } else {
             setEditIdeaVisible(false);
             setEditIdeaName(ideaName);
@@ -522,7 +522,8 @@ export default function IdeaScreen ({route, navigation}) {
                             </View> 
                         )
                     }}
-                    onDismiss= { () => pressEditIdeaHandler(false) }
+                    onPress= { () => pressEditIdeaHandler(true) }
+                    // onDismiss= { () => pressEditIdeaHandler(false) }
                 />
             </Modal>
 

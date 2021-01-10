@@ -304,6 +304,7 @@ export default function CourseScreen ({route, navigation}) {
                     setEditCourseVisible(false);
                     setEditCourseNameErrorVisible(false);
                     setCourseName(editCourseName);
+                    setCourseLink(editCourseLink);
                     setCourseDate(editCourseDate);
                     setMinMembers(editCourseMinMembers);
                     setMaxMembers(editCourseMaxMembers);
@@ -330,6 +331,9 @@ export default function CourseScreen ({route, navigation}) {
     const changeEditCourseNameHandler = (enteredText) => {
         setEditCourseName(enteredText);
         if (enteredText !== "") setEditCourseNameErrorVisible(false);
+    }
+    const changeEditCourseLinkHandler = (enteredText) => {
+        setEditCourseLink(enteredText);
     }
     const changeEditCourseDateHandler = (date) => {
         setEditCourseDate(new Date(date.getFullYear(), date.getMonth(), date.getDate(), editCourseHours, editCourseMinutes));
@@ -416,6 +420,13 @@ export default function CourseScreen ({route, navigation}) {
                                             onChangeText={changeEditCourseNameHandler}
                                         />
                                         <ErrorInfoHandler visible= { editCourseNameErrorVisible } />
+                                        <InputField
+                                            title= "Emil-Link"
+                                            placeholderText= {"Optional einen Link eingeben."}
+                                            value={editCourseLink}
+                                            onChangeText={changeEditCourseLinkHandler}
+                                        />
+                                        <ErrorInfoHandler visible= { false } />
                                         <View style={boxes.unPaddedRow}>
                                             <NumberInput
                                                 title= {"Mitglieder min."}
@@ -546,6 +557,9 @@ export default function CourseScreen ({route, navigation}) {
                         <View style={ boxes.paddedRow }>
                             <Text style={texts.subHeader}>{format(courseDate, "dd.MM.yyyy")}</Text>
                             <Text style={texts.subHeader}>{creator}</Text>
+                        </View>
+                        <View style={ boxes.paddedRow }>
+                            <Text style={texts.subHeader}>{courseLink}</Text>
                         </View>
                         <ScrollRow
                             data= { members }

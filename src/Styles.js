@@ -11,7 +11,7 @@ const colors = {
     lightGrey: '#f2f3f4',
     mediumGrey: '#d2d3d4', // Neue Web-Farbe benötigt für Kommentar-Antworten auf der Idee-Seite
     darkGrey: '#333333',
-    red: '#640023',
+    // red: '#910038',
     lightRed: '#a46073', // Neue Web-Farbe benötigt für Nogo-Button auf der Kurs-Seite
     white: 'white',
 
@@ -32,7 +32,7 @@ const colors = {
     primary: '#222f56',
     secondary: '#ced7e4',
     subheader: '#ced7e4',
-    red: '#640023',
+    red: '#910038',
 }
 
 const iconsize = 35;
@@ -170,11 +170,9 @@ const boxes = {
     },
     
     separator: {
-        paddingLeft: 15,
         paddingVertical: 7,
         borderBottomWidth: 1,
         borderColor: colors.darkBlue,
-        // backgroundColor: colors.white
     },
     
 }

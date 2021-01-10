@@ -64,17 +64,31 @@ export default function ListTile (props) {
             colors.textHl
           } ] } >{ props.title } </Text>
         </View>
-        <Text numberOfLines={2} ellipsizeMode="tail" style = { [texts.copy, { 
-          color: props.inactive ? colors.textInactive : 
-          props.myTeam ? colors.textHighlight : 
-          colors.textCopy
-        } ] } >{ props.subtitle }</Text>
+        <View style= {{ 
+          width: '100%'
+        }} >
+          <Text numberOfLines={2} ellipsizeMode="tail" style = { [texts.copy, { 
+            color: 
+              props.inactive ? colors.textInactive : 
+              props.myTeam ? colors.textHighlight : 
+              colors.textCopy
+          } ] } >{ props.subtitle }</Text>
+        </View>
       </View>
       {props.onDelete &&
         <View style= { Styles.deletebox } >
           <ButtonIcon 
             icon= { "delete" }
             onPress= { () => { props.onDelete() } }
+            status= { "transparent" }
+          />
+        </View>
+        }
+        {props.onExit &&
+        <View style= { Styles.deletebox } >
+          <ButtonIcon 
+            icon= { "exit" }
+            onPress= { () => { props.onExit() } }
             status= { "transparent" }
           />
         </View>
@@ -91,7 +105,8 @@ const Styles = StyleSheet.create({
   },
   content: {
     height: '100%',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    width: '100%'
   },
   listTile: {
     paddingLeft: 15,

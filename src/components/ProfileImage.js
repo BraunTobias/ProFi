@@ -4,7 +4,7 @@ import { boxes, icons } from "../Styles";
 
 export default function ProfileImage (props) {
 
-    const source = props.imageUrl ? { uri: props.imageUrl } : icons.profilePlaceholder;
+    const source = props.imageUrl === "noImage" ? icons.profilePlaceholder : { uri: props.imageUrl };
 
     return (
         <TouchableOpacity 

@@ -1,6 +1,6 @@
 import React from "react";
 import { TouchableOpacity, Image, StyleSheet } from "react-native";
-import { icons, boxes, colors } from '../Styles';
+import { icons, colors } from '../Styles';
 
 export default function ButtonIcon (props) {
 
@@ -21,8 +21,8 @@ export default function ButtonIcon (props) {
                         props.status === "neg" ? colors.red : colors.lightRed
     },
     icon: {
-        width: 35,
-        height: 35,
+      height: 35,
+      width: 35,
     },
     iconColor: {
       // tintColor:  props.status !== "transparent" && props.status !== "color" ? "white" : 
@@ -30,7 +30,7 @@ export default function ButtonIcon (props) {
       tintColor:  props.status !== "transparent" && (props.icon === "nogo" || props.icon === "delete") ? colors.red :
                   props.status !== "transparent" && (props.icon === "back" || props.icon === "profile") ? colors.lightBlue : 
                   props.status !== "transparent" && (props.icon !== "nogo" || props.icon !== "delete") ? colors.darkBlue : 
-                  props.status === "transparent" && (props.icon === "nogo" || props.icon === "delete") ? colors.lightRed :
+                  props.status === "transparent" && (props.icon === "nogo" || props.icon === "delete") ? colors.lightBlue :
                   colors.lightBlue
     },
     logo: {

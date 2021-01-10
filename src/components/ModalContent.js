@@ -44,7 +44,7 @@ export default function ModalComponent (props) {
                     {!props.infoScreen &&
                         <ButtonLarge
                             title={"Bestätigen"}
-                            onPress={ () => { props.onDismiss(true) } }
+                            onPress={ () => { props.onPress(true) } }
                         />
                     }
                     {/* Leere View zum ausgleich des space-between */}
@@ -52,9 +52,9 @@ export default function ModalComponent (props) {
                         <View/>
                     }
                     <ButtonLarge
-                        title={"Abbrechen"}
+                        title={ props.infoScreen ? "OK" : "Abbrechen" }
                         transparent={true}
-                        onPress={ () => { props.onDismiss(false) } }
+                        onPress={ () => { props.onPress(false) } }
                     />
                 </View>
             </View>

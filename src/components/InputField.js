@@ -67,7 +67,7 @@ export default function InputField (props) {
             onChangeText= { text => { props.onChangeText(text); setTextChanged(true) } }
             secureTextEntry= { props.secureTextEntry && !pwVisible }
             multiline={props.multiline}
-            maxLength= { props.multiline ? 300 : 50 }
+            maxLength= { props.multiline ? 300 : 100 }
             numberOfLines={props.numberOfLines}
           />
 

@@ -378,7 +378,7 @@ export default function HomeScreen ({navigation}) {
             <SectionList 
                 data = { Object.keys(currentCourses) }
                 onPress= { (item) => { selectCourseHandler(item) } }
-                onDelete= { (id, courseType) => deleteCourseHandler(id, courseType) }
+                onExit= { (id, courseType) => deleteCourseHandler(id, courseType) }
                 currentCourses = { currentCourses }
             />
         </View>
