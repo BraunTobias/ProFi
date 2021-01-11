@@ -1058,12 +1058,14 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
                 if(isEmptyIdea){
                     for (const memId of emptyIdeas[ideaToResolve].team) {
                         members[memId].sorted = false;
+                        members[memId].interestsCounted = false;
                     }
                     delete emptyIdeas[ideaToResolve];
                 }
                 else{
                     for (const memId of ideas[ideaToResolve].team) {
                     members[memId].sorted = false;
+                    members[memId].interestsCounted = false;
                     }
                     delete ideas[ideaToResolve];
                 }
