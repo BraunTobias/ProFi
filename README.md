@@ -59,6 +59,7 @@ Run on iOS simulator
 
 * [React Native](https://reactnative.dev/) 
 * [Expo](https://docs.expo.io/)
+* [Firebase](https://firebase.google.com/)
 
 
 ## Autoren
