@@ -32,8 +32,8 @@ Die Website wird im Browser geöffnet.
 
 ## Built With
 
-* [React Native](https://reactnative.dev/) 
-* [Expo](https://docs.expo.io/)
+* [React Native](https://reactnative.dev/)
+* [Firebase](https://firebase.google.com/)
 
 
 ## Autoren
