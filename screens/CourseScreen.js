@@ -5,7 +5,7 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { compareAsc, format } from 'date-fns';
 import Autolink from 'react-native-autolink';
 
-import { icons, colors, boxes, texts } from '../Styles';
+import { icons, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
 import InputField from '../components/InputField';
 import SwipeButton from '../components/SwipeButton';
@@ -563,7 +563,7 @@ export default CourseScreen = ({route, navigation}) => {
                             myTeam={item.myTeam}
                             isMember={item.userIsMember}
                             inactive = {(evaluated && (!item.team || item.team.length == 0)) ||
-                                        (item.team && item.team.indexOf(currentUserId) < 0)
+                                        (!evaluated && item.team && item.team.indexOf(currentUserId) < 0)
                                         }
                             warning = {item.warning && item.warning != ""}
                         />

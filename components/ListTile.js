@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { StyleSheet, Text, Image, TouchableHighlight, View, Animated } from "react-native";
-import { icons, colors, boxes, texts } from '../Styles';
+import { icons, texts } from '../Styles';
 import { ThemeContext } from '../components/ThemeManager';
 
 export default ListTile = props => {

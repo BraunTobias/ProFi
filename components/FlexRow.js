@@ -1,8 +1,6 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 
-import { icons, colors, boxes, texts } from '../Styles';
-
 export default FlexRow = (props) => {
     return(
         <View style= { [styles.flexRow, {

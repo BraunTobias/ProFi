@@ -6,7 +6,7 @@ import { compareAsc, format } from 'date-fns';
 import AsyncStorage from '@react-native-community/async-storage';
 import { ScrollView } from 'react-native-gesture-handler';
 
-import { icons, colors, boxes, texts } from '../Styles';
+import { icons, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
 import InputField from '../components/InputField';
 import NumberInput from '../components/NumberInput';
@@ -106,7 +106,7 @@ export default HomeScreen = ({navigation}) => {
                         "data": [addedCourse]
                     })
                 }
-                console.log(addedCourse)
+                // console.log(addedCourse)
                 setCurrentCourses(newCourseList);
                 setFindCourseVisible(false);
 
@@ -362,7 +362,7 @@ export default HomeScreen = ({navigation}) => {
                             onPress={() => {selectCourseHandler(item)}} 
                             id={item.id}
                             title={item.title}
-                            subtitle={item.date ? item.members.length + " Mitglieder, Gruppengröße " + item.minMembers + "-" + item.maxMembers + "\n" + format(item.date.toDate(), "dd.MM.yyyy") : "Gruppengröße " + item.minMembers + "-" + item.maxMembers + "\n" + "Kein Datum"}
+                            subtitle={item.date ? item.members.length + " Mitglied" + (item.members.length != 1 ? "er" : "") + ", Gruppengröße " + item.minMembers + (item.minMembers != item.maxMembers ? "-" + item.maxMembers : "") + "\n" + format(item.date.toDate(), "dd.MM.yyyy") : "Gruppengröße " + item.minMembers + "-" + item.maxMembers + "\n" + "Kein Datum"}
                             index = {index}
                             isMember = {item.userIsMember}
                             myTeam= {item.evaluated && item.members.indexOf(currentUserId) >= 0}

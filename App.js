@@ -10,6 +10,7 @@ import { AppearanceProvider } from 'react-native-appearance';
 
 export default App => {
 
+
   // Schriften laden
   let [fontsLoaded] = useFonts({
     Inter_400Regular,

@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { View, TextInput, Text, Image, TouchableOpacity, TouchableWithoutFeedback, StyleSheet, ActivityIndicator } from 'react-native';
 // import { ,  } from 'react-native-gesture-handler';
-import { icons, colors, boxes, texts } from '../Styles';
+import { icons, boxes, texts } from '../Styles';
 import FlexRow from './FlexRow';
 import { ThemeContext } from '../components/ThemeManager';
 

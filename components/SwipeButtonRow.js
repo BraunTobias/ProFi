@@ -1,8 +1,6 @@
 import React, {useContext} from "react";
-import { StyleSheet, TouchableOpacity, View, Image, Animated } from "react-native";
+import { StyleSheet, View } from "react-native";
 
-import { icons, colors, boxes, texts } from '../Styles';
-import SwipeButton from '../components/SwipeButton';
 import { ThemeContext } from '../components/ThemeManager';
 
 export default SwipeButtonRow = props => {

@@ -64,11 +64,10 @@ export const ThemeProvider = ({children}) => {
 
     // Bei Änderung des Farbschemas am Handy wird es entsprechend neu festgelegt
     Appearance.addChangeListener(({ colorScheme }) => {
+        // console.log(colorScheme);
         if (colorScheme == "dark") {
-            console.log(colorScheme);
             setThemeColors(darkColors);
         } else {
-            console.log(colorScheme);
             setThemeColors(lightColors);
         }
     });

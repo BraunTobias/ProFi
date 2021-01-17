@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useLayoutEffect, useContext} from 'react';
 import {View} from 'react-native';
 
-import { icons, colors, boxes, texts } from '../Styles';
+import { icons } from '../Styles';
 import AttributeList from '../components/AttributeList';
 import DB from '../api/DB_API';
 import FlexRow from '../components/FlexRow';

@@ -4,7 +4,7 @@ import Autolink from 'react-native-autolink';
 import { compareAsc, format } from 'date-fns';
 import { ThemeContext } from '../components/ThemeManager';
 
-import { icons, colors, boxes, texts } from '../Styles';
+import { icons, texts } from '../Styles';
 import DB from '../api/DB_API';
 import ProfileImage from "./ProfileImage";
 

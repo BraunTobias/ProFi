@@ -2,7 +2,6 @@ import React from "react";
 import { Text, View, StyleSheet } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 
-import { icons, colors, boxes, texts } from '../Styles';
 import AttributeImage from "./AttributeImage";
 
 export default ScrollRow = props => {

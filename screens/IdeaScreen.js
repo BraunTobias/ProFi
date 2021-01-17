@@ -3,7 +3,7 @@ import { View, Text, Modal, Keyboard, ActivityIndicator, Animated, Alert, Image 
 import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view';
 import { compareAsc, format } from 'date-fns';
 
-import { icons, colors, boxes, texts } from '../Styles';
+import { icons, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
 import InputField from '../components/InputField';
 import SwipeButton from '../components/SwipeButton';
@@ -74,7 +74,6 @@ export default IdeaScreen = ({route, navigation}) => {
     const onSwipeValueChange = (swipeData) => {
         const { key, value } = swipeData;
         rowSwipeAnimatedValues[key].setValue(Math.abs(value));
-        console.log("change");
     };
     
     useLayoutEffect(() => {
@@ -411,14 +410,14 @@ export default IdeaScreen = ({route, navigation}) => {
                         <Text style={[texts.copy, {color: themeColors.textCopy}]}>{ideaText}</Text>
                     </FlexRow>
                 }
-                { ideaInfo.warning && ideaInfo.warning != "" &&
+                { ideaInfo.warning != null && ideaInfo.warning != "" && 
                     <View>
                         <Padding height={5}/>
                         <FlexRow padding left>
                             <Image source={icons.warning} style= {{ tintColor: themeColors.red, width: 25, height: 25, marginEnd: 7}} resizeMode= { "contain" }/>
-                            <Text style={[texts.copy, {color: themeColors.red}]}>{
-                                ideaInfo.warning == "underMin" ? "Minimale Gruppengröße nicht erreicht" : "Maximale Gruppengröße überschritten"
-                            }</Text>
+                            <Text style={[texts.copy, {color: themeColors.red}]}>
+                                {ideaInfo.warning == "underMin" ? "Minimale Gruppengröße nicht erreicht" : ideaInfo.warning == "overMax" ? "Maximale Gruppengröße überschritten" : "Warnung"}
+                            </Text>
                         </FlexRow>
                     </View>
                 }

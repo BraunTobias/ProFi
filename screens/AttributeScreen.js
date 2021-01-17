@@ -1,13 +1,10 @@
 import React, { useState, useEffect, useLayoutEffect, useContext } from 'react';
-import {FlatList, View, Text, Modal} from "react-native";
+import {FlatList, View } from "react-native";
 
-import { boxes, colors, styles, texts } from '../Styles';
 import AttributeTile from '../components/AttributeTile';
 import ScrollRow from '../components/ScrollRow';
 import DB from '../api/DB_API';
-import Button from '../components/Button';
 import InfoModal from '../components/InfoModal';
-import Padding from '../components/Padding';
 import SubHeader from '../components/SubHeader';
 import SectionHeader from '../components/SectionHeader';
 import { ThemeContext } from '../components/ThemeManager';
@@ -41,7 +38,7 @@ export default AttributeScreen = ({route, navigation}) => {
                 }, (error) => {console.log(error)});    
                 DB.getInfoReceived(attributeType, (isReceived) => {
                     setAttInfoVisible(!isReceived);
-                    console.log("Info zu " + attributeType + " erhalten: " + isReceived);
+                    // console.log("Info zu " + attributeType + " erhalten: " + isReceived);
                 })
             });
         });

@@ -1,6 +1,6 @@
 import React, {useContext} from "react";
 import { Text, TouchableOpacity, Image, StyleSheet } from "react-native";
-import { colors, texts } from '../Styles';
+import { texts } from '../Styles';
 import { ThemeContext } from '../components/ThemeManager';
 
 export default Button = props => {

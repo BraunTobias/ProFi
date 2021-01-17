@@ -1,17 +1,19 @@
-import React from "react";
-import { StyleSheet, TouchableOpacity, View, Image, Animated, PushNotificationIOS, Switch } from "react-native";
+import React, { useContext } from "react";
+import { Switch } from "react-native";
 
-import { icons, colors, boxes, texts } from '../Styles';
+import { ThemeContext } from '../components/ThemeManager';
 
 export default PushNotificationSwitch = props => {
+
+  const {themeColors} = useContext(ThemeContext);
   
   return (
       <Switch
       onValueChange={props.onValueChange}
       value={props.value}
-      trackColor={{ false: colors.lightBlue, true: colors.darkBlue }}
-      thumbColor={colors.white}
-      ios_backgroundColor={colors.lightBlue}
+      trackColor={{ false: themeColors.secondary, true: themeColors.primary }}
+      thumbColor={themeColors.textHighlight}
+      ios_backgroundColor={themeColors.secondary}
       />
   );
 };

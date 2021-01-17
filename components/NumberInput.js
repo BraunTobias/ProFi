@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import InputSpinner from "react-native-input-spinner";
 
 import { View, TextInput, Text, StyleSheet } from 'react-native';
-import { icons, colors, boxes, texts } from '../Styles';
+import { icons, texts } from '../Styles';
 import { ThemeContext } from '../components/ThemeManager';
 
 export default NumberInput = props => {

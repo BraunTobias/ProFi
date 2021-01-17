@@ -1,11 +1,10 @@
 import React, { useState, useContext, useEffect, Fragment } from 'react';
 import {FlatList, Modal, StatusBar, SafeAreaView, StyleSheet } from "react-native";
 
-import { boxes, colors, texts } from '../Styles';
+import { texts } from '../Styles';
 import { View, Text, Image } from 'react-native';
 import { icons } from '../Styles';
 import DB from '../api/DB_API';
-import ModalContent from './ModalContent';
 import AttributeList from './AttributeList';
 import ProfileImage from './ProfileImage';
 import Padding from './Padding';

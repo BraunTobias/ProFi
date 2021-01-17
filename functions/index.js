@@ -7,23 +7,6 @@ admin.initializeApp(functions.config().firebase);
 const db = admin.firestore();
 const FieldValue = admin.firestore.FieldValue;
 
-// Test-Funktion
-// exports.testNotification = functions.pubsub.schedule('* * * * *').timeZone('Europe/Berlin').onRun(async (context) => {
-//     var notificationsArray = [];
-//     notificationsArray.push({"to": "ExponentPushToken[1J5A-iFeQ9sgfdd3ziRD1j]", "title": "Test", "body": "Dies ist eine Test-Notification"});   
-
-//     fetch("https://exp.host/--/api/v2/push/send", {
-//         method: "POST",
-//         headers: {
-//             "Accept": "application/json",
-//             "Content-Type": "application/json"
-//         },
-//         body: JSON.stringify(notificationsArray)
-//     });
-// });
-
-
-
 // Löschen von zu alten Kursen
 exports.deleteOldCourses = functions.pubsub.schedule('0 9 * * *').timeZone('Europe/Berlin').onRun(async (context) => {
     const currentDate = new Date();
@@ -367,7 +350,7 @@ exports.updateInterestsList = functions.firestore.document('interests/{categoryD
 
 });
 
-// Jeden Tag prüfen, ob Deadline-Datum eingetreten ist
+// Jede Minute prüfen, ob Deadline-Datum eingetreten ist
 exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Berlin').onRun(async (context) => {
 
     var notificationsArray = [];   
@@ -459,11 +442,6 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
                     }
                 }        
             }
-
-            // Werte ausgeben
-            for (const skill in skillValues) {
-                // console.log(skill+" – Wert:  "+ skillValues[skill]);
-            } 
         }
         functions.logger.log("-1");
 
@@ -545,7 +523,6 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
             });
             
             ideaScoreList.sort((a,b) => b[1] - a[1]);
-            // console.log(ideaScoreList);
 
             var lowestUserId = ideaScoreList[ideaScoreList.length - 1][0];
             var newArray = ideas[ideaId].team.filter(id => id !== lowestUserId);
@@ -568,7 +545,6 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
             
             // DAS ALLES MACHEN SOLANGE ES NOCH UNSORTIERTE MEMBERS GIBT
             while ((unmatchableMembers+sortedMembers) < Object.keys(members).length) {
-                // console.log("---- Step " + i + " ----");
 
                 i++;
                 // Alle Mitglieder durchgehen
@@ -578,10 +554,8 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
 
                         // if (members[memId].scoreList.length > 0) {
 
-                            // console.log(memId + members[memId].scoreList);
                             var prefIdeaId = members[memId].scoreList[0][0];
             
-                            // console.log(memId + " zu " + prefIdeaId + " hinzufügen …");
                             // User-ID vorübergehend zur Idee hinzufügen
                             ideas[prefIdeaId].team.push(memId);
             
@@ -592,7 +566,6 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
                             } else {
                                 // Bei Überfüllung den User in der Idee anhand der Score-Liste vergleichen und den schlechtesten User löschen
                                 overflowUserId = createSingleIdeaScoreList(prefIdeaId);
-                                // console.log("! "+ overflowUserId + " aus " + prefIdeaId + " rausgeworfen");
                                 if (overflowUserId !== memId) members[memId].sorted = true;
                                 functions.logger.log("Overflow User: " + overflowUserId);
             
@@ -614,8 +587,6 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
                         // functions.logger.log("1. if");
                     }  
                 }
-
-                // console.log(unmatchableMembers+sortedMembers);
             }
         }
 
@@ -631,7 +602,6 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
                     for (const memberId of ideas[ideaId].team) {
                         // Wenn der Skill schon bei einem Mitglied vorhanden ist, diesen aus missingSkills entfernen
                         if (members[memberId].skills.indexOf(missingSkill) >= 0) {
-                            // console.log(missingSkill + "fehlt nicht mehr");
                             missingSkillsList = missingSkillsList.filter(skill => skill !== missingSkill);
                             break;
                         } 
@@ -782,7 +752,6 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
                     let missingSkillsList=[];
                     resolve(newIdea, true);
 
-                    // console.log(lastMembers);
                     //Auf Ideen mit freien Plätzen aufteilen
                     //Erst leere Idee durchgehen
                     for (const ideaId in emptyIdeas) {
@@ -803,7 +772,6 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
                         } 
                         //Wenn keine freien Plätze, auf die mit dem meisten Missing skills aufteilen
                         missingSkillsList.sort((a,b) => b[1] - a[1]);   
-                        // console.log(missingSkillsList);
                         let i =0;
 
                         lastMembers.forEach(member => {
@@ -818,7 +786,6 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
                                     } 
                                 } 
                                 ideas[missingSkillsList[i][0]].team.push(member); 
-                                // console.log(member + " zu " + missingSkillsList[i][0]);
                                 members[member].sorted = true;
                                 i+=1; 
                             }
@@ -897,18 +864,11 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
                 });
                 // Wenn es keine Übereinstimmung mehr gibt, die Schleife beenden
                 if (!missingScoreList[0] || missingScoreList[0][2] === 0) break;
-                
-
-                // console.log("Score-Liste der übrigen User und Ideen:");
-                for (array of missingScoreList) {
-                    // console.log(array.join(", "));
-                }
-                
+                                
                 // User mit höchster Übereinstimmung der entsprechenden Idee zuordnen, wenn diese noch nicht voll ist
                 var topIdea = missingScoreList[0][1];
                 while (ideas[topIdea].team.length >= maxMembers) {
                     missingScoreList.shift();
-                    // console.log("! " + topIdea + " ist schon voll, wird daher ignoriert");
                     if(missingScoreList.length === 0) break;
                     topIdea = missingScoreList[0][1]; 
                 }
@@ -916,7 +876,6 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
                 var topMember = missingScoreList[0][0];
                 ideas[topIdea].team.push(topMember);
                 members[topMember].sorted = true;
-                // console.log("-> " + topMember + " zu " + topIdea + " hinzugefügt\n");
                 // Nach jedem zugeordneten User muss alles neu kalkuliert werden, damit nicht mehrere User aufgrund des selben Skills zugeordnet werden, der dann gar nicht mehr fehlt
 
             }
@@ -968,8 +927,6 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
 
                 return a[3] - b[3]  
             }); 
-
-            // console.log(missingScoreList);
             
             // User der Reihe nach ihrer passendsten Idee zuordnen, wenn diese noch nicht voll ist
             for (var i = 0; i < missingScoreList.length; i++) {
@@ -978,16 +935,11 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
                 if (ideas[topIdea].team.length < maxMembers && !members[topMember].sorted) {
                     ideas[topIdea].team.push(topMember);
                     members[topMember].sorted = true;
-                    // console.log(topMember + " wird " + topIdea + " zugeordnet mit Score " + missingScoreList[i][2]);
                 } 
             }
-            // console.log("");
-
-            // console.log("Konnten nicht zugeordnet werden:");
             var unsorted =[];
             for (const memId in members) {
                 if (!members[memId].sorted) {
-                    // console.log(memId);
                     unsorted.push(memId);
                 }
             }
@@ -999,13 +951,11 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
                 let missingForMinMembers=  1-(unsorted.length / minMembers);
 
                 if(missingForMinMembers <= 0.25){
-                    // console.log("Wir brauchen eine neue Idee!");
                     addEmptyIdeas(unsorted);
                 }
                 else{
 
                     missingScoreList.sort((a,b) => b[2] - a[2]); 
-                    // console.log(missingScoreList);
                     //Hier über maximal anzahl gehen
                     for (var j = 0; j < missingScoreList.length; j++) {
                         const topIdea = missingScoreList[j][1];
@@ -1013,7 +963,6 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
                         if (!members[topMember].sorted) {
                             ideas[topIdea].team.push(topMember);
                             members[topMember].sorted = true;
-                            // console.log(topMember + " wird " + topIdea + " zugeordnet mit Score " + missingScoreList[i][2]);
                         } 
                     }
                 }
@@ -1052,7 +1001,6 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
             
 
             if (freeUsers <= freeSpaces) {
-                // console.log("… und kann aufgelöst werden\n");
                 // In diesem Fall kann die Gruppe aufgelöst werden
 
                 if(isEmptyIdea){
@@ -1070,7 +1018,6 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
                     delete ideas[ideaToResolve];
                 }
                 
-                // MUSS DIE IDEE NOCH AUS ALLEN SCORELISTEN ENTFERNT WERDEN?
             }
         }
 
@@ -1092,11 +1039,7 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
                 return b[1] - a[1]  
             }); 
 
-            // console.log(partialIdeas);
-
             for (var i = 0; i < partialIdeas.length; i++) {
-                // console.log(partialIdeas[i][0] + " hat weniger als " + minMembers +" Teilnehmer");   
-            
                 // Prüfen, ob die unvollständigste Idee aufgelöst werden kann 
                 const ideaToResolve = partialIdeas[i][0];
                 resolve(ideaToResolve, false); 
@@ -1119,8 +1062,6 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
             incompleteIdeas.sort((a,b) => b[1] - a[1]); 
 
             for (var i = 0; i < incompleteIdeas.length; i++) {
-                // console.log(incompleteIdeas[i][0] + " ist nicht abgedeckt, es fehlen: "+ incompleteIdeas[i][1] +" Skills");   
-                // HIER SOLLTEN EVTL NOCH ANDERE FAKTOREN MIT REINSPIELEN? WIE VIELE FAVS? WIE VIEL ABGEDECKTE SKILLS?
             
                 // Prüfen, ob die unvollständigste Idee aufgelöst werden kann 
                 const ideaToResolve = incompleteIdeas[i][0];
@@ -1129,32 +1070,6 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
             }
         }
 
-        function printList() {
-            // var consoleLog = "----------- Team-Liste -----------\n";
-            for (const ideaId in ideas) {
-                outputIdeaId = "" + ideaId;
-                while (outputIdeaId.length < 8) outputIdeaId = outputIdeaId + " ";
-                // consoleLog += outputIdeaId + ": ";
-                for(const member in ideas[ideaId].team) consoleLog = consoleLog + ideas[ideaId].team[member] + " | "
-                // consoleLog += "\n";
-            }
-            for (const ideaId in emptyIdeas) {
-                outputIdeaId = "" + ideaId;
-                while (outputIdeaId.length < 8) outputIdeaId = outputIdeaId + " ";
-                // consoleLog += outputIdeaId + ": ";
-                for(const member in emptyIdeas[ideaId].team) consoleLog = consoleLog + emptyIdeas[ideaId].team[member] + " | "
-                // consoleLog += "\n";
-            }
-            // console.log(consoleLog); 
-
-            // console.log("Noch unsortiert:");
-            for (const memId in members) {
-                if (!members[memId].sorted) {
-                    // console.log(memId);
-                }
-            }
-            // console.log("");
-        }
         if (Object.keys(ideas).length > 0) {
             functions.logger.log("0");
             stableMatching();
@@ -1183,21 +1098,12 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
             // Jetzt sind alle Ideen-Skills so weit es geht abgedeckt und die übrigen User müssen noch zugeordnet werden 
             // nun wieder auf Basis aller benötigten Skills und der Favoriten (diese haben nun Priorität).
             // es werden wieder Scores für alle User/Ideen gebildet und diese Liste abgearbeitet.
-            // console.log("---- Finale Zuordnung ----");
             bestRemainingMatchFinal();
         } else {
             addEmptyIdeas(Object.keys(members));
             updateCommonInterests();
         }
  
-        // printList();
-        for (const idea in ideas) {
-            if (ideas[idea].missingSkills.length > 0) {
-                // console.log("Von " + idea + " sind nicht alle Skills abgedeckt!");
-                // console.log(ideas[idea].missingSkills + " fehlt");
-            }
-        }
-        // console.log(emptyIdeas);
         functions.logger.log(ideas);
         functions.logger.log(emptyIdeas);
 
@@ -1383,7 +1289,7 @@ exports.createTeams = functions.pubsub.schedule('* * * * *').timeZone('Europe/Be
 
 });
   
-// Benachrichtigung bei neuem Kommentarisc
+// Benachrichtigung bei neuem Kommentar
 exports.pushNotificationNewComment = functions.firestore.document('{courseType}/{docId}/ideas/{ideaId}/comments/{commentId}').onCreate(async (snap, context) => {
 
     const newCommentDoc = snap.data();
@@ -1480,27 +1386,3 @@ exports.proFiFunction = functions.runWith(runtimeOpts).pubsub.schedule('3 * * * 
 
 
 });
-// exports.pushNotificationToAllUsers = functions.firestore.document('courses/{docId}').onCreate(async (snap, context) => {
-//     var notificationsArray = [];    
-//     const snapshot = await db.collection("users").get();
-//     if (snapshot) {
-//         snapshot.forEach(doc => {
-//             const docData = doc.data();
-//             if (docData.token) {
-//                 notificationsArray.push({"to": docData.token, "title": docData.username + " hat deine Idee kommmentiert", "body": "Hi " + docData.username + "!"});                   
-//                 functions.logger.log(docData.token);
-//             }
-//         });
-//     } 
-//     fetch("https://exp.host/--/api/v2/push/send", {
-//         method: "POST",
-//         headers: {
-//             "Accept": "application/json",
-//             "Content-Type": "application/json"
-//         },
-//         body: JSON.stringify(notificationsArray)
-//     })
-//     functions.logger.log("Array: " + notificationsArray.toString());
-// });
-
-

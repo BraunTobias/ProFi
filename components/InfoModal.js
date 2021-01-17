@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import {View, Text, Modal, Image, StyleSheet} from "react-native";
 
-import { boxes, colors, icons, texts } from '../Styles';
+import { icons, texts } from '../Styles';
 import { ThemeContext } from '../components/ThemeManager';
 
 export default InfoModal = props => {

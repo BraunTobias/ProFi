@@ -4,7 +4,7 @@ import * as ImageManipulator from "expo-image-manipulator";
 import * as Permissions from "expo-permissions";
 import * as ImagePicker from "expo-image-picker"
 
-import { icons, colors, boxes, texts } from '../Styles';
+import { icons, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
 import Button from '../components/Button';
 import ProfileImage from '../components/ProfileImage';

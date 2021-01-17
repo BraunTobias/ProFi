@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useContext } from 'react';
 import {FlatList, View, Text, SectionList, Image, ActivityIndicator, StyleSheet} from "react-native";
 
-import { boxes, colors, texts } from '../Styles';
+import { texts } from '../Styles';
 import ProfileImage from './ProfileImage';
 import ScrollRow from '../components/ScrollRow';
 import SmallProfileRow from './SmallProfileRow';

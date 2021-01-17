@@ -3,12 +3,153 @@ import { View, Text, Modal, StatusBar, Alert } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { ThemeContext } from '../components/ThemeManager';
 
-import { icons, colors, boxes, texts } from '../Styles';
+import { icons, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
 import InputField from '../components/InputField';
 import Button from '../components/Button';
 
 export default AuthScreen = () => {
+
+    // DB.addTestIdeas();
+
+    // var members ={
+    //     "Anton":{
+    //       "skills":["skill1","skill10","skill3","skill5","skill8"],
+    //       "sorted":false,
+    //       "interests":["interest2","interest4","interest6","interest7","interest9"]},
+          
+    //     "Berta":{
+    //       "skills":["skill0","skill10","skill6","skill9"],
+    //       "sorted":false,
+    //       "interests":["interest0","interest4","interest6","interest9"]},
+          
+    //     "Charlotte":{
+    //       "skills":["skill2","skill8"],
+    //       "sorted":false,
+    //       "interests":["interest1","interest4","interest9"]},
+          
+    //     "Dora":{
+    //       "skills":["skill10","skill8"],
+    //       "sorted":false,
+    //       "interests":["interest3","interest5","interest6","interest7","interest8"]},
+          
+    //     "Emil":{
+    //       "skills":["skill1","skill3","skill5","skill6"],
+    //       "sorted":false,
+    //       "interests":["interest0","interest1","interest2","interest4","interest7"]},
+          
+    //     "Friedrich":{
+    //       "skills":["skill1","skill10","skill11","skill5","skill8"],
+    //       "sorted":false,
+    //       "interests":["interest0","interest6","interest8","interest9"]},
+          
+    //     "Gustav":{
+    //       "skills":["skill1","skill2","skill4","skill8"],
+    //       "sorted":false,
+    //       "interests":["interest0","interest3","interest6","interest7","interest8"]},
+          
+    //     "Heinrich":{
+    //       "skills":["skill11","skill3","skill5"],
+    //       "sorted":false,
+    //       "interests":["interest4","interest5","interest8"]},
+          
+    //     "Ida":{
+    //       "skills":["skill10","skill3","skill4","skill6","skill8"],
+    //       "sorted":false,
+    //       "interests":["interest2","interest5","interest6","interest7"]},
+          
+    //     "Julia":{
+    //       "skills":["skill10","skill9"],
+    //       "sorted":false,
+    //       "interests":["interest0","interest6","interest8"]},
+          
+    //     "Konrad":{
+    //       "skills":["skill4","skill5","skill6","skill9"],
+    //       "sorted":false,
+    //       "interests":["interest0","interest1","interest5","interest7","interest9"]},
+          
+    //     "Ludwig":{
+    //       "skills":["skill0","skill1","skill5","skill8","skill9"],
+    //       "sorted":false,
+    //       "interests":["interest3","interest4","interest8","interest9"]},
+          
+    //     "Martha":{
+    //       "skills":["skill1","skill3"],
+    //       "sorted":false,
+    //       "interests":["interest1","interest2","interest3","interest5","interest9"]},
+          
+    //     "Nina":{
+    //       "skills":["skill3","skill7"],
+    //       "sorted":false,
+    //       "interests":["interest1","interest3","interest4","interest5","interest7"]},
+          
+    //     "Otto":{
+    //       "skills":["skill10","skill3","skill9"],
+    //       "sorted":false,
+    //       "interests":["interest0","interest1","interest4","interest6","interest9"]},
+          
+    //     "Paula":{
+    //       "skills":["skill0","skill10","skill3","skill5"],
+    //       "sorted":false,
+    //       "interests":["interest3","interest6","interest9"]},
+          
+    //     "Quentin":{
+    //       "skills":["skill0","skill10","skill11","skill8","skill9"],
+    //       "sorted":false,
+    //       "interests":["interest1","interest5","interest9"]},
+    //     "Richard":{
+    //       "skills":["skill0","skill1","skill2"],
+    //       "sorted":false,
+    //       "interests":["interest0","interest4","interest9"]},
+          
+    //     "Sophie":{
+    //       "skills":["skill1","skill10","skill6","skill7"],
+    //       "sorted":false,
+    //       "interests":["interest0","interest2","interest4","interest7","interest9"]},
+          
+    //     "Theo":{
+    //       "skills":["skill0","skill11","skill6","skill8"],
+    //       "sorted":false,
+    //       "interests":["interest1","interest7","interest9"]},
+          
+    //     "Ulrike":{
+    //       "skills":["skill3","skill9"],
+    //       "sorted":false,
+    //       "interests":["interest1","interest3","interest6","interest8"]},
+          
+    //     "Vincent":{
+    //       "skills":["skill0","skill3","skill6"],
+    //       "sorted":false,
+    //       "interests":["interest0","interest4","interest5","interest6"]},
+          
+    //     "Wilhelm":{
+    //       "skills":["skill1","skill3","skill4"],
+    //       "sorted":false,
+    //       "interests":["interest0","interest3","interest4","interest5"]},
+          
+    //     "Xenia":{
+    //       "skills":["skill0","skill2","skill3"],
+    //       "sorted":false,
+    //       "interests":["interest3","interest4","interest8"]},
+          
+    //     "Yvonne":{
+    //       "skills":["skill1","skill10"],
+    //       "sorted":false,
+    //       "interests":["interest0","interest3","interest5","interest6","interest7"]},
+          
+    //     "Zoe":{
+    //       "skills":["skill0","skill10","skill3","skill7","skill9"],
+    //       "sorted":false,
+    //     "interests":["interest0","interest7","interest8","interest9"]}
+    // };
+    // var memberIds = [];
+    
+    // for (member in members) {
+    //     memberIds.push(member);
+    // }
+    // console.log(memberIds);
+    // DB.fillTestCourse(memberIds);
+    
 
     const {themeColors} = useContext(ThemeContext);
 

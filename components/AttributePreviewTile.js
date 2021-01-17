@@ -1,6 +1,6 @@
 import React, {useContext} from "react";
 import { StyleSheet, Text, Image, TouchableOpacity, View, ActivityIndicator } from "react-native";
-import { icons, colors, boxes, texts } from '../Styles';
+import { icons, boxes, texts } from '../Styles';
 import { ThemeContext } from '../components/ThemeManager';
 
 export default AttributePreviewTile = props => {

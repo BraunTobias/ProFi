@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, Fragment, useContext } from 'react';
 import {FlatList, View, Text, SafeAreaView, StyleSheet} from "react-native";
 
-import { boxes, colors, texts } from '../Styles';
+import { texts } from '../Styles';
 import AttributeTile from '../components/AttributeTile';
 import ScrollRow from '../components/ScrollRow';
 import DB from '../api/DB_API';

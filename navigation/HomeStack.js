@@ -2,7 +2,7 @@ import React, {useContext} from 'react';
 import { View } from 'react-native';
 import {createStackNavigator, HeaderBackground} from '@react-navigation/stack';
 
-import { icons, colors, boxes, texts } from '../Styles';
+import { texts } from '../Styles';
 import HomeScreen from '../screens/HomeScreen';
 import CourseScreen from '../screens/CourseScreen';
 import IdeaScreen from '../screens/IdeaScreen';

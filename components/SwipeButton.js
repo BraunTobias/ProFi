@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import { StyleSheet, TouchableOpacity, View, Image, Animated } from "react-native";
 
-import { icons, colors, boxes, texts } from '../Styles';
+import { ThemeContext } from '../components/ThemeManager';
 
 export default SwipeButton = props => {
+
+  const {themeColors} = useContext(ThemeContext);
   
   return (
     <TouchableOpacity
@@ -11,14 +13,16 @@ export default SwipeButton = props => {
       onPress={props.onPress}
     >
         <Animated.Image 
-            style= {[styles.swipeIcon, {
+            style= {{
+                  tintColor: themeColors.textHighlight,
+                  width: 40,
                   opacity: props.deactivated ? 0.3 : 1,
                   transform: [{
                   scale: props.animation ? props.animation.interpolate({
                       inputRange: [0,props.rowWidth], outputRange: [0.3,1]})
                       : 1
                   }]}
-            ]}
+            }
             source= { props.icon }
             resizeMode= { "contain" }
         />
@@ -34,9 +38,5 @@ const styles = StyleSheet.create({
     maxWidth: 60,
     alignItems: "center",
     justifyContent: "center",
-  },
-  swipeIcon: {
-      width: 40,
-      tintColor: colors.white
-  },
+  }
 });

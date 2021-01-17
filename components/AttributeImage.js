@@ -1,6 +1,5 @@
 import React, {useContext}  from "react";
 import { Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-import { boxes, colors, icons } from "../Styles";
 import { ThemeContext } from '../components/ThemeManager';
 
 export default AttributeImage = props => {

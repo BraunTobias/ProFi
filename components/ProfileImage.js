@@ -1,7 +1,7 @@
 import React, {useContext}  from "react";
-import { View, Text, Image, TouchableOpacity, ActivityIndicator, StyleSheet } from "react-native";
+import { View, Image, ActivityIndicator, StyleSheet } from "react-native";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
-import { boxes, icons, colors } from "../Styles";
+import { boxes, icons } from "../Styles";
 import { ThemeContext } from '../components/ThemeManager';
 
 export default ProfileImage = props => {

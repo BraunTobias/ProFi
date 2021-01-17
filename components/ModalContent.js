@@ -2,7 +2,6 @@ import React, {useContext} from "react";
 import { View, Text, TouchableWithoutFeedback, Keyboard, StatusBar, StyleSheet } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
-import { icons, colors, boxes, texts } from '../Styles';
 import Button from '../components/Button';
 import { ThemeContext } from '../components/ThemeManager';
 

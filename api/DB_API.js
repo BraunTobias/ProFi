@@ -109,6 +109,33 @@ const DB = {
             onError(error);
         });
     },
+    // Test-Datensatz
+    createTestUser: function(name, email, password, onSuccess, onError) {
+        firebase.firestore().collection("users").doc(name).set({
+            username: name,
+            bio: "User aus Test-Datensatz",
+            email: email,
+            pushNotificationsAllowed: {
+                "evaluate" : false,
+                "courseChange" : false,
+                "comment" : false,
+                "delete" : false,
+                "attChange" : false,
+            },
+            tokens: [],
+            image: "noImage",
+            imageName: "noImage",
+            image: "",
+            imageName: name[0]
+        })        
+        .then(() => {
+            this.fillAttributesList(name);
+            onSuccess();
+        })
+        .catch(error => {
+            onError(error);
+        });
+    },
     // Listen fürs Profil ausfüllen 
     fillAttributesList: async function(uid) {
 
@@ -406,6 +433,81 @@ const DB = {
             console.log(e);
             onError(e);
         })
+    },
+    addTestIdeas: function(courseId, courseType, title, description, skills, interests, onSuccess, onError) {
+
+         var ideas ={
+            "Idee A":{
+                "skills":["Android Programmierung","Unity (C#)","C","C++","FireBase","HTML","Kryptographie","Python"],
+                "missingSkills":["Android Programmierung","Unity (C#)","C","C++","FireBase","HTML","Kryptographie","Python"],
+                "team":[],
+                "favs":["iKDUvd0vvvP3VHb2cgQkumYVfZs2","Nina","Vincent"],
+                "nogos":["Gustav"],
+                "commonInterests":[]
+            },
+            "Idee B":{
+                "skills":["Android Programmierung","C++","CSS","FireBase","HTML","Java"],
+                "missingSkills":["Android Programmierung","C++","CSS","FireBase","HTML","Java"],
+                "team":[],
+                "favs":["Heinrich","Ida","Yvonne"],
+                "nogos":["Friedrich","Ulrike","Zoe"],
+                "commonInterests":[]
+            },
+            "Idee C":{
+                "skills":["Android Programmierung","Augmented Reality","SQL","Unity (C#)","CSS","HTML","Java"],
+                "missingSkills":["Android Programmierung","Augmented Reality","SQL","Unity (C#)","CSS","HTML","Java"],
+                "team":[],
+                "favs":["Charlotte","Emil","Konrad","Otto","Sophie"],
+                "nogos":["Quentin","Wilhelm"],
+                "commonInterests":[]
+            },
+            "Idee D":{
+                "skills":["Android Programmierung","Augmented Reality","SQL","C","C++","CSS","FireBase","Python"],
+                "missingSkills":["Android Programmierung","Augmented Reality","SQL","C","C++","CSS","FireBase","Python"],
+                "team":[],
+                "favs":["Berta","Ludwig","Zoe"],
+                "nogos":["Martha"],
+                "commonInterests":[]
+            },
+             "Idee E":{
+                "skills":["Augmented Reality","SQL","C++","Java","Python"],
+                "missingSkills":["Augmented Reality","SQL","C++","Java","Python"],
+                "team":[],
+                "favs":["Friedrich","Julia","Theo","Ulrike","Wilhelm"],
+                "nogos":["Dora","Richard","Sophie","Xenia"],
+                "commonInterests":[]
+            },
+             "Idee F":{
+                "skills":["Android Programmierung","Augmented Reality","SQL","Unity (C#)","C","CSS","Java"],
+                "missingSkills":["Android Programmierung","Augmented Reality","SQL","Unity (C#)","C","CSS","Java"],
+                "team":[],
+                "favs":["Dora","Martha"],
+                "nogos":["Charlotte","Emil","Ida","Julia","Ludwig","Nina","Otto","Paula"],
+                "commonInterests":[]
+            },
+            "Idee G":{
+                "skills":["Android Programmierung","SQL","Unity (C#)","C++","HTML","Java","Kryptographie"],
+                "missingSkills":["Android Programmierung","SQL","Unity (C#)","C++","HTML","Java","Kryptographie"],
+                "team":[],
+                "favs":["Gustav","Richard","Xenia"],
+                "nogos":["Berta","Heinrich","Konrad","Theo","Vincent"],
+            "commonInterests":[]
+           }
+        };
+
+        for (const idea in ideas) {
+            console.log(idea)
+            firebase.firestore().collection("courses").doc("BSPWS20").collection("ideas").add({
+                title: idea,
+                description: "Idee aus Test-Datensatz",
+                interests: [],
+                skills: ideas[idea].skills,
+                members: [],
+                favourites: ideas[idea].favs,
+                nogos: ideas[idea].nogos,
+                creator: "iKDUvd0vvvP3VHb2cgQkumYVfZs2"
+            })
+        }
     },
     // addOpenIdea: function(courseId, title, description, skills, interests, onSuccess) {
     //     const currentUserID = firebase.auth().currentUser.uid;
@@ -855,6 +957,16 @@ const DB = {
             }
         }
     },
+    // Test-Datensatz
+    fillTestCourse: async function(members) {
+
+        firebase.firestore().collection("courses").doc("BSPWS20").set({
+            prospects: members,
+            members: members
+        }, {merge: true}); 
+        
+    },
+
     // Der User wird zur Members-Liste einer Idee hinzugefügt bzw. entfernt
     joinOpenIdea: async function(courseId, ideaId, onSuccess, onError) {
         var membersArray = [];
@@ -1044,9 +1156,9 @@ const DB = {
                         }
                     } 
                     // Attribute nur anhängen wenn es keine leere Idee ist ODER es mehr als 2 User mit dem Attribut gibt 
-                    if (!isEmptyIdea || attributeObj.users.length > 1) {
+                    // if (!isEmptyIdea || attributeObj.users.length > 1) {
                         categoryAttributes.push(attributeObj);
-                    }
+                    // }
                 }
             }
             if (categoryAttributes.length > 0) {
