@@ -85,6 +85,15 @@ export default function ListTile (props) {
             />
           </View>
           }
+          {!props.delete &&
+          <View style= { Styles.deletebox } >
+            <ButtonIcon 
+              icon= { "delete" }
+              onPress= { () => { props.onExit() } }
+              status= { "transparent" }
+            />
+          </View>
+          }
         </View>
     </View>
   );
