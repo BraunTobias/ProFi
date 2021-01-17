@@ -4,6 +4,8 @@
 
 Die App soll das Finden und Zuteilen von Interessenten in Projektteams unterstützen. Sie ist auf die Studiengänge Media Systems und Medientechnik der HAW Hamburg zugeschnitten. Als Grundlage für die Teamzuteilung dienen von den Usern erstellte Ideen. Passend zu den erforderlichen Fähigkeiten für die Umsetzung der Ideen werden die User anhand ihrer eigenen Fähigkeiten zugeteilt.
 
+Die mobile App befindet sich auf dem Branch [App](https://github.com/BraunTobias/ProFi/tree/App)
+
 ## Website starten
 Eine Kopie der Website für die Entwicklung mit yarn starten.
 
