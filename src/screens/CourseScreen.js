@@ -1,18 +1,15 @@
 import React, {useState, useEffect, useLayoutEffect} from 'react';
 import { View, Text, Modal, Keyboard, FlatList, TouchableHighlight, ActivityIndicator, useWindowDimensions } from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
-import { compareAsc, format } from 'date-fns';
+import { format } from 'date-fns';
 
-import { icons, colors, boxes, texts } from '../Styles';
+import { colors, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';
 import InfoModal from '../components/InfoModal';
 import InputField from '../components/InputField';
 import ButtonSmall from '../components/ButtonSmall';
-//import SwipeButton from '../components/SwipeButton';
 import ListTile from "../components/ListTile";
 import ModalContent from "../components/ModalContent";
 import ButtonIcon from '../components/ButtonIcon';
-import ButtonLarge from '../components/ButtonLarge';
 import ScrollRow from '../components/ScrollRow';
 import AttributeSelect from '../components/AttributeSelect';
 import AttributePreviewTile from '../components/AttributePreviewTile';
@@ -20,8 +17,6 @@ import NumberInput from '../components/NumberInput';
 import TimeInput from '../components/TimeInput';
 import DateModal from '../components/DateModal'
 import ProfileView from '../components/ProfileView';
-import ProfileBox from '../components/ProfileBox';
-//import ProfileView from '../components/ProfileView';
 import Padding from '../components/Padding';
 
 export default function CourseScreen ({route, navigation}) {
@@ -64,7 +59,12 @@ export default function CourseScreen ({route, navigation}) {
     const [currentNewIdeaText, setCurrentNewIdeaText] = useState("");
 
     const [errorMessage, setErrorMessage] = useState(false);
-    const [infosReceived, setInfosReceived] = useState(false);
+    let infos = {
+        fav: false,
+        nogo: false,
+        join: false
+    };
+    const [infosReceived, setInfosReceived] = useState(infos);
     
     const [newIdeaNameErrorVisible, setNewIdeaNameErrorVisible] = useState(false);
     const [newIdeaTextErrorVisible, setNewIdeaTextErrorVisible] = useState(false);
@@ -142,7 +142,7 @@ export default function CourseScreen ({route, navigation}) {
                             setInfosReceived(infos);
                         });
                     });
-                });
+                })
             }
             DB.getIdeasList(courseInfo.id, courseType, (ideasList, myFavourite, myNogo) => {
                 setCurrentIdeas(ideasList);
@@ -164,6 +164,11 @@ export default function CourseScreen ({route, navigation}) {
             setErrorMessage(message);
             let infos = infosReceived;
             infos.fav = true;
+            // let infos = {
+            //     fav: true,
+            //     nogo: infosReceived.nogo,
+            //     join: infosReceived.join
+            // };
             setInfosReceived(infos);
 
         } else {
@@ -190,6 +195,11 @@ export default function CourseScreen ({route, navigation}) {
             setErrorMessage(message);
             let infos = infosReceived;
             infos.nogo = true;
+            // let infos = {
+            //     fav: infosReceived.fav,
+            //     nogo: true,
+            //     join: infosReceived.join
+            // };
             setInfosReceived(infos);
         } else {
             if (currentNogo === ideaId) {
@@ -628,6 +638,7 @@ export default function CourseScreen ({route, navigation}) {
                                 <View style= { {
                                     flexDirection: "row", 
                                 } } >
+                                    {/* Fav- und NoGo-Buttons bei nicht offenen Kursen */}
                                     { (courseType === "courses") &&
                                     <View style= { { flexDirection: "row", marginHorizontal: 15 } } >
                                         <ButtonIcon 
@@ -651,8 +662,6 @@ export default function CourseScreen ({route, navigation}) {
                                     title= { itemData.item.title }
                                     subtitle={itemData.item.description}
                                     skills={itemData.item.skills}
-                                    // isFavourite={itemData.item.id === currentFav}
-                                    // isNogo={itemData.item.id === currentNogo}
                                     index = { itemData.index }
                                     myTeam={itemData.item.myTeam}
                                     isMember={itemData.item.userIsMember}

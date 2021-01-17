@@ -153,21 +153,8 @@ const boxes = {
         height: "75%",
         tintColor: colors.mediumBlue,
     },
-    attributeTile: {
-        paddingLeft: 15,
-        paddingRight: 35,
-        height: 45,
-        width: "100%",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "flex-start",
-    },
-    attributeCheckmark: {
-        height: 25,
-        width: 25,
-        marginRight: 10,
-        tintColor: colors.darkBlue
-    },
+    
+    
     
     separator: {
         paddingVertical: 7,
@@ -246,7 +233,7 @@ const texts = {
         color: colors.darkGrey,
     },
     header: {
-        marginHorizontal: 200,
+        marginHorizontal: 300,
         fontFamily: 'Inter',
         fontWeight: 600,
         fontSize: 20,

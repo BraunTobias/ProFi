@@ -6,7 +6,6 @@ import CourseScreen from '../screens/CourseScreen';
 import IdeaScreen from '../screens/IdeaScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import { boxes, texts, colors } from '../Styles';
-import AttributeListScreen from '../screens/AttributeListScreen';
 
 const MainStack = createStackNavigator();
 

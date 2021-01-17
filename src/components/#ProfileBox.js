@@ -4,16 +4,15 @@ import { View, Text } from "react-native";
 import DB from '../api/DB_API';
 import ProfileImage from './ProfileImage';
 import Padding from './Padding';
-import { boxes, texts, icons, colors } from '../Styles';
+import { boxes, texts, colors } from '../Styles';
 
 export default function ProfileView (props) {
 
     const [currentName, setCurrentName] = useState("");
     const [currentBio, setCurrentBio] = useState("");
     const [currentEmail, setCurrentEmail] = useState("");
-    const [currentImage, setCurrentImage] = useState(icons.profilePlaceholder);
     const [imageUrl, setImageUrl] = useState("");
-    const [skillsList, setSkillsList] = useState([]);
+    // const [skillsList, setSkillsList] = useState([]);
    
     useEffect(() => {
         DB.getUserInfoById(props.userId, (name, imageUrl, bio, email) => {
@@ -22,15 +21,9 @@ export default function ProfileView (props) {
             setCurrentEmail(email);
             if (imageUrl) setImageUrl(imageUrl);
         });
-        DB.getAttributesFromUser(props.userId, (list) => {
-            // if (list.length > 0) {
-            //     DB.getAllAttributes("skills", list, (attributesList) => {
-            //         setSkillsList(attributesList);
-            //         console.log(attributesList.join(", "))
-            //     }, () => {});
-            // }
-            setSkillsList(list);
-        })
+        // DB.getAttributesFromUser(props.userId, (list) => {
+        //     setSkillsList(list);
+        // })
     }, []);
 
     return(
@@ -43,7 +36,6 @@ export default function ProfileView (props) {
                     flex: 1,
                     justifyContent: 'center',
                     alignItems: 'center',
-                    // paddingBottom:20,
                     backgroundColor: colors.darkBlue
                  } ] } >
                     <ProfileImage

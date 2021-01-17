@@ -1,6 +1,7 @@
 import React  from "react";
 import { View } from "react-native";
 
+// Komponent zum Erzeugen von Abständen
 export default function Padding (props) {
 
     return (

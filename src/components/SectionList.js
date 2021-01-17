@@ -76,7 +76,8 @@ export default function SectionList (datas) {
                                         }
                                         index = { index }
                                         isMember = { item.userIsMember }
-                                        onDelete = { () => datas.onDelete(item.id, item.date ? 'courses' : 'openCourses') }
+                                        onExit = { () => datas.onExit(item.id, item.date ? 'courses' : 'openCourses') }
+                                        delte = { datas.delete }
                                     />
                                     {/* <View
                                         style= { {

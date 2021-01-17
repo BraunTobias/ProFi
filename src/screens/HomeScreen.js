@@ -379,6 +379,7 @@ export default function HomeScreen ({navigation}) {
                 data = { Object.keys(currentCourses) }
                 onPress= { (item) => { selectCourseHandler(item) } }
                 onExit= { (id, courseType) => deleteCourseHandler(id, courseType) }
+                delete= { true }
                 currentCourses = { currentCourses }
             />
         </View>

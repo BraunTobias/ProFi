@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { FlatList, View, Text, useWindowDimensions, ScrollView } from "react-native";
+import { FlatList, View, Text, ScrollView } from "react-native";
 
 import { boxes, colors, texts } from '../Styles';
 import AttributeTile from './AttributeTile';
 import ScrollRow from './ScrollRow';
 import Padding from './Padding';
 import DB from '../api/DB_API';
-// import { ScrollView } from 'react-native';
 
-export default function AttributeScreen (props) {
+// Komponent zum Auswählen der Fähigkeiten oder Interessen
+export default function AttributeSelect (props) {
 
     const attributeType = props.attributeType;
 
@@ -34,12 +34,6 @@ export default function AttributeScreen (props) {
         }, (error) => {console.log(error)});
     }
 
-    const clickAttributeHandler = (text) => {
-        DB.toggleAttributeState(attributeType, currentCategory, text, () => {
-            console.log("Att changed")
-        });
-    }
-
     return(
         <View style= { { 
             width: '50%',
@@ -50,11 +44,12 @@ export default function AttributeScreen (props) {
                 borderTopLeftRadius: 7,
                 borderTopRightRadius: 7
             } ] } >
-                <Padding height= { 9.25 } />
+                {/* Header-Title */}
                 <View style= { boxes.paddedRow } >
-                    <Text style= { texts.separatorText } >Fähigkeiten auswählen</Text>
+                    <Text style= { texts.separatorText } >{ attributeType === 'skills' ? "Fähigkeiten auswählen" : "Interessen auswählen" }</Text>
                 </View>
                 <Padding height= { 9.25 } />
+                {/* Attribut-Kategorien-Symbole */}
                 <ScrollRow
                     type= "attributes"
                     data= { categoriesList }
@@ -62,9 +57,12 @@ export default function AttributeScreen (props) {
                     onPress= { (item) => { selectCategoryHandler (item) } }
                 />
             </View>
+            {/* Attribut-Auswahl */}
+            {/* Attribut-Titel */}
             <View style= { boxes.separator } >
                 <Text style= { texts.separatorText, { paddingHorizontal: 15 } } >{ currentCategory }</Text>
             </View>
+            {/* Attribut-Liste */}
             <ScrollView contentContainerStyle= { { 
                 height: '100%'
             } } >

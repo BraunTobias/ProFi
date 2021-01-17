@@ -75,30 +75,24 @@ export default function ListTile (props) {
           } ] } >{ props.subtitle }</Text>
         </View>
       </View>
-      {props.onDelete &&
-        <View style= { Styles.deletebox } >
-          <ButtonIcon 
-            icon= { "delete" }
-            onPress= { () => { props.onDelete() } }
-            status= { "transparent" }
-          />
+      <View>
+        {props.delete &&
+          <View style= { Styles.deletebox } >
+            <ButtonIcon 
+              icon= { "delete" }
+              onPress= { () => { props.onExit() } }
+              status= { "transparent" }
+            />
+          </View>
+          }
         </View>
-        }
-        {props.onExit &&
-        <View style= { Styles.deletebox } >
-          <ButtonIcon 
-            icon= { "exit" }
-            onPress= { () => { props.onExit() } }
-            status= { "transparent" }
-          />
-        </View>
-        }
     </View>
   );
 };
 
 const Styles = StyleSheet.create({
   deletebox: {
+
     height: '100%',
     justifyContent: 'center',
     paddingRight: 15
@@ -106,7 +100,7 @@ const Styles = StyleSheet.create({
   content: {
     height: '100%',
     justifyContent: 'center',
-    width: '100%'
+    width: '80%'
   },
   listTile: {
     paddingLeft: 15,

@@ -2,10 +2,11 @@ import React from "react";
 import { TouchableOpacity, Image, StyleSheet } from "react-native";
 import { icons, colors } from '../Styles';
 
+// Komponent für Buttons nur mit Icon ohne Titel
 export default function ButtonIcon (props) {
 
+  // Styles in Funktion, da die Styles abhängig von den props sind
   const Styles = StyleSheet.create({
-    
     button: {
       height: 45,
       width: 45,
@@ -25,8 +26,6 @@ export default function ButtonIcon (props) {
       width: 35,
     },
     iconColor: {
-      // tintColor:  props.status !== "transparent" && props.status !== "color" ? "white" : 
-      //             props.icon === "nogo" || props.icon === "delete" ? colors.red : colors.darkBlue
       tintColor:  props.status !== "transparent" && (props.icon === "nogo" || props.icon === "delete") ? colors.red :
                   props.status !== "transparent" && (props.icon === "back" || props.icon === "profile") ? colors.lightBlue : 
                   props.status !== "transparent" && (props.icon !== "nogo" || props.icon !== "delete") ? colors.darkBlue : 
@@ -39,12 +38,6 @@ export default function ButtonIcon (props) {
     },
 
   })
-
-  // Button-Einstellungen & -Farbe
-  var buttonSettings;
-  // if (props.status !== "color" && props.status !== "transparent") buttonSettings = [Styles.button, Styles.buttonColor];
-  // else 
-  buttonSettings = Styles.button;
 
   // Icon-Einstellungen & -Farbe
   var iconSettings;
@@ -76,7 +69,7 @@ export default function ButtonIcon (props) {
 
   return (
     <TouchableOpacity 
-      style= { buttonSettings } 
+      style= { Styles.button } 
       onPress= { () => props.onPress() }
     >
       <Image

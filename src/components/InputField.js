@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, TextInput, Text, TouchableOpacity, Image, } from 'react-native';
 import { texts, boxes, icons, colors } from '../Styles';
 
+// Komponent für Texteingaben
 export default function InputField (props) {
   
   const [pwVisible, setPwVisible] = useState(false);
@@ -16,38 +17,9 @@ export default function InputField (props) {
     }
   }
 
-  const mainField = () => {
-    if (props.isButton) {
-      return(
-        <TouchableOpacity onPress= { props.onPress } >
-          <View style= { [
-            boxes.inputField,
-            {
-              flexDirection: "row", 
-              justifyContent: "space-between", 
-              alignItems:"center",
-              // width: 400,
-          } ] } >
-            <TextInput
-                style= {texts.inputField}
-                autoCapitalize="none"
-                textAlign= "left"
-                placeholder= { props.placeholderText }
-                value= { props.value }
-                onChangeText= { text => props.onChangeText(text)}
-                pointerEvents={"none"}
-            />
-            <Image
-              style={boxes.inputFieldIcon}
-              source={props.icon}
-              resizeMode={"contain"}
-            />
-          </View>
-        </TouchableOpacity>
-      )
-    }
-    else {
-      return (
+  return (
+    <View>
+        {titleText()}
         <View style= { [ 
           boxes.inputField, 
           props.showError ? boxes.inputFieldError : {},
@@ -71,6 +43,7 @@ export default function InputField (props) {
             numberOfLines={props.numberOfLines}
           />
 
+          {/* Schließen-Funktion bei der Kurssuche */}
           { props.isCloseable && 
             <TouchableOpacity style= { { right: 7, justifyContent: "center", } }
                 onPress= { () => props.closeButton() }
@@ -82,6 +55,8 @@ export default function InputField (props) {
               />
             </TouchableOpacity>
           }
+
+          {/* Passworteingaben */}
           { props.secureTextEntry && textChanged &&
               <TouchableOpacity 
                 style= { { right: 7, justifyContent: "center", } }
@@ -101,6 +76,8 @@ export default function InputField (props) {
                 />
               </TouchableOpacity>
           }
+
+          {/* Bestätigen-Funktion zum Ändern des eigenen Profils */}
           { props.needConfirmation && textChanged && 
             <TouchableOpacity
               style= { { right: 7, justifyContent: "center", paddingLeft: 7} }
@@ -114,16 +91,6 @@ export default function InputField (props) {
             </TouchableOpacity>
           }
         </View>
-      )
-    }
-  }
-
-  return (
-    <View style={{
-      // width: "100%"
-    }}>
-        {titleText()}
-        {mainField()}
     </View>
   );
 };

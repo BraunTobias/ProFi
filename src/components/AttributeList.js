@@ -3,10 +3,10 @@ import { FlatList, View, Text } from "react-native";
 
 import { boxes, colors, texts } from '../Styles';
 
+// Komponent anstatt der Section-List
 export default function AttributeList (props) {
 
-    // console.log(props.attList)
-
+    // Die Liste aller Sektionen
     const SectionList = () => {
         return (
             <FlatList
@@ -25,6 +25,8 @@ export default function AttributeList (props) {
             />
         );
     }
+    
+    // Die Sektionsliste mit Sektions-Titel und folgender Inhaltsliste
     const Section = (props) => {
         return (
             <View>
@@ -52,5 +54,4 @@ export default function AttributeList (props) {
     }
 
     return <SectionList/>;
-  
 }

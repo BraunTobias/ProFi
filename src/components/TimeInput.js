@@ -2,12 +2,14 @@ import React, { useState  } from 'react';
 import { View,  Text, TextInput, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { icons, boxes, texts, colors } from '../Styles';
 
-export default function NumberInput (props) {
+// Komponent zur numerischen Zeiteingabe beim Erstellen eines neuen Kurses
+export default function TimeInput (props) {
 
-    const min = 0;
-    const max = props.type === 'hours' ? 23 : 55; // 59;
-    const step = props.type === 'hours' ? 1 : 5;
+    const MIN = 0;
+    const MAX = props.type === 'hours' ? 23 : 55;
+    const STEP = props.type === 'hours' ? 1 : 5;
 
+    // StateHooks
     const [oldText, setOldText] = useState(2);
     const [errorVisible, setErrorVisible] = useState(false);
 
@@ -24,7 +26,7 @@ export default function NumberInput (props) {
             }
         }
 
-        if (!error && parseInt(text) < max) {
+        if (!error && parseInt(text) < MAX) {
             props.onChange(parseInt(text))
             setOldText(parseInt(text))
         }
@@ -48,15 +50,15 @@ export default function NumberInput (props) {
                 <TouchableOpacity 
                     style= { Styles.button } 
                     onPress= { () => { 
-                        if (props.value > min) { 
-                            props.onChange(props.value - step) 
+                        if (props.value > MIN) { 
+                            props.onChange(props.value - STEP) 
                             setErrorVisible(false);
-                            setOldText(props.value - step) 
+                            setOldText(props.value - STEP) 
                             console.log(oldText)
-                        } else if (props.value <= min) {
-                            props.onChange(max) 
+                        } else if (props.value <= MIN) {
+                            props.onChange(MAX) 
                             setErrorVisible(false);
-                            setOldText(max) 
+                            setOldText(MAX) 
                             console.log(oldText)
                     } } }
                 >
@@ -80,15 +82,15 @@ export default function NumberInput (props) {
                 <TouchableOpacity 
                     style= { Styles.button } 
                     onPress= { () => {
-                        if (props.value < max) { 
-                            props.onChange(props.value + step) 
+                        if (props.value < MAX) { 
+                            props.onChange(props.value + STEP) 
                             setErrorVisible(false);
-                            setOldText(props.value + step) 
+                            setOldText(props.value + STEP) 
                             console.log(oldText)
-                        } else if (props.value >= max) {
-                            props.onChange(min) 
+                        } else if (props.value >= MAX) {
+                            props.onChange(MIN) 
                             setErrorVisible(false);
-                            setOldText(min) 
+                            setOldText(MIN) 
                             console.log(oldText)
                 } } }
                 >
@@ -102,7 +104,7 @@ export default function NumberInput (props) {
             </View>
             { errorVisible &&
                 <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                    Gib eine Zahl zwischen {min} und {max} ein.
+                    Gib eine Zahl zwischen {MIN} und {MAX} ein.
                 </Text>
             }
         </View>

@@ -15,8 +15,6 @@ import AttributePreviewTile from '../components/AttributePreviewTile';
 import ProfileView from '../components/ProfileView';
 import AttributeSelect from '../components/AttributeSelect';
 import Padding from '../components/Padding';
-import FlexRow from '../components/FlexRow';
-import IdeaFooter from '../components/IdeaFooter';
 import ButtonSmall from '../components/ButtonSmall';
 import ProfileImage from '../components/ProfileImage';
 import InfoModal from '../components/InfoModal';
@@ -74,7 +72,6 @@ export default function IdeaScreen ({route, navigation}) {
     // State Hooks für Profilansicht
     const [viewedUserId, setViewedUserId] = useState(currentUserId);
     const [profileVisible, setProfileVisible] = useState(false);
-    // const [profileInfoVisible, setProfileInfoVisible] = useState(0);
 
     useLayoutEffect(() => {
         navigation.setOptions({
@@ -316,72 +313,6 @@ export default function IdeaScreen ({route, navigation}) {
         else return <Padding height= { 18.5 } />
     }
 
-    const Styles = StyleSheet.create({
-        
-        commentTile: {
-            paddingVertical: 10,
-            paddingHorizontal: 15,
-            minHeight: 200,
-            flexDirection: "row",
-
-        },
-        repliedTile: {
-            backgroundColor: colors.mediumGrey,
-            minHeight: 100,
-            paddingVertical: 10,
-            paddingHorizontal: 15,
-            flexDirection: "row"
-        },
-        replyImage: {
-            width: 30,
-            height: 30,
-            tintColor: colors.mediumGrey,
-            marginRight: 15,
-            alignSelf: 'center'
-        },
-        infoArea: {
-            width: 60,
-            marginRight: 15
-        },
-        rightArea: {
-            position: "absolute",
-            right: 10,
-            width: 250,
-            height: 150,
-            alignItems: 'flex-end',
-        },
-        buttons: {
-            // position: "absolute",
-            // right: 10,
-            // top: 50,
-            // width: 250,
-            flexDirection: 'column',
-            justifyContent: 'space-between'
-        },
-        likes: {
-            width: "100%",
-            marginTop: 5, 
-            flexDirection: "row", 
-            justifyContent: "center", 
-            alignItems: "center"
-        },
-        likesImage: {
-            height: 17,
-            width: 17,
-            resizeMode: "contain", 
-            tintColor: colors.darkBlue, 
-            marginRight: 5    
-        },
-        commentTileTime: {
-            fontSize: 16,
-            fontFamily: 'Inter',
-            fontWeight: 400,
-            color: colors.darkGrey,
-            opacity: 0.5,
-            paddingBottom: 15
-        }
-    });
-
     return(
         <View style= { {
             backgroundColor: colors.lightGrey, 
@@ -398,9 +329,8 @@ export default function IdeaScreen ({route, navigation}) {
 
             {/* Mitglieds-Profil */}
             { profileVisible && 
-            <ProfileView
+            <ProfileView visible= { profileVisible }
                 userId= { viewedUserId }
-                visible= { profileVisible }
                 onDismiss= { () => { setProfileVisible(false) } }
                 infoScreen= { true }
             />
@@ -522,8 +452,7 @@ export default function IdeaScreen ({route, navigation}) {
                             </View> 
                         )
                     }}
-                    onPress= { () => pressEditIdeaHandler(true) }
-                    // onDismiss= { () => pressEditIdeaHandler(false) }
+                    onDismiss= { pressEditIdeaHandler }
                 />
             </Modal>
 
@@ -541,34 +470,19 @@ export default function IdeaScreen ({route, navigation}) {
                         { ideaInfo.warning && ideaInfo.warning != "" &&
                             <View>
                                 <Padding height={5}/>
-                                <FlexRow padding left>
+                                <View style= { styles.flexRow }>
                                     <Image source={icons.warning} style= {{ tintColor: colors.red, width: 25, height: 25, marginEnd: 7}} resizeMode= { "contain" }/>
                                     <Text style={[texts.copy, {color: colors.red}]}>{
                                         ideaInfo.warning == "underMin" ? "Minimale Gruppengröße nicht erreicht" : "Maximale Gruppengröße überschritten"
                                     }</Text>
-                                </FlexRow>
+                                </View>
                             </View>
                         }
 
                         <AttributePreviewTile
-                            // title={ideaInfo.interests.length > 0 ? "Gemeinsamkeiten" : "Passende Fähigkeiten"}
                             title={ideaCreatorId === "ProFi-Algorithmus" ? "Gemeinsamkeiten" : "Passende Fähigkeiten"}
                             subtitle={currentSkills.length > 0 ? currentSkills.join(", ") : "\n"}
                             index={0}
-                            // onPress={() => navigation.navigate("IdeaAttributes", {
-                            //     filterList: currentSkills, 
-                            //     secondaryFilterList: ideaInfo.interests, 
-                            //     courseType: courseType, 
-                            //     courseId: courseId, 
-                            //     ideaId: ideaInfo.id, 
-                            //     title: ideaInfo.interests.length > 0 ? "Gemeinsamkeiten" : "Passende Fähigkeiten"})}
-                            // onPress={() => navigation.navigate("IdeaAttributes", {
-                            //     filterList: currentSkills, 
-                            //     secondaryFilterList: ideaInfo.interests, 
-                            //     courseType: courseType, 
-                            //     courseId: courseId, 
-                            //     ideaId: ideaInfo.id, 
-                            //     title: ideaCreatorId == "ProFi-Algorithmus" ? "Gemeinsamkeiten" : "Passende Fähigkeiten"})}
                             onPress= { () => { setAttributesModalVisible(true); } }
                         />
                         {/* Memebers Icons */}
@@ -576,7 +490,6 @@ export default function IdeaScreen ({route, navigation}) {
                             <ScrollRow
                                 data= { members }
                                 onPress= { (id) => { viewProfileHandler(id) } }
-                                // onEnter= { (num, id) => viewProfileInfoHandler(num, id) }
                             />
                         }
                     </View>
@@ -649,7 +562,11 @@ export default function IdeaScreen ({route, navigation}) {
                 {/* ListFooterComponent */}
                 <View>
                     {!commentsLoading && !currentUserIsCreator &&
-                        <IdeaFooter ideaCreatorId={ideaCreatorId} ideaCreator={ideaCreator}/>
+                        <View style={styles.ideaFooter}>
+                            <Text style={[texts.ideaFooter]}>
+                                {ideaCreatorId == "ProFi-Algorithmus" ? "Automatisch erstellte Idee" : "Idee von " + ideaCreator}
+                            </Text>
+                        </View>
                     }
                     {commentsLoading && 
                         <View style={{backgroundColor: colors.white, paddingVertical: 30}}>
@@ -661,8 +578,8 @@ export default function IdeaScreen ({route, navigation}) {
             
             {/* Kommentar schreiben */}
             {newCommentVisible &&
-            <View style= { [boxes.width, Styles.commentTile] } >
-                <View style= { Styles.infoArea } >
+            <View style= { [boxes.width, styles.commentTile] } >
+                <View style= { styles.infoArea } >
                     <ProfileImage
                         userId= { currentUserId }
                         imageUrl= {currentUserImage}
@@ -678,8 +595,8 @@ export default function IdeaScreen ({route, navigation}) {
                         multiline= { true }
                     />
                 </View>
-                <View style= { Styles.rightArea } >
-                    <Text style= { Styles.commentTileTime } >{ new Date().toLocaleDateString('de-DE') }</Text>
+                <View style= { styles.rightArea } >
+                    <Text style= { styles.commentTileTime } >{ new Date().toLocaleDateString('de-DE') }</Text>
                     
                     <ButtonLarge 
                         title="Kommentar senden"
@@ -701,16 +618,16 @@ export default function IdeaScreen ({route, navigation}) {
             {newReplyVisible &&
             <View style= { [boxes.width] } >
                 {/* Original-Beitrag */}
-                <View style= { [Styles.repliedTile] } >
-                    <View style= { Styles.infoArea } >
+                <View style= { [styles.repliedTile] } >
+                    <View style= { styles.infoArea } >
                         <ProfileImage
                             userId= { currentReplyComment.user }
                             imageUrl= { currentReplyComment.userUrl }
                             onPress= { () => { viewProfileHandler(currentReplyComment.user) } }
                         />
-                        <View style= { Styles.likes } >
+                        <View style= { styles.likes } >
                             <Image
-                                style= { Styles.likesImage }
+                                style= { styles.likesImage }
                                 height= { 17 }
                                 width= { 17 }
                                 source= { icons.like }
@@ -726,18 +643,18 @@ export default function IdeaScreen ({route, navigation}) {
                             text= { currentReplyComment.text }
                         />
                     </View>
-                    <View style= { Styles.rightArea } >            
-                        <Text style = { Styles.commentTileTime } >{ currentReplyComment.time.toDate().toLocaleDateString('de-DE') }</Text>
+                    <View style= { styles.rightArea } >            
+                        <Text style = { styles.commentTileTime } >{ currentReplyComment.time.toDate().toLocaleDateString('de-DE') }</Text>
                     </View>
                 </View>
                 {/* Eingabefeld */}
-                <View style= { Styles.commentTile } >
+                <View style= { styles.commentTile } >
                     <Image
-                        style= { Styles.replyImage }
+                        style= { styles.replyImage }
                         source= { icons.replyComment }
                         resizeMode= { "contain" }
                     />
-                    <View style= { Styles.infoArea } >
+                    <View style= { styles.infoArea } >
                         <ProfileImage
                             userId= { currentUserId }
                             imageUrl= {currentUserImage}
@@ -753,8 +670,8 @@ export default function IdeaScreen ({route, navigation}) {
                             multiline= { true }
                         />
                     </View>
-                    <View style= { Styles.rightArea } >
-                        <Text style= { Styles.commentTileTime } >{ new Date().toLocaleDateString('de-DE') }</Text>
+                    <View style= { styles.rightArea } >
+                        <Text style= { styles.commentTileTime } >{ new Date().toLocaleDateString('de-DE') }</Text>
                         
                         {/* <View style= { Styles.buttons } > */}
                             <ButtonLarge 
@@ -777,3 +694,83 @@ export default function IdeaScreen ({route, navigation}) {
         </View>
     )
 }
+
+const styles = StyleSheet.create({
+    
+    flexRow: {
+        width: "100%",
+        flexDirection: "row",
+        alignItems: "center",
+        paddingHorizontal: 15,
+        justifyContent: "space-between"
+    },
+    ideaFooter: {
+        width: "100%",
+        justifyContent: "center",
+        flexDirection: "row",
+        paddingTop: 10,
+        paddingBottom: 15,
+        borderTopWidth: 1,
+        borderColor: colors.darkGrey,
+        opacity: 0.5
+    },
+    commentTile: {
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        minHeight: 200,
+        flexDirection: "row",
+
+    },
+    repliedTile: {
+        backgroundColor: colors.mediumGrey,
+        minHeight: 100,
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        flexDirection: "row"
+    },
+    replyImage: {
+        width: 30,
+        height: 30,
+        tintColor: colors.mediumGrey,
+        marginRight: 15,
+        alignSelf: 'center'
+    },
+    infoArea: {
+        width: 60,
+        marginRight: 15
+    },
+    rightArea: {
+        position: "absolute",
+        right: 10,
+        width: 250,
+        height: 150,
+        alignItems: 'flex-end',
+    },
+    buttons: {
+        // width: 250,
+        flexDirection: 'column',
+        justifyContent: 'space-between'
+    },
+    likes: {
+        width: "100%",
+        marginTop: 5, 
+        flexDirection: "row", 
+        justifyContent: "center", 
+        alignItems: "center"
+    },
+    likesImage: {
+        height: 17,
+        width: 17,
+        resizeMode: "contain", 
+        tintColor: colors.darkBlue, 
+        marginRight: 5    
+    },
+    commentTileTime: {
+        fontSize: 16,
+        fontFamily: 'Inter',
+        fontWeight: 400,
+        color: colors.darkGrey,
+        opacity: 0.5,
+        paddingBottom: 15
+    }
+});

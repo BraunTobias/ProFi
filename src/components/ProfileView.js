@@ -7,6 +7,7 @@ import Padding from './Padding';
 import { boxes, texts, icons } from '../Styles';
 import ModalContent from "../components/ModalContent";
 
+// Komponent für eine Profilansicht
 export default function ProfileView (props) {
 
     const window = useWindowDimensions();

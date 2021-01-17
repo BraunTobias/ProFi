@@ -2,6 +2,7 @@ import React  from "react";
 import { Image, TouchableOpacity } from "react-native";
 import { boxes, colors } from "../Styles";
 
+// Komponent für Attribut-Symbole bei der Fähigkeiten/Interessen-Auswahl und -Anzeige
 export default function AttributeImage (props) {
     
     var iconName =  "";

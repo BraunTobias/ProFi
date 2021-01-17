@@ -2,6 +2,7 @@ import React from "react";
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
 import { colors, texts } from '../Styles';
 
+// Komponent für Buttons mit Titel ohne Icon
 export default function ButtonLarge (props) {
   
   const selectBoxStyle = () => {

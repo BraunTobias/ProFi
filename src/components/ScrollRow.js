@@ -4,6 +4,7 @@ import { View, FlatList, ScrollView } from "react-native";
 import AttributeImage from "./AttributeImage";
 import ProfileImage from "./ProfileImage";
 
+// Komponent für eine Icon-Leiste aus Profilbildern oder Attribut-Icons
 export default function ScrollRow (props) {
 
     const data = props.data;

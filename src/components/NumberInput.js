@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { View,  Text, TextInput, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { icons, boxes, texts, colors } from '../Styles';
 
+// Komponent für Zahlen-Eingaben beim Festlegen der Teamgröße beim Erstellen eines neuen Kurses
 export default function NumberInput (props) {
 
-    const min = 2;
-    const max = 20;
+    const MIN = 2;
+    const MAX = 20;
 
+    // StateHooks
     const [oldText, setOldText] = useState(2);
     const [errorVisible, setErrorVisible] = useState(false);
 
@@ -88,7 +90,7 @@ export default function NumberInput (props) {
             </View>
             { errorVisible &&
                 <Text style={[boxes.unPaddedRow, texts.errorLine]}>
-                    Gib eine Zahl zwischen {min} und {max} ein.
+                    Gib eine Zahl zwischen {MIN} und {MAX} ein.
                 </Text>
             }
         </View>

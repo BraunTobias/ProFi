@@ -61,8 +61,6 @@ export default function LoginScreen () {
             });
         }
     }
-    // tobias.braun@haw-hamburg.de
-    // benjamin.braun@haw-hamburg.de
     
     // Registrierung
     const registerHandler = () => {

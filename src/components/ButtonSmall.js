@@ -1,7 +1,8 @@
 import React from "react";
 import { Text, TouchableOpacity, Image, StyleSheet } from "react-native";
-import { icons, boxes, texts, colors } from '../Styles';
+import { icons, texts, colors } from '../Styles';
 
+// Komponent für Buttons mit Titel und Icon
 export default function ButtonSmall (props) {
 
   const Styles = StyleSheet.create({

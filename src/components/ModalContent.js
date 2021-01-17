@@ -1,5 +1,5 @@
 import React from "react";
-import { View, ScrollView, StyleSheet, useWindowDimensions } from "react-native";
+import { View, StyleSheet } from "react-native";
 
 import { boxes, colors } from '../Styles';
 import ButtonLarge from '../components/ButtonLarge';
@@ -15,7 +15,6 @@ export default function ModalComponent (props) {
         },
         scrollView: {
             height: 200
-            // height: useWindowDimensions().height -180 -60 -65
         }
     })
 
@@ -44,7 +43,7 @@ export default function ModalComponent (props) {
                     {!props.infoScreen &&
                         <ButtonLarge
                             title={"Bestätigen"}
-                            onPress={ () => { props.onPress(true) } }
+                            onPress={ () => { props.onDismiss(true) } }
                         />
                     }
                     {/* Leere View zum ausgleich des space-between */}
@@ -54,7 +53,7 @@ export default function ModalComponent (props) {
                     <ButtonLarge
                         title={ props.infoScreen ? "OK" : "Abbrechen" }
                         transparent={true}
-                        onPress={ () => { props.onPress(false) } }
+                        onPress={ () => { props.onDismiss(false) } }
                     />
                 </View>
             </View>

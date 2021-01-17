@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { TouchableOpacity } from 'react-native-web'
 
 import ButtonIcon from '../components/ButtonIcon';
 import { colors, boxes, texts } from '../Styles';
 
+// Komponent zur Datumsauswahl
 export default function DateModal ( values ) {
 
     const TODAY = new Date();
@@ -30,9 +31,7 @@ export default function DateModal ( values ) {
     ]
     const [firstDayOfTheWeek, setFirstDayOfTheWeek] = useState(new Date(year, month, 0).getDay());
    
-    // console.log('date: ' + format(currentDate, "dd.MM.yyyy"))
-    // console.log('day: ' + day + ', month: ' + month + ', year: ' + year + ', start: ' + (firstDayOfTheWeek))
-    
+    // Element für das Feld der Tage
     var shownDay = 1;
     const DAY = (props) => {      
         
@@ -63,9 +62,7 @@ export default function DateModal ( values ) {
             shownWeekday = shownDay % daysV2[month] - 1;
             active = false;
         }
-        // console.log('shownDay: ' + shownDay + ', shownWeekday: ' + shownWeekday);
-        // console.log('daysV2[(month - 1 + 11) % 11] - day + 1: ' + ( daysV2[(month - 1 + 11) % 11] - props.day) + 1)
-        // console.log('(' + 9 + ' - 1 +11) % 11 = ' + (9 - 1 +11) % 11)
+        
         if (!active) {
             return (
                 // Inactive Tile
@@ -126,6 +123,7 @@ export default function DateModal ( values ) {
         }
     }
 
+    // Element für die Reihe von Tagen einer Woche
     const WEEK = (props) => {
         return (
             <View style= { boxes.unPaddedRow } >
@@ -140,6 +138,7 @@ export default function DateModal ( values ) {
         );
     }
 
+    // Button zum Navigieren zum vorherigen Monat, wenn der vorherige Monat nicht ein vergangener ist
     const BACKBUTTON = (props)  => {
         if (month === TODAY.getMonth() && year === TODAY.getFullYear()) {
             return (
@@ -155,75 +154,86 @@ export default function DateModal ( values ) {
     }
     
     return (
-            <View style= { {
-                paddingTop: 5
-            } } >
-                <View
-                    transparent= {true}
-                    style= {{
-                        width: 400, 
-                        height: 360,
-                        paddingHorizontal: 15,
-                        paddingTop: 10,
-                        borderRadius: 8,
-                        backgroundColor: colors.lightBlue, 
-                }}>
-                    <View style= { [boxes.unPaddedRow, { alignItems: "center", } ] } >
-                        
-                        <BACKBUTTON onPress= { () => { 
-                            var newMonth = month - 1
-                            var newYear = year;
-                            if (newMonth === -1) {
-                                newMonth = 11;
-                                newYear --;
-                                setFirstDayOfTheWeek(new Date(newYear, newMonth, 0).getDay());
-                                setYear(newYear);
-                                values.onPress( currentDate );
-                            }
-                            else setFirstDayOfTheWeek(new Date(year, newMonth, 0).getDay());
-                            setMonth(newMonth);
-                        } }/>
-
-                        <Text style= { texts.subHeader } > { months[month] } { year } </Text>
-                        
-                        <ButtonIcon status= { 'active' } icon= { 'plus' } onPress= { () => { 
-                            const newMonth = (month + 1 ) % 12
-                            var newYear = year;
-                            if (newMonth === 0) {
-                                newYear ++;
-                                setYear(newYear);
-                                setFirstDayOfTheWeek(new Date(newYear, 0, 0).getDay());
-                                values.onPress( currentDate );
-                            }
-                            else setFirstDayOfTheWeek(new Date(year, newMonth, 0).getDay());
-                            setMonth(newMonth);
-                        } } />
-                    </View>
-
-                    {/* Names of the days of the week */}
-                    <View style= { boxes.unPaddedRow } >
-                        <View style={{width:40,height:40,alignItems: "center",justifyContent: "center",}}><Text>Mo</Text></View>
-                        <View style={{width:40,height:40,alignItems: "center",justifyContent: "center",}}><Text>Di</Text></View>
-                        <View style={{width:40,height:40,alignItems: "center",justifyContent: "center",}}><Text>Mi</Text></View>
-                        <View style={{width:40,height:40,alignItems: "center",justifyContent: "center",}}><Text>Do</Text></View>
-                        <View style={{width:40,height:40,alignItems: "center",justifyContent: "center",}}><Text>Fr</Text></View>
-                        <View style={{width:40,height:40,alignItems: "center",justifyContent: "center",}}><Text>Sa</Text></View>
-                        <View style={{width:40,height:40,alignItems: "center",justifyContent: "center",}}><Text>So</Text></View>
-                    </View>
+        <View style= { {
+            paddingTop: 5
+        } } >
+            <View
+                transparent= {true}
+                style= {{
+                    width: 400, 
+                    height: 360,
+                    paddingHorizontal: 15,
+                    paddingTop: 10,
+                    borderRadius: 8,
+                    backgroundColor: colors.lightBlue, 
+            }}>
+                <View style= { [boxes.unPaddedRow, { alignItems: "center", } ] } >
                     
-                    {/* Calendar */}
-                    <WEEK weekStart= { firstDayOfTheWeek } week= { 0 } />
-                    <WEEK weekStart= { firstDayOfTheWeek } week= { 7 } />
-                    <WEEK weekStart= { firstDayOfTheWeek } week= { 14 } />
-                    <WEEK weekStart= { firstDayOfTheWeek } week= { 21 } />
-                    <WEEK weekStart= { firstDayOfTheWeek } week= { 28 } />
-                    <WEEK weekStart= { firstDayOfTheWeek } week= { 35 } />
-                    
-                    {/* Space between */}
-                    <View style={{height:10}}/>
+                    {/* Button zum vorherigen Monat */}
+                    <BACKBUTTON onPress= { () => { 
+                        var newMonth = month - 1
+                        var newYear = year;
+                        if (newMonth === -1) {
+                            newMonth = 11;
+                            newYear --;
+                            setFirstDayOfTheWeek(new Date(newYear, newMonth, 0).getDay());
+                            setYear(newYear);
+                            values.onPress( currentDate );
+                        }
+                        else setFirstDayOfTheWeek(new Date(year, newMonth, 0).getDay());
+                        setMonth(newMonth);
+                    } }/>
 
+                    {/* Titel aus Monatsname und Jahr */}
+                    <Text style= { texts.subHeader } > { months[month] } { year } </Text>
+                    
+                    {/* Button zum folgenden Monat */}
+                    <ButtonIcon status= { 'active' } icon= { 'plus' } onPress= { () => { 
+                        const newMonth = (month + 1 ) % 12
+                        var newYear = year;
+                        if (newMonth === 0) {
+                            newYear ++;
+                            setYear(newYear);
+                            setFirstDayOfTheWeek(new Date(newYear, 0, 0).getDay());
+                            values.onPress( currentDate );
+                        }
+                        else setFirstDayOfTheWeek(new Date(year, newMonth, 0).getDay());
+                        setMonth(newMonth);
+                    } } />
                 </View>
+
+                {/* Namen der Wochentage */}
+                <View style= { boxes.unPaddedRow } >
+                    <View style= { styles.naming } ><Text>Mo</Text></View>
+                    <View style= { styles.naming } ><Text>Di</Text></View>
+                    <View style= { styles.naming } ><Text>Mi</Text></View>
+                    <View style= { styles.naming } ><Text>Do</Text></View>
+                    <View style= { styles.naming } ><Text>Fr</Text></View>
+                    <View style= { styles.naming } ><Text>Sa</Text></View>
+                    <View style= { styles.naming } ><Text>So</Text></View>
+                </View>
+                
+                {/* Kalender */}
+                <WEEK weekStart= { firstDayOfTheWeek } week= { 0 } />
+                <WEEK weekStart= { firstDayOfTheWeek } week= { 7 } />
+                <WEEK weekStart= { firstDayOfTheWeek } week= { 14 } />
+                <WEEK weekStart= { firstDayOfTheWeek } week= { 21 } />
+                <WEEK weekStart= { firstDayOfTheWeek } week= { 28 } />
+                <WEEK weekStart= { firstDayOfTheWeek } week= { 35 } />
+                
+                {/* Space between */}
+                <View style={{height:10}}/>
+
             </View>
-        // </Modal>
+        </View>
     )
 }
+
+const styles = StyleSheet.create({
+    naming: {
+        width:40,
+        height:40,
+        alignItems: "center",
+        justifyContent: "center",
+    }
+})

@@ -74,10 +74,6 @@ const DB = {
     },
     // Listen fürs Profil ausfüllen 
     fillAttributesList: async function(uid) {
-        // for (var category in skillsList) {
-        //     // console.log("SKILLS: " + category + skillsList[category]);
-        //     firebase.firestore().collection("users").doc(uid).collection("skills").doc(category).set(skillsList[category], {merge: true});        
-        // }
         const allSkills = await firebase.firestore().collection("skills").get();
         if (allSkills) {
             allSkills.forEach(categoryDoc => {
