@@ -2,22 +2,22 @@ import React from 'react';
 import { FlatList, View, Text } from "react-native";
 import { TouchableHighlight, ScrollView } from 'react-native-web'
 import ListTile from "../components/ListTile";
-import ButtonIcon from '../components/ButtonIcon';
 import { colors, boxes, texts } from '../Styles';
 import { format } from 'date-fns';
 
+// Neue Komponente als Ersatz für das Section-List-Modul
 export default function SectionList (datas) {
 
     const SectionList = () => {
         return (
             <ScrollView 
-                style= {{ overlow:'scroll' }}
+                style= { { overlow:'scroll' } }
                 showsHorizontalScrollIndicator= { true }
                 showsVerticalScrollIndicator= { true }
             >
                 <View>
                     <FlatList
-                        style= {{overflow: 'hidden'}}
+                        style= { { overflow: 'hidden' } }
                         data= { datas.data }
                         keyExtractor= { (item, index) => index.toString() }
                         renderItem= { ( { item } ) => { 
@@ -28,7 +28,7 @@ export default function SectionList (datas) {
                             )
                         }}
                     />
-                    <Text style={[boxes.width, texts.errorLine]}>
+                    <Text style= { [boxes.width, texts.errorLine] } >
                         Sollten deine Kurse nicht angezeigt werden, lade bitte die Seite neu.
                     </Text>
                 </View>
@@ -79,18 +79,6 @@ export default function SectionList (datas) {
                                         onExit = { () => datas.onExit(item.id, item.date ? 'courses' : 'openCourses') }
                                         delte = { datas.delete }
                                     />
-                                    {/* <View
-                                        style= { {
-                                            flexDirection: "row", 
-                                            paddingHorizontal: 10,
-                                        } }
-                                    >
-                                        <ButtonIcon 
-                                            icon= { "delete" }
-                                            onPress= { (ref) => { datas.onDelete(item.id, item.date ? 'courses' : 'openCourses') } }
-                                            status= { "transparent" }
-                                        />
-                                    </View> */}
                                 </View>
                             </TouchableHighlight>
                         )

@@ -1,6 +1,6 @@
 import React from "react";
 import { Text, Image, View, StyleSheet } from "react-native";
-import { icons, colors, boxes, texts } from '../Styles';
+import { icons, colors, texts } from '../Styles';
 import ButtonIcon from "../components/ButtonIcon";
 
 export default function ListTile (props) {

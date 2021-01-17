@@ -5,7 +5,7 @@ import "firebase/storage";
 // import * as Notifications from 'expo-notifications'
 
 import {skillsList} from '../data/AttributesList';
-import { compareAsc, format } from 'date-fns';
+import { format } from 'date-fns';
 
 const DB = {
 
@@ -270,7 +270,7 @@ const DB = {
             semester = "SS" + year;
         } else {
             // Wintersemester
-            if (month == 0) year --;
+            if (month === 0) year --;
             semester = "WS" + year;
         }
 
@@ -503,7 +503,7 @@ const DB = {
         ideasList.sort((a, b) => {
             if (a.myTeam) return -1;
             else if (b.myTeam) return 1;
-            else if (!a.team == -1) return 1;
+            else if (!a.team === -1) return 1;
             else return b.userSkillCount - a.userSkillCount;
         });
 
@@ -516,7 +516,7 @@ const DB = {
         // Erst normale Kommentare einordnen
         snapshot.forEach((doc) => {
             const comment = doc.data();
-            if (comment.text == "Deleted") comment.text = "Gelöschter Kommentar";
+            if (comment.text === "Deleted") comment.text = "Gelöschter Kommentar";
             if (!comment.replyTo) {
                 comment["id"] = doc.id;
                 commentsList.push(comment);
@@ -530,7 +530,7 @@ const DB = {
                 var index = 0;
                 //Index des ursprünglichen Kommentars finden und dort einsetzen
                 for (const normalComment of commentsList) {
-                    if (comment.replyTo == normalComment.id) index = commentsList.indexOf(normalComment);
+                    if (comment.replyTo === normalComment.id) index = commentsList.indexOf(normalComment);
                 }
                 commentsList.splice(index + 1, 0, comment);
             }
@@ -564,10 +564,10 @@ const DB = {
         const snapshot = await firebase.firestore().collection(courseType).doc(courseId).collection("ideas").doc(ideaId).collection("comments").get();
         snapshot.forEach(doc => {
             var commentData = doc.data();
-            if (commentData.replyTo == commentId) {
+            if (commentData.replyTo === commentId) {
                 hasReplies = true;
             }
-            if (doc.id != commentId && commentData.replyTo == replyTo) {
+            if (doc.id != commentId && commentData.replyTo === replyTo) {
                 otherReplies = true;
             }
         });
@@ -586,7 +586,7 @@ const DB = {
                 const snapshotDoc = await firebase.firestore().collection(courseType).doc(courseId).collection("ideas").doc(ideaId).collection("comments").doc(replyTo).get();
                 if (snapshotDoc) {
                     const originalCommentData = snapshotDoc.data();
-                    if (originalCommentData && originalCommentData.text == "Deleted") {
+                    if (originalCommentData && originalCommentData.text === "Deleted") {
                         firebase.firestore().collection(courseType).doc(courseId).collection("ideas").doc(ideaId).collection("comments").doc(replyTo).delete();
                     }
                 }
@@ -810,7 +810,7 @@ const DB = {
         if (snapshotDoc.data().members) {
             var membersArray = snapshotDoc.data().members;
             membersArray.forEach((memberId) => {
-                if (memberId == currentUserID) {
+                if (memberId === currentUserID) {
                     isMember = true;
                 }
             });
@@ -852,7 +852,7 @@ const DB = {
             if (snapshotIdeaDoc) {
                 if (snapshotIdeaDoc.data().team) ideaMembers = snapshotIdeaDoc.data().team;
                 else if (snapshotIdeaDoc.data().members) ideaMembers = snapshotIdeaDoc.data().members;
-                if (snapshotIdeaDoc.data().creator == "ProFi-Algorithmus") isEmptyIdea = true;
+                if (snapshotIdeaDoc.data().creator === "ProFi-Algorithmus") isEmptyIdea = true;
                 if (ideaMembers) {
                     for (const member of ideaMembers) {
                         memberAttributes[member] = [];
@@ -920,14 +920,14 @@ const DB = {
 
         skillSnapshot.forEach((categoryDoc) => {
             for (const title in categoryDoc.data()) {
-                if (categoryDoc.data()[title] == true) {
+                if (categoryDoc.data()[title] === true) {
                     skillsList.push(title);
                 }
             }
         });    
         interestSnapshot.forEach((categoryDoc) => {
             for (const title in categoryDoc.data()) {
-                if (categoryDoc.data()[title] == true) {
+                if (categoryDoc.data()[title] === true) {
                     interestsList.push(title);
                 }
             }

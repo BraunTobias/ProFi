@@ -362,7 +362,7 @@ export default function IdeaScreen ({route, navigation}) {
                                     { interestsList.length > 0 &&
                                         <View>
                                             <Button
-                                                inactive={viewedList == interestsList}
+                                                inactive={viewedList === interestsList}
                                                 title="Fähigkeiten"
                                                 icon={icons.info}
                                                 onPress={() => setViewedList(skillsList)}
@@ -473,7 +473,7 @@ export default function IdeaScreen ({route, navigation}) {
                                 <View style= { styles.flexRow }>
                                     <Image source={icons.warning} style= {{ tintColor: colors.red, width: 25, height: 25, marginEnd: 7}} resizeMode= { "contain" }/>
                                     <Text style={[texts.copy, {color: colors.red}]}>{
-                                        ideaInfo.warning == "underMin" ? "Minimale Gruppengröße nicht erreicht" : "Maximale Gruppengröße überschritten"
+                                        ideaInfo.warning === "underMin" ? "Minimale Gruppengröße nicht erreicht" : "Maximale Gruppengröße überschritten"
                                     }</Text>
                                 </View>
                             </View>
@@ -564,7 +564,7 @@ export default function IdeaScreen ({route, navigation}) {
                     {!commentsLoading && !currentUserIsCreator &&
                         <View style={styles.ideaFooter}>
                             <Text style={[texts.ideaFooter]}>
-                                {ideaCreatorId == "ProFi-Algorithmus" ? "Automatisch erstellte Idee" : "Idee von " + ideaCreator}
+                                {ideaCreatorId === "ProFi-Algorithmus" ? "Automatisch erstellte Idee" : "Idee von " + ideaCreator}
                             </Text>
                         </View>
                     }

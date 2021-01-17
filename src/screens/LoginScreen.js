@@ -64,7 +64,7 @@ export default function LoginScreen () {
     
     // Registrierung
     const registerHandler = () => {
-        if (currentName != "" && currentPW.length >= 6 && currentMail != "" && currentPW == currentConfirmPW) {
+        if (currentName != "" && currentPW.length >= 6 && currentMail != "" && currentPW === currentConfirmPW) {
             DB.signUp(currentName, currentMail, currentPW, () => {}, (error) => {
                 switch (error.code) {
                     case "auth/email-already-in-use": setCurrentMailError("Diese E-Mail-Adresse ist schon vergeben."); break;
@@ -74,10 +74,10 @@ export default function LoginScreen () {
                 setCurrentConfirmPWError("");
             });
         } else {
-            if (currentName == "") setCurrentNameError("Bitte einen Namen eingeben.");
+            if (currentName === "") setCurrentNameError("Bitte einen Namen eingeben.");
             else setCurrentMailError("");
             
-            if (currentMail == "") setCurrentMailError("Bitte eine E-Mail-Adresse eingeben.");
+            if (currentMail === "") setCurrentMailError("Bitte eine E-Mail-Adresse eingeben.");
             else setCurrentMailError("");
             
             if (currentPW.length < 6) { 

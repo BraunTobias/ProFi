@@ -1,6 +1,6 @@
 import React  from "react";
 import { Image, TouchableOpacity, StyleSheet } from "react-native";
-import { boxes, icons } from "../Styles";
+import { icons } from "../Styles";
 
 export default function ProfileImage (props) {
 

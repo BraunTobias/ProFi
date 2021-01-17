@@ -665,7 +665,7 @@ export default function CourseScreen ({route, navigation}) {
                                     index = { itemData.index }
                                     myTeam={itemData.item.myTeam}
                                     isMember={itemData.item.userIsMember}
-                                    inactive = {(evaluated && (!itemData.item.team || itemData.item.team.length == 0)) ||
+                                    inactive = {(evaluated && (!itemData.item.team || itemData.item.team.length === 0)) ||
                                         (itemData.item.team && itemData.item.team.indexOf(currentUserId) < 0)
                                     }
                                     warning = {itemData.item.warning && itemData.item.warning != ""}
