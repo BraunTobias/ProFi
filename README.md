@@ -1,4 +1,4 @@
-<img src="https://github.com/BraunTobias/ProFi/blob/neueVersion/assets/App%20Icon%20Alternative.png" width="100" height="100">
+<img src="https://github.com/BraunTobias/ProFi/blob/App/assets/App%20Icon%20Alternative.png" width="100" height="100">
 
 # ProFi Projektfindungs-App
 
