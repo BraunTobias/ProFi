@@ -1,7 +1,6 @@
 import React, {useState, useEffect, useLayoutEffect, useContext} from 'react';
-import { View, Text, Modal, Keyboard, ActivityIndicator, Animated, Alert, Image } from 'react-native';
+import { View, Text, Modal, ActivityIndicator, Animated, Alert, Image } from 'react-native';
 import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view';
-import { compareAsc, format } from 'date-fns';
 
 import { icons, boxes, texts } from '../Styles';
 import DB from '../api/DB_API';

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useLayoutEffect, useContext } from 'react';
-import {FlatList, View, Text, SectionList, Image, ActivityIndicator, StyleSheet} from "react-native";
+import React, { useContext } from 'react';
+import { View, Text, SectionList, ActivityIndicator, StyleSheet} from "react-native";
 
 import { texts } from '../Styles';
 import ProfileImage from './ProfileImage';

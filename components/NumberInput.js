@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import InputSpinner from "react-native-input-spinner";
 
-import { View, TextInput, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { icons, texts } from '../Styles';
 import { ThemeContext } from '../components/ThemeManager';
 

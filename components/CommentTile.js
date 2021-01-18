@@ -1,11 +1,10 @@
-import React , {useState, useEffect, useContext} from "react";
-import { StyleSheet, Text, TouchableOpacity, View, Image } from "react-native";
+import React , { useContext} from "react";
+import { StyleSheet, Text, View, Image } from "react-native";
 import Autolink from 'react-native-autolink';
-import { compareAsc, format } from 'date-fns';
+import { format } from 'date-fns';
 import { ThemeContext } from '../components/ThemeManager';
 
 import { icons, texts } from '../Styles';
-import DB from '../api/DB_API';
 import ProfileImage from "./ProfileImage";
 
 export default CommentTile = props => {

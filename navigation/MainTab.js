@@ -1,11 +1,9 @@
-import React , {useEffect, useContext} from 'react';
+import React , { useContext} from 'react';
 import { NavigationContainer, } from '@react-navigation/native';
 import { Image, StatusBar } from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import { Appearance, AppearanceProvider, useColorScheme } from 'react-native-appearance';
 
-import DB from '../api/DB_API';
-import { icons, colors } from '../Styles';
+import { icons } from '../Styles';
 import HomeStack from './HomeStack';
 import ProfileStack from './ProfileStack';
 import { ThemeContext } from '../components/ThemeManager';

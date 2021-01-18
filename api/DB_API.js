@@ -509,20 +509,6 @@ const DB = {
             })
         }
     },
-    // addOpenIdea: function(courseId, title, description, skills, interests, onSuccess) {
-    //     const currentUserID = firebase.auth().currentUser.uid;
-
-    //     firebase.firestore().collection("openCourses").doc(courseId).collection("ideas").add({
-    //         title: title,
-    //         description: description,
-    //         interests: interests,
-    //         skills: skills,
-    //         members: [],
-    //         creator: currentUserID
-    //     }).then(() => {
-    //         onSuccess();
-    //     })
-    // },
     // Idee bearbeiten
     editIdea: function(courseId, ideaId, courseType, title, description, skills, interests, onSuccess, onError) {
         firebase.firestore().collection(courseType).doc(courseId).collection("ideas").doc(ideaId).set({
@@ -874,28 +860,6 @@ const DB = {
         }
         onSuccess(membersList);
     },
-    // Gibt Eigenschaften einer Idee zurück
-    // getOpenIdeaData: async function(courseId, ideaId, onSuccess) {
-    //     var ideaData = {};
-    //     const snapshotDoc = await firebase.firestore().collection("openCourses").doc(courseId).collection("ideas").doc(ideaId).get();
-    //     if (snapshotDoc.data()) {
-    //         ideaData = snapshotDoc.data();
-    //         var sortedSkills = snapshotDoc.data().skills;
-    //         sortedSkills.sort();
-    //         ideaData.skills = sortedSkills;
-    //         var membersList = [];
-    //         for (var memberId of ideaData.members) {
-    //             var member = {userId: memberId};
-    //             await this.getUserInfoById(memberId, (name, url) => {
-    //                 member.userName = name;
-    //                 member.imageUrl = url;
-    //             });
-    //             membersList.push(member);
-    //         }
-    //         ideaData.members = membersList;
-    //     }
-    //     onSuccess(ideaData);
-    // },
 
     // Der User wird zur Interessenten-Liste eines Kurses hinzugefügt
     addCourseToList: async function(courseId, onSuccess, onError) {
@@ -1100,12 +1064,6 @@ const DB = {
         var isEmptyIdea = false;
         const currentUserID = firebase.auth().currentUser.uid;
         const snapshot = await firebase.firestore().collection("users").doc(currentUserID).collection(attributeType).get();
-        // Die Profilbilder und Attribute der Mitglieder abspeichern (sofern die Idee Mitglieder hat)
-        // console.log(attributeType);
-        // console.log(filterList);
-        // console.log(courseType);
-        // console.log(courseId);
-        // console.log(ideaId);
         if (courseType && courseId && ideaId) {
             const snapshotIdeaDoc = await firebase.firestore().collection(courseType).doc(courseId).collection("ideas").doc(ideaId).get();
             if (snapshotIdeaDoc) {
@@ -1155,10 +1113,7 @@ const DB = {
                             }
                         }
                     } 
-                    // Attribute nur anhängen wenn es keine leere Idee ist ODER es mehr als 2 User mit dem Attribut gibt 
-                    // if (!isEmptyIdea || attributeObj.users.length > 1) {
-                        categoryAttributes.push(attributeObj);
-                    // }
+                    categoryAttributes.push(attributeObj);
                 }
             }
             if (categoryAttributes.length > 0) {
@@ -1168,7 +1123,6 @@ const DB = {
                 });
             }
         });  
-        // console.log(attributesList)
         onSuccess(attributesList);
     },
     
@@ -1204,7 +1158,6 @@ const DB = {
         if (snapshotData) {            
             // Gibt Liste als (alphabetisch geordnetes) Array zurück
             for (var title in snapshotData) {
-                // console.log("title: " + title);
                 attributesList.push(title);
             }
             attributesList.sort();
@@ -1354,11 +1307,8 @@ const DB = {
         const allUserIds = [];
         const snapshot = await firebase.firestore().collection("users").get();
         snapshot.forEach((userDoc) => {
-            // const idea = userDoc.data();
-            // idea["id"] = userDoc.id;
             allUserIds.push(userDoc.id);
         });    
-        // console.log(allUserIds);
 
         const randomCreatorId = Math.floor((Math.random() * (allUserIds.length - 1)));
         firebase.firestore().collection("courses").doc("TEST").set({
@@ -1494,8 +1444,6 @@ const DB = {
             }
         }
     }
-
-
 }
 
 export default DB;

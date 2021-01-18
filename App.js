@@ -1,7 +1,7 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState} from 'react';
 import { View } from 'react-native';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
-import { AppLoading, Permissions, Notifications } from 'expo';
+import { AppLoading } from 'expo';
 import * as firebase from 'firebase';
 import MainNavigator from './navigation/MainTab';
 import AuthScreen from './screens/AuthScreen';

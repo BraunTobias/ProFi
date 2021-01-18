@@ -1,5 +1,5 @@
 import React, {useContext} from "react";
-import { View, Text, TouchableWithoutFeedback, Keyboard, StatusBar, StyleSheet } from "react-native";
+import { View, TouchableWithoutFeedback, Keyboard, StatusBar, StyleSheet } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
 import Button from '../components/Button';

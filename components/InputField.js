@@ -1,8 +1,6 @@
 import React, { useState, useContext } from 'react';
-import { View, TextInput, Text, Image, TouchableOpacity, TouchableWithoutFeedback, StyleSheet, ActivityIndicator } from 'react-native';
-// import { ,  } from 'react-native-gesture-handler';
+import { View, TextInput, Text, Image, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { icons, boxes, texts } from '../Styles';
-import FlexRow from './FlexRow';
 import { ThemeContext } from '../components/ThemeManager';
 
 export default InputField = props => {

@@ -1,5 +1,5 @@
 import React, {useContext} from "react";
-import { View, StyleSheet } from "react-native";
+import { View } from "react-native";
 import { ThemeContext } from '../components/ThemeManager';
 
 export default SubHeader = (props) => {

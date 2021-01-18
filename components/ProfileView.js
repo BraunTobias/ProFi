@@ -1,9 +1,7 @@
 import React, { useState, useContext, useEffect, Fragment } from 'react';
-import {FlatList, Modal, StatusBar, SafeAreaView, StyleSheet } from "react-native";
+import { View, Text, FlatList, Modal, StatusBar, SafeAreaView, StyleSheet } from "react-native";
 
-import { texts } from '../Styles';
-import { View, Text, Image } from 'react-native';
-import { icons } from '../Styles';
+import { texts, icons } from '../Styles';
 import DB from '../api/DB_API';
 import AttributeList from './AttributeList';
 import ProfileImage from './ProfileImage';

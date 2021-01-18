@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import { Appearance, AppearanceProvider, useColorScheme } from 'react-native-appearance';
+import { Appearance } from 'react-native-appearance';
 
 export const ThemeContext = React.createContext();
 

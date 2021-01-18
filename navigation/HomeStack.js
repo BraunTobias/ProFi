@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import { View } from 'react-native';
-import {createStackNavigator, HeaderBackground} from '@react-navigation/stack';
+import {createStackNavigator} from '@react-navigation/stack';
 
 import { texts } from '../Styles';
 import HomeScreen from '../screens/HomeScreen';

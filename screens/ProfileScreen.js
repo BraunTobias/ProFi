@@ -1,5 +1,5 @@
-import React, {useState, useEffect, useLayoutEffect, useContext} from 'react';
-import { View, Text, TouchableWithoutFeedback, Keyboard, Modal, Alert, Switch } from 'react-native';
+import React, {useState, useEffect, useContext} from 'react';
+import { View, Text, TouchableWithoutFeedback, Keyboard, Modal, Alert } from 'react-native';
 import * as ImageManipulator from "expo-image-manipulator";
 import * as Permissions from "expo-permissions";
 import * as ImagePicker from "expo-image-picker"

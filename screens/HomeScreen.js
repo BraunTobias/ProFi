@@ -2,8 +2,7 @@ import React, {useState, useEffect, useContext} from 'react';
 import { View, Text, Modal, Keyboard, Alert, Animated, Switch } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { compareAsc, format } from 'date-fns';
-import AsyncStorage from '@react-native-community/async-storage';
+import { format } from 'date-fns';
 import { ScrollView } from 'react-native-gesture-handler';
 
 import { icons, boxes, texts } from '../Styles';

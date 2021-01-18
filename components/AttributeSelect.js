@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect, Fragment, useContext } from 'react';
+import React, { useState, useEffect, Fragment, useContext } from 'react';
 import {FlatList, View, Text, SafeAreaView, StyleSheet} from "react-native";
 
 import { texts } from '../Styles';
